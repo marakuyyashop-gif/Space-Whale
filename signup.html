@@ -13,8 +13,8 @@
   <main class="login-wrap">
     <section class="login-card">
       <div class="sw-brand">Space Whale</div>
-      <h1>Create account</h1>
-      <p>Create your account first. Lesson access is activated only after payment.</p>
+      <h1>Create student account</h1>
+      <p>Create a student account. Your teacher will connect you to their Space Whale workspace.</p>
 
       <form id="signupForm" class="sw-form">
         <div class="sw-field">
@@ -29,7 +29,8 @@
           <label for="password">Password</label>
           <input id="password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
         </div>
-        <button id="signupButton" class="sw-button" type="submit">Create account</button>
+        <button id="signupButton" class="sw-button" type="submit">Create student account</button>
+        <a class="sw-button secondary" href="teacher-signup.html">I'm a teacher</a>
         <a class="sw-button secondary" href="login.html">I already have an account</a>
         <div id="signupMessage" class="sw-message"></div>
       </form>
@@ -60,7 +61,7 @@
         email,
         password,
         options: {
-          data: { display_name: displayName },
+          data: { display_name: displayName, account_type: "student" },
           emailRedirectTo: new URL("dashboard.html", location.href).href
         }
       });
