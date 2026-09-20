@@ -2,37 +2,16 @@
   const client = window.spaceWhaleSupabase;
   const auth = window.SpaceWhaleAuth;
 
-  const lessonList = document.getElementById("lessonList");
-  const teacherPanel = document.getElementById("teacherPanel");
-  const studentPanel = document.getElementById("studentPanel");
-  const profileLabel = document.getElementById("profileLabel");
-  const displayNameInput = document.getElementById("displayName");
-  const profileMessage = document.getElementById("profileMessage");
-  const scheduleMessage = document.getElementById("scheduleMessage");
-  const studentSelect = document.getElementById("studentSelect");
-  const studentsList = document.getElementById("studentsList");
-
-  const productForm = document.getElementById("productForm");
-  const productId = document.getElementById("productId");
-  const productName = document.getElementById("productName");
-  const productDescription = document.getElementById("productDescription");
-  const productPrice = document.getElementById("productPrice");
-  const productUses = document.getElementById("productUses");
-  const productDays = document.getElementById("productDays");
-  const productActive = document.getElementById("productActive");
-  const productMessage = document.getElementById("productMessage");
-  const teacherProducts = document.getElementById("teacherProducts");
-  const cancelProductEdit = document.getElementById("cancelProductEdit");
-
-  const accessSummary = document.getElementById("accessSummary");
-  const studentProducts = document.getElementById("studentProducts");
-  const paymentMessage = document.getElementById("paymentMessage");
-
   let session;
   let profile;
-  let activeWorkspaceId = null;
-  let workspaces = [];
-  let cachedTeacherProducts = [];
+  let workspaceId;
+  let students = [];
+  let lessons = [];
+  let entitlements = [];
+  let products = [];
+  let studentMap = new Map();
+
+  const el = (id) => document.getElementById(id);
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -43,7 +22,44 @@
       .replaceAll("'", "&#039;");
   }
 
-  function formatDate(value) {
+  function startOfDay(date = new Date()) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function endOfDay(date = new Date()) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+  }
+
+  function startOfWeek(date = new Date()) {
+    const d = startOfDay(date);
+    const day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day);
+    return d;
+  }
+
+  function endOfWeek(date = new Date()) {
+    const d = startOfWeek(date);
+    d.setDate(d.getDate() + 7);
+    return d;
+  }
+
+  function sameDay(value, date = new Date()) {
+    if (!value) return false;
+    const d = new Date(value);
+    return d.getFullYear() === date.getFullYear() &&
+      d.getMonth() === date.getMonth() &&
+      d.getDate() === date.getDate();
+  }
+
+  function formatTime(value) {
+    if (!value) return "Time not set";
+    return new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(new Date(value));
+  }
+
+  function formatDateTime(value) {
     if (!value) return "Time not set";
     return new Intl.DateTimeFormat(undefined, {
       weekday: "short",
@@ -51,6 +67,15 @@
       month: "short",
       hour: "2-digit",
       minute: "2-digit"
+    }).format(new Date(value));
+  }
+
+  function formatDay(value) {
+    if (!value) return "";
+    return new Intl.DateTimeFormat(undefined, {
+      weekday: "short",
+      day: "numeric",
+      month: "short"
     }).format(new Date(value));
   }
 
@@ -62,517 +87,576 @@
     }).format(amountMinor / 100);
   }
 
-  function relationObject(value) {
-    if (Array.isArray(value)) return value[0] || null;
-    return value || null;
-  }
-
-  async function loadWorkspaces() {
-    let rows = [];
-
-    if (profile.role === "teacher") {
-      const { data, error } = await client
-        .from("workspace_members")
-        .select("workspace_id,role,status,workspaces(id,name,slug,kind,status)")
-        .eq("user_id", session.user.id)
-        .eq("status", "active");
-
-      if (error) throw error;
-      rows = (data || []).map((row) => ({
-        ...relationObject(row.workspaces),
-        membershipRole: row.role
-      })).filter((row) => row.id);
-    } else {
-      const { data, error } = await client
-        .from("workspace_students")
-        .select("workspace_id,status,workspaces(id,name,slug,kind,status)")
-        .eq("student_id", session.user.id)
-        .in("status", ["active", "paused"]);
-
-      if (error) throw error;
-      rows = (data || []).map((row) => ({
-        ...relationObject(row.workspaces),
-        studentStatus: row.status
-      })).filter((row) => row.id);
-    }
-
-    workspaces = rows;
-
-    const storageKey = `spaceWhaleWorkspace:${session.user.id}`;
-    const savedId = localStorage.getItem(storageKey);
-    const preferred = workspaces.find((workspace) => workspace.id === savedId) || workspaces[0] || null;
-
-    activeWorkspaceId = preferred?.id || null;
-
-    if (!workspaces.length) {
-      return;
-    }
-
-    localStorage.setItem(storageKey, activeWorkspaceId);
-  }
-
-  function canEnterLesson(lesson) {
+  function canJoin(lesson) {
     if (lesson.status === "live") return true;
-    if (!lesson.scheduled_at || lesson.status !== "scheduled") return false;
-    const opensAt = new Date(lesson.scheduled_at).getTime() - (lesson.join_window_minutes ?? 5) * 60000;
-    return Date.now() >= opensAt;
+    if (lesson.status !== "scheduled" || !lesson.scheduled_at) return false;
+    const openAt = new Date(lesson.scheduled_at).getTime() - Number(lesson.join_window_minutes || 5) * 60000;
+    return Date.now() >= openAt;
   }
 
-  function renderLessons(lessons) {
-    if (!activeWorkspaceId) {
-      lessonList.innerHTML = '<div class="sw-message">No workspace selected.</div>';
+  function studentName(studentId) {
+    return studentMap.get(studentId)?.display_name || "Student";
+  }
+
+  function renderAvatar(target, url, name) {
+    if (!target) return;
+    const initial = escapeHtml((name || "T").trim().charAt(0).toUpperCase());
+    target.innerHTML = url
+      ? `<img src="${escapeHtml(url)}" alt="">`
+      : `<span>${initial}</span>`;
+  }
+
+  function setGreeting() {
+    const hour = new Date().getHours();
+    const word = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    const firstName = (profile.display_name || "Teacher").trim().split(/\s+/)[0];
+    el("greeting").textContent = `${word}, ${firstName}`;
+    el("todayLabel").textContent = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    }).format(new Date());
+  }
+
+  async function loadWorkspace() {
+    const { data, error } = await client
+      .from("workspace_members")
+      .select("workspace_id")
+      .eq("user_id", session.user.id)
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data?.workspace_id) throw new Error("Your teaching space is not ready yet.");
+    workspaceId = data.workspace_id;
+  }
+
+  async function loadStudents() {
+    const { data: links, error } = await client
+      .from("teacher_students")
+      .select("student_id,status")
+      .eq("workspace_id", workspaceId)
+      .eq("teacher_id", session.user.id)
+      .eq("status", "active");
+
+    if (error) throw error;
+
+    const ids = (links || []).map((row) => row.student_id);
+    if (!ids.length) {
+      students = [];
+      studentMap = new Map();
       return;
     }
 
-    if (!lessons.length) {
-      lessonList.innerHTML = '<div class="sw-message">No lessons scheduled yet.</div>';
+    const { data: profiles, error: profileError } = await client
+      .from("profiles")
+      .select("id,display_name,avatar_url")
+      .in("id", ids)
+      .order("display_name", { ascending: true });
+
+    if (profileError) throw profileError;
+
+    students = profiles || [];
+    studentMap = new Map(students.map((student) => [student.id, student]));
+  }
+
+  async function loadLessons() {
+    const from = new Date();
+    from.setDate(from.getDate() - 1);
+    const to = new Date();
+    to.setDate(to.getDate() + 31);
+
+    const { data, error } = await client
+      .from("lesson_sessions")
+      .select("id,title,status,scheduled_at,duration_minutes,join_window_minutes,student_id")
+      .eq("workspace_id", workspaceId)
+      .eq("teacher_id", session.user.id)
+      .in("status", ["scheduled", "live"])
+      .gte("scheduled_at", from.toISOString())
+      .lt("scheduled_at", to.toISOString())
+      .order("scheduled_at", { ascending: true });
+
+    if (error) throw error;
+    lessons = data || [];
+  }
+
+  async function loadEntitlements() {
+    const { data, error } = await client
+      .from("access_entitlements")
+      .select("id,user_id,status,remaining_uses,ends_at,starts_at")
+      .eq("workspace_id", workspaceId)
+      .eq("status", "active");
+
+    if (error) throw error;
+    entitlements = data || [];
+  }
+
+  async function loadProducts() {
+    const { data, error } = await client
+      .from("billing_products")
+      .select("id,code,name,description,amount_minor,currency,active,included_uses,access_duration_days,created_at")
+      .eq("workspace_id", workspaceId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    products = data || [];
+  }
+
+  async function loadAdminStatus() {
+    const { data } = await client
+      .from("platform_admins")
+      .select("user_id")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+    el("adminBadge").hidden = !data;
+  }
+
+  function renderMetrics() {
+    const now = new Date();
+    const weekStart = startOfWeek(now);
+    const weekEnd = endOfWeek(now);
+
+    const today = lessons.filter((lesson) => sameDay(lesson.scheduled_at, now));
+    const week = lessons.filter((lesson) => {
+      const time = new Date(lesson.scheduled_at);
+      return time >= weekStart && time < weekEnd;
+    });
+
+    const lowStudentIds = new Set(
+      entitlements
+        .filter((item) => item.remaining_uses != null && item.remaining_uses <= 2 && item.remaining_uses > 0)
+        .map((item) => item.user_id)
+    );
+
+    el("metricStudents").textContent = String(students.length);
+    el("metricToday").textContent = String(today.length);
+    el("metricWeek").textContent = String(week.length);
+    el("metricLowBalance").textContent = String(lowStudentIds.size);
+    el("studentsCountLabel").textContent = `${students.length} active`;
+  }
+
+  function renderNextLesson() {
+    const now = Date.now();
+    const next = lessons.find((lesson) =>
+      lesson.status === "live" ||
+      (lesson.scheduled_at && new Date(lesson.scheduled_at).getTime() >= now)
+    );
+
+    if (!next) {
+      el("nextLessonCard").innerHTML = `
+        <div class="teacher-empty">
+          <strong>No upcoming lesson</strong>
+          <span>Schedule your next lesson when you're ready.</span>
+          <button class="teacher-text-button" type="button" data-open-schedule>+ Schedule lesson</button>
+        </div>
+      `;
       return;
     }
 
-    lessonList.innerHTML = lessons.map((lesson) => {
-      const enabled = canEnterLesson(lesson);
-      const action = enabled
-        ? `<a class="sw-button" href="waiting-room.html?session=${encodeURIComponent(lesson.id)}">Join lesson</a>`
-        : '<button class="sw-button secondary" type="button" disabled>Available 5 min before</button>';
+    const action = canJoin(next)
+      ? `<a class="sw-button" href="waiting-room.html?session=${encodeURIComponent(next.id)}">Open lesson</a>`
+      : `<span class="next-lesson-note">Opens 5 min before</span>`;
+
+    el("nextLessonCard").innerHTML = `
+      <div class="next-lesson-time">${escapeHtml(formatTime(next.scheduled_at))}</div>
+      <div class="next-lesson-details">
+        <div class="next-lesson-day">${escapeHtml(formatDay(next.scheduled_at))}</div>
+        <h3>${escapeHtml(next.title || "English lesson")}</h3>
+        <p>${escapeHtml(studentName(next.student_id))} · ${Number(next.duration_minutes || 60)} min</p>
+      </div>
+      <div class="next-lesson-action">${action}</div>
+    `;
+  }
+
+  function renderAttention() {
+    const now = Date.now();
+    const inSevenDays = now + 7 * 86400000;
+
+    const low = entitlements.filter((item) =>
+      item.remaining_uses != null && item.remaining_uses > 0 && item.remaining_uses <= 2
+    );
+
+    const expiring = entitlements.filter((item) =>
+      item.ends_at &&
+      new Date(item.ends_at).getTime() > now &&
+      new Date(item.ends_at).getTime() <= inSevenDays
+    );
+
+    const studentWithUpcoming = new Set(
+      lessons
+        .filter((lesson) => lesson.scheduled_at && new Date(lesson.scheduled_at).getTime() >= now)
+        .map((lesson) => lesson.student_id)
+    );
+    const noUpcoming = students.filter((student) => !studentWithUpcoming.has(student.id));
+
+    const items = [];
+    if (low.length) {
+      items.push({
+        value: new Set(low.map((item) => item.user_id)).size,
+        title: "Low lesson balance",
+        copy: "Students with 1–2 lessons remaining"
+      });
+    }
+    if (expiring.length) {
+      items.push({
+        value: new Set(expiring.map((item) => item.user_id)).size,
+        title: "Package expiring soon",
+        copy: "Access ends within 7 days"
+      });
+    }
+    if (noUpcoming.length) {
+      items.push({
+        value: noUpcoming.length,
+        title: "No next lesson",
+        copy: "Active students without an upcoming booking"
+      });
+    }
+
+    if (!items.length) {
+      el("attentionList").innerHTML = `
+        <div class="attention-clear">
+          <span>✓</span>
+          <div><strong>Nothing urgent</strong><p>Your schedule and balances look good.</p></div>
+        </div>
+      `;
+      return;
+    }
+
+    el("attentionList").innerHTML = items.map((item) => `
+      <div class="attention-row">
+        <span class="attention-value">${item.value}</span>
+        <div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.copy)}</p></div>
+      </div>
+    `).join("");
+  }
+
+  function lessonRow(lesson, showDay = false) {
+    const action = canJoin(lesson)
+      ? `<a class="teacher-row-action" href="waiting-room.html?session=${encodeURIComponent(lesson.id)}">Open</a>`
+      : '<span class="teacher-row-muted">Scheduled</span>';
+
+    return `
+      <article class="teacher-list-row">
+        <div class="lesson-time-block">
+          <strong>${escapeHtml(formatTime(lesson.scheduled_at))}</strong>
+          ${showDay ? `<span>${escapeHtml(formatDay(lesson.scheduled_at))}</span>` : ""}
+        </div>
+        <div class="teacher-row-main">
+          <strong>${escapeHtml(lesson.title || "English lesson")}</strong>
+          <span>${escapeHtml(studentName(lesson.student_id))} · ${Number(lesson.duration_minutes || 60)} min</span>
+        </div>
+        <span class="lesson-status">${escapeHtml(lesson.status)}</span>
+        ${action}
+      </article>
+    `;
+  }
+
+  function renderSchedule() {
+    const now = new Date();
+    const today = lessons.filter((lesson) => sameDay(lesson.scheduled_at, now));
+    const sevenDays = Date.now() + 7 * 86400000;
+    const upcoming = lessons.filter((lesson) => {
+      const time = new Date(lesson.scheduled_at).getTime();
+      return !sameDay(lesson.scheduled_at, now) && time > Date.now() && time <= sevenDays;
+    });
+
+    el("todayLessons").innerHTML = today.length
+      ? today.map((lesson) => lessonRow(lesson)).join("")
+      : '<div class="teacher-empty compact"><strong>No lessons today</strong><span>Your day is clear.</span></div>';
+
+    el("upcomingLessons").innerHTML = upcoming.length
+      ? upcoming.map((lesson) => lessonRow(lesson, true)).join("")
+      : '<div class="teacher-empty compact"><strong>No lessons in the next 7 days</strong><span>New bookings will appear here.</span></div>';
+  }
+
+  function renderStudents() {
+    const grid = el("studentsGrid");
+
+    if (!students.length) {
+      grid.innerHTML = `
+        <div class="teacher-empty student-empty">
+          <strong>No students yet</strong>
+          <span>Once a student is connected to your account, they will appear here with their lesson balance and next class.</span>
+        </div>
+      `;
+      return;
+    }
+
+    const now = Date.now();
+
+    grid.innerHTML = students.map((student) => {
+      const activeEntitlement = entitlements.find((item) =>
+        item.user_id === student.id &&
+        (!item.ends_at || new Date(item.ends_at).getTime() > now) &&
+        (item.remaining_uses == null || item.remaining_uses > 0)
+      );
+
+      const nextLesson = lessons.find((lesson) =>
+        lesson.student_id === student.id &&
+        lesson.scheduled_at &&
+        new Date(lesson.scheduled_at).getTime() >= now
+      );
+
+      let balance = "Access active";
+      if (!activeEntitlement) balance = "No active package";
+      else if (activeEntitlement.remaining_uses != null) balance = `${activeEntitlement.remaining_uses} lessons left`;
 
       return `
-        <article class="lesson-card">
-          <div class="lesson-main">
-            <div class="lesson-title">${escapeHtml(lesson.title || lesson.lesson_id || "English lesson")}</div>
-            <div class="lesson-meta">${escapeHtml(formatDate(lesson.scheduled_at))} · ${Number(lesson.duration_minutes || 60)} min</div>
+        <article class="student-card">
+          <div class="student-card-top">
+            <div class="student-card-avatar">
+              ${student.avatar_url ? `<img src="${escapeHtml(student.avatar_url)}" alt="">` : `<span>${escapeHtml((student.display_name || "S").charAt(0).toUpperCase())}</span>`}
+            </div>
+            <div>
+              <strong>${escapeHtml(student.display_name || "Student")}</strong>
+              <span>${escapeHtml(balance)}</span>
+            </div>
           </div>
-          <div class="lesson-actions">
-            <span class="lesson-status">${escapeHtml(lesson.status)}</span>
-            ${action}
+          <div class="student-next">
+            <span>Next lesson</span>
+            <strong>${nextLesson ? escapeHtml(formatDateTime(nextLesson.scheduled_at)) : "Not scheduled"}</strong>
           </div>
         </article>
       `;
     }).join("");
   }
 
-  async function loadLessons() {
-    if (!activeWorkspaceId) {
-      renderLessons([]);
+  function renderProducts() {
+    const grid = el("productsGrid");
+
+    if (!products.length) {
+      grid.innerHTML = `
+        <div class="teacher-empty">
+          <strong>No lesson packages yet</strong>
+          <span>Create a package students can purchase, for example 8 lessons for 20,000 ₽.</span>
+          <button class="teacher-text-button" type="button" data-open-product>+ Create package</button>
+        </div>
+      `;
       return;
     }
 
-    let query = client
-      .from("lesson_sessions")
-      .select("id,workspace_id,title,course_id,lesson_id,status,scheduled_at,duration_minutes,join_window_minutes,teacher_id,student_id")
-      .eq("workspace_id", activeWorkspaceId)
-      .in("status", ["scheduled", "live"])
-      .order("scheduled_at", { ascending: true, nullsFirst: false });
+    grid.innerHTML = products.map((product) => {
+      const details = [];
+      if (product.included_uses) details.push(`${product.included_uses} lessons`);
+      if (product.access_duration_days) details.push(`${product.access_duration_days} days`);
 
-    query = profile.role === "teacher"
-      ? query.eq("teacher_id", session.user.id)
-      : query.eq("student_id", session.user.id);
-
-    const { data, error } = await query;
-    if (error) throw error;
-    renderLessons(data || []);
+      return `
+        <article class="package-card">
+          <div>
+            <div class="package-status">${product.active ? "Available" : "Hidden"}</div>
+            <h3>${escapeHtml(product.name)}</h3>
+            <p>${escapeHtml(product.description || details.join(" · ") || "Lesson package")}</p>
+          </div>
+          <div class="package-bottom">
+            <strong>${escapeHtml(formatPrice(product.amount_minor, product.currency || "RUB"))}</strong>
+            <button class="teacher-text-button" type="button" data-toggle-product="${escapeHtml(product.id)}">${product.active ? "Hide" : "Publish"}</button>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
-  async function loadStudents() {
-    const scheduleButton = document.querySelector("#scheduleForm button[type=submit]");
-
-    if (!activeWorkspaceId) {
-      studentSelect.innerHTML = '<option value="">No workspace selected</option>';
-      studentsList.innerHTML = '<div class="sw-message">Choose a workspace first.</div>';
-      scheduleButton.disabled = true;
-      return [];
+  function populateStudentSelect() {
+    const select = el("studentSelect");
+    if (!students.length) {
+      select.innerHTML = '<option value="">No students connected yet</option>';
+      el("scheduleSubmit").disabled = true;
+      return;
     }
 
-    const { data: links, error } = await client
-      .from("teacher_students")
-      .select("student_id,status")
-      .eq("workspace_id", activeWorkspaceId)
-      .eq("teacher_id", session.user.id)
-      .eq("status", "active");
-
-    if (error) throw error;
-
-    const ids = (links || []).map((item) => item.student_id);
-
-    if (!ids.length) {
-      studentSelect.innerHTML = '<option value="">No paid students yet</option>';
-      studentsList.innerHTML = '<div class="sw-message">Students will appear here after onboarding and payment.</div>';
-      scheduleButton.disabled = true;
-      return [];
-    }
-
-    const { data: students, error: studentError } = await client
-      .from("profiles")
-      .select("id,display_name")
-      .in("id", ids)
-      .order("display_name", { ascending: true });
-
-    if (studentError) throw studentError;
-
-    studentSelect.innerHTML = (students || []).map((student) =>
+    select.innerHTML = students.map((student) =>
       `<option value="${escapeHtml(student.id)}">${escapeHtml(student.display_name || "Student")}</option>`
     ).join("");
-
-    studentsList.innerHTML = (students || []).map((student) => `
-      <div class="student-row">
-        <span class="student-avatar">${escapeHtml((student.display_name || "S").trim().charAt(0).toUpperCase())}</span>
-        <span class="student-name">${escapeHtml(student.display_name || "Student")}</span>
-        <span class="lesson-status">active</span>
-      </div>
-    `).join("");
-
-    scheduleButton.disabled = false;
-    return students || [];
+    el("scheduleSubmit").disabled = false;
   }
 
-  function resetProductForm() {
-    productForm.reset();
-    productId.value = "";
-    productActive.checked = false;
-    cancelProductEdit.hidden = true;
-    productMessage.textContent = "";
+  function openDialog(id) {
+    const dialog = el(id);
+    if (!dialog) return;
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
   }
 
-  function productDetails(product) {
-    const bits = [];
-    if (product.included_uses) bits.push(`${product.included_uses} lessons`);
-    if (product.access_duration_days) bits.push(`${product.access_duration_days} days access`);
-    return bits.join(" · ");
+  function closeDialog(id) {
+    const dialog = el(id);
+    if (!dialog) return;
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
   }
 
-  async function loadTeacherProducts() {
-    cachedTeacherProducts = [];
+  async function createLesson(event) {
+    event.preventDefault();
+    const button = el("scheduleSubmit");
+    const message = el("scheduleMessage");
+    const studentId = el("studentSelect").value;
+    const localTime = el("lessonTime").value;
 
-    if (!activeWorkspaceId) {
-      teacherProducts.innerHTML = '<div class="sw-message">Choose a workspace first.</div>';
-      return;
-    }
+    if (!studentId || !localTime) return;
 
-    const { data, error } = await client
-      .from("billing_products")
-      .select("id,workspace_id,code,name,description,amount_minor,currency,active,included_uses,access_duration_days,created_at")
-      .eq("workspace_id", activeWorkspaceId)
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-    cachedTeacherProducts = data || [];
-
-    if (!cachedTeacherProducts.length) {
-      teacherProducts.innerHTML = '<div class="sw-message">No products yet. Create your first lesson package above.</div>';
-      return;
-    }
-
-    teacherProducts.innerHTML = cachedTeacherProducts.map((product) => `
-      <article class="product-card">
-        <div class="product-main">
-          <div class="product-name">${escapeHtml(product.name)}</div>
-          <div class="product-price">${escapeHtml(formatPrice(product.amount_minor, product.currency || "RUB"))}</div>
-          ${product.description ? `<div class="product-copy">${escapeHtml(product.description)}</div>` : ""}
-          ${productDetails(product) ? `<div class="product-copy">${escapeHtml(productDetails(product))}</div>` : ""}
-        </div>
-        <div class="product-actions">
-          <span class="lesson-status">${product.active ? "available" : "hidden"}</span>
-          <button class="sw-button secondary" type="button" data-product-edit="${escapeHtml(product.id)}">Edit</button>
-          <button class="sw-button secondary" type="button" data-product-toggle="${escapeHtml(product.id)}">${product.active ? "Hide" : "Publish"}</button>
-        </div>
-      </article>
-    `).join("");
-  }
-
-  async function loadStudentBilling() {
-    if (!activeWorkspaceId) {
-      accessSummary.innerHTML = '<div class="access-banner"><strong>No teacher workspace yet</strong><span>Your teacher will connect your account to a workspace.</span></div>';
-      studentProducts.innerHTML = "";
-      return;
-    }
-
-    const now = Date.now();
-
-    const { data: entitlements, error: accessError } = await client
-      .from("access_entitlements")
-      .select("id,workspace_id,access_key,status,starts_at,ends_at,remaining_uses,created_at")
-      .eq("workspace_id", activeWorkspaceId)
-      .eq("user_id", session.user.id)
-      .eq("status", "active")
-      .order("created_at", { ascending: false });
-
-    if (accessError) throw accessError;
-
-    const active = (entitlements || []).find((item) =>
-      new Date(item.starts_at).getTime() <= now &&
-      (!item.ends_at || new Date(item.ends_at).getTime() > now) &&
-      (item.remaining_uses == null || item.remaining_uses > 0)
-    );
-
-    if (active) {
-      const parts = ["Lesson access is active."];
-      if (active.remaining_uses != null) parts.push(`${active.remaining_uses} lessons remaining.`);
-      if (active.ends_at) parts.push(`Valid until ${formatDate(active.ends_at)}.`);
-      accessSummary.innerHTML = `<div class="access-banner"><strong>Access active</strong><span>${escapeHtml(parts.join(" "))}</span></div>`;
-    } else {
-      accessSummary.innerHTML = '<div class="access-banner"><strong>No active lesson access</strong><span>Choose a lesson package below. Access opens automatically after a confirmed payment.</span></div>';
-    }
-
-    const { data: products, error: productError } = await client
-      .from("billing_products")
-      .select("id,workspace_id,code,name,description,amount_minor,currency,included_uses,access_duration_days")
-      .eq("workspace_id", activeWorkspaceId)
-      .eq("active", true)
-      .not("amount_minor", "is", null)
-      .order("created_at", { ascending: true });
-
-    if (productError) throw productError;
-
-    if (!products?.length) {
-      studentProducts.innerHTML = '<div class="sw-message">Lesson packages are not published yet.</div>';
-      return;
-    }
-
-    studentProducts.innerHTML = products.map((product) => `
-      <article class="product-card">
-        <div class="product-main">
-          <div class="product-name">${escapeHtml(product.name)}</div>
-          <div class="product-price">${escapeHtml(formatPrice(product.amount_minor, product.currency || "RUB"))}</div>
-          ${product.description ? `<div class="product-copy">${escapeHtml(product.description)}</div>` : ""}
-          ${productDetails(product) ? `<div class="product-copy">${escapeHtml(productDetails(product))}</div>` : ""}
-        </div>
-        <button class="sw-button" type="button" data-buy-product="${escapeHtml(product.code)}">Pay</button>
-      </article>
-    `).join("");
-  }
-
-  async function startPayment(productCode, button) {
     button.disabled = true;
-    paymentMessage.textContent = "Creating secure payment…";
-
-    const { data, error } = await client.functions.invoke("robokassa-create-payment", {
-      body: { product_code: productCode }
-    });
-
-    if (error) {
-      let details = error.message || "Could not create payment.";
-      try {
-        if (error.context) {
-          const body = await error.context.clone().json();
-          if (body?.error) details = body.error;
-        }
-      } catch (_) {}
-      paymentMessage.textContent = details;
-      button.disabled = false;
-      return;
-    }
-
-    if (data?.error) {
-      paymentMessage.textContent = data.error;
-      button.disabled = false;
-      return;
-    }
-
-    if (!data?.payment_url) {
-      paymentMessage.textContent = "Payment link was not created.";
-      button.disabled = false;
-      return;
-    }
-
-    location.href = data.payment_url;
-  }
-
-  async function refreshWorkspaceView() {
-    lessonList.innerHTML = '<div class="sw-message">Loading…</div>';
-
-    if (profile.role === "teacher") {
-      await Promise.all([loadStudents(), loadTeacherProducts(), loadLessons()]);
-    } else {
-      await Promise.all([loadStudentBilling(), loadLessons()]);
-    }
-  }
-
-  document.getElementById("logoutButton").addEventListener("click", () => auth.signOut());
-
-  document.getElementById("profileForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    profileMessage.textContent = "Saving…";
-    const { error } = await client
-      .from("profiles")
-      .update({
-        display_name: displayNameInput.value.trim() || null,
-        profile_complete: true
-      })
-      .eq("id", session.user.id);
-
-    profileMessage.textContent = error ? error.message : "Saved.";
-    if (!error) profileLabel.textContent = displayNameInput.value.trim() || session.user.email;
-  });
-
-  if (productForm) {
-    productForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      if (!activeWorkspaceId) {
-        productMessage.textContent = "Choose a workspace first.";
-        return;
-      }
-
-      const submitButton = event.target.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-      productMessage.textContent = "Saving…";
-
-      const price = Number(productPrice.value);
-      const uses = productUses.value ? Number(productUses.value) : null;
-      const days = productDays.value ? Number(productDays.value) : null;
-
-      const payload = {
-        workspace_id: activeWorkspaceId,
-        teacher_id: session.user.id,
-        name: productName.value.trim(),
-        description: productDescription.value.trim() || null,
-        access_key: "lessons",
-        billing_type: uses ? "lesson_pack" : "one_time",
-        amount_minor: Math.round(price * 100),
-        currency: "RUB",
-        active: productActive.checked,
-        included_uses: uses,
-        access_duration_days: days
-      };
-
-      let error;
-
-      if (productId.value) {
-        ({ error } = await client
-          .from("billing_products")
-          .update(payload)
-          .eq("id", productId.value)
-          .eq("workspace_id", activeWorkspaceId));
-      } else {
-        payload.code = `lesson-${crypto.randomUUID()}`;
-        ({ error } = await client.from("billing_products").insert(payload));
-      }
-
-      submitButton.disabled = false;
-
-      if (error) {
-        productMessage.textContent = error.message;
-        return;
-      }
-
-      resetProductForm();
-      productMessage.textContent = "Saved.";
-      await loadTeacherProducts();
-    });
-
-    cancelProductEdit.addEventListener("click", resetProductForm);
-
-    teacherProducts.addEventListener("click", async (event) => {
-      const editButton = event.target.closest("[data-product-edit]");
-      const toggleButton = event.target.closest("[data-product-toggle]");
-
-      if (editButton) {
-        const product = cachedTeacherProducts.find((item) => item.id === editButton.dataset.productEdit);
-        if (!product) return;
-
-        productId.value = product.id;
-        productName.value = product.name || "";
-        productDescription.value = product.description || "";
-        productPrice.value = product.amount_minor != null ? (product.amount_minor / 100).toFixed(2) : "";
-        productUses.value = product.included_uses || "";
-        productDays.value = product.access_duration_days || "";
-        productActive.checked = Boolean(product.active);
-        cancelProductEdit.hidden = false;
-        productMessage.textContent = "Editing product.";
-        productName.focus();
-        return;
-      }
-
-      if (toggleButton) {
-        const product = cachedTeacherProducts.find((item) => item.id === toggleButton.dataset.productToggle);
-        if (!product) return;
-
-        toggleButton.disabled = true;
-        const { error } = await client
-          .from("billing_products")
-          .update({ active: !product.active })
-          .eq("id", product.id)
-          .eq("workspace_id", activeWorkspaceId);
-
-        if (error) productMessage.textContent = error.message;
-        else await loadTeacherProducts();
-      }
-    });
-  }
-
-  if (studentProducts) {
-    studentProducts.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-buy-product]");
-      if (!button) return;
-      startPayment(button.dataset.buyProduct, button);
-    });
-  }
-
-  document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    if (!activeWorkspaceId) {
-      scheduleMessage.textContent = "Choose a workspace first.";
-      return;
-    }
-
-    scheduleMessage.textContent = "Scheduling…";
-
-    const localTime = document.getElementById("lessonTime").value;
-    const studentId = studentSelect.value;
+    message.textContent = "Scheduling…";
 
     const { error } = await client.from("lesson_sessions").insert({
-      workspace_id: activeWorkspaceId,
+      workspace_id: workspaceId,
       teacher_id: session.user.id,
       student_id: studentId,
-      title: document.getElementById("lessonTitle").value.trim() || "English lesson",
+      title: el("lessonTitle").value.trim() || "English lesson",
       scheduled_at: new Date(localTime).toISOString(),
-      duration_minutes: Number(document.getElementById("duration").value),
+      duration_minutes: Number(el("duration").value),
       join_window_minutes: 5,
       status: "scheduled"
     });
 
     if (error) {
-      scheduleMessage.textContent = error.message;
+      button.disabled = false;
+      message.textContent = error.message;
       return;
     }
 
-    scheduleMessage.textContent = "Lesson scheduled.";
     event.target.reset();
-    document.getElementById("duration").value = "60";
+    el("duration").value = "60";
+    message.textContent = "";
+    closeDialog("scheduleDialog");
     await loadLessons();
-  });
+    renderAll();
+    populateStudentSelect();
+    button.disabled = !students.length;
+  }
+
+  async function createProduct(event) {
+    event.preventDefault();
+    const button = el("productSubmit");
+    const message = el("productMessage");
+    const uses = el("productUses").value ? Number(el("productUses").value) : null;
+    const days = el("productDays").value ? Number(el("productDays").value) : null;
+
+    button.disabled = true;
+    message.textContent = "Creating…";
+
+    const { error } = await client.from("billing_products").insert({
+      workspace_id: workspaceId,
+      teacher_id: session.user.id,
+      code: `lesson-${crypto.randomUUID()}`,
+      name: el("productName").value.trim(),
+      description: el("productDescription").value.trim() || null,
+      access_key: "lessons",
+      billing_type: uses ? "lesson_pack" : "one_time",
+      amount_minor: Math.round(Number(el("productPrice").value) * 100),
+      currency: "RUB",
+      active: el("productActive").checked,
+      included_uses: uses,
+      access_duration_days: days
+    });
+
+    if (error) {
+      button.disabled = false;
+      message.textContent = error.message;
+      return;
+    }
+
+    event.target.reset();
+    el("productActive").checked = true;
+    message.textContent = "";
+    closeDialog("productDialog");
+    await loadProducts();
+    renderProducts();
+    button.disabled = false;
+  }
+
+  async function toggleProduct(productId) {
+    const product = products.find((item) => item.id === productId);
+    if (!product) return;
+
+    const { error } = await client
+      .from("billing_products")
+      .update({ active: !product.active })
+      .eq("id", product.id)
+      .eq("workspace_id", workspaceId);
+
+    if (error) throw error;
+    await loadProducts();
+    renderProducts();
+  }
+
+  function renderAll() {
+    renderMetrics();
+    renderNextLesson();
+    renderAttention();
+    renderSchedule();
+    renderStudents();
+    renderProducts();
+  }
+
+  function bindEvents() {
+    el("logoutButton").addEventListener("click", () => auth.signOut());
+    el("openScheduleDialog").addEventListener("click", () => openDialog("scheduleDialog"));
+    el("scheduleFromSection").addEventListener("click", () => openDialog("scheduleDialog"));
+    el("openProductDialog").addEventListener("click", () => openDialog("productDialog"));
+    el("productFromSection").addEventListener("click", () => openDialog("productDialog"));
+
+    document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+      button.addEventListener("click", () => closeDialog(button.dataset.closeDialog));
+    });
+
+    document.addEventListener("click", async (event) => {
+      const scheduleButton = event.target.closest("[data-open-schedule]");
+      const productButton = event.target.closest("[data-open-product]");
+      const toggleButton = event.target.closest("[data-toggle-product]");
+
+      if (scheduleButton) openDialog("scheduleDialog");
+      if (productButton) openDialog("productDialog");
+
+      if (toggleButton) {
+        toggleButton.disabled = true;
+        try {
+          await toggleProduct(toggleButton.dataset.toggleProduct);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          toggleButton.disabled = false;
+        }
+      }
+    });
+
+    el("scheduleForm").addEventListener("submit", createLesson);
+    el("productForm").addEventListener("submit", createProduct);
+  }
 
   async function init() {
     session = await auth.requireSession();
     if (!session) return;
 
     profile = await auth.getProfile(session.user.id);
-    profileLabel.textContent = profile.display_name || session.user.email;
-    displayNameInput.value = profile.display_name || "";
-
-    document.getElementById("dashboardTitle").textContent =
-      profile.role === "teacher" ? "Teaching dashboard" : "My lessons";
-    document.getElementById("dashboardSubtitle").textContent =
-      profile.role === "teacher"
-        ? "Manage your workspace, students and upcoming classes."
-        : "Your lessons and access live here.";
-
-    await loadWorkspaces();
-
-    if (profile.role === "teacher") {
-      teacherPanel.hidden = false;
-      const settingsLink = document.getElementById("teacherSettingsLink");
-      if (settingsLink) settingsLink.hidden = false;
-    } else {
-      studentPanel.hidden = false;
+    if (profile.role !== "teacher") {
+      location.href = "student-dashboard.html";
+      return;
     }
 
-    await refreshWorkspaceView();
-    setInterval(loadLessons, 30000);
+    setGreeting();
+    el("sidebarName").textContent = profile.display_name || "Teacher";
+    renderAvatar(el("sidebarAvatar"), profile.avatar_url, profile.display_name);
+
+    await loadWorkspace();
+    await Promise.all([
+      loadStudents(),
+      loadLessons(),
+      loadEntitlements(),
+      loadProducts(),
+      loadAdminStatus()
+    ]);
+
+    populateStudentSelect();
+    renderAll();
+    bindEvents();
+
+    el("pageLoading").hidden = true;
+    el("teacherApp").hidden = false;
   }
 
   init().catch((error) => {
     console.error(error);
-    lessonList.innerHTML = `<div class="sw-message">${escapeHtml(error.message)}</div>`;
+    el("pageLoading").textContent = error.message;
   });
 })();
