@@ -155,7 +155,14 @@
     button.disabled = false;
 
     if (error) {
-      inviteMessage.textContent = error.message || "Could not send the invitation.";
+      let details = error.message || "Could not send the invitation.";
+      try {
+        if (error.context) {
+          const body = await error.context.clone().json();
+          if (body?.error) details = body.error;
+        }
+      } catch (_) {}
+      inviteMessage.textContent = details;
       return;
     }
 
