@@ -14,16 +14,12 @@
     <section class="login-card">
       <div class="sw-brand">Space Whale</div>
       <h1>Create teacher account</h1>
-      <p>Your private workspace will be created automatically after registration.</p>
+      <p>Create your teacher account. Your private teaching space is set up automatically.</p>
 
       <form id="signupForm" class="sw-form">
         <div class="sw-field">
           <label for="name">Your name</label>
           <input id="name" type="text" autocomplete="name" required placeholder="Your name">
-        </div>
-        <div class="sw-field">
-          <label for="workspaceName">Workspace name</label>
-          <input id="workspaceName" type="text" placeholder="My English Studio">
         </div>
         <div class="sw-field">
           <label for="email">Email</label>
@@ -58,7 +54,6 @@
       message.textContent = "Creating teacher account…";
 
       const displayName = document.getElementById("name").value.trim();
-      const workspaceName = document.getElementById("workspaceName").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
@@ -68,7 +63,6 @@
         options: {
           data: {
             display_name: displayName,
-            workspace_name: workspaceName || (displayName + " workspace"),
             account_type: "teacher",
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Vilnius"
           },
