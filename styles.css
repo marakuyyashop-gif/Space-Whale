@@ -107,16 +107,16 @@ button{font:inherit;color:inherit}
 
 .guide-section__title{
   width:100%;
-  min-height:56px;
-  padding:17px 0 9px;
+  min-height:60px;
+  padding:18px 0 10px;
   border:0;
   background:transparent;
   display:flex;
   align-items:center;
   justify-content:flex-start;
   text-align:left;
-  font-size:18px;
-  line-height:24px;
+  font-size:19px;
+  line-height:25px;
   font-weight:700;
   cursor:pointer;
 }
@@ -186,8 +186,8 @@ button{font:inherit;color:inherit}
 }
 
 .guide-task__name{
-  font-size:14px;
-  line-height:20px;
+  font-size:15px;
+  line-height:21px;
   font-weight:700;
 }
 
@@ -235,9 +235,9 @@ button{font:inherit;color:inherit}
 
 .detail-row{
   padding-top:6px;
-  font-size:14px;
-  line-height:21px;
-  color:#26282c;
+  font-size:15px;
+  line-height:22px;
+  color:#202226;
 }
 
 .detail-row strong{font-weight:700}
@@ -341,6 +341,7 @@ button{font:inherit;color:inherit}
 }
 
 .module-banner{
+  display:none;
   position:absolute;
   top:10px;
   left:50%;
@@ -459,9 +460,9 @@ button{font:inherit;color:inherit}
 }
 
 .stage-image{
-  flex:0 0 456px;
-  width:456px;
-  height:456px;
+  flex:0 0 330px;
+  width:330px;
+  height:330px;
   border-radius:35px;
   overflow:hidden;
 }
@@ -474,10 +475,11 @@ button{font:inherit;color:inherit}
 }
 
 .stage-copy{
-  flex:0 0 475px;
-  width:475px;
-  font-size:19px;
-  line-height:29px;
+  flex:1 1 auto;
+  width:auto;
+  max-width:475px;
+  font-size:20px;
+  line-height:30px;
 }
 
 .stage-copy p{
@@ -502,24 +504,24 @@ button{font:inherit;color:inherit}
 }
 
 .followup{
-  min-height:320px;
+  min-height:0;
   display:flex;
-  align-items:center;
-  gap:32px;
-  padding:40px;
-  border-radius:29px;
-  background:#fff;
+  align-items:flex-start;
+  gap:34px;
+  padding:0;
+  border-radius:0;
+  background:transparent;
 }
 
 .followup img{
   width:300px;
-  height:300px;
+  height:auto;
   object-fit:contain;
 }
 
 .followup p{
-  font-size:18px;
-  line-height:28px;
+  font-size:19px;
+  line-height:29px;
   margin:0 0 12px;
 }
 
