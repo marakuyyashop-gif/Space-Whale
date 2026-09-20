@@ -50,10 +50,10 @@
               <h2 class="sw-section-title">Students</h2>
               <form id="inviteStudentForm" class="sw-form">
                 <div class="sw-field">
-                  <label for="studentName">Student name</label>
-                  <input id="studentName" type="text" required placeholder="Name">
+                  <label for="studentEmail">Paid student email</label>
+                  <input id="studentEmail" type="email" required placeholder="student@example.com">
                 </div>
-                <button class="sw-button" type="submit">Create student link</button>
+                <button class="sw-button" type="submit">Add paid student</button>
                 <div id="inviteMessage" class="sw-message"></div>
               </form>
               <div id="studentsList" class="student-list"></div>
@@ -96,6 +96,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260920-account-v1"></script>
-  <script src="dashboard.js?v=20260921-links-v1"></script>
+  <script src="dashboard.js?v=20260921-production-auth-v1"></script>
 </body>
 </html>
