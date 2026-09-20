@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Create account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=1">
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-card">
+      <div class="sw-brand">Space Whale</div>
+      <h1>Create account</h1>
+      <p>Create your account first. Lesson access is activated only after payment.</p>
+
+      <form id="signupForm" class="sw-form">
+        <div class="sw-field">
+          <label for="name">Name</label>
+          <input id="name" type="text" autocomplete="name" required placeholder="Your name">
+        </div>
+        <div class="sw-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+        <div class="sw-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+        </div>
+        <button id="signupButton" class="sw-button" type="submit">Create account</button>
+        <a class="sw-button secondary" href="login.html">I already have an account</a>
+        <div id="signupMessage" class="sw-message"></div>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script>
+    const form = document.getElementById("signupForm");
+    const button = document.getElementById("signupButton");
+    const message = document.getElementById("signupMessage");
+
+    window.spaceWhaleSupabase.auth.getSession().then(({ data }) => {
+      if (data.session) location.href = "dashboard.html";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      message.textContent = "Creating account…";
+
+      const displayName = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await window.spaceWhaleSupabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName },
+          emailRedirectTo: new URL("dashboard.html", location.href).href
+        }
+      });
+
+      button.disabled = false;
+
+      if (error) {
+        message.textContent = error.message;
+        return;
+      }
+
+      if (data.session) {
+        location.href = "dashboard.html";
+        return;
+      }
+
+      message.textContent = "Account created. Check your email to confirm your address, then sign in.";
+    });
+  </script>
+</body>
+</html>
