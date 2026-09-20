@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Join your teacher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-students-v1">
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-card student-join-card">
+      <div class="sw-brand">Space Whale</div>
+      <div id="inviteLoading">
+        <h1>Opening invitation…</h1>
+        <p>Please wait a moment.</p>
+      </div>
+
+      <div id="inviteContent" hidden>
+        <div class="join-teacher">
+          <div id="teacherAvatar" class="join-teacher-avatar"><span>T</span></div>
+          <div>
+            <span>Invitation from</span>
+            <strong id="teacherName">Your teacher</strong>
+          </div>
+        </div>
+        <h1>Join your lessons</h1>
+        <p>Create your student account with the invited email address. Your teacher, schedule and lesson packages will be connected automatically.</p>
+
+        <form id="signupForm" class="sw-form">
+          <div class="sw-field">
+            <label for="name">Your name</label>
+            <input id="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="sw-field">
+            <label for="email">Email</label>
+            <input id="email" type="email" readonly>
+          </div>
+          <div class="sw-field">
+            <label for="password">Password</label>
+            <input id="password" type="password" minlength="8" autocomplete="new-password" required placeholder="At least 8 characters">
+          </div>
+          <button id="signupButton" class="sw-button" type="submit">Create student account</button>
+        </form>
+
+        <a id="existingAccountLink" class="sw-button secondary join-existing" href="#">I already have an account</a>
+        <div id="joinMessage" class="sw-message"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="student-join.js?v=20260921-v1"></script>
+</body>
+</html>
