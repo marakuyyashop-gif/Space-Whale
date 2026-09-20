@@ -55,3 +55,18 @@ a{color:inherit}
 .student-row{display:flex;align-items:center;gap:10px;min-width:0}
 .student-avatar{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--sw-soft);font-size:13px;font-weight:700}
 .student-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600}
+
+.lesson-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sw-check{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--sw-text)}
+.sw-check input{width:16px;height:16px}
+.product-list{display:grid;gap:10px;margin-top:18px}
+.product-card{border:1px solid var(--sw-line);border-radius:18px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.product-main{min-width:0}
+.product-name{font-size:15px;font-weight:700}
+.product-price{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+.product-copy{font-size:13px;color:var(--sw-muted);margin-top:4px;line-height:1.4}
+.product-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.access-banner{display:grid;gap:4px;border:1px solid var(--sw-line);background:var(--sw-bg);border-radius:16px;padding:15px;color:var(--sw-text)}
+.access-banner strong{font-size:15px}
+.access-banner span{font-size:13px;line-height:1.45;color:var(--sw-muted)}
+@media(max-width:800px){.product-card{align-items:flex-start;flex-direction:column}.product-actions{width:100%}}
