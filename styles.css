@@ -1049,3 +1049,43 @@ button{font:inherit;color:inherit}
 .level-selector:active{
   transform:scale(.985);
 }
+
+
+/* === EXACT SPACE WHALE SIDEBAR ART === */
+.app-sidebar{
+  background:
+    url("assets/sidebar-space.jpg") center top / cover no-repeat !important;
+  border-right:1px solid rgba(255,255,255,.08);
+}
+
+.app-sidebar::before{
+  content:none !important;
+  display:none !important;
+}
+
+.app-sidebar::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:linear-gradient(
+    180deg,
+    rgba(3,7,18,.12) 0%,
+    rgba(3,7,18,.18) 46%,
+    rgba(3,7,18,.32) 100%
+  );
+}
+
+.sidebar-header{
+  background:linear-gradient(180deg,rgba(4,8,20,.26),rgba(4,8,20,.04));
+}
+
+.sidebar-account{
+  background:rgba(4,8,20,.46);
+}
+
+.course-module.expanded,
+.course-lesson.expanded{
+  background:rgba(5,9,20,.08);
+}
