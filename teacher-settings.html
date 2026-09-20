@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Teacher settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-teacher-settings-v1">
+</head>
+<body>
+  <main class="sw-page">
+    <div class="sw-shell settings-shell">
+      <header class="sw-topbar">
+        <div>
+          <div class="sw-brand">Space Whale</div>
+          <h1 class="sw-title">Teacher settings</h1>
+          <p class="sw-subtitle">Your profile and teaching preferences.</p>
+        </div>
+        <div class="sw-user">
+          <a class="sw-button secondary" href="dashboard.html">Back to dashboard</a>
+        </div>
+      </header>
+
+      <section class="sw-card settings-card">
+        <div class="settings-avatar-block">
+          <div class="settings-avatar" id="avatarPreview" aria-label="Profile photo">
+            <span id="avatarInitial">T</span>
+          </div>
+          <div>
+            <div class="settings-avatar-title">Profile photo</div>
+            <div class="sw-message">JPG, PNG or WEBP · up to 2 MB</div>
+            <label class="sw-button secondary settings-upload-button">
+              Upload photo
+              <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+            </label>
+            <div id="avatarMessage" class="sw-message"></div>
+          </div>
+        </div>
+
+        <form id="settingsForm" class="sw-form settings-form">
+          <div class="sw-field">
+            <label for="displayName">Your name</label>
+            <input id="displayName" type="text" autocomplete="name" required placeholder="Your name">
+          </div>
+
+          <div class="sw-field">
+            <label for="practiceName">Practice / brand name <span class="field-optional">optional</span></label>
+            <input id="practiceName" type="text" placeholder="For example: Anna English">
+          </div>
+
+          <div class="sw-field">
+            <label for="timezone">Time zone</label>
+            <select id="timezone" required></select>
+          </div>
+
+          <div class="sw-field">
+            <label for="email">Account email</label>
+            <input id="email" type="email" readonly>
+          </div>
+
+          <button id="saveButton" class="sw-button" type="submit">Save settings</button>
+          <div id="settingsMessage" class="sw-message"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="teacher-settings.js?v=20260921-v1"></script>
+</body>
+</html>
