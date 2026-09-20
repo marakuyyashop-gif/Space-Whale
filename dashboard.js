@@ -404,7 +404,7 @@
       else if (activeEntitlement.remaining_uses != null) balance = `${activeEntitlement.remaining_uses} lessons left`;
 
       return `
-        <article class="student-card">
+        <a class="student-card student-card-link" href="student-detail.html?id=${encodeURIComponent(student.id)}">
           <div class="student-card-top">
             <div class="student-card-avatar">
               ${student.avatar_url ? `<img src="${escapeHtml(student.avatar_url)}" alt="">` : `<span>${escapeHtml((student.display_name || "S").charAt(0).toUpperCase())}</span>`}
@@ -418,7 +418,7 @@
             <span>Next lesson</span>
             <strong>${nextLesson ? escapeHtml(formatDateTime(nextLesson.scheduled_at)) : "Not scheduled"}</strong>
           </div>
-        </article>
+        </a>
       `;
     }).join("");
   }
