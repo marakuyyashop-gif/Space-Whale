@@ -3,139 +3,241 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Space Whale — Dashboard</title>
+  <title>Space Whale — Teacher Home</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app-shell.css?v=20260921-workspaces-v1">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-teacher-home-v1">
 </head>
-<body>
-  <main class="sw-page">
-    <div class="sw-shell">
-      <header class="sw-topbar">
-        <div>
-          <div class="sw-brand">Space Whale</div>
-          <h1 class="sw-title" id="dashboardTitle">My lessons</h1>
-          <p class="sw-subtitle" id="dashboardSubtitle">Loading your schedule…</p>
+<body class="teacher-home-body">
+  <div id="teacherApp" class="teacher-app" hidden>
+    <aside class="teacher-sidebar">
+      <a class="teacher-brand" href="dashboard.html">
+        <span class="teacher-brand-mark">SW</span>
+        <span>Space Whale</span>
+      </a>
+
+      <nav class="teacher-nav" aria-label="Teacher navigation">
+        <a class="teacher-nav-item active" href="#home">
+          <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9 20v-6h6v6"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="teacher-nav-item" href="#schedule">
+          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/></svg>
+          <span>Schedule</span>
+        </a>
+        <a class="teacher-nav-item" href="#students">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.7-4.1 2.6-6.2 5.5-6.2s4.8 2.1 5.5 6.2"/><circle cx="17" cy="9" r="2.4"/><path d="M14.5 19c.4-2.5 1.6-3.8 3.7-3.8 1.1 0 2.1.4 2.8 1.1"/></svg>
+          <span>Students</span>
+        </a>
+        <a class="teacher-nav-item" href="#payments">
+          <svg viewBox="0 0 24 24"><rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M3.5 10h17M7 15h4"/></svg>
+          <span>Payments</span>
+        </a>
+        <a class="teacher-nav-item" href="teacher-settings.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4.8l-.4 3.1a7 7 0 0 0-1.7 1L5 6.1 3 9.5 5 11a7 7 0 0 0 0 2l-2 1.5L5 18l2.5-1a7 7 0 0 0 1.7 1l.4 3h4.8l.4-3a7 7 0 0 0 1.7-1l2.5 1 2-3.5-2-1.5a7 7 0 0 0 0-2Z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="teacher-sidebar-bottom">
+        <div class="teacher-account">
+          <div class="teacher-avatar" id="sidebarAvatar"><span id="sidebarInitial">T</span></div>
+          <div class="teacher-account-copy">
+            <strong id="sidebarName">Teacher</strong>
+            <span id="adminBadge" hidden>Platform admin</span>
+          </div>
         </div>
-        <div class="sw-user">
-          <span id="profileLabel"></span>
-          <a class="sw-button secondary" id="teacherSettingsLink" href="teacher-settings.html" hidden>Settings</a>
-          <button class="sw-button secondary" id="logoutButton" type="button">Log out</button>
+        <button id="logoutButton" class="teacher-logout" type="button">Log out</button>
+      </div>
+    </aside>
+
+    <main class="teacher-main" id="home">
+      <header class="teacher-home-header">
+        <div>
+          <div class="teacher-date" id="todayLabel"></div>
+          <h1 id="greeting">Hello</h1>
+          <p id="homeSubtitle">Here’s what’s happening with your lessons today.</p>
+        </div>
+        <div class="teacher-header-actions">
+          <button id="openScheduleDialog" class="sw-button secondary" type="button">Schedule lesson</button>
+          <button id="openProductDialog" class="sw-button" type="button">Create package</button>
         </div>
       </header>
 
-      <div class="sw-grid">
-        <section class="sw-card">
-          <h2 class="sw-section-title">Schedule</h2>
-          <div id="lessonList" class="lesson-list">
-            <div class="sw-message">Loading…</div>
+      <section class="teacher-metrics" aria-label="Teacher overview">
+        <article class="teacher-metric">
+          <span>Active students</span>
+          <strong id="metricStudents">0</strong>
+        </article>
+        <article class="teacher-metric">
+          <span>Lessons today</span>
+          <strong id="metricToday">0</strong>
+        </article>
+        <article class="teacher-metric">
+          <span>This week</span>
+          <strong id="metricWeek">0</strong>
+        </article>
+        <article class="teacher-metric">
+          <span>Low lesson balance</span>
+          <strong id="metricLowBalance">0</strong>
+        </article>
+      </section>
+
+      <section class="teacher-hero-grid">
+        <article class="teacher-panel next-lesson-panel">
+          <div class="teacher-panel-heading">
+            <div>
+              <span class="teacher-eyebrow">NEXT LESSON</span>
+              <h2>Coming up</h2>
+            </div>
           </div>
-        </section>
-
-        <aside class="sw-stack">
-          <section class="sw-card">
-            <h2 class="sw-section-title">Profile</h2>
-            <form id="profileForm" class="sw-form">
-              <div class="sw-field">
-                <label for="displayName">Name</label>
-                <input id="displayName" type="text" placeholder="Your name">
-              </div>
-              <button class="sw-button secondary" type="submit">Save profile</button>
-              <div id="profileMessage" class="sw-message"></div>
-            </form>
-          </section>
-
-          <div id="studentPanel" class="sw-stack" hidden>
-            <section class="sw-card">
-              <h2 class="sw-section-title">Access & payment</h2>
-              <div id="accessSummary" class="sw-message">Checking access…</div>
-              <div id="studentProducts" class="product-list"></div>
-              <div id="paymentMessage" class="sw-message"></div>
-            </section>
+          <div id="nextLessonCard" class="next-lesson-content">
+            <div class="teacher-empty">No upcoming lessons yet.</div>
           </div>
+        </article>
 
-          <div id="teacherPanel" class="sw-stack" hidden>
-            <section class="sw-card">
-              <h2 class="sw-section-title">Students</h2>
-              <p class="sw-message">Students appear here automatically after a successful payment.</p>
-              <div id="studentsList" class="student-list"></div>
-            </section>
-
-            <section class="sw-card">
-              <h2 class="sw-section-title">Products & pricing</h2>
-              <form id="productForm" class="sw-form">
-                <input id="productId" type="hidden">
-                <div class="sw-field">
-                  <label for="productName">Product name</label>
-                  <input id="productName" type="text" required placeholder="8 private lessons">
-                </div>
-                <div class="sw-field">
-                  <label for="productDescription">Description</label>
-                  <input id="productDescription" type="text" placeholder="Private English lessons">
-                </div>
-                <div class="sw-field">
-                  <label for="productPrice">Price, ₽</label>
-                  <input id="productPrice" type="number" min="1" step="0.01" required placeholder="20000">
-                </div>
-                <div class="sw-field">
-                  <label for="productUses">Number of lessons (optional)</label>
-                  <input id="productUses" type="number" min="1" step="1" placeholder="8">
-                </div>
-                <div class="sw-field">
-                  <label for="productDays">Access validity in days (optional)</label>
-                  <input id="productDays" type="number" min="1" step="1" placeholder="60">
-                </div>
-                <label class="sw-check">
-                  <input id="productActive" type="checkbox">
-                  <span>Available for purchase</span>
-                </label>
-                <div class="product-actions">
-                  <button class="sw-button" type="submit">Save product</button>
-                  <button class="sw-button secondary" id="cancelProductEdit" type="button" hidden>Cancel</button>
-                </div>
-                <div id="productMessage" class="sw-message"></div>
-              </form>
-              <div id="teacherProducts" class="product-list"></div>
-            </section>
-
-            <section class="sw-card">
-              <h2 class="sw-section-title">Schedule a lesson</h2>
-              <form id="scheduleForm" class="sw-form">
-                <div class="sw-field">
-                  <label for="studentSelect">Student</label>
-                  <select id="studentSelect" required></select>
-                </div>
-                <div class="sw-field">
-                  <label for="lessonTitle">Lesson title</label>
-                  <input id="lessonTitle" type="text" placeholder="English lesson">
-                </div>
-                <div class="sw-field">
-                  <label for="lessonTime">Date and time</label>
-                  <input id="lessonTime" type="datetime-local" required>
-                </div>
-                <div class="sw-field">
-                  <label for="duration">Duration</label>
-                  <select id="duration">
-                    <option value="30">30 min</option>
-                    <option value="45">45 min</option>
-                    <option value="60" selected>60 min</option>
-                    <option value="90">90 min</option>
-                  </select>
-                </div>
-                <button class="sw-button" type="submit">Schedule lesson</button>
-                <div id="scheduleMessage" class="sw-message"></div>
-              </form>
-            </section>
+        <article class="teacher-panel attention-panel">
+          <div class="teacher-panel-heading">
+            <div>
+              <span class="teacher-eyebrow">NEEDS ATTENTION</span>
+              <h2>Keep an eye on</h2>
+            </div>
           </div>
-        </aside>
+          <div id="attentionList" class="attention-list"></div>
+        </article>
+      </section>
+
+      <section id="schedule" class="teacher-section">
+        <div class="teacher-section-heading">
+          <div>
+            <span class="teacher-eyebrow">SCHEDULE</span>
+            <h2>Today</h2>
+          </div>
+          <button id="scheduleFromSection" class="teacher-text-button" type="button">+ Add lesson</button>
+        </div>
+        <div id="todayLessons" class="teacher-list"></div>
+
+        <div class="teacher-section-subheading">
+          <h3>Upcoming</h3>
+          <span>Next 7 days</span>
+        </div>
+        <div id="upcomingLessons" class="teacher-list"></div>
+      </section>
+
+      <section id="students" class="teacher-section">
+        <div class="teacher-section-heading">
+          <div>
+            <span class="teacher-eyebrow">STUDENTS</span>
+            <h2>Your students</h2>
+          </div>
+          <span class="teacher-section-count" id="studentsCountLabel">0 active</span>
+        </div>
+        <div id="studentsGrid" class="students-grid"></div>
+      </section>
+
+      <section id="payments" class="teacher-section">
+        <div class="teacher-section-heading">
+          <div>
+            <span class="teacher-eyebrow">PAYMENTS</span>
+            <h2>Lesson packages</h2>
+            <p>Packages your students can purchase from you.</p>
+          </div>
+          <button id="productFromSection" class="teacher-text-button" type="button">+ Create package</button>
+        </div>
+        <div id="productsGrid" class="products-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="pageLoading" class="page-loading">Loading your teaching space…</div>
+
+  <dialog id="scheduleDialog" class="sw-dialog">
+    <form id="scheduleForm" class="dialog-card">
+      <div class="dialog-header">
+        <div>
+          <span class="teacher-eyebrow">NEW LESSON</span>
+          <h2>Schedule a lesson</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close-dialog="scheduleDialog" aria-label="Close">×</button>
       </div>
-    </div>
-  </main>
+      <div class="sw-field">
+        <label for="studentSelect">Student</label>
+        <select id="studentSelect" required></select>
+      </div>
+      <div class="sw-field">
+        <label for="lessonTitle">Lesson title</label>
+        <input id="lessonTitle" type="text" placeholder="English lesson">
+      </div>
+      <div class="dialog-grid">
+        <div class="sw-field">
+          <label for="lessonTime">Date and time</label>
+          <input id="lessonTime" type="datetime-local" required>
+        </div>
+        <div class="sw-field">
+          <label for="duration">Duration</label>
+          <select id="duration">
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="sw-button secondary" type="button" data-close-dialog="scheduleDialog">Cancel</button>
+        <button class="sw-button" id="scheduleSubmit" type="submit">Schedule</button>
+      </div>
+      <div id="scheduleMessage" class="sw-message"></div>
+    </form>
+  </dialog>
+
+  <dialog id="productDialog" class="sw-dialog">
+    <form id="productForm" class="dialog-card">
+      <div class="dialog-header">
+        <div>
+          <span class="teacher-eyebrow">NEW PACKAGE</span>
+          <h2>Create lesson package</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close-dialog="productDialog" aria-label="Close">×</button>
+      </div>
+      <div class="sw-field">
+        <label for="productName">Package name</label>
+        <input id="productName" type="text" required placeholder="8 private lessons">
+      </div>
+      <div class="sw-field">
+        <label for="productDescription">Description</label>
+        <input id="productDescription" type="text" placeholder="Private English lessons">
+      </div>
+      <div class="dialog-grid">
+        <div class="sw-field">
+          <label for="productPrice">Price, ₽</label>
+          <input id="productPrice" type="number" min="1" step="0.01" required placeholder="20000">
+        </div>
+        <div class="sw-field">
+          <label for="productUses">Number of lessons</label>
+          <input id="productUses" type="number" min="1" step="1" placeholder="8">
+        </div>
+      </div>
+      <div class="sw-field">
+        <label for="productDays">Access validity in days <span class="field-optional">optional</span></label>
+        <input id="productDays" type="number" min="1" step="1" placeholder="60">
+      </div>
+      <label class="sw-check">
+        <input id="productActive" type="checkbox" checked>
+        <span>Available for students to purchase</span>
+      </label>
+      <div class="dialog-actions">
+        <button class="sw-button secondary" type="button" data-close-dialog="productDialog">Cancel</button>
+        <button class="sw-button" id="productSubmit" type="submit">Create package</button>
+      </div>
+      <div id="productMessage" class="sw-message"></div>
+    </form>
+  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260921-teacher-settings-v1"></script>
-  <script src="dashboard.js?v=20260921-solo-v1"></script>
+  <script src="dashboard.js?v=20260921-teacher-home-v1"></script>
 </body>
 </html>
