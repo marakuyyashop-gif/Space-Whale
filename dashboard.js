@@ -9,6 +9,8 @@
   const profileMessage = document.getElementById("profileMessage");
   const scheduleMessage = document.getElementById("scheduleMessage");
   const studentSelect = document.getElementById("studentSelect");
+  const inviteMessage = document.getElementById("inviteMessage");
+  const studentsList = document.getElementById("studentsList");
 
   let session;
   let profile;
@@ -84,22 +86,37 @@
     if (error) throw error;
 
     const ids = (links || []).map((item) => item.student_id);
+    const scheduleButton = document.querySelector("#scheduleForm button[type=submit]");
+
     if (!ids.length) {
       studentSelect.innerHTML = '<option value="">No students connected yet</option>';
-      document.querySelector("#scheduleForm button[type=submit]").disabled = true;
-      return;
+      studentsList.innerHTML = '<div class="sw-message">No students yet. Invite your first student above.</div>';
+      scheduleButton.disabled = true;
+      return [];
     }
 
     const { data: students, error: studentError } = await client
       .from("profiles")
       .select("id,display_name")
-      .in("id", ids);
+      .in("id", ids)
+      .order("display_name", { ascending: true });
 
     if (studentError) throw studentError;
 
     studentSelect.innerHTML = (students || []).map((student) =>
       `<option value="${student.id}">${student.display_name || "Student"}</option>`
     ).join("");
+
+    studentsList.innerHTML = (students || []).map((student) => `
+      <div class="student-row">
+        <span class="student-avatar">${(student.display_name || "S").trim().charAt(0).toUpperCase()}</span>
+        <span class="student-name">${student.display_name || "Student"}</span>
+        <span class="lesson-status">active</span>
+      </div>
+    `).join("");
+
+    scheduleButton.disabled = false;
+    return students || [];
   }
 
   document.getElementById("logoutButton").addEventListener("click", () => auth.signOut());
@@ -117,6 +134,42 @@
 
     profileMessage.textContent = error ? error.message : "Saved.";
     if (!error) profileLabel.textContent = displayNameInput.value.trim() || session.user.email;
+  });
+
+  document.getElementById("inviteStudentForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = event.target.querySelector("button[type=submit]");
+    button.disabled = true;
+    inviteMessage.textContent = "Sending invitation…";
+
+    const email = document.getElementById("studentEmail").value.trim();
+    const displayName = document.getElementById("studentName").value.trim();
+
+    const { data, error } = await client.functions.invoke("invite-student", {
+      body: {
+        email,
+        display_name: displayName
+      }
+    });
+
+    button.disabled = false;
+
+    if (error) {
+      inviteMessage.textContent = error.message || "Could not send the invitation.";
+      return;
+    }
+
+    if (data?.error) {
+      inviteMessage.textContent = data.error;
+      return;
+    }
+
+    inviteMessage.textContent = data?.invited
+      ? "Invitation sent. The student is now linked to your account."
+      : "Student linked to your account.";
+
+    event.target.reset();
+    await loadStudents();
   });
 
   document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
