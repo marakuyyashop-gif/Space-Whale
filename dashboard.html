@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app-shell.css?v=1">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-billing-v1">
 </head>
 <body>
   <main class="sw-page">
@@ -45,18 +45,57 @@
             </form>
           </section>
 
+          <div id="studentPanel" class="sw-stack" hidden>
+            <section class="sw-card">
+              <h2 class="sw-section-title">Access & payment</h2>
+              <div id="accessSummary" class="sw-message">Checking access…</div>
+              <div id="studentProducts" class="product-list"></div>
+              <div id="paymentMessage" class="sw-message"></div>
+            </section>
+          </div>
+
           <div id="teacherPanel" class="sw-stack" hidden>
             <section class="sw-card">
               <h2 class="sw-section-title">Students</h2>
-              <form id="inviteStudentForm" class="sw-form">
-                <div class="sw-field">
-                  <label for="studentEmail">Paid student email</label>
-                  <input id="studentEmail" type="email" required placeholder="student@example.com">
-                </div>
-                <button class="sw-button" type="submit">Add paid student</button>
-                <div id="inviteMessage" class="sw-message"></div>
-              </form>
+              <p class="sw-message">Students appear here automatically after a successful payment.</p>
               <div id="studentsList" class="student-list"></div>
+            </section>
+
+            <section class="sw-card">
+              <h2 class="sw-section-title">Products & pricing</h2>
+              <form id="productForm" class="sw-form">
+                <input id="productId" type="hidden">
+                <div class="sw-field">
+                  <label for="productName">Product name</label>
+                  <input id="productName" type="text" required placeholder="8 private lessons">
+                </div>
+                <div class="sw-field">
+                  <label for="productDescription">Description</label>
+                  <input id="productDescription" type="text" placeholder="Private English lessons">
+                </div>
+                <div class="sw-field">
+                  <label for="productPrice">Price, ₽</label>
+                  <input id="productPrice" type="number" min="1" step="0.01" required placeholder="20000">
+                </div>
+                <div class="sw-field">
+                  <label for="productUses">Number of lessons (optional)</label>
+                  <input id="productUses" type="number" min="1" step="1" placeholder="8">
+                </div>
+                <div class="sw-field">
+                  <label for="productDays">Access validity in days (optional)</label>
+                  <input id="productDays" type="number" min="1" step="1" placeholder="60">
+                </div>
+                <label class="sw-check">
+                  <input id="productActive" type="checkbox">
+                  <span>Available for purchase</span>
+                </label>
+                <div class="product-actions">
+                  <button class="sw-button" type="submit">Save product</button>
+                  <button class="sw-button secondary" id="cancelProductEdit" type="button" hidden>Cancel</button>
+                </div>
+                <div id="productMessage" class="sw-message"></div>
+              </form>
+              <div id="teacherProducts" class="product-list"></div>
             </section>
 
             <section class="sw-card">
@@ -96,6 +135,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260920-account-v1"></script>
-  <script src="dashboard.js?v=20260921-production-auth-v1"></script>
+  <script src="dashboard.js?v=20260921-billing-v1"></script>
 </body>
 </html>
