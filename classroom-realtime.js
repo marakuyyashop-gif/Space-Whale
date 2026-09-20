@@ -21,7 +21,7 @@
 
     const { data, error } = await client
       .from("lesson_sessions")
-      .select("id, teacher_id, student_id, course_id, lesson_id, room_topic, status")
+      .select("id, teacher_id, student_id, course_id, lesson_id, title, room_topic, status, scheduled_at, duration_minutes, join_window_minutes")
       .eq("id", sessionId)
       .single();
 
@@ -78,6 +78,7 @@
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
       .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
+      .on("broadcast", { event: "lesson_started" }, ({ payload }) => handlers.onLessonStarted?.(payload))
       .on("presence", { event: "sync" }, () => handlers.onPresence?.(channel.presenceState()))
       .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
       .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
@@ -109,6 +110,28 @@
       type: "broadcast",
       event,
       payload
+    });
+  }
+
+  async function startLesson() {
+    if (state.role !== "teacher") {
+      throw new Error("Only the teacher can start the lesson.");
+    }
+    const startedAt = new Date().toISOString();
+    const { error } = await client
+      .from("lesson_sessions")
+      .update({
+        status: "live",
+        started_at: startedAt,
+        waiting_room_opened_at: startedAt
+      })
+      .eq("id", state.session.id);
+
+    if (error) throw error;
+    state.session.status = "live";
+    await broadcast("lesson_started", {
+      session_id: state.session.id,
+      started_at: startedAt
     });
   }
 
@@ -201,6 +224,7 @@
     loadSession,
     loadSharedState,
     navigate,
+    startLesson,
     syncAudio,
     saveExerciseResponse,
     broadcast,
