@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — My lessons</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-teacher-home-v1">
+</head>
+<body>
+  <main class="sw-page">
+    <div class="sw-shell">
+      <header class="sw-topbar">
+        <div>
+          <div class="sw-brand">Space Whale</div>
+          <h1 class="sw-title">My lessons</h1>
+          <p class="sw-subtitle">Your schedule, lesson access and packages.</p>
+        </div>
+        <div class="sw-user">
+          <span id="studentName"></span>
+          <button class="sw-button secondary" id="logoutButton" type="button">Log out</button>
+        </div>
+      </header>
+
+      <div class="sw-grid">
+        <section class="sw-card">
+          <h2 class="sw-section-title">Upcoming lessons</h2>
+          <div id="studentLessons" class="lesson-list"><div class="sw-message">Loading…</div></div>
+        </section>
+
+        <aside class="sw-stack">
+          <section class="sw-card">
+            <h2 class="sw-section-title">Lesson access</h2>
+            <div id="accessSummary" class="sw-message">Checking access…</div>
+          </section>
+          <section class="sw-card">
+            <h2 class="sw-section-title">Packages</h2>
+            <div id="studentProducts" class="product-list"></div>
+            <div id="paymentMessage" class="sw-message"></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="student-dashboard.js?v=20260921-v1"></script>
+</body>
+</html>
