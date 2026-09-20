@@ -139,19 +139,14 @@
   document.getElementById("inviteStudentForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = event.target.querySelector("button[type=submit]");
-    const displayName = document.getElementById("studentName").value.trim();
+    const email = document.getElementById("studentEmail").value.trim();
 
     button.disabled = true;
-    inviteMessage.textContent = "Creating link…";
+    inviteMessage.textContent = "Checking account and payment access…";
 
-    const { data, error } = await client
-      .from("student_invites")
-      .insert({
-        teacher_id: session.user.id,
-        display_name: displayName
-      })
-      .select("token")
-      .single();
+    const { data, error } = await client.rpc("connect_paid_student", {
+      p_email: email
+    });
 
     button.disabled = false;
 
@@ -160,23 +155,14 @@
       return;
     }
 
-    const inviteUrl = new URL("student-signup.html", location.href);
-    inviteUrl.searchParams.set("invite", data.token);
+    if (!data?.ok) {
+      inviteMessage.textContent = "Could not add this student.";
+      return;
+    }
 
-    inviteMessage.innerHTML = `
-      Student link created.
-      <div style="margin-top:10px">
-        <button id="copyInviteLink" class="sw-button secondary" type="button">Copy student link</button>
-      </div>
-    `;
-
-    const copyButton = document.getElementById("copyInviteLink");
-    copyButton.addEventListener("click", async () => {
-      await navigator.clipboard.writeText(inviteUrl.href);
-      copyButton.textContent = "Copied";
-    });
-
+    inviteMessage.textContent = "Student added.";
     event.target.reset();
+    await loadStudents();
   });
 
   document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
