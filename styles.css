@@ -1265,3 +1265,18 @@ button{font:inherit;color:inherit}
 @media (max-width:980px){
   :root{--sidebar-width:280px}
 }
+
+/* === WORKSPACE SPACE PRINT === */
+.class-area{
+  background:
+    url("background") center center / cover no-repeat,
+    #f7f7f8 !important;
+}
+
+.class-content{
+  background:transparent !important;
+}
+
+.lesson-scroll{
+  background:transparent !important;
+}
