@@ -164,9 +164,23 @@
       return;
     }
 
-    inviteMessage.textContent = data?.invited
-      ? "Invitation sent. The student is now linked to your account."
-      : "Student linked to your account.";
+    if (data?.invite_link) {
+      inviteMessage.innerHTML = `
+        Email delivery is not configured yet, so I created a temporary sign-in link for testing.
+        <div style="margin-top:10px">
+          <button id="copyInviteLink" class="sw-button secondary" type="button">Copy student sign-in link</button>
+        </div>
+      `;
+      const copyButton = document.getElementById("copyInviteLink");
+      copyButton.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(data.invite_link);
+        copyButton.textContent = "Copied";
+      });
+    } else {
+      inviteMessage.textContent = data?.invited
+        ? "Invitation sent. The student is now linked to your account."
+        : "Student linked to your account.";
+    }
 
     event.target.reset();
     await loadStudents();
