@@ -6,7 +6,6 @@
   const teacherPanel = document.getElementById("teacherPanel");
   const studentPanel = document.getElementById("studentPanel");
   const profileLabel = document.getElementById("profileLabel");
-  const workspaceSelect = document.getElementById("workspaceSelect");
   const displayNameInput = document.getElementById("displayName");
   const profileMessage = document.getElementById("profileMessage");
   const scheduleMessage = document.getElementById("scheduleMessage");
@@ -106,16 +105,8 @@
     activeWorkspaceId = preferred?.id || null;
 
     if (!workspaces.length) {
-      workspaceSelect.innerHTML = '<option value="">No workspace</option>';
-      workspaceSelect.disabled = true;
       return;
     }
-
-    workspaceSelect.disabled = false;
-    workspaceSelect.innerHTML = workspaces.map((workspace) =>
-      `<option value="${escapeHtml(workspace.id)}">${escapeHtml(workspace.name)}</option>`
-    ).join("");
-    workspaceSelect.value = activeWorkspaceId;
 
     localStorage.setItem(storageKey, activeWorkspaceId);
   }
@@ -394,17 +385,6 @@
       await Promise.all([loadStudentBilling(), loadLessons()]);
     }
   }
-
-  workspaceSelect.addEventListener("change", async () => {
-    activeWorkspaceId = workspaceSelect.value || null;
-    const storageKey = `spaceWhaleWorkspace:${session.user.id}`;
-
-    if (activeWorkspaceId) localStorage.setItem(storageKey, activeWorkspaceId);
-    else localStorage.removeItem(storageKey);
-
-    resetProductForm?.();
-    await refreshWorkspaceView();
-  });
 
   document.getElementById("logoutButton").addEventListener("click", () => auth.signOut());
 
