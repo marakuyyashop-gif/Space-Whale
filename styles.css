@@ -855,3 +855,197 @@ button{font:inherit;color:inherit}
 }
 
 .module-banner{display:none!important;}
+
+
+/* === SPACE WHALE COSMIC SIDEBAR OVERRIDE === */
+:root{
+  --sidebar-bg:#060914;
+  --sidebar-hover:rgba(255,255,255,.075);
+  --sidebar-active:rgba(255,255,255,.13);
+  --sidebar-text:#f5f7ff;
+  --sidebar-muted:rgba(235,240,255,.66);
+  --sidebar-line:rgba(255,255,255,.10);
+  --sidebar-line-strong:rgba(255,255,255,.17);
+}
+
+.app-sidebar{
+  color:var(--sidebar-text);
+  background:
+    radial-gradient(circle at 18% 9%,rgba(100,84,255,.32),transparent 24%),
+    radial-gradient(circle at 88% 20%,rgba(40,150,255,.18),transparent 28%),
+    radial-gradient(circle at 46% 68%,rgba(114,57,202,.14),transparent 31%),
+    linear-gradient(180deg,#080b18 0%,#070b16 42%,#050711 100%);
+  border-right:1px solid rgba(255,255,255,.055);
+  isolation:isolate;
+}
+
+.app-sidebar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.72;
+  background-image:
+    radial-gradient(circle,rgba(255,255,255,.85) 0 1px,transparent 1.35px),
+    radial-gradient(circle,rgba(173,190,255,.55) 0 .8px,transparent 1.15px),
+    radial-gradient(circle,rgba(255,255,255,.38) 0 .65px,transparent 1px);
+  background-size:83px 83px,127px 127px,59px 59px;
+  background-position:11px 17px,39px 64px,5px 43px;
+}
+
+.app-sidebar::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(3,6,15,.06),rgba(3,6,15,.32) 42%,rgba(3,6,15,.68) 100%),
+    radial-gradient(ellipse at 50% 110%,rgba(66,87,180,.18),transparent 48%);
+}
+
+.app-sidebar>*{
+  position:relative;
+  z-index:1;
+}
+
+.sidebar-header{
+  background:transparent;
+}
+
+.sidebar-brand{
+  color:var(--sidebar-text);
+}
+
+.sidebar-brand:hover,
+.sidebar-icon-button:hover,
+.sidebar-nav-item:hover,
+.course-module__button:hover,
+.course-lesson__button:hover,
+.course-activity:hover{
+  background:var(--sidebar-hover);
+}
+
+.brand-mark{
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 26px rgba(0,0,0,.16);
+}
+
+.brand-name{
+  color:#fff;
+  letter-spacing:-.025em;
+}
+
+.sidebar-icon-button{
+  color:rgba(245,247,255,.86);
+}
+
+.sidebar-nav-item{
+  color:rgba(240,244,255,.80);
+}
+
+.sidebar-nav-item.active{
+  color:#fff;
+  background:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
+}
+
+.sidebar-scroll{
+  scrollbar-color:rgba(255,255,255,.22) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.20);
+}
+
+.sidebar-section-heading{
+  color:rgba(235,240,255,.53);
+}
+
+.level-selector{
+  color:#fff;
+  border:1px solid var(--sidebar-line-strong);
+  background:rgba(255,255,255,.065);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.course-module__button,
+.course-lesson__button{
+  color:rgba(244,247,255,.90);
+}
+
+.course-module__button.active{
+  color:#fff;
+  background:rgba(255,255,255,.10);
+}
+
+.course-lesson.current>.course-lesson__button{
+  color:#fff;
+}
+
+.course-activity{
+  color:rgba(231,237,255,.68);
+}
+
+.course-activity.active{
+  color:#fff;
+  background:linear-gradient(90deg,rgba(124,110,255,.24),rgba(255,255,255,.08));
+  border:1px solid rgba(164,153,255,.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 8px 22px rgba(0,0,0,.12);
+}
+
+.course-activity.done::after{
+  color:#91e3ae;
+}
+
+.sidebar-account{
+  color:var(--sidebar-text);
+  background:rgba(5,7,17,.54);
+  border-top:1px solid var(--sidebar-line);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.account-avatar{
+  color:#fff;
+  border:1px solid var(--sidebar-line-strong);
+  background:rgba(255,255,255,.08);
+}
+
+.account-caption{
+  color:var(--sidebar-muted);
+}
+
+.course-chevron,
+.level-selector svg,
+.sidebar-nav-item svg,
+.sidebar-icon-button svg{
+  opacity:.9;
+}
+
+.course-module.expanded,
+.course-lesson.expanded{
+  background:rgba(255,255,255,.018);
+}
+
+/* A subtle "space glass" treatment for clickable sidebar rows. */
+.sidebar-nav-item,
+.course-module__button,
+.course-lesson__button,
+.course-activity,
+.level-selector,
+.sidebar-icon-button,
+.sidebar-brand{
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+
+.sidebar-nav-item:active,
+.course-activity:active,
+.level-selector:active{
+  transform:scale(.985);
+}
