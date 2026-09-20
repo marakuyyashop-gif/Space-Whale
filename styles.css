@@ -6,7 +6,7 @@
   --muted:#858a92;
   --line:#e6e7ea;
   --shadow:0 8px 28px rgba(31,32,35,.10);
-  --font:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 *{box-sizing:border-box}
@@ -16,7 +16,8 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:var(--font);
-  text-rendering:optimizeLegibility;\n  font-feature-settings:"kern","liga";
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"kern","liga";
 }
 button{font:inherit;color:inherit}
 
