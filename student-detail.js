@@ -136,6 +136,9 @@
     el("detailNextLesson").textContent = upcoming ? formatDate(upcoming.scheduled_at) : "Not scheduled";
     el("detailCompleted").textContent = String(lessons.filter((lesson) => lesson.status === "completed").length);
     el("detailExpiry").textContent = entitlement?.ends_at ? formatDate(entitlement.ends_at) : "—";
+    const scheduleButton = el("scheduleStudentLesson");
+    scheduleButton.disabled = !entitlement;
+    scheduleButton.title = entitlement ? "" : "The student needs an active lesson package before a lesson can be scheduled.";
 
     if (!entitlement) {
       el("packageSummary").innerHTML = `
