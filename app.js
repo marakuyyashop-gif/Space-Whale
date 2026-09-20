@@ -245,3 +245,11 @@ function renderLesson() {
 
 renderCourseTree();
 renderLesson();
+
+
+document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".sidebar-nav-item").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
