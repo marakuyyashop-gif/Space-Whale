@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=1">
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-card">
+      <div class="sw-brand">Space Whale</div>
+      <h1>Welcome</h1>
+      <p>Enter your email. We’ll send you a secure sign-in link — no password needed.</p>
+      <form id="loginForm" class="sw-form">
+        <div class="sw-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+        <button id="loginButton" class="sw-button" type="submit">Send sign-in link</button>
+        <div id="loginMessage" class="sw-message"></div>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script>
+    const form=document.getElementById("loginForm");
+    const button=document.getElementById("loginButton");
+    const message=document.getElementById("loginMessage");
+    const params=new URLSearchParams(location.search);
+    const next=params.get("next")||"dashboard.html";
+
+    window.spaceWhaleSupabase.auth.getSession().then(({data})=>{
+      if(data.session) location.href=next;
+    });
+
+    form.addEventListener("submit",async(e)=>{
+      e.preventDefault();
+      button.disabled=true;
+      message.textContent="Sending…";
+      const email=document.getElementById("email").value.trim();
+      const redirect=new URL(next,location.href).href;
+      const {error}=await window.spaceWhaleSupabase.auth.signInWithOtp({
+        email,
+        options:{shouldCreateUser:true,emailRedirectTo:redirect}
+      });
+      button.disabled=false;
+      message.textContent=error?error.message:"Check your email — the sign-in link is on its way.";
+    });
+  </script>
+</body>
+</html>
