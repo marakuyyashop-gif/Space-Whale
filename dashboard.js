@@ -4,16 +4,42 @@
 
   const lessonList = document.getElementById("lessonList");
   const teacherPanel = document.getElementById("teacherPanel");
+  const studentPanel = document.getElementById("studentPanel");
   const profileLabel = document.getElementById("profileLabel");
   const displayNameInput = document.getElementById("displayName");
   const profileMessage = document.getElementById("profileMessage");
   const scheduleMessage = document.getElementById("scheduleMessage");
   const studentSelect = document.getElementById("studentSelect");
-  const inviteMessage = document.getElementById("inviteMessage");
   const studentsList = document.getElementById("studentsList");
+
+  const productForm = document.getElementById("productForm");
+  const productId = document.getElementById("productId");
+  const productName = document.getElementById("productName");
+  const productDescription = document.getElementById("productDescription");
+  const productPrice = document.getElementById("productPrice");
+  const productUses = document.getElementById("productUses");
+  const productDays = document.getElementById("productDays");
+  const productActive = document.getElementById("productActive");
+  const productMessage = document.getElementById("productMessage");
+  const teacherProducts = document.getElementById("teacherProducts");
+  const cancelProductEdit = document.getElementById("cancelProductEdit");
+
+  const accessSummary = document.getElementById("accessSummary");
+  const studentProducts = document.getElementById("studentProducts");
+  const paymentMessage = document.getElementById("paymentMessage");
 
   let session;
   let profile;
+  let cachedTeacherProducts = [];
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
   function formatDate(value) {
     if (!value) return "Time not set";
@@ -24,6 +50,14 @@
       hour: "2-digit",
       minute: "2-digit"
     }).format(new Date(value));
+  }
+
+  function formatPrice(amountMinor, currency = "RUB") {
+    if (amountMinor == null) return "Price not set";
+    return new Intl.NumberFormat("ru-RU", {
+      style: "currency",
+      currency
+    }).format(amountMinor / 100);
   }
 
   function canEnterLesson(lesson) {
@@ -42,17 +76,17 @@
     lessonList.innerHTML = lessons.map((lesson) => {
       const enabled = canEnterLesson(lesson);
       const action = enabled
-        ? `<a class="sw-button" href="waiting-room.html?session=${lesson.id}">Join lesson</a>`
-        : `<button class="sw-button secondary" type="button" disabled>Available 5 min before</button>`;
+        ? `<a class="sw-button" href="waiting-room.html?session=${encodeURIComponent(lesson.id)}">Join lesson</a>`
+        : '<button class="sw-button secondary" type="button" disabled>Available 5 min before</button>';
 
       return `
         <article class="lesson-card">
           <div class="lesson-main">
-            <div class="lesson-title">${lesson.title || lesson.lesson_id || "English lesson"}</div>
-            <div class="lesson-meta">${formatDate(lesson.scheduled_at)} · ${lesson.duration_minutes || 60} min</div>
+            <div class="lesson-title">${escapeHtml(lesson.title || lesson.lesson_id || "English lesson")}</div>
+            <div class="lesson-meta">${escapeHtml(formatDate(lesson.scheduled_at))} · ${Number(lesson.duration_minutes || 60)} min</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span class="lesson-status">${lesson.status}</span>
+          <div class="lesson-actions">
+            <span class="lesson-status">${escapeHtml(lesson.status)}</span>
             ${action}
           </div>
         </article>
@@ -89,8 +123,8 @@
     const scheduleButton = document.querySelector("#scheduleForm button[type=submit]");
 
     if (!ids.length) {
-      studentSelect.innerHTML = '<option value="">No students connected yet</option>';
-      studentsList.innerHTML = '<div class="sw-message">No students yet. Invite your first student above.</div>';
+      studentSelect.innerHTML = '<option value="">No paid students yet</option>';
+      studentsList.innerHTML = '<div class="sw-message">Students will appear here automatically after payment.</div>';
       scheduleButton.disabled = true;
       return [];
     }
@@ -104,19 +138,156 @@
     if (studentError) throw studentError;
 
     studentSelect.innerHTML = (students || []).map((student) =>
-      `<option value="${student.id}">${student.display_name || "Student"}</option>`
+      `<option value="${escapeHtml(student.id)}">${escapeHtml(student.display_name || "Student")}</option>`
     ).join("");
 
     studentsList.innerHTML = (students || []).map((student) => `
       <div class="student-row">
-        <span class="student-avatar">${(student.display_name || "S").trim().charAt(0).toUpperCase()}</span>
-        <span class="student-name">${student.display_name || "Student"}</span>
-        <span class="lesson-status">active</span>
+        <span class="student-avatar">${escapeHtml((student.display_name || "S").trim().charAt(0).toUpperCase())}</span>
+        <span class="student-name">${escapeHtml(student.display_name || "Student")}</span>
+        <span class="lesson-status">paid access</span>
       </div>
     `).join("");
 
     scheduleButton.disabled = false;
     return students || [];
+  }
+
+  function resetProductForm() {
+    productForm.reset();
+    productId.value = "";
+    productActive.checked = false;
+    cancelProductEdit.hidden = true;
+    productMessage.textContent = "";
+  }
+
+  function productDetails(product) {
+    const bits = [];
+    if (product.included_uses) bits.push(`${product.included_uses} lessons`);
+    if (product.access_duration_days) bits.push(`${product.access_duration_days} days access`);
+    return bits.join(" · ");
+  }
+
+  async function loadTeacherProducts() {
+    const { data, error } = await client
+      .from("billing_products")
+      .select("id,code,name,description,amount_minor,currency,active,included_uses,access_duration_days,created_at")
+      .eq("teacher_id", session.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    cachedTeacherProducts = data || [];
+
+    if (!cachedTeacherProducts.length) {
+      teacherProducts.innerHTML = '<div class="sw-message">No products yet. Create your first lesson package above.</div>';
+      return;
+    }
+
+    teacherProducts.innerHTML = cachedTeacherProducts.map((product) => `
+      <article class="product-card">
+        <div class="product-main">
+          <div class="product-name">${escapeHtml(product.name)}</div>
+          <div class="product-price">${escapeHtml(formatPrice(product.amount_minor, product.currency || "RUB"))}</div>
+          ${product.description ? `<div class="product-copy">${escapeHtml(product.description)}</div>` : ""}
+          ${productDetails(product) ? `<div class="product-copy">${escapeHtml(productDetails(product))}</div>` : ""}
+        </div>
+        <div class="product-actions">
+          <span class="lesson-status">${product.active ? "available" : "hidden"}</span>
+          <button class="sw-button secondary" type="button" data-product-edit="${escapeHtml(product.id)}">Edit</button>
+          <button class="sw-button secondary" type="button" data-product-toggle="${escapeHtml(product.id)}">${product.active ? "Hide" : "Publish"}</button>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function loadStudentBilling() {
+    const now = Date.now();
+
+    const { data: entitlements, error: accessError } = await client
+      .from("access_entitlements")
+      .select("id,access_key,status,starts_at,ends_at,remaining_uses,created_at")
+      .eq("user_id", session.user.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+
+    if (accessError) throw accessError;
+
+    const active = (entitlements || []).find((item) =>
+      new Date(item.starts_at).getTime() <= now &&
+      (!item.ends_at || new Date(item.ends_at).getTime() > now) &&
+      (item.remaining_uses == null || item.remaining_uses > 0)
+    );
+
+    if (active) {
+      const parts = ["Lesson access is active."];
+      if (active.remaining_uses != null) parts.push(`${active.remaining_uses} lessons remaining.`);
+      if (active.ends_at) parts.push(`Valid until ${formatDate(active.ends_at)}.`);
+      accessSummary.innerHTML = `<div class="access-banner"><strong>Access active</strong><span>${escapeHtml(parts.join(" "))}</span></div>`;
+    } else {
+      accessSummary.innerHTML = '<div class="access-banner"><strong>No active lesson access</strong><span>Choose a lesson package below. Access opens automatically after a confirmed payment.</span></div>';
+    }
+
+    const { data: products, error: productError } = await client
+      .from("billing_products")
+      .select("id,code,name,description,amount_minor,currency,included_uses,access_duration_days")
+      .eq("active", true)
+      .not("amount_minor", "is", null)
+      .order("created_at", { ascending: true });
+
+    if (productError) throw productError;
+
+    if (!products?.length) {
+      studentProducts.innerHTML = '<div class="sw-message">Lesson packages are not published yet.</div>';
+      return;
+    }
+
+    studentProducts.innerHTML = products.map((product) => `
+      <article class="product-card">
+        <div class="product-main">
+          <div class="product-name">${escapeHtml(product.name)}</div>
+          <div class="product-price">${escapeHtml(formatPrice(product.amount_minor, product.currency || "RUB"))}</div>
+          ${product.description ? `<div class="product-copy">${escapeHtml(product.description)}</div>` : ""}
+          ${productDetails(product) ? `<div class="product-copy">${escapeHtml(productDetails(product))}</div>` : ""}
+        </div>
+        <button class="sw-button" type="button" data-buy-product="${escapeHtml(product.code)}">Pay</button>
+      </article>
+    `).join("");
+  }
+
+  async function startPayment(productCode, button) {
+    button.disabled = true;
+    paymentMessage.textContent = "Creating secure payment…";
+
+    const { data, error } = await client.functions.invoke("robokassa-create-payment", {
+      body: { product_code: productCode }
+    });
+
+    if (error) {
+      let details = error.message || "Could not create payment.";
+      try {
+        if (error.context) {
+          const body = await error.context.clone().json();
+          if (body?.error) details = body.error;
+        }
+      } catch (_) {}
+      paymentMessage.textContent = details;
+      button.disabled = false;
+      return;
+    }
+
+    if (data?.error) {
+      paymentMessage.textContent = data.error;
+      button.disabled = false;
+      return;
+    }
+
+    if (!data?.payment_url) {
+      paymentMessage.textContent = "Payment link was not created.";
+      button.disabled = false;
+      return;
+    }
+
+    location.href = data.payment_url;
   }
 
   document.getElementById("logoutButton").addEventListener("click", () => auth.signOut());
@@ -136,34 +307,102 @@
     if (!error) profileLabel.textContent = displayNameInput.value.trim() || session.user.email;
   });
 
-  document.getElementById("inviteStudentForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const button = event.target.querySelector("button[type=submit]");
-    const email = document.getElementById("studentEmail").value.trim();
+  if (productForm) {
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submitButton = event.target.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      productMessage.textContent = "Saving…";
 
-    button.disabled = true;
-    inviteMessage.textContent = "Checking account and payment access…";
+      const price = Number(productPrice.value);
+      const uses = productUses.value ? Number(productUses.value) : null;
+      const days = productDays.value ? Number(productDays.value) : null;
 
-    const { data, error } = await client.rpc("connect_paid_student", {
-      p_email: email
+      const payload = {
+        teacher_id: session.user.id,
+        name: productName.value.trim(),
+        description: productDescription.value.trim() || null,
+        access_key: "lessons",
+        billing_type: uses ? "lesson_pack" : "one_time",
+        amount_minor: Math.round(price * 100),
+        currency: "RUB",
+        active: productActive.checked,
+        included_uses: uses,
+        access_duration_days: days
+      };
+
+      let error;
+
+      if (productId.value) {
+        ({ error } = await client
+          .from("billing_products")
+          .update(payload)
+          .eq("id", productId.value)
+          .eq("teacher_id", session.user.id));
+      } else {
+        payload.code = `lesson-${crypto.randomUUID()}`;
+        ({ error } = await client.from("billing_products").insert(payload));
+      }
+
+      submitButton.disabled = false;
+
+      if (error) {
+        productMessage.textContent = error.message;
+        return;
+      }
+
+      resetProductForm();
+      productMessage.textContent = "Saved.";
+      await loadTeacherProducts();
     });
 
-    button.disabled = false;
+    cancelProductEdit.addEventListener("click", resetProductForm);
 
-    if (error) {
-      inviteMessage.textContent = error.message;
-      return;
-    }
+    teacherProducts.addEventListener("click", async (event) => {
+      const editButton = event.target.closest("[data-product-edit]");
+      const toggleButton = event.target.closest("[data-product-toggle]");
 
-    if (!data?.ok) {
-      inviteMessage.textContent = "Could not add this student.";
-      return;
-    }
+      if (editButton) {
+        const product = cachedTeacherProducts.find((item) => item.id === editButton.dataset.productEdit);
+        if (!product) return;
 
-    inviteMessage.textContent = "Student added.";
-    event.target.reset();
-    await loadStudents();
-  });
+        productId.value = product.id;
+        productName.value = product.name || "";
+        productDescription.value = product.description || "";
+        productPrice.value = product.amount_minor != null ? (product.amount_minor / 100).toFixed(2) : "";
+        productUses.value = product.included_uses || "";
+        productDays.value = product.access_duration_days || "";
+        productActive.checked = Boolean(product.active);
+        cancelProductEdit.hidden = false;
+        productMessage.textContent = "Editing product.";
+        productName.focus();
+        return;
+      }
+
+      if (toggleButton) {
+        const product = cachedTeacherProducts.find((item) => item.id === toggleButton.dataset.productToggle);
+        if (!product) return;
+
+        toggleButton.disabled = true;
+        const { error } = await client
+          .from("billing_products")
+          .update({ active: !product.active })
+          .eq("id", product.id)
+          .eq("teacher_id", session.user.id);
+
+        if (error) productMessage.textContent = error.message;
+        else await loadTeacherProducts();
+      }
+    });
+  }
+
+  if (studentProducts) {
+    studentProducts.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-buy-product]");
+      if (!button) return;
+      startPayment(button.dataset.buyProduct, button);
+    });
+  }
 
   document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -205,21 +444,23 @@
       profile.role === "teacher" ? "Teaching dashboard" : "My lessons";
     document.getElementById("dashboardSubtitle").textContent =
       profile.role === "teacher"
-        ? "Your upcoming lessons and classroom access."
-        : "Your upcoming lessons will appear here.";
+        ? "Manage students, lesson packages and upcoming classes."
+        : "Your lessons and paid access live here.";
 
     if (profile.role === "teacher") {
       teacherPanel.hidden = false;
-      await loadStudents();
+      await Promise.all([loadStudents(), loadTeacherProducts()]);
+    } else {
+      studentPanel.hidden = false;
+      await loadStudentBilling();
     }
 
     await loadLessons();
-
     setInterval(loadLessons, 30000);
   }
 
   init().catch((error) => {
     console.error(error);
-    lessonList.innerHTML = `<div class="sw-message">${error.message}</div>`;
+    lessonList.innerHTML = `<div class="sw-message">${escapeHtml(error.message)}</div>`;
   });
 })();
