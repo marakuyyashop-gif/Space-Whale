@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Join as student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=1">
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-card">
+      <div class="sw-brand">Space Whale</div>
+      <h1>Join your teacher</h1>
+      <p>Create your student account. For this test version, no email invitation is required.</p>
+
+      <form id="studentSignupForm" class="sw-form">
+        <div class="sw-field">
+          <label for="studentEmail">Email</label>
+          <input id="studentEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+        <div class="sw-field">
+          <label for="studentPassword">Password</label>
+          <input id="studentPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+        </div>
+        <button id="createAccountButton" class="sw-button" type="submit">Create student account</button>
+        <button id="signInButton" class="sw-button secondary" type="button">I already have an account</button>
+        <div id="studentSignupMessage" class="sw-message"></div>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="student-signup.js?v=20260921-v1"></script>
+</body>
+</html>
