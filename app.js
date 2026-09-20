@@ -2,296 +2,271 @@ const sections = [
   {
     id: "module-info",
     title: "Module info",
-    open: false,
-    tabs: ["Tasks", "Language input", "Self study"],
+    collapsed: true,
     tasks: [
       {
-        id: "tutor-overview",
-        title: "[info] A2.1 Module 2 overview for tutor",
-        subtitle: "Tutor-only block",
-        screen: "tutor-overview"
+        id: "module-info-task",
+        name: "[info] A2.1 Module 2 overview for tutor",
+        done: false,
+        aim: "",
+        tl: "",
+        say: "",
+        time: ""
       }
     ]
   },
   {
-    id: "module-overview",
+    id: "overview",
     title: "A2.1 Модуль 2. Обзор",
-    open: false,
-    tabs: ["Tasks", "Language input", "Self study"],
-    tasks: [
-      { id: "overview-lead", title: "Lead-in", subtitle: "Warm-up", screen: "overview-lead" },
-      { id: "overview-test", title: "Test task", subtitle: "Interactive block", screen: "photos-test" },
-      { id: "overview-revision", title: "Revision", subtitle: "Practice", screen: "overview-revision" },
-      { id: "overview-extension", title: "Extension", subtitle: "Extra practice", screen: "overview-extension" }
-    ]
+    collapsed: true,
+    tasks: []
   },
   {
-    id: "photos-past",
+    id: "photos",
     title: "Фотографии из прошлого",
-    open: true,
-    tabs: ["Tasks", "Language input", "Self study"],
+    collapsed: false,
     tasks: [
-      { id: "photos-lead", title: "Lead-in", subtitle: "Discussion", screen: "photos-lead" },
-      { id: "photos-test", title: "Test task", subtitle: "Current screen", screen: "photos-test" },
-      { id: "photos-revision", title: "Revision", subtitle: "Practice", screen: "photos-revision" },
-      { id: "photos-extension", title: "Extension", subtitle: "Extra practice", screen: "photos-extension" }
+      {
+        id: "photos-test",
+        name: "Test task",
+        done: true,
+        open: true,
+        aim: "To set the context and talk about someone’s trip in the past",
+        tl: "was/were (+)",
+        say: "1. Look at the picture. What can you see? (a camera and photos) Right, today we’re going to talk about photos. Let’s discuss the questions first. 2. Now look at this photo and read the task. 3. Where was Rick in 2009? (in Bali) Which month was it? (May) What was the weather like? (sunny) 4. OK, now look at the comments. Where were Rick’s sons? Why?",
+        time: "5 minutes"
+      },
+      {
+        id: "photos-revision",
+        name: "Revision",
+        done: false,
+        open: false,
+        aim: "To describe a trip in the past",
+        tl: "was/were (+)",
+        say: "Look at the picture and read the task. You have one minute to think about your answers. Then tell me about this trip.",
+        time: "5 minutes"
+      },
+      {
+        id: "photos-extension",
+        name: "Extension",
+        done: false,
+        open: false,
+        aim: "To practice the target language in a freer context",
+        tl: "was/were",
+        say: "Read the task and discuss it with your tutor.",
+        time: "5 minutes"
+      }
     ]
   },
   {
-    id: "celebrities-past",
+    id: "celebrities",
     title: "Знаменитости прошлого",
-    open: false,
-    tabs: ["Tasks", "Language input", "Self study"],
+    collapsed: true,
     tasks: [
-      { id: "celeb-test", title: "Test task", subtitle: "Main block", screen: "celeb-test" },
-      { id: "celeb-revision", title: "Revision", subtitle: "Practice", screen: "celeb-revision" },
-      { id: "celeb-extension", title: "Extension", subtitle: "Extra practice", screen: "celeb-extension" }
+      { id: "celeb-test", name: "Test task", done: false, open: false }
     ]
   },
   {
     id: "yesterday",
     title: "Где ты был вчера?",
-    open: false,
-    tabs: ["Tasks", "Language input", "Self study"],
+    collapsed: true,
     tasks: [
-      { id: "yesterday-test", title: "Test task", subtitle: "Main block", screen: "yesterday-test" },
-      { id: "yesterday-revision", title: "Revision", subtitle: "Practice", screen: "yesterday-revision" },
-      { id: "yesterday-extension", title: "Extension", subtitle: "Extra practice", screen: "yesterday-extension" }
+      { id: "yesterday-test", name: "Test task", done: false, open: false }
     ]
   }
 ];
 
 let activeTaskId = "photos-test";
 
-const taskGuideEl = document.getElementById("taskGuide");
-const workspaceContentEl = document.getElementById("workspaceContent");
+const taskGuide = document.getElementById("taskGuide");
+const lessonContent = document.getElementById("lessonContent");
 
-function findTaskById(taskId) {
+const chevronSvg = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M17.6 9H6.4c-.9 0-1.3 1.1-.7 1.7l5.9 5.9a.5.5 0 0 0 .8 0l5.9-5.9c.6-.6.2-1.7-.7-1.7Z"/>
+  </svg>
+`;
+
+const checkSvg = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M19.7 4.4a1 1 0 0 1 1.6 1.2L10.7 19.1a1.5 1.5 0 0 1-2.3 0l-5.2-6a1 1 0 1 1 1.6-1.3l4.7 5.6L19.7 4.4Z"/>
+  </svg>
+`;
+
+function findTask(taskId) {
   for (const section of sections) {
-    for (const task of section.tasks) {
-      if (task.id === taskId) return { section, task };
-    }
+    const task = section.tasks.find((item) => item.id === taskId);
+    if (task) return { section, task };
   }
   return null;
 }
 
-function renderTaskGuide() {
-  taskGuideEl.innerHTML = "";
+function renderGuide() {
+  taskGuide.innerHTML = "";
 
   sections.forEach((section) => {
-    const sectionCard = document.createElement("div");
-    sectionCard.className = `section-card ${section.open ? "open" : ""}`;
+    const wrapper = document.createElement("section");
+    wrapper.className = `guide-section ${section.collapsed ? "collapsed" : "expanded"}`;
 
-    const header = document.createElement("button");
-    header.className = "section-header";
-    header.type = "button";
-    header.innerHTML = `
-      <span class="section-title">${section.title}</span>
-      <span class="section-chevron">▾</span>
-    `;
-    header.addEventListener("click", () => {
-      section.open = !section.open;
-      renderTaskGuide();
+    const title = document.createElement("button");
+    title.className = "guide-section__title";
+    title.type = "button";
+    title.innerHTML = `<span>${section.title}</span>${chevronSvg}`;
+    title.addEventListener("click", () => {
+      section.collapsed = !section.collapsed;
+      renderGuide();
     });
 
-    const body = document.createElement("div");
-    body.className = "section-body";
+    wrapper.appendChild(title);
 
-    if (section.tabs && section.tabs.length) {
+    if (section.collapsed) {
+      const preview = document.createElement("div");
+      preview.className = "collapsed-preview";
+      preview.textContent = section.tasks.length ? section.tasks[0].name : "";
+      wrapper.appendChild(preview);
+    } else {
       const tabs = document.createElement("div");
-      tabs.className = "section-tabs";
-      tabs.innerHTML = section.tabs
-        .map((tab, index) => `<span class="section-tab ${index === 0 ? "active" : ""}">${tab}</span>`)
-        .join("");
-      body.appendChild(tabs);
+      tabs.className = "guide-tabs";
+      tabs.innerHTML = `
+        <button class="guide-tab active" type="button">Tasks</button>
+        <button class="guide-tab" type="button">Language input</button>
+        <button class="guide-tab" type="button">Self study</button>
+      `;
+      wrapper.appendChild(tabs);
+
+      section.tasks.forEach((task) => {
+        const taskEl = document.createElement("div");
+        taskEl.className = `guide-task ${task.open ? "open" : ""}`;
+
+        const header = document.createElement("button");
+        header.type = "button";
+        header.className = "guide-task__header";
+        header.innerHTML = `
+          <span class="guide-task__name">${task.name}</span>
+          <span class="guide-task__right">
+            ${task.done ? `<span class="done-pill">Done ${checkSvg}</span>` : ""}
+            <span class="task-chevron">${chevronSvg}</span>
+          </span>
+        `;
+        header.addEventListener("click", () => {
+          task.open = !task.open;
+          activeTaskId = task.id;
+          renderGuide();
+          renderLesson();
+        });
+
+        taskEl.appendChild(header);
+
+        if (task.aim || task.tl || task.say || task.time) {
+          const details = document.createElement("div");
+          details.className = "guide-task__details";
+          details.innerHTML = `
+            ${task.aim ? `<div class="detail-row"><strong>Aim:</strong> ${task.aim}</div>` : ""}
+            ${task.tl ? `<div class="detail-row"><strong>TL:</strong> ${task.tl}</div>` : ""}
+            ${task.say ? `<div class="detail-row"><strong>Say:</strong> ${task.say}</div>` : ""}
+            ${task.time ? `<div class="detail-row"><strong>Time:</strong> ${task.time}</div>` : ""}
+          `;
+          taskEl.appendChild(details);
+        }
+
+        wrapper.appendChild(taskEl);
+      });
+
+      const action = document.createElement("button");
+      action.type = "button";
+      action.className = "guide-action";
+      action.textContent = "Show all tasks";
+      wrapper.appendChild(action);
     }
 
-    const taskList = document.createElement("div");
-    taskList.className = "task-list";
-
-    section.tasks.forEach((task) => {
-      const taskButton = document.createElement("button");
-      taskButton.className = `task-button ${activeTaskId === task.id ? "active" : ""}`;
-      taskButton.type = "button";
-      taskButton.innerHTML = `
-        <span class="task-button-title">${task.title}</span>
-        <span class="task-button-subtitle">${task.subtitle}</span>
-      `;
-      taskButton.addEventListener("click", () => {
-        activeTaskId = task.id;
-        section.open = true;
-        renderTaskGuide();
-        renderWorkspace();
-      });
-      taskList.appendChild(taskButton);
-    });
-
-    body.appendChild(taskList);
-    sectionCard.appendChild(header);
-    sectionCard.appendChild(body);
-    taskGuideEl.appendChild(sectionCard);
+    taskGuide.appendChild(wrapper);
   });
 }
 
-function renderWorkspace() {
-  const selected = findTaskById(activeTaskId);
+function renderLesson() {
+  const current = findTask(activeTaskId);
 
-  if (!selected) {
-    workspaceContentEl.innerHTML = "";
-    return;
-  }
-
-  const screen = selected.task.screen;
-
-  if (screen === "photos-test") {
-    workspaceContentEl.innerHTML = `
-      <section class="content-card hero-card">
-        <span class="badge">Test task</span>
-
-        <div class="hero-head">
-          <div class="hero-title-block">
-            <h1 class="hero-title">Photos from the past</h1>
-            <p class="hero-subtitle">
-              Do you like taking photos? How many photos do you have on your phone?
-              What do you usually take photos of?
-            </p>
-
-            <div class="idea-chips">
-              <span class="idea-chip">yourself</span>
-              <span class="idea-chip">other people</span>
-              <span class="idea-chip">animals</span>
-              <span class="idea-chip">nature</span>
-              <span class="idea-chip">buildings</span>
-            </div>
-          </div>
-
-          <img
-            class="hero-illustration"
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg"
-            alt="Camera illustration"
-          />
-        </div>
-      </section>
-
-      <section class="content-card image-task-card">
-        <div class="image-task-grid">
-          <p class="task-text">
-            Посмотрите на фотографию Рика. Где он был в 2009 году?
-            В каком месяце он был там? Какая была погода?
-          </p>
-
-          <img
-            class="task-image"
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg"
-            alt="Photo from the past"
-          />
-        </div>
-      </section>
-
-      <section class="content-card image-task-card">
-        <div class="image-task-grid">
-          <p class="task-text">
-            Прочитайте комментарии под фото. Где в это время были сыновья Рика? Почему?
-          </p>
-
-          <img
-            class="task-image"
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg"
-            alt="Comments under the photo"
-          />
-        </div>
-      </section>
-
-      <section class="dual-card content-card">
-        <div class="dual-grid">
-          <div class="sub-card">
-            <h3 class="sub-card-title">Layout notes</h3>
-            <p class="sub-card-text">
-              Left task guide is fixed at 469 px. Workspace starts at x = 468.984 px
-              and fills the remaining width of the 1260 px root container.
-            </p>
-          </div>
-
-          <div class="sub-card">
-            <h3 class="sub-card-title">Current goal</h3>
-            <p class="sub-card-text">
-              This is the neutral reference clone stage — no Space Whale redesign yet.
-              First we match geometry, spacing, cards, and content behavior.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div class="exercise-nav">
-        <button class="nav-button" type="button">Previous</button>
-
-        <div class="nav-dots" aria-label="Exercise steps">
-          <span class="nav-dot"></span>
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
-        </div>
-
-        <button class="nav-button primary" type="button">Next</button>
+  if (!current || current.task.id !== "photos-test") {
+    lessonContent.innerHTML = `
+      <div class="placeholder-page">
+        <h2>${current ? current.task.name : "Lesson"}</h2>
+        <p>This screen will be replaced with your own Space Whale lesson content after the reference shell is frozen.</p>
       </div>
     `;
     return;
   }
 
-  const screenTitles = {
-    "tutor-overview": "Tutor overview",
-    "overview-lead": "Lead-in",
-    "overview-revision": "Revision",
-    "overview-extension": "Extension",
-    "photos-lead": "Lead-in",
-    "photos-revision": "Revision",
-    "photos-extension": "Extension",
-    "celeb-test": "Celebrities from the past",
-    "celeb-revision": "Revision",
-    "celeb-extension": "Extension",
-    "yesterday-test": "Where were you yesterday?",
-    "yesterday-revision": "Revision",
-    "yesterday-extension": "Extension"
-  };
+  lessonContent.innerHTML = `
+    <article class="lesson">
+      <h1 class="lesson-title">Test task: Photos from the past</h1>
 
-  const title = screenTitles[screen] || "Screen";
-  const sectionTitle = selected.section.title;
-  const taskTitle = selected.task.title;
+      <section class="lesson-block">
+        <div class="lesson-block__visual">
+          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg" alt="" />
+        </div>
+        <div class="lesson-block__content">
+          <p><strong>Do you like taking photos?</strong></p>
+          <p>How many photos do you have on your phone?</p>
+          <p>What do you usually take photos of?</p>
+          <ul>
+            <li>yourself</li>
+            <li>other people</li>
+            <li>animals</li>
+            <li>nature</li>
+            <li>buildings</li>
+          </ul>
+        </div>
+        <div class="drawing-tools" aria-hidden="true">
+          <button class="tool" type="button">✎</button>
+          <button class="tool" type="button">╱</button>
+          <button class="tool" type="button">T</button>
+          <button class="tool" type="button">●</button>
+          <button class="tool" type="button">↶</button>
+          <button class="tool" type="button">⌫</button>
+        </div>
+      </section>
 
-  workspaceContentEl.innerHTML = `
-    <section class="content-card placeholder-screen">
-      <span class="badge">${taskTitle}</span>
-      <h1 class="placeholder-title">${title}</h1>
-      <p class="placeholder-text">
-        Section: <strong>${sectionTitle}</strong><br />
-        This screen is a placeholder in V1 of the reference clone.
-        The main purpose right now is to lock the overall geometry,
-        sidebar behavior, content card system, and page rhythm.
-      </p>
-    </section>
+      <section class="lesson-block">
+        <div class="lesson-block__visual">
+          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg" alt="" />
+        </div>
+        <div class="lesson-block__content">
+          <p>Посмотрите на фотографию Рика.</p>
+          <p>Где он был в 2009 году?</p>
+          <p>В каком месяце он был там?</p>
+          <p>Какая была погода?</p>
+        </div>
+        <div class="drawing-tools" aria-hidden="true">
+          <button class="tool" type="button">✎</button>
+          <button class="tool" type="button">╱</button>
+          <button class="tool" type="button">T</button>
+          <button class="tool" type="button">●</button>
+          <button class="tool" type="button">↶</button>
+          <button class="tool" type="button">⌫</button>
+        </div>
+      </section>
 
-    <section class="content-card placeholder-screen">
-      <h2 class="placeholder-title">Next refinement step</h2>
-      <p class="placeholder-text">
-        After you open this in the browser, compare it with the original page and note:
-        card heights, vertical gaps, button size, font size, and the exact look of the task guide.
-      </p>
-    </section>
-
-    <div class="exercise-nav">
-      <button class="nav-button" type="button">Previous</button>
-
-      <div class="nav-dots" aria-label="Exercise steps">
-        <span class="nav-dot active"></span>
-        <span class="nav-dot"></span>
-        <span class="nav-dot"></span>
-        <span class="nav-dot"></span>
-      </div>
-
-      <button class="nav-button primary" type="button">Next</button>
-    </div>
+      <section class="lesson-block">
+        <div class="lesson-block__visual">
+          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg" alt="" />
+        </div>
+        <div class="lesson-block__content">
+          <p>Прочитайте комментарии под фото.</p>
+          <p>Где в это время были сыновья Рика?</p>
+          <p>Почему?</p>
+        </div>
+        <div class="drawing-tools" aria-hidden="true">
+          <button class="tool" type="button">✎</button>
+          <button class="tool" type="button">╱</button>
+          <button class="tool" type="button">T</button>
+          <button class="tool" type="button">●</button>
+          <button class="tool" type="button">↶</button>
+          <button class="tool" type="button">⌫</button>
+        </div>
+      </section>
+    </article>
   `;
 }
 
-renderTaskGuide();
-renderWorkspace();
+renderGuide();
+renderLesson();
