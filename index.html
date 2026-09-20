@@ -23,11 +23,11 @@
           <button type="button">Class</button>
           <button type="button" class="active">Library</button>
           <button type="button">Self Study</button>
-          <button type="button" class="icon-btn" aria-label="Previous">
-            <svg viewBox="0 0 24 24"><path d="M9.5 5 3 12l6.5 7M4 12h17"/></svg>
+          <button type="button" class="icon-btn" aria-label="Draw">
+            <svg viewBox="0 0 24 24"><path d="m5 18 2.2-5.7L15.9 3.6a2 2 0 0 1 2.8 2.8L10 15.1 5 18Z"/><path d="m12.9 6.6 4.5 4.5"/></svg>
           </button>
-          <button type="button" class="icon-btn" aria-label="More">
-            <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+          <button type="button" class="icon-btn" aria-label="Profile">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4.1 3-6.2 6.5-6.2s5.7 2.1 6.5 6.2"/></svg>
           </button>
         </div>
         <div class="task-guide__menu-divider"></div>
@@ -57,26 +57,45 @@
       </main>
 
       <div class="session-bar">
-        <div class="session-state">
-          <span class="session-state__icon">
-            <svg viewBox="0 0 24 24"><path d="M7 10a5 5 0 1 1 10 0c0 4-5 8-5 8s-5-4-5-8Z"/><circle cx="12" cy="10" r="1.7"/></svg>
-          </span>
-          <span>Student has not joined yet</span>
+        <div class="session-left">
+          <div class="session-state">
+            <span class="session-state__icon">
+              <svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><path d="M2.5 19c.7-3.8 2.5-5.7 5.5-5.7s4.8 1.9 5.5 5.7"/><path d="m16.5 8 4 4m0-4-4 4"/></svg>
+            </span>
+            <span>Student has not joined yet</span>
+          </div>
+
+          <div class="canvas-controls">
+            <button type="button" class="canvas-control color-dot" aria-label="Color"></button>
+            <button type="button" class="canvas-control" aria-label="Delete">
+              <svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>
+            </button>
+            <button type="button" class="canvas-control muted" aria-label="Undo">
+              <svg viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M5 12h8a6 6 0 0 1 6 6"/></svg>
+            </button>
+            <button type="button" class="canvas-control muted" aria-label="Redo">
+              <svg viewBox="0 0 24 24"><path d="m15 7 5 5-5 5m4-5h-8a6 6 0 0 0-6 6"/></svg>
+            </button>
+            <button type="button" class="canvas-control" aria-label="Remove participant">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.7 2.5-5.6 5.5-5.6s4.8 1.9 5.5 5.6M17 9h5"/></svg>
+            </button>
+          </div>
         </div>
 
-        <div class="session-controls">
-          <button type="button" class="round-control" aria-label="Show settings">
-            <svg viewBox="0 0 24 24"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z"/><path d="M4.5 13.5 3 12l1.5-1.5.3-1.3L3.8 7l2.1-2.1 2.2 1 .1-.1 1.3-.3L10.5 3h3l1 2.5 1.3.3.1.1 2.2-1L20.2 7l-1 2.2.3 1.3L21 12l-1.5 1.5-.3 1.3 1 2.2-2.1 2.1-2.2-1-.1.1-1.3.3-1 2.5h-3l-1-2.5-1.3-.3-.1-.1-2.2 1L3.8 17l1-2.2-.3-1.3Z"/></svg>
-          </button>
-          <button type="button" class="round-control" aria-label="Show chat">
-            <svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H9l-5 3v-14Z"/></svg>
-          </button>
-          <button type="button" class="round-control" aria-label="Interlocutor's name">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3"/><path d="M5.5 20c.8-4.1 3-6.2 6.5-6.2s5.7 2.1 6.5 6.2"/></svg>
-          </button>
+        <div class="session-right">
+          <div class="session-controls">
+            <button type="button" class="round-control" aria-label="Settings">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="m4.8 13.7-1.5-1.7 1.5-1.7.5-1.6-.6-2.2 2.2-1.2 1.6 1 1.7-.5L11 3h2l.8 2.8 1.7.5 1.6-1 2.2 1.2-.6 2.2.5 1.6 1.5 1.7-1.5 1.7-.5 1.6.6 2.2-2.2 1.2-1.6-1-1.7.5L13 21h-2l-.8-2.8-1.7-.5-1.6 1-2.2-1.2.6-2.2-.5-1.6Z"/></svg>
+            </button>
+            <button type="button" class="round-control" aria-label="Chat">
+              <svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H9l-5 3v-14Z"/></svg>
+            </button>
+            <button type="button" class="round-control" aria-label="Participant">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4.1 3-6.2 6.5-6.2s5.7 2.1 6.5 6.2"/></svg>
+            </button>
+          </div>
+          <button type="button" class="support-btn" aria-label="Support">?</button>
         </div>
-
-        <button type="button" class="support-btn" aria-label="Support">?</button>
       </div>
     </section>
   </div>
