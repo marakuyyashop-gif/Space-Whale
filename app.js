@@ -1,182 +1,153 @@
-const sections = [
+const courseModules = [
   {
-    id: "module-info",
-    title: "Module info",
-    collapsed: true,
-    tasks: [
+    id: "small-talk",
+    title: "Module 1 · Small Talk",
+    expanded: false,
+    lessons: [
+      { id: "small-talk-1", title: "Знакомство с новыми людьми", expanded: false, activities: [] }
+    ]
+  },
+  {
+    id: "the-past",
+    title: "Module 2 · The Past",
+    expanded: true,
+    active: true,
+    lessons: [
       {
-        id: "module-info-task",
-        name: "[info] A2.1 Module 2 overview for tutor",
-        done: false,
-        open: false
+        id: "photos",
+        title: "Фотографии из прошлого",
+        expanded: true,
+        current: true,
+        activities: [
+          { id: "photos-test", name: "Test task", done: true },
+          { id: "photos-revision", name: "Revision", done: false },
+          { id: "photos-extension", name: "Extension", done: false }
+        ]
+      },
+      {
+        id: "celebrities",
+        title: "Знаменитости прошлого",
+        expanded: false,
+        activities: [
+          { id: "celeb-test", name: "Test task", done: false }
+        ]
+      },
+      {
+        id: "yesterday",
+        title: "Где ты был вчера?",
+        expanded: false,
+        activities: [
+          { id: "yesterday-test", name: "Test task", done: false }
+        ]
       }
     ]
   },
   {
-    id: "overview",
-    title: "A2.1 Модуль 2. Обзор",
-    collapsed: true,
-    tasks: []
-  },
-  {
-    id: "photos",
-    title: "Фотографии из прошлого",
-    collapsed: false,
-    tasks: [
-      {
-        id: "photos-test",
-        name: "Test task",
-        done: true,
-        open: true,
-        aim: "To set the context and talk about someone’s trip in the past",
-        tl: "was/were (+)",
-        say: "1. Look at the picture. What can you see? (a camera and photos) Right, today we’re going to talk about photos. Let’s discuss the questions first. 2. Now look at this photo and read the task. 3. Where was Rick in 2009? (in Bali) Which month was it? (May) What was the weather like? (sunny) 4. OK, now look at the comments. Where were Rick’s sons? Why?",
-        time: "5 minutes"
-      },
-      {
-        id: "photos-revision",
-        name: "Revision",
-        done: false,
-        open: false,
-        aim: "To describe a trip in the past",
-        tl: "was/were (+)",
-        say: "Look at the picture and read the task. You have one minute to think about your answers. Then tell me about this trip.",
-        time: "5 minutes"
-      },
-      {
-        id: "photos-extension",
-        name: "Extension",
-        done: false,
-        open: false,
-        aim: "To practice the target language in a freer context",
-        tl: "was/were",
-        say: "Read the task and discuss it with your tutor.",
-        time: "5 minutes"
-      }
-    ]
-  },
-  {
-    id: "celebrities",
-    title: "Знаменитости прошлого",
-    collapsed: true,
-    tasks: [
-      { id: "celeb-test", name: "Test task", done: false, open: false }
-    ]
-  },
-  {
-    id: "yesterday",
-    title: "Где ты был вчера?",
-    collapsed: true,
-    tasks: [
-      { id: "yesterday-test", name: "Test task", done: false, open: false }
+    id: "stories",
+    title: "Module 3 · Stories",
+    expanded: false,
+    lessons: [
+      { id: "stories-1", title: "Первый день на новом месте", expanded: false, activities: [] }
     ]
   }
 ];
 
 let activeTaskId = "photos-test";
 
-const taskGuide = document.getElementById("taskGuide");
+const courseTree = document.getElementById("courseTree");
 const lessonContent = document.getElementById("lessonContent");
 
-const chevronSvg = `
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M17.6 9H6.4c-.9 0-1.3 1.1-.7 1.7l5.9 5.9a.5.5 0 0 0 .8 0l5.9-5.9c.6-.6.2-1.7-.7-1.7Z"/>
+const chevronRightSvg = `
+  <svg class="course-chevron" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="m9 6 6 6-6 6"/>
   </svg>
 `;
 
-const checkSvg = `
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M19.7 4.4a1 1 0 0 1 1.6 1.2L10.7 19.1a1.5 1.5 0 0 1-2.3 0l-5.2-6a1 1 0 1 1 1.6-1.3l4.7 5.6L19.7 4.4Z"/>
-  </svg>
-`;
-
-function findTask(taskId) {
-  for (const section of sections) {
-    const task = section.tasks.find((item) => item.id === taskId);
-    if (task) return { section, task };
+function findActivity(activityId) {
+  for (const module of courseModules) {
+    for (const lesson of module.lessons) {
+      const activity = lesson.activities.find((item) => item.id === activityId);
+      if (activity) return { module, lesson, activity };
+    }
   }
   return null;
 }
 
-function renderGuide() {
-  taskGuide.innerHTML = "";
+function renderCourseTree() {
+  courseTree.innerHTML = "";
 
-  sections.forEach((section) => {
-    const wrapper = document.createElement("section");
-    wrapper.className = `guide-section ${section.collapsed ? "collapsed" : "expanded"}`;
+  courseModules.forEach((module) => {
+    const moduleEl = document.createElement("section");
+    moduleEl.className = `course-module ${module.expanded ? "expanded" : ""}`;
 
-    const title = document.createElement("button");
-    title.className = "guide-section__title";
-    title.type = "button";
-    title.innerHTML = `<span>${section.title}</span>`;
-    title.addEventListener("click", () => {
-      section.collapsed = !section.collapsed;
-      renderGuide();
+    const moduleButton = document.createElement("button");
+    moduleButton.type = "button";
+    moduleButton.className = `course-module__button ${module.active ? "active" : ""}`;
+    moduleButton.innerHTML = `
+      <span>${module.title}</span>
+      ${chevronRightSvg}
+    `;
+
+    moduleButton.addEventListener("click", () => {
+      module.expanded = !module.expanded;
+      renderCourseTree();
     });
 
-    wrapper.appendChild(title);
+    moduleEl.appendChild(moduleButton);
 
-    if (section.collapsed) {
-      const toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.className = "section-toggle-circle";
-      toggle.setAttribute("aria-label", "Expand section");
-      toggle.innerHTML = chevronSvg;
-      toggle.addEventListener("click", () => {
-        section.collapsed = false;
-        renderGuide();
-      });
-      wrapper.appendChild(toggle);
-    } else {
-      const tabs = document.createElement("div");
-      tabs.className = "guide-tabs";
-      tabs.innerHTML = `
-        <button class="guide-tab active" type="button">Tasks</button>
-        <button class="guide-tab" type="button">Language input</button>
-        <button class="guide-tab" type="button">Self study</button>
+    const moduleContent = document.createElement("div");
+    moduleContent.className = "course-module__content";
+
+    module.lessons.forEach((lesson) => {
+      const lessonEl = document.createElement("div");
+      lessonEl.className = `course-lesson ${lesson.expanded ? "expanded" : ""} ${lesson.current ? "current" : ""}`;
+
+      const lessonButton = document.createElement("button");
+      lessonButton.type = "button";
+      lessonButton.className = "course-lesson__button";
+      lessonButton.innerHTML = `
+        <span>${lesson.title}</span>
+        ${lesson.activities.length ? chevronRightSvg : ""}
       `;
-      wrapper.appendChild(tabs);
 
-      section.tasks.forEach((task) => {
-        const taskEl = document.createElement("div");
-        taskEl.className = `guide-task ${task.open ? "open" : ""}`;
+      lessonButton.addEventListener("click", () => {
+        if (lesson.activities.length) {
+          lesson.expanded = !lesson.expanded;
+          renderCourseTree();
+        }
+      });
 
-        const header = document.createElement("button");
-        header.type = "button";
-        header.className = "guide-task__header";
-        header.innerHTML = `
-          <span class="guide-task__name">${task.name}</span>
-          <span class="guide-task__right">
-            ${task.done ? `<span class="done-pill">Done ${checkSvg}</span>` : ""}
-          </span>
-        `;
+      lessonEl.appendChild(lessonButton);
 
-        header.addEventListener("click", () => {
-          task.open = !task.open;
-          activeTaskId = task.id;
-          renderGuide();
-          renderLesson();
+      if (lesson.activities.length) {
+        const activitiesEl = document.createElement("div");
+        activitiesEl.className = "course-lesson__activities";
+
+        lesson.activities.forEach((activity) => {
+          const activityButton = document.createElement("button");
+          activityButton.type = "button";
+          activityButton.className = `course-activity ${activeTaskId === activity.id ? "active" : ""} ${activity.done ? "done" : ""}`;
+          activityButton.textContent = activity.name;
+
+          activityButton.addEventListener("click", () => {
+            activeTaskId = activity.id;
+            module.expanded = true;
+            lesson.expanded = true;
+            renderCourseTree();
+            renderLesson();
+          });
+
+          activitiesEl.appendChild(activityButton);
         });
 
-        taskEl.appendChild(header);
+        lessonEl.appendChild(activitiesEl);
+      }
 
-        if (task.aim || task.tl || task.say || task.time) {
-          const details = document.createElement("div");
-          details.className = "guide-task__details";
-          details.innerHTML = `
-            ${task.aim ? `<div class="detail-row"><strong>Aim:</strong> ${task.aim}</div>` : ""}
-            ${task.tl ? `<div class="detail-row"><strong>TL:</strong> ${task.tl}</div>` : ""}
-            ${task.say ? `<div class="detail-row"><strong>Say:</strong> ${task.say}</div>` : ""}
-            ${task.time ? `<div class="detail-row"><strong>Time:</strong> ${task.time}</div>` : ""}
-          `;
-          taskEl.appendChild(details);
-        }
+      moduleContent.appendChild(lessonEl);
+    });
 
-        wrapper.appendChild(taskEl);
-      });
-    }
-
-    taskGuide.appendChild(wrapper);
+    moduleEl.appendChild(moduleContent);
+    courseTree.appendChild(moduleEl);
   });
 }
 
@@ -250,14 +221,14 @@ function renderWorkspacePage(page) {
 }
 
 function renderLesson() {
-  const current = findTask(activeTaskId);
+  const current = findActivity(activeTaskId);
   const page = workspacePages[activeTaskId];
 
   if (page) {
     renderWorkspacePage(page);
   } else {
     renderWorkspacePage({
-      title: current ? current.task.name : "Lesson",
+      title: current ? current.activity.name : "Lesson",
       blocks: [
         {
           variant: "standard",
@@ -272,5 +243,5 @@ function renderLesson() {
   lessonContent.scrollTop = 0;
 }
 
-renderGuide();
+renderCourseTree();
 renderLesson();
