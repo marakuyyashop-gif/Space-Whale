@@ -361,13 +361,18 @@
 
   function openNewLesson(localDateTime = "") {
     resetLessonForm();
-    if (localDateTime) el("lessonTime").value = localDateTime;
-    else {
-      const now = zonedParts(new Date(Date.now() + 60 * 60000));
-      const roundedMinute = now.minute < 30 ? 30 : 0;
-      const hour = now.minute < 30 ? now.hour : (now.hour + 1) % 24;
-      const key = dateKeyFromParts(now);
-      el("lessonTime").value = `${key}T${pad(hour)}:${pad(roundedMinute)}`;
+    if (localDateTime) {
+      el("lessonTime").value = localDateTime;
+    } else {
+      const now = zonedParts(new Date());
+      let key = dateKeyFromParts(now);
+      let totalMinutes = now.hour * 60 + now.minute + 60;
+      totalMinutes = Math.ceil(totalMinutes / 30) * 30;
+      if (totalMinutes >= 24 * 60) {
+        key = addDays(key, 1);
+        totalMinutes -= 24 * 60;
+      }
+      el("lessonTime").value = `${key}T${pad(Math.floor(totalMinutes / 60))}:${pad(totalMinutes % 60)}`;
     }
     openDialog();
   }
@@ -443,20 +448,24 @@
         ? Math.max(2, Math.min(24, Number(el("repeatCount").value || 4)))
         : 1;
       const seriesId = count > 1 ? crypto.randomUUID() : null;
-      const baseMs = scheduledAt.getTime();
+      const [baseDateKey, baseTime] = localTime.split("T");
 
-      const payload = Array.from({ length: count }, (_, index) => ({
-        workspace_id: workspaceId,
-        teacher_id: session.user.id,
-        student_id: studentId,
-        title: el("lessonTitle").value.trim() || "English lesson",
-        scheduled_at: new Date(baseMs + index * 7 * 86400000).toISOString(),
-        duration_minutes: Number(el("duration").value),
-        join_window_minutes: 5,
-        status: "scheduled",
-        series_id: seriesId,
-        series_index: seriesId ? index : null
-      }));
+      const payload = Array.from({ length: count }, (_, index) => {
+        const occurrenceLocal = `${addDays(baseDateKey, index * 7)}T${baseTime}`;
+        const occurrenceUtc = zonedLocalToUtc(occurrenceLocal);
+        return {
+          workspace_id: workspaceId,
+          teacher_id: session.user.id,
+          student_id: studentId,
+          title: el("lessonTitle").value.trim() || "English lesson",
+          scheduled_at: occurrenceUtc.toISOString(),
+          duration_minutes: Number(el("duration").value),
+          join_window_minutes: 5,
+          status: "scheduled",
+          series_id: seriesId,
+          series_index: seriesId ? index : null
+        };
+      });
 
       const { error } = await client.from("lesson_sessions").insert(payload);
 
