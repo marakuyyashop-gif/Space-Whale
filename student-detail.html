@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-students-v1">
+</head>
+<body class="teacher-home-body">
+  <main class="student-detail-shell">
+    <a class="student-detail-back" href="students.html">← Students</a>
+
+    <section id="studentDetail" hidden>
+      <header class="student-detail-header">
+        <div class="student-detail-identity">
+          <div id="studentAvatar" class="student-detail-avatar"><span>S</span></div>
+          <div>
+            <div class="student-detail-title-row">
+              <h1 id="studentName">Student</h1>
+              <span id="studentStatusBadge" class="student-status-pill active">active</span>
+            </div>
+            <p id="studentEmail">—</p>
+          </div>
+        </div>
+        <div class="student-detail-actions">
+          <button id="scheduleStudentLesson" class="sw-button" type="button">Schedule lesson</button>
+          <a class="sw-button secondary" href="dashboard.html">Home</a>
+        </div>
+      </header>
+
+      <section class="student-detail-metrics">
+        <article><span>Lesson balance</span><strong id="detailBalance">—</strong></article>
+        <article><span>Next lesson</span><strong id="detailNextLesson">—</strong></article>
+        <article><span>Completed lessons</span><strong id="detailCompleted">0</strong></article>
+        <article><span>Package valid until</span><strong id="detailExpiry">—</strong></article>
+      </section>
+
+      <div class="student-detail-grid">
+        <section class="teacher-panel">
+          <div class="teacher-panel-heading">
+            <div>
+              <span class="teacher-eyebrow">PROFILE</span>
+              <h2>Learning details</h2>
+            </div>
+          </div>
+          <form id="studentRecordForm" class="sw-form student-record-form">
+            <div class="sw-field">
+              <label for="studentLevel">Level</label>
+              <select id="studentLevel">
+                <option value="">Not set</option>
+                <option>A0</option>
+                <option>A1</option>
+                <option>A1.1</option>
+                <option>A1.2</option>
+                <option>A2</option>
+                <option>A2.1</option>
+                <option>A2.2</option>
+                <option>B1</option>
+                <option>B2</option>
+                <option>C1</option>
+              </select>
+            </div>
+            <div class="sw-field">
+              <label for="learningGoal">Learning goal</label>
+              <input id="learningGoal" type="text" placeholder="For example: speaking confidence">
+            </div>
+            <div class="sw-field">
+              <label for="privateNotes">Private teacher notes</label>
+              <textarea id="privateNotes" rows="6" placeholder="Visible only to you"></textarea>
+            </div>
+            <div class="sw-field">
+              <label for="studentStatus">Student status</label>
+              <select id="studentStatus">
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+            <button class="sw-button" type="submit">Save student</button>
+            <div id="recordMessage" class="sw-message"></div>
+          </form>
+        </section>
+
+        <section class="teacher-panel">
+          <div class="teacher-panel-heading">
+            <div>
+              <span class="teacher-eyebrow">ACCESS</span>
+              <h2>Current package</h2>
+            </div>
+          </div>
+          <div id="packageSummary" class="student-package-summary"></div>
+        </section>
+      </div>
+
+      <section class="teacher-section">
+        <div class="teacher-section-heading">
+          <div>
+            <span class="teacher-eyebrow">LESSONS</span>
+            <h2>Lesson history</h2>
+          </div>
+        </div>
+        <div id="lessonHistory" class="teacher-list"></div>
+      </section>
+
+      <section class="teacher-section">
+        <div class="teacher-section-heading">
+          <div>
+            <span class="teacher-eyebrow">PAYMENTS</span>
+            <h2>Orders</h2>
+          </div>
+        </div>
+        <div id="studentOrders" class="teacher-list"></div>
+      </section>
+    </section>
+
+    <div id="detailLoading" class="page-loading">Loading student…</div>
+  </main>
+
+  <dialog id="scheduleDialog" class="sw-dialog">
+    <form id="scheduleForm" class="dialog-card">
+      <div class="dialog-header">
+        <div><span class="teacher-eyebrow">NEW LESSON</span><h2>Schedule lesson</h2></div>
+        <button class="dialog-close" type="button" data-close-dialog>×</button>
+      </div>
+      <div class="sw-field">
+        <label for="lessonTitle">Lesson title</label>
+        <input id="lessonTitle" type="text" placeholder="English lesson">
+      </div>
+      <div class="dialog-grid">
+        <div class="sw-field">
+          <label for="lessonTime">Date and time</label>
+          <input id="lessonTime" type="datetime-local" required>
+        </div>
+        <div class="sw-field">
+          <label for="duration">Duration</label>
+          <select id="duration">
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="sw-button secondary" type="button" data-close-dialog>Cancel</button>
+        <button id="scheduleSubmit" class="sw-button" type="submit">Schedule</button>
+      </div>
+      <div id="scheduleMessage" class="sw-message"></div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="student-detail.js?v=20260921-v1"></script>
+</body>
+</html>
