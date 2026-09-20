@@ -1,0 +1,179 @@
+(() => {
+  const client = window.spaceWhaleSupabase;
+  const auth = window.SpaceWhaleAuth;
+
+  const lessonList = document.getElementById("lessonList");
+  const teacherPanel = document.getElementById("teacherPanel");
+  const profileLabel = document.getElementById("profileLabel");
+  const displayNameInput = document.getElementById("displayName");
+  const profileMessage = document.getElementById("profileMessage");
+  const scheduleMessage = document.getElementById("scheduleMessage");
+  const studentSelect = document.getElementById("studentSelect");
+
+  let session;
+  let profile;
+
+  function formatDate(value) {
+    if (!value) return "Time not set";
+    return new Intl.DateTimeFormat(undefined, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(new Date(value));
+  }
+
+  function canEnterLesson(lesson) {
+    if (lesson.status === "live") return true;
+    if (!lesson.scheduled_at || lesson.status !== "scheduled") return false;
+    const opensAt = new Date(lesson.scheduled_at).getTime() - (lesson.join_window_minutes ?? 5) * 60000;
+    return Date.now() >= opensAt;
+  }
+
+  function renderLessons(lessons) {
+    if (!lessons.length) {
+      lessonList.innerHTML = '<div class="sw-message">No lessons scheduled yet.</div>';
+      return;
+    }
+
+    lessonList.innerHTML = lessons.map((lesson) => {
+      const enabled = canEnterLesson(lesson);
+      const action = enabled
+        ? `<a class="sw-button" href="waiting-room.html?session=${lesson.id}">Join lesson</a>`
+        : `<button class="sw-button secondary" type="button" disabled>Available 5 min before</button>`;
+
+      return `
+        <article class="lesson-card">
+          <div class="lesson-main">
+            <div class="lesson-title">${lesson.title || lesson.lesson_id || "English lesson"}</div>
+            <div class="lesson-meta">${formatDate(lesson.scheduled_at)} · ${lesson.duration_minutes || 60} min</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="lesson-status">${lesson.status}</span>
+            ${action}
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  async function loadLessons() {
+    let query = client
+      .from("lesson_sessions")
+      .select("id,title,course_id,lesson_id,status,scheduled_at,duration_minutes,join_window_minutes,teacher_id,student_id")
+      .in("status", ["scheduled", "live"])
+      .order("scheduled_at", { ascending: true, nullsFirst: false });
+
+    query = profile.role === "teacher"
+      ? query.eq("teacher_id", session.user.id)
+      : query.eq("student_id", session.user.id);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    renderLessons(data || []);
+  }
+
+  async function loadStudents() {
+    const { data: links, error } = await client
+      .from("teacher_students")
+      .select("student_id,status")
+      .eq("teacher_id", session.user.id)
+      .eq("status", "active");
+
+    if (error) throw error;
+
+    const ids = (links || []).map((item) => item.student_id);
+    if (!ids.length) {
+      studentSelect.innerHTML = '<option value="">No students connected yet</option>';
+      document.querySelector("#scheduleForm button[type=submit]").disabled = true;
+      return;
+    }
+
+    const { data: students, error: studentError } = await client
+      .from("profiles")
+      .select("id,display_name")
+      .in("id", ids);
+
+    if (studentError) throw studentError;
+
+    studentSelect.innerHTML = (students || []).map((student) =>
+      `<option value="${student.id}">${student.display_name || "Student"}</option>`
+    ).join("");
+  }
+
+  document.getElementById("logoutButton").addEventListener("click", () => auth.signOut());
+
+  document.getElementById("profileForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    profileMessage.textContent = "Saving…";
+    const { error } = await client
+      .from("profiles")
+      .update({
+        display_name: displayNameInput.value.trim() || null,
+        profile_complete: true
+      })
+      .eq("id", session.user.id);
+
+    profileMessage.textContent = error ? error.message : "Saved.";
+    if (!error) profileLabel.textContent = displayNameInput.value.trim() || session.user.email;
+  });
+
+  document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    scheduleMessage.textContent = "Scheduling…";
+
+    const localTime = document.getElementById("lessonTime").value;
+    const studentId = studentSelect.value;
+
+    const { error } = await client.from("lesson_sessions").insert({
+      teacher_id: session.user.id,
+      student_id: studentId,
+      title: document.getElementById("lessonTitle").value.trim() || "English lesson",
+      scheduled_at: new Date(localTime).toISOString(),
+      duration_minutes: Number(document.getElementById("duration").value),
+      join_window_minutes: 5,
+      status: "scheduled"
+    });
+
+    if (error) {
+      scheduleMessage.textContent = error.message;
+      return;
+    }
+
+    scheduleMessage.textContent = "Lesson scheduled.";
+    event.target.reset();
+    document.getElementById("duration").value = "60";
+    await loadLessons();
+  });
+
+  async function init() {
+    session = await auth.requireSession();
+    if (!session) return;
+
+    profile = await auth.getProfile(session.user.id);
+    profileLabel.textContent = profile.display_name || session.user.email;
+    displayNameInput.value = profile.display_name || "";
+
+    document.getElementById("dashboardTitle").textContent =
+      profile.role === "teacher" ? "Teaching dashboard" : "My lessons";
+    document.getElementById("dashboardSubtitle").textContent =
+      profile.role === "teacher"
+        ? "Your upcoming lessons and classroom access."
+        : "Your upcoming lessons will appear here.";
+
+    if (profile.role === "teacher") {
+      teacherPanel.hidden = false;
+      await loadStudents();
+    }
+
+    await loadLessons();
+
+    setInterval(loadLessons, 30000);
+  }
+
+  init().catch((error) => {
+    console.error(error);
+    lessonList.innerHTML = `<div class="sw-message">${error.message}</div>`;
+  });
+})();
