@@ -853,3 +853,5 @@ button{font:inherit;color:inherit}
     border-radius:26px;
   }
 }
+
+.module-banner{display:none!important;}
