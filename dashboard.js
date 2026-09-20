@@ -139,69 +139,44 @@
   document.getElementById("inviteStudentForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = event.target.querySelector("button[type=submit]");
-    button.disabled = true;
-    inviteMessage.textContent = "Sending invitation…";
-
-    const email = document.getElementById("studentEmail").value.trim();
     const displayName = document.getElementById("studentName").value.trim();
 
-    const { data: authData, error: sessionError } = await client.auth.getSession();
-    if (sessionError || !authData.session?.access_token) {
-      button.disabled = false;
-      inviteMessage.textContent = "Your teacher session expired. Please sign in again.";
-      return;
-    }
+    button.disabled = true;
+    inviteMessage.textContent = "Creating link…";
 
-    const { data, error } = await client.functions.invoke("student-invite-v2", {
-      body: {
-        email,
+    const { data, error } = await client
+      .from("student_invites")
+      .insert({
+        teacher_id: session.user.id,
         display_name: displayName
-      },
-      headers: {
-        Authorization: `Bearer ${authData.session.access_token}`
-      }
-    });
+      })
+      .select("token")
+      .single();
 
     button.disabled = false;
 
     if (error) {
-      let details = error.message || "Could not reach the invitation service.";
-      try {
-        if (error.context) {
-          const response = error.context.clone();
-          const body = await response.json();
-          if (body?.error) details = body.error;
-        }
-      } catch (_) {}
-      inviteMessage.textContent = details;
+      inviteMessage.textContent = error.message;
       return;
     }
 
-    if (data?.error) {
-      inviteMessage.textContent = data.error;
-      return;
-    }
+    const inviteUrl = new URL("student-signup.html", location.href);
+    inviteUrl.searchParams.set("invite", data.token);
 
-    if (data?.invite_link) {
-      inviteMessage.innerHTML = `
-        Email delivery is not configured yet, so I created a temporary sign-in link for testing.
-        <div style="margin-top:10px">
-          <button id="copyInviteLink" class="sw-button secondary" type="button">Copy student sign-in link</button>
-        </div>
-      `;
-      const copyButton = document.getElementById("copyInviteLink");
-      copyButton.addEventListener("click", async () => {
-        await navigator.clipboard.writeText(data.invite_link);
-        copyButton.textContent = "Copied";
-      });
-    } else {
-      inviteMessage.textContent = data?.invited
-        ? "Invitation sent. The student is now linked to your account."
-        : "Student linked to your account.";
-    }
+    inviteMessage.innerHTML = `
+      Student link created.
+      <div style="margin-top:10px">
+        <button id="copyInviteLink" class="sw-button secondary" type="button">Copy student link</button>
+      </div>
+    `;
+
+    const copyButton = document.getElementById("copyInviteLink");
+    copyButton.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(inviteUrl.href);
+      copyButton.textContent = "Copied";
+    });
 
     event.target.reset();
-    await loadStudents();
   });
 
   document.getElementById("scheduleForm").addEventListener("submit", async (event) => {
