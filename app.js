@@ -8,10 +8,7 @@ const sections = [
         id: "module-info-task",
         name: "[info] A2.1 Module 2 overview for tutor",
         done: false,
-        aim: "",
-        tl: "",
-        say: "",
-        time: ""
+        open: false
       }
     ]
   },
@@ -111,7 +108,7 @@ function renderGuide() {
     const title = document.createElement("button");
     title.className = "guide-section__title";
     title.type = "button";
-    title.innerHTML = `<span>${section.title}</span>${chevronSvg}`;
+    title.innerHTML = `<span>${section.title}</span>`;
     title.addEventListener("click", () => {
       section.collapsed = !section.collapsed;
       renderGuide();
@@ -120,10 +117,16 @@ function renderGuide() {
     wrapper.appendChild(title);
 
     if (section.collapsed) {
-      const preview = document.createElement("div");
-      preview.className = "collapsed-preview";
-      preview.textContent = section.tasks.length ? section.tasks[0].name : "";
-      wrapper.appendChild(preview);
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "section-toggle-circle";
+      toggle.setAttribute("aria-label", "Expand section");
+      toggle.innerHTML = chevronSvg;
+      toggle.addEventListener("click", () => {
+        section.collapsed = false;
+        renderGuide();
+      });
+      wrapper.appendChild(toggle);
     } else {
       const tabs = document.createElement("div");
       tabs.className = "guide-tabs";
@@ -145,9 +148,9 @@ function renderGuide() {
           <span class="guide-task__name">${task.name}</span>
           <span class="guide-task__right">
             ${task.done ? `<span class="done-pill">Done ${checkSvg}</span>` : ""}
-            <span class="task-chevron">${chevronSvg}</span>
           </span>
         `;
+
         header.addEventListener("click", () => {
           task.open = !task.open;
           activeTaskId = task.id;
@@ -171,12 +174,6 @@ function renderGuide() {
 
         wrapper.appendChild(taskEl);
       });
-
-      const action = document.createElement("button");
-      action.type = "button";
-      action.className = "guide-action";
-      action.textContent = "Show all tasks";
-      wrapper.appendChild(action);
     }
 
     taskGuide.appendChild(wrapper);
@@ -188,26 +185,31 @@ function renderLesson() {
 
   if (!current || current.task.id !== "photos-test") {
     lessonContent.innerHTML = `
-      <div class="placeholder-page">
+      <section class="placeholder-page">
         <h2>${current ? current.task.name : "Lesson"}</h2>
-        <p>This screen will be replaced with your own Space Whale lesson content after the reference shell is frozen.</p>
-      </div>
+        <p>This screen is a placeholder. The reference shell stays the same while lesson content can be replaced later.</p>
+      </section>
     `;
     return;
   }
 
   lessonContent.innerHTML = `
     <article class="lesson">
-      <h1 class="lesson-title">Test task: Photos from the past</h1>
+      <section class="lesson-title-card">
+        <h1 class="lesson-title">Test task: Photos from the past</h1>
+      </section>
 
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg" alt="" />
+      <section class="lesson-stage">
+        <div class="stage-image">
+          <img
+            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg"
+            alt="Camera and photos"
+          />
         </div>
-        <div class="lesson-block__content">
-          <p><strong>Do you like taking photos?</strong></p>
-          <p>How many photos do you have on your phone?</p>
-          <p>What do you usually take photos of?</p>
+
+        <div class="stage-copy">
+          <p>Do you like taking photos? How many photos do you have on your phone?</p>
+          <p>What do you usually take photos of? Here are some ideas:</p>
           <ul>
             <li>yourself</li>
             <li>other people</li>
@@ -216,54 +218,34 @@ function renderLesson() {
             <li>buildings</li>
           </ul>
         </div>
-        <div class="drawing-tools" aria-hidden="true">
-          <button class="tool" type="button">✎</button>
-          <button class="tool" type="button">╱</button>
-          <button class="tool" type="button">T</button>
-          <button class="tool" type="button">●</button>
-          <button class="tool" type="button">↶</button>
-          <button class="tool" type="button">⌫</button>
-        </div>
       </section>
 
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg" alt="" />
-        </div>
-        <div class="lesson-block__content">
-          <p>Посмотрите на фотографию Рика.</p>
-          <p>Где он был в 2009 году?</p>
-          <p>В каком месяце он был там?</p>
-          <p>Какая была погода?</p>
-        </div>
-        <div class="drawing-tools" aria-hidden="true">
-          <button class="tool" type="button">✎</button>
-          <button class="tool" type="button">╱</button>
-          <button class="tool" type="button">T</button>
-          <button class="tool" type="button">●</button>
-          <button class="tool" type="button">↶</button>
-          <button class="tool" type="button">⌫</button>
-        </div>
-      </section>
+      <div class="followup-blocks">
+        <section class="followup">
+          <img
+            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg"
+            alt="Rick's photo"
+          />
+          <div>
+            <p>Посмотрите на фотографию Рика.</p>
+            <p>Где он был в 2009 году?</p>
+            <p>В каком месяце он был там?</p>
+            <p>Какая была погода?</p>
+          </div>
+        </section>
 
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg" alt="" />
-        </div>
-        <div class="lesson-block__content">
-          <p>Прочитайте комментарии под фото.</p>
-          <p>Где в это время были сыновья Рика?</p>
-          <p>Почему?</p>
-        </div>
-        <div class="drawing-tools" aria-hidden="true">
-          <button class="tool" type="button">✎</button>
-          <button class="tool" type="button">╱</button>
-          <button class="tool" type="button">T</button>
-          <button class="tool" type="button">●</button>
-          <button class="tool" type="button">↶</button>
-          <button class="tool" type="button">⌫</button>
-        </div>
-      </section>
+        <section class="followup">
+          <img
+            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg"
+            alt="Comments under Rick's photo"
+          />
+          <div>
+            <p>Прочитайте комментарии под фото.</p>
+            <p>Где в это время были сыновья Рика?</p>
+            <p>Почему?</p>
+          </div>
+        </section>
+      </div>
     </article>
   `;
 }
