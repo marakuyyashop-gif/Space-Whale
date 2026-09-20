@@ -152,28 +152,30 @@
       return;
     }
 
-    let data;
-    try {
-      const response = await fetch("https://xpeywyonbapnvtjnwawi.supabase.co/functions/v1/invite-student", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": "sb_publishable_GAp0g1oQSikZ1GA6Z3NxfQ_WpZtdeVy"
-        },
-        body: JSON.stringify({
-          access_token: authData.session.access_token,
-          email,
-          display_name: displayName
-        })
-      });
-      data = await response.json();
-    } catch (error) {
-      button.disabled = false;
-      inviteMessage.textContent = error.message || "Could not reach the invitation service.";
-      return;
-    }
+    const { data, error } = await client.functions.invoke("student-invite-v2", {
+      body: {
+        email,
+        display_name: displayName
+      },
+      headers: {
+        Authorization: `Bearer ${authData.session.access_token}`
+      }
+    });
 
     button.disabled = false;
+
+    if (error) {
+      let details = error.message || "Could not reach the invitation service.";
+      try {
+        if (error.context) {
+          const response = error.context.clone();
+          const body = await response.json();
+          if (body?.error) details = body.error;
+        }
+      } catch (_) {}
+      inviteMessage.textContent = details;
+      return;
+    }
 
     if (data?.error) {
       inviteMessage.textContent = data.error;
