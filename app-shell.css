@@ -70,3 +70,8 @@ a{color:inherit}
 .access-banner strong{font-size:15px}
 .access-banner span{font-size:13px;line-height:1.45;color:var(--sw-muted)}
 @media(max-width:800px){.product-card{align-items:flex-start;flex-direction:column}.product-actions{width:100%}}
+
+.workspace-select{max-width:220px;border:1px solid var(--sw-line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--sw-text);font:inherit;font-size:13px;font-weight:600;outline:none}
+.workspace-select:focus{border-color:#a8a8b0}
+.workspace-select:disabled{opacity:.55}
+@media(max-width:800px){.sw-user{flex-wrap:wrap;justify-content:flex-end}.workspace-select{max-width:100%}}
