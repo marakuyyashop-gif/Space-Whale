@@ -1,189 +1,186 @@
-const taskGuide = document.getElementById("taskGuide");
-const lessonContent = document.getElementById("lessonContent");
-
-const chevronSvg = `
-<svg viewBox="0 0 24 24" aria-hidden="true">
-  <path d="M17.586 9H6.414c-.89 0-1.337 1.077-.707 1.707l5.94 5.94a.5.5 0 0 0 .707 0l5.939-5.94c.63-.63.184-1.707-.707-1.707Z"/>
-</svg>`;
-
-const checkSvg = `
-<svg viewBox="0 0 24 24" aria-hidden="true">
-  <path d="M19.716 4.386a1 1 0 0 1 1.572 1.236L10.665 19.136a1.499 1.499 0 0 1-2.324.042l-5.104-6.032a1 1 0 1 1 1.526-1.292l4.708 5.564L19.716 4.386Z"/>
-</svg>`;
-
-const sections = [
+const courseModules = [
   {
-    id: "module-info",
-    title: "Module info",
+    id: "small-talk",
+    title: "Module 1 · Small Talk",
     expanded: false,
-    preview: "Информация для преподавателя",
-    tasks: [
-      {
-        id: "module-info-task",
-        name: "[info] A2.1 Module 2 overview for tutor",
-        done: false,
-        details: {
-          Tip: "Здесь лежит информация для преподавателя. Не делись экраном со студентом. По возможности, изучи её до урока."
-        }
-      }
+    lessons: [
+      { id: "small-talk-1", title: "Знакомство с новыми людьми", expanded: false, activities: [] }
     ]
   },
   {
-    id: "overview",
-    title: "A2.1 Модуль 2. Обзор",
-    expanded: false,
-    preview: "Обзор модуля"
-  },
-  {
-    id: "photos",
-    title: "Фотографии из прошлого",
+    id: "the-past",
+    title: "Module 2 · The Past",
     expanded: true,
-    tasks: [
+    active: true,
+    lessons: [
       {
-        id: "photos-test",
-        name: "Test task",
-        done: true,
-        details: {
-          Aim: "To set the context and talk about someone’s trip in the past",
-          TL: "was/were (+)",
-          Say: "1. Look at the picture. What can you see? (a camera and photos) Right, today we’re going to talk about photos. Let’s discuss the questions first. 2. Now look at this photo and read the task. 3. Where was Rick in 2009? (in Bali) Which month was it? (May) What was the weather like? (sunny) 4. OK, now look at the comments. Where were Rick’s sons? Why?",
-          Time: "5 minutes"
-        }
+        id: "photos",
+        title: "Фотографии из прошлого",
+        expanded: true,
+        current: true,
+        activities: [
+          { id: "photos-test", name: "Test task", done: true },
+          { id: "photos-revision", name: "Revision", done: false },
+          { id: "photos-extension", name: "Extension", done: false }
+        ]
       },
       {
-        id: "photos-revision",
-        name: "Revision",
-        done: false,
-        details: {
-          Aim: "To describe a trip in the past",
-          TL: "was/were (+)"
-        }
+        id: "celebrities",
+        title: "Знаменитости прошлого",
+        expanded: false,
+        activities: [
+          { id: "celeb-test", name: "Test task", done: false }
+        ]
       },
       {
-        id: "photos-extension",
-        name: "Extension",
-        done: false,
-        details: {
-          Aim: "To practice talking about the past"
-        }
+        id: "yesterday",
+        title: "Где ты был вчера?",
+        expanded: false,
+        activities: [
+          { id: "yesterday-test", name: "Test task", done: false }
+        ]
       }
     ]
   },
   {
-    id: "celebrities",
-    title: "Знаменитости прошлого",
+    id: "stories",
+    title: "Module 3 · Stories",
     expanded: false,
-    preview: "Test task · Revision · Extension"
-  },
-  {
-    id: "yesterday",
-    title: "Где ты был вчера?",
-    expanded: false,
-    preview: "Test task · Revision · Extension"
+    lessons: [
+      { id: "stories-1", title: "Первый день на новом месте", expanded: false, activities: [] }
+    ]
   }
 ];
 
 let activeTaskId = "photos-test";
-let openTaskId = "photos-test";
 
-function renderGuide() {
-  taskGuide.innerHTML = "";
+const courseTree = document.getElementById("courseTree");
+const lessonContent = document.getElementById("lessonContent");
 
-  sections.forEach((section) => {
-    const sectionEl = document.createElement("section");
-    sectionEl.className = "guide-section " + (section.expanded ? "expanded" : "collapsed");
+const chevronRightSvg = `
+  <svg class="course-chevron" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="m9 6 6 6-6 6"/>
+  </svg>
+`;
 
-    const titleButton = document.createElement("button");
-    titleButton.type = "button";
-    titleButton.className = "guide-section__title";
-    titleButton.innerHTML = `
-      <span>${section.title}</span>
-      ${chevronSvg}
+function findActivity(activityId) {
+  for (const module of courseModules) {
+    for (const lesson of module.lessons) {
+      const activity = lesson.activities.find((item) => item.id === activityId);
+      if (activity) return { module, lesson, activity };
+    }
+  }
+  return null;
+}
+
+function selectActivity(activityId, { remote = false } = {}) {
+  const classroom = window.SpaceWhaleClassroom;
+  if (!remote && classroom?.state?.channel && classroom.state.role === "student") {
+    return;
+  }
+
+  const target = findActivity(activityId);
+  if (!target) return;
+
+  activeTaskId = activityId;
+  target.module.expanded = true;
+  target.lesson.expanded = true;
+  renderCourseTree();
+  renderLesson();
+
+  if (!remote && classroom?.state?.channel && classroom.state.role === "teacher") {
+    classroom.navigate(activityId).catch((error) => console.error("[Space Whale] Navigation sync failed", error));
+  }
+}
+
+function renderCourseTree() {
+  courseTree.innerHTML = "";
+
+  courseModules.forEach((module) => {
+    const moduleEl = document.createElement("section");
+    moduleEl.className = `course-module ${module.expanded ? "expanded" : ""}`;
+
+    const moduleButton = document.createElement("button");
+    moduleButton.type = "button";
+    moduleButton.className = `course-module__button ${module.active ? "active" : ""}`;
+    moduleButton.innerHTML = `
+      <span>${module.title}</span>
+      ${chevronRightSvg}
     `;
 
-    titleButton.addEventListener("click", () => {
-      section.expanded = !section.expanded;
-      renderGuide();
+    moduleButton.addEventListener("click", () => {
+      module.expanded = !module.expanded;
+      renderCourseTree();
     });
 
-    sectionEl.appendChild(titleButton);
+    moduleEl.appendChild(moduleButton);
 
-    if (!section.expanded) {
-      const preview = document.createElement("div");
-      preview.className = "collapsed-preview";
-      preview.textContent = section.preview || "";
-      sectionEl.appendChild(preview);
-      taskGuide.appendChild(sectionEl);
-      return;
-    }
+    const moduleContent = document.createElement("div");
+    moduleContent.className = "course-module__content";
 
-    if (section.tasks?.length) {
-      const tabs = document.createElement("div");
-      tabs.className = "guide-tabs";
-      tabs.innerHTML = `
-        <button class="guide-tab active" type="button">Tasks</button>
-        <button class="guide-tab" type="button">Language input</button>
-        <button class="guide-tab" type="button">Self study</button>
+    module.lessons.forEach((lesson) => {
+      const lessonEl = document.createElement("div");
+      lessonEl.className = `course-lesson ${lesson.expanded ? "expanded" : ""} ${lesson.current ? "current" : ""}`;
+
+      const lessonButton = document.createElement("button");
+      lessonButton.type = "button";
+      lessonButton.className = "course-lesson__button";
+      lessonButton.innerHTML = `
+        <span>${lesson.title}</span>
+        ${lesson.activities.length ? chevronRightSvg : ""}
       `;
-      sectionEl.appendChild(tabs);
 
-      section.tasks.forEach((task) => {
-        const taskEl = document.createElement("div");
-        taskEl.className = "guide-task " + (openTaskId === task.id ? "open" : "");
-
-        const taskButton = document.createElement("button");
-        taskButton.type = "button";
-        taskButton.className = "guide-task__header";
-        taskButton.innerHTML = `
-          <span class="guide-task__name">${task.name}</span>
-          <span class="guide-task__right">
-            ${task.done ? `<span class="done-pill">Done ${checkSvg}</span>` : ""}
-            <span class="task-chevron">${chevronSvg}</span>
-          </span>
-        `;
-
-        taskButton.addEventListener("click", () => {
-          activeTaskId = task.id;
-          openTaskId = openTaskId === task.id ? null : task.id;
-          renderGuide();
-          renderLesson();
-        });
-
-        taskEl.appendChild(taskButton);
-
-        const details = document.createElement("div");
-        details.className = "guide-task__details";
-        Object.entries(task.details || {}).forEach(([label, value]) => {
-          const row = document.createElement("div");
-          row.className = "detail-row";
-          row.innerHTML = `<strong>${label}:</strong> ${value}`;
-          details.appendChild(row);
-        });
-        taskEl.appendChild(details);
-
-        sectionEl.appendChild(taskEl);
+      lessonButton.addEventListener("click", () => {
+        if (lesson.activities.length) {
+          lesson.expanded = !lesson.expanded;
+          renderCourseTree();
+        }
       });
-    }
 
-    taskGuide.appendChild(sectionEl);
+      lessonEl.appendChild(lessonButton);
+
+      if (lesson.activities.length) {
+        const activitiesEl = document.createElement("div");
+        activitiesEl.className = "course-lesson__activities";
+
+        lesson.activities.forEach((activity) => {
+          const activityButton = document.createElement("button");
+          activityButton.type = "button";
+          activityButton.className = `course-activity ${activeTaskId === activity.id ? "active" : ""} ${activity.done ? "done" : ""}`;
+          activityButton.textContent = activity.name;
+
+          if (window.SpaceWhaleClassroom?.state?.channel && window.SpaceWhaleClassroom.state.role === "student") {
+            activityButton.disabled = true;
+          }
+
+          activityButton.addEventListener("click", () => {
+            selectActivity(activity.id);
+          });
+
+          activitiesEl.appendChild(activityButton);
+        });
+
+        lessonEl.appendChild(activitiesEl);
+      }
+
+      moduleContent.appendChild(lessonEl);
+    });
+
+    moduleEl.appendChild(moduleContent);
+    courseTree.appendChild(moduleEl);
   });
 }
 
-function photosTestPage() {
-  return `
-    <article class="lesson">
-      <h1 class="lesson-title">Test task: Photos from the past</h1>
-
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg"
-            alt="Camera and photos"
-          />
-        </div>
-        <div class="lesson-block__content">
-          <p>Do you like taking photos?</p>
-          <p>How many photos do you have on your phone?</p>
+const workspacePages = {
+  "photos-test": {
+    title: "Test task: Photos from the past",
+    blocks: [
+      {
+        variant: "hero",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg",
+        alt: "Camera and photos",
+        html: `
+          <p>Do you like taking photos? How many photos do you have on your phone?</p>
           <p>What do you usually take photos of? Here are some ideas:</p>
           <ul>
             <li>yourself</li>
@@ -192,81 +189,138 @@ function photosTestPage() {
             <li>nature</li>
             <li>buildings</li>
           </ul>
-        </div>
-        ${drawingTools()}
-      </section>
-
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg"
-            alt="Rick in Bali"
-          />
-        </div>
-        <div class="lesson-block__content">
+        `
+      },
+      {
+        variant: "standard",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg",
+        alt: "Rick's photo",
+        html: `
           <p>Посмотрите на фотографию Рика.</p>
           <p>Где он был в 2009 году?</p>
           <p>В каком месяце он был там?</p>
           <p>Какая была погода?</p>
-        </div>
-        ${drawingTools()}
-      </section>
-
-      <section class="lesson-block">
-        <div class="lesson-block__visual">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg"
-            alt="Comments under Rick's photo"
-          />
-        </div>
-        <div class="lesson-block__content">
+        `
+      },
+      {
+        variant: "standard",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg",
+        alt: "Comments under Rick's photo",
+        html: `
           <p>Прочитайте комментарии под фото.</p>
           <p>Где в это время были сыновья Рика?</p>
           <p>Почему?</p>
-        </div>
-        ${drawingTools()}
+        `
+      }
+    ]
+  }
+};
+
+function renderWorkspacePage(page) {
+  const blocks = page.blocks.map((block) => `
+    <section class="exercise-row exercise-row--${block.variant || "standard"}">
+      <div class="exercise-media">
+        <img src="${block.image}" alt="${block.alt || ""}" />
+      </div>
+      <div class="exercise-copy">
+        ${block.html}
+      </div>
+    </section>
+  `).join("");
+
+  lessonContent.innerHTML = `
+    <article class="exercise-page">
+      <section class="exercise-title-card">
+        <h1 class="lesson-title">${page.title}</h1>
       </section>
-    </article>
-  `;
-}
-
-function drawingTools() {
-  return `
-    <div class="drawing-tools" aria-hidden="true">
-      <button class="tool" type="button">✎</button>
-      <button class="tool" type="button">╱</button>
-      <button class="tool" type="button">T</button>
-      <button class="tool" type="button">●</button>
-      <button class="tool" type="button">↶</button>
-      <button class="tool" type="button">↷</button>
-      <button class="tool" type="button">⌫</button>
-    </div>
-  `;
-}
-
-function placeholderPage(title) {
-  return `
-    <article class="placeholder-page">
-      <h2>${title}</h2>
-      <p>Этот экран пока оставлен как заготовка. Сейчас мы доводим до референса основной экран Test task и общую разметку интерфейса.</p>
+      <div class="exercise-stack">
+        ${blocks}
+      </div>
     </article>
   `;
 }
 
 function renderLesson() {
-  if (activeTaskId === "photos-test") {
-    lessonContent.innerHTML = photosTestPage();
+  const current = findActivity(activeTaskId);
+  const page = workspacePages[activeTaskId];
+
+  if (page) {
+    renderWorkspacePage(page);
+  } else {
+    renderWorkspacePage({
+      title: current ? current.activity.name : "Lesson",
+      blocks: [
+        {
+          variant: "standard",
+          image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg",
+          alt: "",
+          html: `<div class="exercise-placeholder">Здесь будет содержимое упражнения. Геометрия рабочего пространства уже остаётся такой же для всех заданий.</div>`
+        }
+      ]
+    });
+  }
+
+  lessonContent.scrollTop = 0;
+}
+
+renderCourseTree();
+renderLesson();
+
+
+document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".sidebar-nav-item").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
+
+async function initLiveClassroom() {
+  const classroom = window.SpaceWhaleClassroom;
+  if (!classroom) return;
+
+  const params = new URLSearchParams(location.search);
+  const sessionId = params.get("session");
+  if (!sessionId) return;
+
+  const user = await classroom.getCurrentUser();
+  if (!user) {
+    const next = encodeURIComponent("index.html" + location.search);
+    location.href = `login.html?next=${next}`;
     return;
   }
 
-  const taskNames = {
-    "module-info-task": "Module info",
-    "photos-revision": "Revision",
-    "photos-extension": "Extension"
+  const stateLabel = document.querySelector(".session-state span:last-child");
+
+  const renderPresence = (presenceState) => {
+    const presences = Object.values(presenceState || {}).flat();
+    const studentOnline = presences.some((item) => item.role === "student");
+    if (stateLabel) {
+      stateLabel.textContent = studentOnline ? "Student is online" : "Student has not joined yet";
+    }
   };
 
-  lessonContent.innerHTML = placeholderPage(taskNames[activeTaskId] || "Lesson");
+  const result = await classroom.connect(sessionId, {
+    onNavigate: (payload) => {
+      if (payload?.current_exercise_id) {
+        selectActivity(payload.current_exercise_id, { remote: true });
+      }
+    },
+    onPresence: renderPresence,
+    onJoin: () => renderPresence(classroom.state.channel?.presenceState?.() || {}),
+    onLeave: () => renderPresence(classroom.state.channel?.presenceState?.() || {})
+  });
+
+  const shared = await classroom.loadSharedState(sessionId);
+  if (shared?.current_exercise_id) {
+    selectActivity(shared.current_exercise_id, { remote: true });
+  } else if (result.role === "teacher") {
+    await classroom.navigate(activeTaskId);
+  }
+
+  renderCourseTree();
+  renderPresence(classroom.state.channel.presenceState());
 }
 
-renderGuide();
-renderLesson();
+initLiveClassroom().catch((error) => {
+  console.error("[Space Whale] Classroom connection failed", error);
+});
