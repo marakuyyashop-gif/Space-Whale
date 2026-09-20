@@ -145,26 +145,35 @@
     const email = document.getElementById("studentEmail").value.trim();
     const displayName = document.getElementById("studentName").value.trim();
 
-    const { data, error } = await client.functions.invoke("invite-student", {
-      body: {
-        email,
-        display_name: displayName
-      }
-    });
-
-    button.disabled = false;
-
-    if (error) {
-      let details = error.message || "Could not send the invitation.";
-      try {
-        if (error.context) {
-          const body = await error.context.clone().json();
-          if (body?.error) details = body.error;
-        }
-      } catch (_) {}
-      inviteMessage.textContent = details;
+    const { data: authData, error: sessionError } = await client.auth.getSession();
+    if (sessionError || !authData.session?.access_token) {
+      button.disabled = false;
+      inviteMessage.textContent = "Your teacher session expired. Please sign in again.";
       return;
     }
+
+    let data;
+    try {
+      const response = await fetch("https://xpeywyonbapnvtjnwawi.supabase.co/functions/v1/invite-student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": "sb_publishable_GAp0g1oQSikZ1GA6Z3NxfQ_WpZtdeVy"
+        },
+        body: JSON.stringify({
+          access_token: authData.session.access_token,
+          email,
+          display_name: displayName
+        })
+      });
+      data = await response.json();
+    } catch (error) {
+      button.disabled = false;
+      inviteMessage.textContent = error.message || "Could not reach the invitation service.";
+      return;
+    }
+
+    button.disabled = false;
 
     if (data?.error) {
       inviteMessage.textContent = data.error;
