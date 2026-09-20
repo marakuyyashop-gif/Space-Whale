@@ -1054,7 +1054,7 @@ button{font:inherit;color:inherit}
 /* === EXACT SPACE WHALE SIDEBAR ART === */
 .app-sidebar{
   background:
-    url("5fc9aff8-627e-4de9-b5c0-841505de9952.png") center top / cover no-repeat !important;
+    url("Space") center top / cover no-repeat !important;
   border-right:1px solid rgba(255,255,255,.06);\n  box-shadow:14px 0 34px rgba(2,5,14,.26);
 }
 
