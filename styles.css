@@ -6,7 +6,7 @@
   --muted:#858a92;
   --line:#e6e7ea;
   --shadow:0 8px 28px rgba(31,32,35,.10);
-  --font:Arial,"Helvetica Neue",sans-serif;
+  --font:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
 }
 
 *{box-sizing:border-box}
@@ -235,8 +235,8 @@ button{font:inherit;color:inherit}
 
 .detail-row{
   padding-top:6px;
-  font-size:15px;
-  line-height:22px;
+  font-size:16px;
+  line-height:23px;
   color:#202226;
 }
 
@@ -435,7 +435,7 @@ button{font:inherit;color:inherit}
 .lesson-title-card{
   width:min(1176px,calc(100% - 64px));
   min-height:100px;
-  margin:0 0 0 32px;
+  margin:0 auto;
   padding:26px 30px;
   border-radius:29px;
   background:#fff;
@@ -453,9 +453,10 @@ button{font:inherit;color:inherit}
 
 .lesson-stage{
   width:min(1176px,calc(100% - 64px));
-  margin:112px 0 0 32px;
+  margin:112px auto 0;
   display:flex;
   align-items:center;
+  justify-content:center;
   gap:28px;
 }
 
@@ -498,7 +499,7 @@ button{font:inherit;color:inherit}
 
 .followup-blocks{
   width:min(1176px,calc(100% - 64px));
-  margin:82px 0 0 32px;
+  margin:82px auto 0;
   display:grid;
   gap:28px;
 }
@@ -528,7 +529,7 @@ button{font:inherit;color:inherit}
 .placeholder-page{
   width:min(1176px,calc(100% - 64px));
   min-height:100px;
-  margin:0 0 0 32px;
+  margin:0 auto;
   padding:28px 30px;
   border-radius:29px;
   background:#fff;
@@ -696,7 +697,8 @@ button{font:inherit;color:inherit}
   .followup-blocks,
   .placeholder-page{
     width:calc(100% - 56px);
-    margin-left:28px;
+    margin-left:auto;
+    margin-right:auto;
   }
 
   .lesson-stage{
@@ -729,7 +731,8 @@ button{font:inherit;color:inherit}
   .followup-blocks,
   .placeholder-page{
     width:calc(100% - 40px);
-    margin-left:20px;
+    margin-left:auto;
+    margin-right:auto;
   }
 
   .lesson-title{
