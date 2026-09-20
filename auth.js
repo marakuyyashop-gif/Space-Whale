@@ -21,7 +21,7 @@
   async function getProfile(userId) {
     const { data, error } = await client
       .from("profiles")
-      .select("id, role, display_name, avatar_url, timezone, profile_complete")
+      .select("id, role, display_name, avatar_url, timezone, practice_name, profile_complete")
       .eq("id", userId)
       .single();
     if (error) throw error;
