@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app-shell.css?v=20260921-billing-v1">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-workspaces-v1">
 </head>
 <body>
   <main class="sw-page">
@@ -19,6 +19,7 @@
           <p class="sw-subtitle" id="dashboardSubtitle">Loading your schedule…</p>
         </div>
         <div class="sw-user">
+          <select id="workspaceSelect" class="workspace-select" aria-label="Workspace"></select>
           <span id="profileLabel"></span>
           <button class="sw-button secondary" id="logoutButton" type="button">Log out</button>
         </div>
@@ -135,6 +136,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260920-account-v1"></script>
-  <script src="dashboard.js?v=20260921-billing-v1"></script>
+  <script src="dashboard.js?v=20260921-workspaces-v1"></script>
 </body>
 </html>
