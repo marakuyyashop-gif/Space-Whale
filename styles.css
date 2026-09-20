@@ -1071,9 +1071,9 @@ button{font:inherit;color:inherit}
   pointer-events:none;
   background:linear-gradient(
     180deg,
-    rgba(3,7,18,.12) 0%,
-    rgba(3,7,18,.18) 46%,
-    rgba(3,7,18,.32) 100%
+    rgba(3,7,18,.22) 0%,
+    rgba(3,7,18,.30) 46%,
+    rgba(3,7,18,.46) 100%
   );
 }
 
