@@ -1054,7 +1054,7 @@ button{font:inherit;color:inherit}
 /* === EXACT SPACE WHALE SIDEBAR ART === */
 .app-sidebar{
   background:
-    url("5834ee88-5f28-454a-af48-63b15a2ee22c.png") center top / cover no-repeat !important;
+    url("5fc9aff8-627e-4de9-b5c0-841505de9952.png") center top / cover no-repeat !important;
   border-right:1px solid rgba(255,255,255,.08);
 }
 
@@ -1097,16 +1097,15 @@ button{font:inherit;color:inherit}
   background:
     linear-gradient(
       180deg,
-      rgba(2,5,14,.46) 0%,
-      rgba(2,5,14,.54) 34%,
-      rgba(2,5,14,.62) 68%,
-      rgba(2,5,14,.70) 100%
+      rgba(2,5,14,.08) 0%,
+      rgba(2,5,14,.11) 42%,
+      rgba(2,5,14,.18) 100%
     ),
     linear-gradient(
       90deg,
-      rgba(2,5,14,.20) 0%,
-      rgba(2,5,14,.06) 48%,
-      rgba(2,5,14,.16) 100%
+      rgba(2,5,14,.06) 0%,
+      rgba(2,5,14,.02) 50%,
+      rgba(2,5,14,.05) 100%
     ) !important;
 }
 
