@@ -1089,3 +1089,156 @@ button{font:inherit;color:inherit}
 .course-lesson.expanded{
   background:rgba(5,9,20,.08);
 }
+
+
+
+/* === SIDEBAR READABILITY PASS — keep the artwork, strengthen the navigation === */
+.app-sidebar::after{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2,5,14,.46) 0%,
+      rgba(2,5,14,.54) 34%,
+      rgba(2,5,14,.62) 68%,
+      rgba(2,5,14,.70) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(2,5,14,.20) 0%,
+      rgba(2,5,14,.06) 48%,
+      rgba(2,5,14,.16) 100%
+    ) !important;
+}
+
+.sidebar-header{
+  background:linear-gradient(180deg,rgba(2,5,14,.28),rgba(2,5,14,.08)) !important;
+}
+
+.sidebar-scroll{
+  background:linear-gradient(180deg,rgba(2,5,14,.08),rgba(2,5,14,.16));
+}
+
+.brand-name{
+  color:#fff !important;
+  font-size:19px !important;
+  font-weight:750 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.58);
+}
+
+.sidebar-nav-item{
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:650 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.62);
+}
+
+.sidebar-nav-item svg,
+.sidebar-icon-button svg{
+  color:#fff;
+  opacity:1 !important;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.48));
+}
+
+.sidebar-section-heading{
+  color:rgba(255,255,255,.90) !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.60);
+}
+
+.level-selector{
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+  background:rgba(6,10,24,.46) !important;
+  border-color:rgba(255,255,255,.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 2px 8px rgba(0,0,0,.16);
+  text-shadow:0 1px 2px rgba(0,0,0,.55);
+}
+
+.course-module__button{
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:680 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.65);
+}
+
+.course-lesson__button{
+  color:#fff !important;
+  font-size:15px !important;
+  font-weight:650 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.65);
+}
+
+.course-activity{
+  color:#fff !important;
+  font-size:15px !important;
+  font-weight:620 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.68);
+}
+
+.course-module__button:hover,
+.course-lesson__button:hover,
+.course-activity:hover,
+.sidebar-nav-item:hover{
+  background:rgba(4,8,22,.42) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.sidebar-nav-item.active,
+.course-module__button.active{
+  background:rgba(7,11,27,.54) !important;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 6px 18px rgba(0,0,0,.14);
+}
+
+.course-activity.active{
+  color:#fff !important;
+  background:linear-gradient(
+    90deg,
+    rgba(113,99,255,.38),
+    rgba(8,13,31,.58)
+  ) !important;
+  border:1px solid rgba(190,184,255,.34) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 8px 22px rgba(0,0,0,.18) !important;
+}
+
+.course-activity.done::after{
+  color:#b8f6cb !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.7);
+}
+
+.account-name{
+  color:#fff !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+}
+
+.account-caption{
+  color:rgba(255,255,255,.80) !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+}
+
+.sidebar-account{
+  background:rgba(2,5,14,.62) !important;
+  border-top-color:rgba(255,255,255,.13) !important;
+}
+
+.sidebar-icon-button,
+.sidebar-brand,
+.level-selector,
+.sidebar-nav-item,
+.course-module__button,
+.course-lesson__button,
+.course-activity{
+  -webkit-font-smoothing:antialiased;
+}
