@@ -7,39 +7,72 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260920-workspace-template" />
+  <link rel="stylesheet" href="styles.css?v=20260920-chatgpt-sidebar" />
 </head>
 <body>
   <div id="root" class="reference-app">
-    <aside class="task-guide" aria-label="Lesson task guide">
-      <header class="task-guide__header">
-        <button class="module-select" type="button">
-          <span>A2.1 Module 2. The Past (ver 2)</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 9h11.2c.9 0 1.3 1.1.7 1.7l-5.9 5.9a.5.5 0 0 1-.8 0l-5.9-5.9c-.6-.6-.2-1.7.7-1.7Z"/></svg>
+    <aside class="app-sidebar" aria-label="Space Whale navigation">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-row">
+          <button class="sidebar-brand" type="button" aria-label="Space Whale home">
+            <span class="brand-mark">SW</span>
+            <span class="brand-name">Space Whale</span>
+          </button>
+
+          <div class="sidebar-header-actions">
+            <button class="sidebar-icon-button" type="button" aria-label="Search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            </button>
+            <button class="sidebar-icon-button" type="button" aria-label="Collapse sidebar">
+              <svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M9 4v16"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <nav class="sidebar-primary" aria-label="Main navigation">
+          <button class="sidebar-nav-item active" type="button">
+            <svg viewBox="0 0 24 24"><path d="M4 5.5h16v13H4z"/><path d="M8 3v5M16 3v5M4 9h16"/></svg>
+            <span>Session</span>
+          </button>
+
+          <button class="sidebar-nav-item" type="button">
+            <svg viewBox="0 0 24 24"><path d="M5 4.5h5.5v15H5zM13.5 4.5H19v15h-5.5z"/></svg>
+            <span>Library</span>
+          </button>
+
+          <button class="sidebar-nav-item" type="button">
+            <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="m8 12 2.2 2.2L16.5 8"/></svg>
+            <span>Homework</span>
+          </button>
+
+          <button class="sidebar-nav-item" type="button">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3.5 20c.7-4.1 2.6-6.2 5.5-6.2s4.8 2.1 5.5 6.2M14 20c.4-2.8 1.7-4.2 4-4.2 1.2 0 2.2.4 3 1.2"/></svg>
+            <span>Students</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-scroll">
+        <div class="sidebar-section-heading">
+          <span>Course</span>
+          <button class="level-selector" type="button">
+            <span>A2.1</span>
+            <svg viewBox="0 0 24 24"><path d="m7 9 5 5 5-5"/></svg>
+          </button>
+        </div>
+
+        <div id="courseTree" class="course-tree"></div>
+      </div>
+
+      <footer class="sidebar-account">
+        <div class="account-avatar">T</div>
+        <div class="account-copy">
+          <div class="account-name">Tutor</div>
+          <div class="account-caption">Teacher account</div>
+        </div>
+        <button class="sidebar-icon-button" type="button" aria-label="Account menu">
+          <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
         </button>
-      </header>
-
-      <div class="task-guide__scroll" id="taskGuide"></div>
-
-      <footer class="task-guide__menu">
-        <div class="task-guide__nav">
-          <button type="button">Class</button>
-          <button type="button" class="active">Library</button>
-          <button type="button">Self Study</button>
-          <button type="button" class="icon-btn" aria-label="Draw">
-            <svg viewBox="0 0 24 24"><path d="m5 18 2.2-5.7L15.9 3.6a2 2 0 0 1 2.8 2.8L10 15.1 5 18Z"/><path d="m12.9 6.6 4.5 4.5"/></svg>
-          </button>
-          <button type="button" class="icon-btn" aria-label="Profile">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4.1 3-6.2 6.5-6.2s5.7 2.1 6.5 6.2"/></svg>
-          </button>
-        </div>
-        <div class="task-guide__menu-divider"></div>
-        <div class="task-guide__bottom">
-          <button type="button" class="icon-btn small" aria-label="Back">
-            <svg viewBox="0 0 24 24"><path d="M9.5 5 3 12l6.5 7M4 12h17"/></svg>
-          </button>
-          <button type="button" class="start-btn" disabled>Start lesson</button>
-        </div>
       </footer>
     </aside>
 
@@ -103,6 +136,6 @@
     </section>
   </div>
 
-  <script src="app.js?v=20260920-workspace-template"></script>
+  <script src="app.js?v=20260920-chatgpt-sidebar"></script>
 </body>
 </html>
