@@ -466,10 +466,22 @@
       return;
     }
 
-    select.innerHTML = students.map((student) =>
-      `<option value="${escapeHtml(student.id)}">${escapeHtml(student.display_name || "Student")}</option>`
-    ).join("");
-    el("scheduleSubmit").disabled = false;
+    const now = Date.now();
+    let availableCount = 0;
+
+    select.innerHTML = students.map((student) => {
+      const hasAccess = entitlements.some((item) =>
+        item.user_id === student.id &&
+        item.status === "active" &&
+        new Date(item.starts_at).getTime() <= now &&
+        (!item.ends_at || new Date(item.ends_at).getTime() > now) &&
+        (item.remaining_uses == null || item.remaining_uses > 0)
+      );
+      if (hasAccess) availableCount += 1;
+      return `<option value="${escapeHtml(student.id)}" ${hasAccess ? "" : "disabled"}>${escapeHtml(student.display_name || "Student")}${hasAccess ? "" : " — payment required"}</option>`;
+    }).join("");
+
+    el("scheduleSubmit").disabled = availableCount === 0;
   }
 
   function openDialog(id) {
