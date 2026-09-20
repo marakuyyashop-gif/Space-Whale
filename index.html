@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reference Clone — Space Whale</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="root" class="app-shell">
+    <aside class="task-guide-panel">
+      <div class="module-selector">
+        <button class="module-selector-button" type="button">
+          <span class="module-selector-title">A2.1 Module 2. The Past (ver 2)</span>
+          <span class="module-selector-chevron">▾</span>
+        </button>
+      </div>
+
+      <div class="task-guide-scroll" id="taskGuide"></div>
+
+      <div class="task-guide-footer">
+        <button class="footer-icon-button" type="button" aria-label="Back">←</button>
+        <button class="footer-primary-button" type="button" disabled>Start lesson</button>
+      </div>
+    </aside>
+
+    <main class="workspace-shell">
+      <div class="workspace-banner">
+        <div class="workspace-banner-left">
+          <span class="banner-icon">✦</span>
+          <div class="workspace-banner-text">
+            <div class="workspace-banner-title">Teacher mode is on</div>
+            <div class="workspace-banner-subtitle">Напоминание: у студента текущий модуль не выбран</div>
+          </div>
+        </div>
+        <button class="banner-button" type="button">Да, сделать</button>
+      </div>
+
+      <div class="workspace-content" id="workspaceContent"></div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
