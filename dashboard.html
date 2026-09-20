@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=1">
+</head>
+<body>
+  <main class="sw-page">
+    <div class="sw-shell">
+      <header class="sw-topbar">
+        <div>
+          <div class="sw-brand">Space Whale</div>
+          <h1 class="sw-title" id="dashboardTitle">My lessons</h1>
+          <p class="sw-subtitle" id="dashboardSubtitle">Loading your schedule…</p>
+        </div>
+        <div class="sw-user">
+          <span id="profileLabel"></span>
+          <button class="sw-button secondary" id="logoutButton" type="button">Log out</button>
+        </div>
+      </header>
+
+      <div class="sw-grid">
+        <section class="sw-card">
+          <h2 class="sw-section-title">Schedule</h2>
+          <div id="lessonList" class="lesson-list">
+            <div class="sw-message">Loading…</div>
+          </div>
+        </section>
+
+        <aside class="sw-stack">
+          <section class="sw-card">
+            <h2 class="sw-section-title">Profile</h2>
+            <form id="profileForm" class="sw-form">
+              <div class="sw-field">
+                <label for="displayName">Name</label>
+                <input id="displayName" type="text" placeholder="Your name">
+              </div>
+              <button class="sw-button secondary" type="submit">Save profile</button>
+              <div id="profileMessage" class="sw-message"></div>
+            </form>
+          </section>
+
+          <section class="sw-card" id="teacherPanel" hidden>
+            <h2 class="sw-section-title">Schedule a lesson</h2>
+            <form id="scheduleForm" class="sw-form">
+              <div class="sw-field">
+                <label for="studentSelect">Student</label>
+                <select id="studentSelect" required></select>
+              </div>
+              <div class="sw-field">
+                <label for="lessonTitle">Lesson title</label>
+                <input id="lessonTitle" type="text" placeholder="English lesson">
+              </div>
+              <div class="sw-field">
+                <label for="lessonTime">Date and time</label>
+                <input id="lessonTime" type="datetime-local" required>
+              </div>
+              <div class="sw-field">
+                <label for="duration">Duration</label>
+                <select id="duration">
+                  <option value="30">30 min</option>
+                  <option value="45">45 min</option>
+                  <option value="60" selected>60 min</option>
+                  <option value="90">90 min</option>
+                </select>
+              </div>
+              <button class="sw-button" type="submit">Schedule lesson</button>
+              <div id="scheduleMessage" class="sw-message"></div>
+            </form>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260920-account-v1"></script>
+  <script src="dashboard.js?v=20260920-account-v1"></script>
+</body>
+</html>
