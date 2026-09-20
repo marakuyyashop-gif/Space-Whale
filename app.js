@@ -180,34 +180,15 @@ function renderGuide() {
   });
 }
 
-function renderLesson() {
-  const current = findTask(activeTaskId);
-
-  if (!current || current.task.id !== "photos-test") {
-    lessonContent.innerHTML = `
-      <section class="placeholder-page">
-        <h2>${current ? current.task.name : "Lesson"}</h2>
-        <p>This screen is a placeholder. The reference shell stays the same while lesson content can be replaced later.</p>
-      </section>
-    `;
-    return;
-  }
-
-  lessonContent.innerHTML = `
-    <article class="lesson">
-      <section class="lesson-title-card">
-        <h1 class="lesson-title">Test task: Photos from the past</h1>
-      </section>
-
-      <section class="lesson-stage">
-        <div class="stage-image">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg"
-            alt="Camera and photos"
-          />
-        </div>
-
-        <div class="stage-copy">
+const workspacePages = {
+  "photos-test": {
+    title: "Test task: Photos from the past",
+    blocks: [
+      {
+        variant: "hero",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg",
+        alt: "Camera and photos",
+        html: `
           <p>Do you like taking photos? How many photos do you have on your phone?</p>
           <p>What do you usually take photos of? Here are some ideas:</p>
           <ul>
@@ -217,37 +198,78 @@ function renderLesson() {
             <li>nature</li>
             <li>buildings</li>
           </ul>
-        </div>
+        `
+      },
+      {
+        variant: "standard",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg",
+        alt: "Rick's photo",
+        html: `
+          <p>Посмотрите на фотографию Рика.</p>
+          <p>Где он был в 2009 году?</p>
+          <p>В каком месяце он был там?</p>
+          <p>Какая была погода?</p>
+        `
+      },
+      {
+        variant: "standard",
+        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg",
+        alt: "Comments under Rick's photo",
+        html: `
+          <p>Прочитайте комментарии под фото.</p>
+          <p>Где в это время были сыновья Рика?</p>
+          <p>Почему?</p>
+        `
+      }
+    ]
+  }
+};
+
+function renderWorkspacePage(page) {
+  const blocks = page.blocks.map((block) => `
+    <section class="exercise-row exercise-row--${block.variant || "standard"}">
+      <div class="exercise-media">
+        <img src="${block.image}" alt="${block.alt || ""}" />
+      </div>
+      <div class="exercise-copy">
+        ${block.html}
+      </div>
+    </section>
+  `).join("");
+
+  lessonContent.innerHTML = `
+    <article class="exercise-page">
+      <section class="exercise-title-card">
+        <h1 class="lesson-title">${page.title}</h1>
       </section>
-
-      <div class="followup-blocks">
-        <section class="followup">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali.svg"
-            alt="Rick's photo"
-          />
-          <div>
-            <p>Посмотрите на фотографию Рика.</p>
-            <p>Где он был в 2009 году?</p>
-            <p>В каком месяце он был там?</p>
-            <p>Какая была погода?</p>
-          </div>
-        </section>
-
-        <section class="followup">
-          <img
-            src="https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg"
-            alt="Comments under Rick's photo"
-          />
-          <div>
-            <p>Прочитайте комментарии под фото.</p>
-            <p>Где в это время были сыновья Рика?</p>
-            <p>Почему?</p>
-          </div>
-        </section>
+      <div class="exercise-stack">
+        ${blocks}
       </div>
     </article>
   `;
+}
+
+function renderLesson() {
+  const current = findTask(activeTaskId);
+  const page = workspacePages[activeTaskId];
+
+  if (page) {
+    renderWorkspacePage(page);
+  } else {
+    renderWorkspacePage({
+      title: current ? current.task.name : "Lesson",
+      blocks: [
+        {
+          variant: "standard",
+          image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg",
+          alt: "",
+          html: `<div class="exercise-placeholder">Здесь будет содержимое упражнения. Геометрия рабочего пространства уже остаётся такой же для всех заданий.</div>`
+        }
+      ]
+    });
+  }
+
+  lessonContent.scrollTop = 0;
 }
 
 renderGuide();
