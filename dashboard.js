@@ -561,6 +561,8 @@
 
     if (profile.role === "teacher") {
       teacherPanel.hidden = false;
+      const settingsLink = document.getElementById("teacherSettingsLink");
+      if (settingsLink) settingsLink.hidden = false;
     } else {
       studentPanel.hidden = false;
     }
