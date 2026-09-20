@@ -73,6 +73,26 @@ function findActivity(activityId) {
   return null;
 }
 
+function selectActivity(activityId, { remote = false } = {}) {
+  const classroom = window.SpaceWhaleClassroom;
+  if (!remote && classroom?.state?.channel && classroom.state.role === "student") {
+    return;
+  }
+
+  const target = findActivity(activityId);
+  if (!target) return;
+
+  activeTaskId = activityId;
+  target.module.expanded = true;
+  target.lesson.expanded = true;
+  renderCourseTree();
+  renderLesson();
+
+  if (!remote && classroom?.state?.channel && classroom.state.role === "teacher") {
+    classroom.navigate(activityId).catch((error) => console.error("[Space Whale] Navigation sync failed", error));
+  }
+}
+
 function renderCourseTree() {
   courseTree.innerHTML = "";
 
@@ -129,12 +149,12 @@ function renderCourseTree() {
           activityButton.className = `course-activity ${activeTaskId === activity.id ? "active" : ""} ${activity.done ? "done" : ""}`;
           activityButton.textContent = activity.name;
 
+          if (window.SpaceWhaleClassroom?.state?.channel && window.SpaceWhaleClassroom.state.role === "student") {
+            activityButton.disabled = true;
+          }
+
           activityButton.addEventListener("click", () => {
-            activeTaskId = activity.id;
-            module.expanded = true;
-            lesson.expanded = true;
-            renderCourseTree();
-            renderLesson();
+            selectActivity(activity.id);
           });
 
           activitiesEl.appendChild(activityButton);
@@ -252,4 +272,55 @@ document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
     document.querySelectorAll(".sidebar-nav-item").forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
   });
+});
+
+async function initLiveClassroom() {
+  const classroom = window.SpaceWhaleClassroom;
+  if (!classroom) return;
+
+  const params = new URLSearchParams(location.search);
+  const sessionId = params.get("session");
+  if (!sessionId) return;
+
+  const user = await classroom.getCurrentUser();
+  if (!user) {
+    const next = encodeURIComponent("index.html" + location.search);
+    location.href = `login.html?next=${next}`;
+    return;
+  }
+
+  const stateLabel = document.querySelector(".session-state span:last-child");
+
+  const renderPresence = (presenceState) => {
+    const presences = Object.values(presenceState || {}).flat();
+    const studentOnline = presences.some((item) => item.role === "student");
+    if (stateLabel) {
+      stateLabel.textContent = studentOnline ? "Student is online" : "Student has not joined yet";
+    }
+  };
+
+  const result = await classroom.connect(sessionId, {
+    onNavigate: (payload) => {
+      if (payload?.current_exercise_id) {
+        selectActivity(payload.current_exercise_id, { remote: true });
+      }
+    },
+    onPresence: renderPresence,
+    onJoin: () => renderPresence(classroom.state.channel?.presenceState?.() || {}),
+    onLeave: () => renderPresence(classroom.state.channel?.presenceState?.() || {})
+  });
+
+  const shared = await classroom.loadSharedState(sessionId);
+  if (shared?.current_exercise_id) {
+    selectActivity(shared.current_exercise_id, { remote: true });
+  } else if (result.role === "teacher") {
+    await classroom.navigate(activeTaskId);
+  }
+
+  renderCourseTree();
+  renderPresence(classroom.state.channel.presenceState());
+}
+
+initLiveClassroom().catch((error) => {
+  console.error("[Space Whale] Classroom connection failed", error);
 });
