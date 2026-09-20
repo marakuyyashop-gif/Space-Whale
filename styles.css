@@ -1,5 +1,5 @@
 :root{
-  --sidebar-width:390px;
+  --sidebar-width:320px;
   --bg:rgb(247,247,248);
   --sidebar-bg:#f7f7f8;
   --sidebar-hover:#ececef;
@@ -821,7 +821,7 @@ button{font:inherit;color:inherit}
 }
 
 @media (max-width:1180px){
-  :root{--sidebar-width:469px}
+  :root{--sidebar-width:320px}
 
   .module-banner{
     width:calc(100% - 40px);
@@ -1055,7 +1055,7 @@ button{font:inherit;color:inherit}
 .app-sidebar{
   background:
     url("5fc9aff8-627e-4de9-b5c0-841505de9952.png") center top / cover no-repeat !important;
-  border-right:1px solid rgba(255,255,255,.08);
+  border-right:1px solid rgba(255,255,255,.06);\n  box-shadow:14px 0 34px rgba(2,5,14,.26);
 }
 
 .app-sidebar::before{
@@ -1240,4 +1240,28 @@ button{font:inherit;color:inherit}
 .course-lesson__button,
 .course-activity{
   -webkit-font-smoothing:antialiased;
+}
+
+
+/* === SIDEBAR REFINEMENT: narrower, no account footer, visible depth === */
+.sidebar-account{
+  display:none !important;
+}
+
+.app-sidebar{
+  box-shadow:
+    14px 0 34px rgba(2,5,14,.26),
+    4px 0 10px rgba(2,5,14,.18) !important;
+}
+
+.sidebar-scroll{
+  padding-bottom:26px;
+}
+
+@media (max-width:1180px){
+  :root{--sidebar-width:300px}
+}
+
+@media (max-width:980px){
+  :root{--sidebar-width:280px}
 }
