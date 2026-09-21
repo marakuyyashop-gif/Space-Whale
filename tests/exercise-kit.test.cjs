@@ -79,3 +79,13 @@ test('image-label validates coordinates and grades each target', () => {
   const badX = copy(def); badX.items[0].x = 120; assert.throws(() => validate(badX));
   const duplicateAnswer = copy(def); duplicateAnswer.items[1].correctId = 'lamp'; assert.throws(() => validate(duplicateAnswer));
 });
+
+test('choice image-grid layout is validated', () => {
+  const def = copy(choice);
+  def.layout = 'image-grid';
+  def.items[0].options[0].image = '/assets/choice-hiking.svg';
+  def.items[0].options[0].alt = 'Hiking';
+  assert.equal(validate(def), def);
+  def.layout = 'giant-cards';
+  assert.throws(() => validate(def));
+});
