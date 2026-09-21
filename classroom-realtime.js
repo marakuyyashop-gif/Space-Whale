@@ -21,7 +21,7 @@
 
     const { data, error } = await client
       .from("lesson_sessions")
-      .select("id, teacher_id, student_id, course_id, lesson_id, title, room_topic, status, scheduled_at, duration_minutes, join_window_minutes")
+      .select("id, teacher_id, student_id, course_id, lesson_id, library_lesson_id, title, room_topic, status, scheduled_at, duration_minutes, join_window_minutes")
       .eq("id", sessionId)
       .single();
 
