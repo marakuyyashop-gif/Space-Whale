@@ -3,30 +3,168 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Space Whale</title>
+  <meta name="description" content="Space Whale is an early-access teaching platform for live English lessons, reusable materials, homework and student progress.">
+  <title>Space Whale — Teach English in one beautiful space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app-shell.css?v=20260921-app-entry-v1">
+  <link rel="stylesheet" href="marketing.css?v=20260921-marketing-v1">
 </head>
-<body>
-  <main class="login-wrap" aria-live="polite">
-    <section class="login-card">
-      <div class="sw-brand">Space Whale</div>
-      <h1>Opening your workspace</h1>
-      <p id="entryStatus">Checking your account…</p>
-      <div id="entryFallback" class="sw-form" hidden>
-        <a class="sw-button" href="login.html">Go to sign in</a>
+<body class="marketing-body">
+  <header class="marketing-header">
+    <div class="marketing-container header-inner">
+      <a class="marketing-brand" href="#top" aria-label="Space Whale home">
+        <span class="marketing-brand-mark">SW</span>
+        <span>Space Whale</span>
+      </a>
+      <button class="marketing-menu-button" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <nav class="marketing-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#curriculum">Curriculum</a>
+        <a href="#workflow">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="marketing-header-actions">
+        <a class="marketing-link-button" href="login.html">Sign in</a>
+        <a class="marketing-button compact" href="teacher-signup.html">Join early access</a>
       </div>
-      <noscript>
-        <p>JavaScript is required to open Space Whale.</p>
-        <a class="sw-button" href="login.html">Go to sign in</a>
-      </noscript>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="marketing-hero">
+      <div class="marketing-container hero-grid">
+        <div class="hero-copy">
+          <span class="marketing-pill">EARLY ACCESS · BUILT FOR INDEPENDENT TEACHERS</span>
+          <h1>Teach beautifully.<br>Run everything in one place.</h1>
+          <p>Live English lessons, structured A1–B1 materials, homework and student progress — brought together in one calm teaching workspace.</p>
+          <div class="hero-actions">
+            <a class="marketing-button" href="teacher-signup.html">Create teacher account</a>
+            <a class="marketing-link-button with-arrow" href="#platform">Explore the platform <span>→</span></a>
+          </div>
+          <div class="hero-notes" aria-label="Platform highlights">
+            <span>No downloads</span>
+            <span>Teacher and student spaces</span>
+            <span>Reusable lesson library</span>
+          </div>
+        </div>
+
+        <div class="product-preview" aria-label="Space Whale lesson workspace preview">
+          <div class="preview-window">
+            <div class="preview-topbar">
+              <span class="preview-logo">SW</span>
+              <span class="preview-title">At the theatre · A2</span>
+              <span class="preview-live">LIVE</span>
+            </div>
+            <div class="preview-layout">
+              <aside class="preview-sidebar">
+                <span class="preview-avatar">L</span>
+                <i class="active"></i><i></i><i></i><i></i><i></i>
+              </aside>
+              <div class="preview-canvas">
+                <div class="preview-progress"><span></span></div>
+                <small>SPEAKING · SCENE 4 OF 6</small>
+                <h2>What was happening<br>when the lights went out?</h2>
+                <div class="preview-scenes">
+                  <div><span>1</span><b>audience</b></div>
+                  <div class="selected"><span>2</span><b>stage</b></div>
+                  <div><span>3</span><b>performance</b></div>
+                </div>
+                <div class="preview-answer">The actors were performing when…<span></span></div>
+              </div>
+              <aside class="preview-call">
+                <div class="video-card teacher-video"><span>Teacher</span></div>
+                <div class="video-card student-video"><span>Student</span></div>
+                <div class="call-controls"><i></i><i></i><i></i></div>
+              </aside>
+            </div>
+          </div>
+          <div class="preview-float float-library"><strong>A1–B1</strong><span>Lesson library</span></div>
+          <div class="preview-float float-sync"><span class="sync-dot"></span><strong>Shared live view</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marketing-strip" aria-label="Core platform areas">
+      <div class="marketing-container strip-items">
+        <span>Live classroom</span><i></i><span>Lesson library</span><i></i><span>Homework</span><i></i><span>Student progress</span><i></i><span>Teacher workspace</span>
+      </div>
+    </section>
+
+    <section id="platform" class="marketing-section platform-section">
+      <div class="marketing-container">
+        <div class="section-heading split-heading">
+          <div><span class="section-kicker">ONE TEACHING SYSTEM</span><h2>Less switching.<br>More teaching.</h2></div>
+          <p>Space Whale is being built around the real flow of a private lesson — before, during and after the call.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-dark"><span class="feature-number">01</span><h3>Teach live</h3><p>Open one shared lesson space with video, audio and synchronized activities.</p><div class="feature-visual live-visual"><span></span><span></span><span></span></div></article>
+          <article class="feature-card"><span class="feature-number">02</span><h3>Use ready lessons</h3><p>Move through a structured A1–B1 library instead of rebuilding materials for every student.</p><div class="feature-visual library-visual"><b>A1</b><b>A2</b><b>B1</b></div></article>
+          <article class="feature-card"><span class="feature-number">03</span><h3>Keep each learner organized</h3><p>Schedule lessons, save notes and keep individual progress attached to the right student.</p><div class="feature-visual people-visual"><span>A</span><span>E</span><span>M</span><i>+12</i></div></article>
+          <article class="feature-card feature-wide"><div><span class="feature-number">04</span><h3>Continue after class</h3><p>Homework, saved vocabulary, grammar cards and teacher feedback stay inside the student account.</p></div><div class="homework-visual"><span><i></i>Vocabulary review<b>Done</b></span><span><i></i>Grammar practice<b>Next</b></span><span><i></i>Speaking notes<b>Saved</b></span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="curriculum" class="marketing-section curriculum-section">
+      <div class="marketing-container curriculum-grid">
+        <div class="section-heading"><span class="section-kicker">STRUCTURED CONTENT</span><h2>A clear path from A1 to B1.</h2><p>Every lesson follows one visual and methodological system, so teachers can focus on the learner instead of formatting slides.</p></div>
+        <div class="level-stack">
+          <article><span class="level-code">A1</span><div><h3>Build the foundation</h3><p>Essential language for everyday situations.</p></div><strong>Beginner</strong></article>
+          <article><span class="level-code">A2</span><div><h3>Speak with more freedom</h3><p>Connected language, practical grammar and richer situations.</p></div><strong>Elementary</strong></article>
+          <article><span class="level-code">B1</span><div><h3>Develop independence</h3><p>Longer communication, opinions and real-world confidence.</p></div><strong>Intermediate</strong></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow" class="marketing-section workflow-section">
+      <div class="marketing-container">
+        <div class="section-heading centered"><span class="section-kicker">A SIMPLE WEEKLY FLOW</span><h2>From planning to progress.</h2></div>
+        <div class="workflow-grid">
+          <article><span>1</span><h3>Choose and schedule</h3><p>Select a lesson from the library, attach it to a student and add it to the calendar.</p></article>
+          <article><span>2</span><h3>Teach together</h3><p>Meet in the waiting room and open the same synchronized lesson workspace.</p></article>
+          <article><span>3</span><h3>Save what matters</h3><p>Record progress, assign homework and keep useful language in the student notebook.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="marketing-section roles-section">
+      <div class="marketing-container roles-grid">
+        <article class="role-card teacher-role"><span class="section-kicker">FOR TEACHERS</span><h2>Your whole practice,<br>without the clutter.</h2><ul><li>Private teaching workspace</li><li>Students and schedule</li><li>Reusable A1–B1 materials</li><li>Homework and progress</li></ul><a href="teacher-signup.html">Create teacher account →</a></article>
+        <article class="role-card student-role"><span class="section-kicker">FOR STUDENTS</span><h2>Everything from class,<br>easy to find again.</h2><ul><li>Upcoming and past lessons</li><li>Homework and feedback</li><li>Personal notebook</li><li>Visible learning progress</li></ul><a href="signup.html">Create student account →</a></article>
+      </div>
+    </section>
+
+    <section id="pricing" class="marketing-section pricing-section">
+      <div class="marketing-container pricing-card">
+        <div><span class="section-kicker">EARLY ACCESS</span><h2>Help shape Space Whale.</h2><p>The platform is still being assembled. Early teachers can create an account, explore the current workspace and follow new features as they are connected.</p></div>
+        <div class="pricing-action"><span>Founding teacher access</span><strong>Pricing announced before launch</strong><a class="marketing-button light" href="teacher-signup.html">Join early access</a></div>
+      </div>
+    </section>
+
+    <section id="faq" class="marketing-section faq-section">
+      <div class="marketing-container faq-grid">
+        <div class="section-heading"><span class="section-kicker">QUESTIONS</span><h2>Before you begin.</h2></div>
+        <div class="faq-list">
+          <details><summary>Is Space Whale already fully launched?<span>+</span></summary><p>Not yet. It is in early access while the teaching workspace, curriculum and live classroom are connected step by step.</p></details>
+          <details><summary>Who is the platform for?<span>+</span></summary><p>It is designed primarily for independent English teachers and their private students.</p></details>
+          <details><summary>Which levels will be included?<span>+</span></summary><p>The planned core curriculum covers A1, A2 and B1 with one consistent lesson system.</p></details>
+          <details><summary>Do students need to install anything?<span>+</span></summary><p>No download is planned. Teacher and student spaces run in a modern web browser.</p></details>
+          <details><summary>Can I use my own lessons?<span>+</span></summary><p>The teacher library is designed to include both Space Whale materials and personal reusable lessons.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="marketing-container final-cta-inner"><span class="marketing-pill dark-pill">SPACE WHALE EARLY ACCESS</span><h2>A calmer way to teach<br>is taking shape.</h2><p>Create your workspace and follow the platform as it grows.</p><div class="hero-actions centered-actions"><a class="marketing-button light" href="teacher-signup.html">Create teacher account</a><a class="marketing-link-button light-link" href="login.html">Sign in</a></div></div>
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js?v=20260920-backend-v1"></script>
-  <script src="entry.js?v=20260921-app-entry-v1"></script>
+  <footer class="marketing-footer">
+    <div class="marketing-container footer-inner"><a class="marketing-brand" href="#top"><span class="marketing-brand-mark">SW</span><span>Space Whale</span></a><p>One space for thoughtful English teaching.</p><div><a href="login.html">Sign in</a><a href="teacher-signup.html">Teacher account</a><a href="signup.html">Student account</a></div></div>
+  </footer>
+
+  <script src="marketing.js?v=20260921-marketing-v1"></script>
 </body>
 </html>

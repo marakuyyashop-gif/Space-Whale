@@ -41,7 +41,7 @@
     const button = document.getElementById("loginButton");
     const message = document.getElementById("loginMessage");
     const params = new URLSearchParams(location.search);
-    const next = params.get("next") || "dashboard.html";
+    const next = params.get("next") || "app.html";
 
     window.spaceWhaleSupabase.auth.getSession().then(({ data }) => {
       if (data.session) location.href = next;
