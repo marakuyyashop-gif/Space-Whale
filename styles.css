@@ -1953,3 +1953,122 @@ button{font:inherit;color:inherit}
     display:none;
   }
 }
+
+
+/* === MINIMAL LIGHT SIDEBAR — SIDEBAR.PNG === */
+:root{
+  --sidebar-width:300px;
+  --sidebar-bg:#f1f1ef;
+  --sidebar-text:#22252a;
+  --sidebar-muted:#70757d;
+  --sidebar-line:rgba(31,32,35,.10);
+  --sidebar-line-strong:rgba(31,32,35,.15);
+  --sidebar-hover:rgba(31,32,35,.055);
+  --sidebar-active:rgba(31,32,35,.08);
+}
+
+.app-sidebar{
+  color:var(--sidebar-text) !important;
+  background-color:var(--sidebar-bg) !important;
+  background-image:url("Sidebar.png") !important;
+  background-position:center bottom !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  border-right:1px solid rgba(31,32,35,.10) !important;
+  box-shadow:8px 0 22px rgba(31,32,35,.06) !important;
+}
+
+.app-sidebar::before,
+.app-sidebar::after{
+  content:none !important;
+  display:none !important;
+}
+
+.sidebar-header,
+.sidebar-scroll{
+  background:transparent !important;
+}
+
+.sidebar-brand,
+.brand-name,
+.sidebar-nav-item,
+.course-module__button,
+.course-lesson__button,
+.course-activity,
+.level-selector,
+.sidebar-icon-button{
+  color:#22252a !important;
+  text-shadow:none !important;
+}
+
+.brand-mark{
+  background:rgba(255,255,255,.72) !important;
+  color:#22252a !important;
+  border:1px solid rgba(31,32,35,.10) !important;
+  box-shadow:0 2px 8px rgba(31,32,35,.05) !important;
+}
+
+.sidebar-icon-button svg,
+.sidebar-nav-item svg,
+.course-chevron,
+.level-selector svg{
+  color:#22252a !important;
+  opacity:.82 !important;
+  filter:none !important;
+}
+
+.sidebar-section-heading{
+  color:#6f747c !important;
+  text-shadow:none !important;
+}
+
+.level-selector{
+  background:rgba(255,255,255,.62) !important;
+  border-color:rgba(31,32,35,.11) !important;
+  box-shadow:0 2px 8px rgba(31,32,35,.04) !important;
+}
+
+.sidebar-nav-item:hover,
+.course-module__button:hover,
+.course-lesson__button:hover,
+.course-activity:hover,
+.sidebar-brand:hover,
+.sidebar-icon-button:hover{
+  background:rgba(255,255,255,.55) !important;
+  box-shadow:none !important;
+}
+
+.sidebar-nav-item.active,
+.course-module__button.active,
+.course-activity.active{
+  color:#1f2023 !important;
+  background:rgba(255,255,255,.72) !important;
+  border-color:rgba(31,32,35,.10) !important;
+  box-shadow:0 2px 8px rgba(31,32,35,.05) !important;
+}
+
+.course-module.expanded,
+.course-lesson.expanded{
+  background:transparent !important;
+}
+
+.course-activity.done::after{
+  color:#62856b !important;
+  text-shadow:none !important;
+}
+
+@media (max-width:1180px){
+  :root{--sidebar-width:288px}
+}
+
+@media (max-width:980px){
+  :root{--sidebar-width:276px}
+}
+
+@media (max-width:768px){
+  .app-sidebar{
+    width:min(84vw,300px) !important;
+    min-width:min(84vw,300px) !important;
+    background-position:center bottom !important;
+  }
+}
