@@ -1320,3 +1320,189 @@ button{font:inherit;color:inherit}
     padding:24px;
   }
 }
+
+
+/* === MOBILE CLASSROOM LAYOUT === */
+.mobile-menu-toggle,
+.mobile-menu-backdrop{
+  display:none;
+}
+
+@media (max-width:768px){
+  html,body{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+  }
+
+  .reference-app{
+    min-width:0 !important;
+    width:100vw;
+    height:100dvh;
+    display:block;
+    overflow:hidden;
+  }
+
+  .mobile-menu-toggle{
+    display:grid;
+    place-items:center;
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:140;
+    width:42px;
+    height:42px;
+    padding:0;
+    border:1px solid rgba(20,22,28,.10);
+    border-radius:13px;
+    background:rgba(255,255,255,.92);
+    box-shadow:0 4px 16px rgba(24,28,36,.12);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  .mobile-menu-toggle svg{
+    width:21px;
+    height:21px;
+    fill:none;
+    stroke:#202124;
+    stroke-width:1.9;
+    stroke-linecap:round;
+  }
+
+  .mobile-menu-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:125;
+    border:0;
+    background:rgba(12,14,20,.32);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease;
+  }
+
+  .reference-app.mobile-sidebar-open .mobile-menu-backdrop{
+    display:block;
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .app-sidebar{
+    position:fixed !important;
+    top:0;
+    left:0;
+    bottom:0;
+    z-index:130;
+    width:min(86vw,320px) !important;
+    min-width:min(86vw,320px) !important;
+    height:100dvh !important;
+    transform:translateX(-102%);
+    transition:transform .24s ease;
+    box-shadow:18px 0 38px rgba(2,5,14,.28) !important;
+  }
+
+  .reference-app.mobile-sidebar-open .app-sidebar{
+    transform:translateX(0);
+  }
+
+  .class-area{
+    width:100vw !important;
+    min-width:0 !important;
+    height:100dvh !important;
+  }
+
+  .class-content{
+    inset:0 !important;
+  }
+
+  .lesson-scroll{
+    padding:62px 0 92px !important;
+    background-position:center top !important;
+    background-size:100% auto !important;
+    overflow-x:hidden !important;
+  }
+
+  .exercise-page,
+  .lesson-title-card,
+  .lesson-stage,
+  .followup-blocks,
+  .placeholder-page{
+    width:calc(100% - 24px) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  .exercise-title-card{
+    min-height:auto !important;
+    padding:20px 18px !important;
+    border-radius:22px !important;
+  }
+
+  .lesson-title{
+    font-size:28px !important;
+    line-height:34px !important;
+  }
+
+  .exercise-stack{
+    margin-top:42px !important;
+    gap:42px !important;
+  }
+
+  .exercise-row{
+    grid-template-columns:1fr !important;
+    row-gap:18px !important;
+    column-gap:0 !important;
+  }
+
+  .exercise-media{
+    width:100% !important;
+    justify-self:stretch !important;
+  }
+
+  .exercise-row--hero .exercise-media img,
+  .exercise-row--standard .exercise-media img,
+  .stage-image{
+    width:min(78vw,320px) !important;
+    height:auto !important;
+    max-height:none !important;
+    flex-basis:auto !important;
+    margin:0 auto !important;
+  }
+
+  .exercise-copy,
+  .stage-copy{
+    width:100% !important;
+    max-width:none !important;
+    font-size:17px !important;
+    line-height:1.45 !important;
+  }
+
+  .session-left{
+    display:none !important;
+  }
+
+  .session-bar{
+    height:64px !important;
+    background:transparent !important;
+  }
+
+  .session-right{
+    right:8px !important;
+    bottom:8px !important;
+  }
+
+  .session-controls{
+    height:44px !important;
+  }
+
+  .round-control{
+    width:34px !important;
+    height:34px !important;
+  }
+
+  .support-btn{
+    width:42px !important;
+    height:42px !important;
+  }
+}
+
