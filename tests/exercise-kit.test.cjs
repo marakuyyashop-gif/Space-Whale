@@ -54,3 +54,28 @@ test('gap bank must include all accepted answers', () => {
   const def = copy(gaps); def.bank = ['was']; assert.throws(() => validate(def));
   def.bank.push('were'); assert.equal(validate(def), def);
 });
+
+test('image-label validates coordinates and grades each target', () => {
+  const def = {
+    version: 1,
+    id: 'image-label',
+    title: 'Label the picture',
+    kind: 'image-label',
+    image: '/assets/image-label-demo.svg',
+    alt: 'Study desk',
+    options: [
+      { id: 'lamp', text: 'lamp' },
+      { id: 'plant', text: 'plant' }
+    ],
+    items: [
+      { id: 't1', prompt: 'Object 1', x: 20, y: 40, correctId: 'lamp' },
+      { id: 't2', prompt: 'Object 2', x: 80, y: 35, correctId: 'plant' }
+    ]
+  };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, { t1: 'lamp', t2: 'plant' }), { t1: 'correct', t2: 'correct' });
+  assert.deepEqual(grade(def, { t1: 'plant' }), { t1: 'retry', t2: 'empty' });
+
+  const badX = copy(def); badX.items[0].x = 120; assert.throws(() => validate(badX));
+  const duplicateAnswer = copy(def); duplicateAnswer.items[1].correctId = 'lamp'; assert.throws(() => validate(duplicateAnswer));
+});
