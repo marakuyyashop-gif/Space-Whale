@@ -168,8 +168,6 @@
     if (button) startPayment(button.dataset.buyProduct, button);
   });
 
-  el("logoutButton").addEventListener("click", () => auth.signOut());
-
   async function init() {
     session = await auth.requireSession();
     if (!session) return;
@@ -180,13 +178,16 @@
       return;
     }
 
-    el("studentName").textContent = profile.display_name || session.user.email;
+    window.SpaceWhaleStudentShell?.setAccount(profile, session.user.email);
+    el("logoutButton").addEventListener("click", () => auth.signOut());
     await loadWorkspace();
     await Promise.all([loadLessons(), loadBilling()]);
+    el("pageLoading").hidden = true;
+    el("studentApp").hidden = false;
   }
 
   init().catch((error) => {
     console.error(error);
-    el("studentLessons").innerHTML = `<div class="sw-message">${escapeHtml(error.message)}</div>`;
+    el("pageLoading").textContent = error.message;
   });
 })();

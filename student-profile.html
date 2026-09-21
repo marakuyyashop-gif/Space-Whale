@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-student-shell-v1">
+</head>
+<body class="student-home-body">
+  <div id="studentApp" class="student-app" hidden>
+    <aside class="student-sidebar" data-student-sidebar data-active="profile"></aside>
+    <main class="student-main">
+      <header class="student-page-header">
+        <span class="student-eyebrow">ACCOUNT</span>
+        <h1>Profile</h1>
+        <p>Your account and learning preferences.</p>
+      </header>
+      <section class="student-placeholder-card">
+        <h2>Profile details</h2>
+        <div class="student-profile-list">
+          <div class="student-profile-row"><span>Name</span><strong data-profile-name>Student</strong></div>
+          <div class="student-profile-row"><span>Email</span><strong data-profile-email></strong></div>
+          <div class="student-profile-row"><span>Time zone</span><strong data-profile-timezone></strong></div>
+          <div class="student-profile-row"><span>Avatar</span><strong>Space Whale characters — coming next</strong></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="pageLoading" class="page-loading">Loading profile…</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="student-shell.js?v=20260921-student-shell-v1"></script>
+  <script src="student-placeholder.js?v=20260921-student-shell-v1"></script>
+</body>
+</html>
