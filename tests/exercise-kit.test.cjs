@@ -219,3 +219,34 @@ test('rule-page accepts optional ordered content and nested discovery exercises'
   nested.blocks[1].exercise = { version: 1, id: 'nested', title: 'No', kind: 'rule-page', blocks: [{ type: 'text', text: 'x' }] };
   assert.throws(() => validate(nested));
 });
+
+test('cropped picture-word items validate and reject crops outside the image', () => {
+  const def = {
+    version: 1,
+    id: 'crop-picture-word',
+    title: 'Match',
+    kind: 'matching',
+    layout: 'picture-word',
+    items: [
+      { id: 'i1', text: 'Food stall', image: '/assets/sheet.jpg', alt: 'Food stall', crop: { x: 3, y: 2, w: 26, h: 44 }, correctId: 'stall' }
+    ],
+    options: [{ id: 'stall', text: 'food stall' }]
+  };
+  assert.equal(validate(def), def);
+  const bad = copy(def); bad.items[0].crop = { x: 90, y: 2, w: 20, h: 44 }; assert.throws(() => validate(bad));
+});
+
+test('Listen & Repeat can reserve per-item audio slots without fake audio', () => {
+  const def = {
+    version: 1,
+    id: 'pending-audio',
+    title: 'Listen and repeat',
+    kind: 'audio',
+    layout: 'listen-repeat',
+    audioPending: true,
+    items: [{ id: 'a', text: 'invitation', example: 'This is an invitation.' }]
+  };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, {}), {});
+  const strict = copy(def); delete strict.audioPending; assert.throws(() => validate(strict));
+});
