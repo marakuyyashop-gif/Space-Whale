@@ -49,6 +49,7 @@ let courseModules = [
 ];
 
 let activeTaskId = "photos-test";
+const liveResponses = new Map();
 
 const courseTree = document.getElementById("courseTree");
 const lessonContent = document.getElementById("lessonContent");
@@ -250,8 +251,225 @@ function renderWorkspacePage(page) {
   `;
 }
 
+function responseSummaryHtml(payload) {
+  if (!payload) {
+    return '<div class="live-response-empty">Waiting for the student’s answer…</div>';
+  }
+
+  const response = payload.response || {};
+  let answer = "";
+  if (response.option_text) answer = response.option_text;
+  else if (response.text) answer = response.text;
+  else answer = JSON.stringify(response);
+
+  const verdict = payload.is_correct === true
+    ? '<span class="response-verdict correct">Correct</span>'
+    : payload.is_correct === false
+      ? '<span class="response-verdict incorrect">Needs another try</span>'
+      : '<span class="response-verdict neutral">Submitted</span>';
+
+  return `
+    <div class="live-response-answer">
+      <div>${verdict}</div>
+      <strong>${escapeHtml(answer)}</strong>
+      <small>${payload.submitted_at ? escapeHtml(new Date(payload.submitted_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})) : "Live"}</small>
+    </div>
+  `;
+}
+
+async function hydrateExerciseResponse(exerciseId) {
+  const classroom = window.SpaceWhaleClassroom;
+  if (!classroom?.state?.session || !exerciseId) return;
+
+  try {
+    const saved = await classroom.loadExerciseResponse(exerciseId);
+    if (!saved) return;
+    const payload = {
+      exercise_id: exerciseId,
+      response: saved.response,
+      is_correct: saved.is_correct,
+      submitted_at: saved.submitted_at,
+      student_id: saved.student_id
+    };
+    liveResponses.set(exerciseId, payload);
+
+    if (activeTaskId !== exerciseId) return;
+
+    const teacherPanel = document.querySelector("[data-live-response]");
+    if (teacherPanel && classroom.state.role === "teacher") {
+      teacherPanel.innerHTML = responseSummaryHtml(payload);
+    }
+
+    if (classroom.state.role === "student") {
+      const response = saved.response || {};
+      if (response.option_index != null) {
+        document.querySelectorAll('[name="exerciseOption"]').forEach((input) => {
+          input.checked = Number(input.value) === Number(response.option_index);
+        });
+      }
+      const text = document.getElementById("shortTextAnswer");
+      if (text && typeof response.text === "string") text.value = response.text;
+      const feedback = document.getElementById("exerciseFeedback");
+      if (feedback && saved.submitted_at) {
+        feedback.textContent = saved.is_correct === true
+          ? "Saved — correct."
+          : saved.is_correct === false
+            ? "Saved — try once more."
+            : "Answer saved.";
+      }
+    }
+  } catch (error) {
+    console.error("[Space Whale] Could not restore exercise response", error);
+  }
+}
+
+function renderInteractiveActivity(activity) {
+  const content = activity.content || {};
+  const classroom = window.SpaceWhaleClassroom;
+  const role = classroom?.state?.role || null;
+  const saved = liveResponses.get(activity.id);
+
+  if (content.kind === "multiple_choice") {
+    const options = Array.isArray(content.options) ? content.options : [];
+    const optionHtml = options.map((option,index) => `
+      <label class="exercise-option">
+        <input type="radio" name="exerciseOption" value="${index}" ${role === "teacher" ? "disabled" : ""}>
+        <span class="exercise-option-marker">${String.fromCharCode(65 + index)}</span>
+        <span>${escapeHtml(option)}</span>
+      </label>
+    `).join("");
+
+    lessonContent.innerHTML = `
+      <article class="exercise-page interactive-page">
+        <section class="exercise-title-card">
+          <h1 class="lesson-title">${escapeHtml(activity.name)}</h1>
+        </section>
+        <section class="interactive-exercise-card">
+          <div class="interactive-question">${escapeHtml(content.question || "Choose the correct answer.")}</div>
+          <div class="exercise-options">${optionHtml}</div>
+          ${role === "student" ? `
+            <div class="interactive-actions">
+              <button id="checkExerciseButton" class="exercise-action-button" type="button">Check answer</button>
+              <span id="exerciseFeedback" class="exercise-feedback"></span>
+            </div>
+          ` : `
+            <div class="teacher-live-response">
+              <div class="teacher-live-response-heading">
+                <span>LIVE STUDENT RESPONSE</span>
+                <span class="live-dot"></span>
+              </div>
+              <div data-live-response>${responseSummaryHtml(saved)}</div>
+            </div>
+          `}
+        </section>
+      </article>
+    `;
+
+    if (role === "student") {
+      document.getElementById("checkExerciseButton")?.addEventListener("click", async () => {
+        const selected = document.querySelector('[name="exerciseOption"]:checked');
+        const feedback = document.getElementById("exerciseFeedback");
+        if (!selected) {
+          feedback.textContent = "Choose an answer first.";
+          return;
+        }
+
+        const index = Number(selected.value);
+        const isCorrect = index === Number(content.correct_index);
+        feedback.textContent = "Saving…";
+
+        try {
+          await classroom.saveExerciseResponse(activity.id, {
+            option_index: index,
+            option_text: options[index]
+          }, { isCorrect, submitted: true });
+
+          const payload = {
+            exercise_id: activity.id,
+            response: { option_index:index, option_text:options[index] },
+            is_correct: isCorrect,
+            submitted_at: new Date().toISOString()
+          };
+          liveResponses.set(activity.id,payload);
+          feedback.textContent = isCorrect
+            ? (content.correct_feedback || "Correct.")
+            : (content.incorrect_feedback || "Try again.");
+        } catch (error) {
+          feedback.textContent = error.message;
+        }
+      });
+    }
+
+    hydrateExerciseResponse(activity.id);
+    return true;
+  }
+
+  if (content.kind === "short_text") {
+    lessonContent.innerHTML = `
+      <article class="exercise-page interactive-page">
+        <section class="exercise-title-card">
+          <h1 class="lesson-title">${escapeHtml(activity.name)}</h1>
+        </section>
+        <section class="interactive-exercise-card">
+          <div class="interactive-question">${escapeHtml(content.question || "Write your answer.")}</div>
+          ${role === "student" ? `
+            <textarea id="shortTextAnswer" class="exercise-text-answer" rows="5" placeholder="${escapeHtml(content.placeholder || "Type your answer…")}"></textarea>
+            <div class="interactive-actions">
+              <button id="submitTextAnswer" class="exercise-action-button" type="button">Send answer</button>
+              <span id="exerciseFeedback" class="exercise-feedback"></span>
+            </div>
+          ` : `
+            <div class="teacher-live-response">
+              <div class="teacher-live-response-heading">
+                <span>LIVE STUDENT RESPONSE</span>
+                <span class="live-dot"></span>
+              </div>
+              <div data-live-response>${responseSummaryHtml(saved)}</div>
+              ${content.teacher_note ? `<p class="teacher-note">${escapeHtml(content.teacher_note)}</p>` : ""}
+            </div>
+          `}
+        </section>
+      </article>
+    `;
+
+    if (role === "student") {
+      document.getElementById("submitTextAnswer")?.addEventListener("click", async () => {
+        const text = document.getElementById("shortTextAnswer").value.trim();
+        const feedback = document.getElementById("exerciseFeedback");
+        if (!text) {
+          feedback.textContent = "Write an answer first.";
+          return;
+        }
+        feedback.textContent = "Sending…";
+        try {
+          await classroom.saveExerciseResponse(activity.id,{ text },{ submitted:true });
+          liveResponses.set(activity.id,{
+            exercise_id:activity.id,
+            response:{text},
+            is_correct:null,
+            submitted_at:new Date().toISOString()
+          });
+          feedback.textContent = "Answer sent to your teacher.";
+        } catch (error) {
+          feedback.textContent = error.message;
+        }
+      });
+    }
+
+    hydrateExerciseResponse(activity.id);
+    return true;
+  }
+
+  return false;
+}
+
 function renderLesson() {
   const current = findActivity(activeTaskId);
+  if (current?.activity?.content?.kind && renderInteractiveActivity(current.activity)) {
+    lessonContent.scrollTop = 0;
+    return;
+  }
+
   const page = workspacePages[activeTaskId];
 
   if (page) {
@@ -380,8 +598,18 @@ renderLesson();
 
 document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
   button.addEventListener("click", () => {
-    document.querySelectorAll(".sidebar-nav-item").forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
+    const label = button.textContent.trim();
+    const role = window.SpaceWhaleClassroom?.state?.role;
+
+    if (label === "Session") return;
+    if (label === "Library") {
+      location.href = role === "teacher" ? "library.html" : "student-dashboard.html";
+      return;
+    }
+    if (label === "Students") {
+      location.href = role === "teacher" ? "students.html" : "student-dashboard.html";
+      return;
+    }
   });
 });
 
@@ -414,6 +642,23 @@ async function initLiveClassroom() {
     onNavigate: (payload) => {
       if (payload?.current_exercise_id) {
         selectActivity(payload.current_exercise_id, { remote: true });
+      }
+    },
+    onExerciseResponse: (payload) => {
+      if (!payload?.exercise_id) return;
+      liveResponses.set(payload.exercise_id,payload);
+
+      if (payload.exercise_id === activeTaskId && classroom.state.role === "teacher") {
+        const panel = document.querySelector("[data-live-response]");
+        if (panel) panel.innerHTML = responseSummaryHtml(payload);
+      }
+
+      const toast = document.getElementById("classroomToast");
+      if (toast && classroom.state.role === "teacher") {
+        toast.textContent = "Student answer received";
+        toast.classList.add("show");
+        clearTimeout(window.__spaceWhaleToastTimer);
+        window.__spaceWhaleToastTimer = setTimeout(() => toast.classList.remove("show"),1800);
       }
     },
     onPresence: renderPresence,
