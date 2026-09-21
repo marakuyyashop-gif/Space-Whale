@@ -1506,3 +1506,72 @@ button{font:inherit;color:inherit}
   }
 }
 
+
+
+/* === CLASSROOM LESSON TABS === */
+.classroom-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  padding:2px 10px 14px;
+}
+
+.classroom-tabs .sidebar-nav-item{
+  min-width:0;
+  height:auto;
+  padding:9px 7px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  font-size:12px;
+  line-height:1.15;
+}
+
+.classroom-tabs .sidebar-nav-item svg{
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+}
+
+.classroom-tabs .sidebar-nav-item span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:100%;
+}
+
+.classroom-tab-panel[hidden]{
+  display:none !important;
+}
+
+.lesson-reference-panel{
+  padding:8px 16px 24px;
+  color:var(--sidebar-text,#f5f7ff);
+}
+
+.lesson-reference-panel h3{
+  margin:0 0 8px;
+  font-size:17px;
+  line-height:1.25;
+  font-weight:650;
+}
+
+.lesson-reference-copy{
+  margin:0;
+  color:rgba(245,247,255,.68);
+  font-size:13px;
+  line-height:1.45;
+}
+
+.lesson-reference-content{
+  margin-top:16px;
+}
+
+@media (max-width:768px){
+  .classroom-tabs{
+    padding-left:10px;
+    padding-right:10px;
+  }
+}
