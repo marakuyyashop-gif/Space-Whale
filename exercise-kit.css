@@ -546,3 +546,16 @@
 .exercise-kit .ek-inline-option:hover, .exercise-kit .ek-inline-option:focus-visible { background: #f1f1f3; outline-offset: -2px; }
 .exercise-kit .ek-inline-clear { color: var(--ek-muted); border-top: 1px solid #eee; }
 .exercise-kit.ek-reading-width .ek-typed-gap { border: 1px solid #bcbcc5; box-shadow: none; }
+
+.exercise-kit .ek-crop-image {
+  background-repeat: no-repeat;
+  background-color: #f3f3f1;
+}
+.exercise-kit .ek-picture-word-card > .ek-crop-image {
+  display: block;
+  background-repeat: no-repeat;
+}
+.exercise-kit .ek-audio-pending {
+  opacity: .45;
+  cursor: default;
+}
