@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app-shell.css?v=20260921-students-v1">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-library-v1">
 </head>
 <body class="teacher-home-body">
   <main class="student-detail-shell">
@@ -126,6 +126,12 @@
         <button class="dialog-close" type="button" data-close-dialog>×</button>
       </div>
       <div class="sw-field">
+        <label for="detailLibraryLesson">Lesson material</label>
+        <select id="detailLibraryLesson">
+          <option value="">No material attached</option>
+        </select>
+      </div>
+      <div class="sw-field">
         <label for="lessonTitle">Lesson title</label>
         <input id="lessonTitle" type="text" placeholder="English lesson">
       </div>
@@ -155,6 +161,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260921-teacher-settings-v1"></script>
-  <script src="student-detail.js?v=20260921-v1"></script>
+  <script src="student-detail.js?v=20260921-library-v1"></script>
 </body>
 </html>
