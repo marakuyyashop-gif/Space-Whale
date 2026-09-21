@@ -161,3 +161,46 @@ test('word-definition is a matching layout, not a second renderer', () => {
   assert.equal(validate(def), def);
   assert.equal(grade(def, { w1: 'd1' }).w1, 'correct');
 });
+
+test('rule-page accepts optional ordered content and nested discovery exercises', () => {
+  const def = {
+    version: 1,
+    id: 'rule-page',
+    title: 'Grammar',
+    kind: 'rule-page',
+    blocks: [
+      { type: 'text', title: 'Look', text: 'It is easy to get there.' },
+      {
+        type: 'exercise',
+        id: 'lead-in',
+        exercise: {
+          version: 1,
+          id: 'lead-in-choice',
+          title: 'Complete the rule',
+          kind: 'choice',
+          items: [{
+            id: 'q1',
+            prompt: 'Use It is for...',
+            options: [{ id: 'now', text: 'now or in general' }, { id: 'past', text: 'the past' }],
+            correctId: 'now'
+          }]
+        }
+      },
+      { type: 'rule', title: 'Rule', formula: 'It is + adjective + to + base form', examples: ['It is easy to get there.'] },
+      { type: 'image', image: '/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }
+    ]
+  };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, {}), {});
+  const imageOnly = {
+    version: 1,
+    id: 'rule-image-only',
+    title: 'Visual',
+    kind: 'rule-page',
+    blocks: [{ type: 'image', image: '/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }]
+  };
+  assert.equal(validate(imageOnly), imageOnly);
+  const nested = copy(def);
+  nested.blocks[1].exercise = { version: 1, id: 'nested', title: 'No', kind: 'rule-page', blocks: [{ type: 'text', text: 'x' }] };
+  assert.throws(() => validate(nested));
+});
