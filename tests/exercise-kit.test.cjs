@@ -108,21 +108,56 @@ test('picture ordering accepts image tokens and rejects unsupported layout', () 
   const bad = copy(def); bad.layout = 'carousel'; assert.throws(() => validate(bad));
 });
 
-test('audio Listen & Repeat accepts safe sources and is not graded', () => {
+test('audio Listen & Repeat requires one safe audio source per item and is not graded', () => {
   const def = {
     version: 1,
     id: 'lnr',
     title: 'Listen and repeat',
     kind: 'audio',
     layout: 'listen-repeat',
-    audio: 'data:audio/mpeg;base64,SUQz',
     items: [
-      { id: 'a', text: 'space', example: 'Space is quiet.' },
-      { id: 'b', text: 'a planet', example: 'Earth is a planet.' }
+      { id: 'a', text: 'space', audio: 'data:audio/mpeg;base64,SUQz', example: 'Space is quiet.' },
+      { id: 'b', text: 'a planet', audio: 'data:audio/mpeg;base64,SUQz', example: 'Earth is a planet.' }
     ]
   };
   assert.equal(validate(def), def);
   assert.deepEqual(grade(def, {}), {});
-  const bad = copy(def); bad.audio = 'javascript:alert(1)'; assert.throws(() => validate(bad));
+  const missing = copy(def); delete missing.items[0].audio; assert.throws(() => validate(missing));
+  const bad = copy(def); bad.items[0].audio = 'javascript:alert(1)'; assert.throws(() => validate(bad));
   const badLayout = copy(def); badLayout.layout = 'waveform-editor'; assert.throws(() => validate(badLayout));
+});
+
+test('picture-word matching requires images and grades through shared matching logic', () => {
+  const def = {
+    version: 1,
+    id: 'picture-word',
+    title: 'Match',
+    kind: 'matching',
+    layout: 'picture-word',
+    items: [
+      { id: 'i1', text: 'Reading picture', image: '/assets/choice-reading.svg', alt: 'Reading', correctId: 'reading' },
+      { id: 'i2', text: 'Hiking picture', image: '/assets/choice-hiking.svg', alt: 'Hiking', correctId: 'hiking' }
+    ],
+    options: [
+      { id: 'hiking', text: 'hiking' },
+      { id: 'reading', text: 'reading' }
+    ]
+  };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, { i1: 'reading', i2: 'hiking' }), { i1: 'correct', i2: 'correct' });
+  const missingImage = copy(def); delete missingImage.items[0].image; delete missingImage.items[0].alt; assert.throws(() => validate(missingImage));
+});
+
+test('word-definition is a matching layout, not a second renderer', () => {
+  const def = {
+    version: 1,
+    id: 'word-definition',
+    title: 'Definitions',
+    kind: 'matching',
+    layout: 'word-definition',
+    items: [{ id: 'w1', text: 'stage', correctId: 'd1' }],
+    options: [{ id: 'd1', text: 'the place where actors perform' }]
+  };
+  assert.equal(validate(def), def);
+  assert.equal(grade(def, { w1: 'd1' }).w1, 'correct');
 });
