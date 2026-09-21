@@ -1,4 +1,4 @@
-const courseModules = [
+let courseModules = [
   {
     id: "small-talk",
     title: "Module 1 · Small Talk",
@@ -28,17 +28,13 @@ const courseModules = [
         id: "celebrities",
         title: "Знаменитости прошлого",
         expanded: false,
-        activities: [
-          { id: "celeb-test", name: "Test task", done: false }
-        ]
+        activities: [{ id: "celeb-test", name: "Test task", done: false }]
       },
       {
         id: "yesterday",
         title: "Где ты был вчера?",
         expanded: false,
-        activities: [
-          { id: "yesterday-test", name: "Test task", done: false }
-        ]
+        activities: [{ id: "yesterday-test", name: "Test task", done: false }]
       }
     ]
   },
@@ -57,6 +53,15 @@ let activeTaskId = "photos-test";
 const courseTree = document.getElementById("courseTree");
 const lessonContent = document.getElementById("lessonContent");
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 const chevronRightSvg = `
   <svg class="course-chevron" viewBox="0 0 24 24" aria-hidden="true">
     <path d="m9 6 6 6-6 6"/>
@@ -73,11 +78,18 @@ function findActivity(activityId) {
   return null;
 }
 
+function firstActivityId() {
+  for (const module of courseModules) {
+    for (const lesson of module.lessons) {
+      if (lesson.activities.length) return lesson.activities[0].id;
+    }
+  }
+  return null;
+}
+
 function selectActivity(activityId, { remote = false } = {}) {
   const classroom = window.SpaceWhaleClassroom;
-  if (!remote && classroom?.state?.channel && classroom.state.role === "student") {
-    return;
-  }
+  if (!remote && classroom?.state?.channel && classroom.state.role === "student") return;
 
   const target = findActivity(activityId);
   if (!target) return;
@@ -104,7 +116,7 @@ function renderCourseTree() {
     moduleButton.type = "button";
     moduleButton.className = `course-module__button ${module.active ? "active" : ""}`;
     moduleButton.innerHTML = `
-      <span>${module.title}</span>
+      <span>${escapeHtml(module.title)}</span>
       ${chevronRightSvg}
     `;
 
@@ -126,7 +138,7 @@ function renderCourseTree() {
       lessonButton.type = "button";
       lessonButton.className = "course-lesson__button";
       lessonButton.innerHTML = `
-        <span>${lesson.title}</span>
+        <span>${escapeHtml(lesson.title)}</span>
         ${lesson.activities.length ? chevronRightSvg : ""}
       `;
 
@@ -153,10 +165,7 @@ function renderCourseTree() {
             activityButton.disabled = true;
           }
 
-          activityButton.addEventListener("click", () => {
-            selectActivity(activity.id);
-          });
-
+          activityButton.addEventListener("click", () => selectActivity(activity.id));
           activitiesEl.appendChild(activityButton);
         });
 
@@ -171,7 +180,7 @@ function renderCourseTree() {
   });
 }
 
-const workspacePages = {
+let workspacePages = {
   "photos-test": {
     title: "Test task: Photos from the past",
     blocks: [
@@ -201,40 +210,41 @@ const workspacePages = {
           <p>В каком месяце он был там?</p>
           <p>Какая была погода?</p>
         `
-      },
-      {
-        variant: "standard",
-        image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photo_bali_comments.svg",
-        alt: "Comments under Rick's photo",
-        html: `
-          <p>Прочитайте комментарии под фото.</p>
-          <p>Где в это время были сыновья Рика?</p>
-          <p>Почему?</p>
-        `
       }
     ]
   }
 };
 
+function renderStructuredCopy(block) {
+  const title = block.title ? `<h3>${escapeHtml(block.title)}</h3>` : "";
+  const text = block.text
+    ? String(block.text).split(/\n+/).filter(Boolean).map((line) => `<p>${escapeHtml(line)}</p>`).join("")
+    : "";
+  return title + text;
+}
+
 function renderWorkspacePage(page) {
-  const blocks = page.blocks.map((block) => `
-    <section class="exercise-row exercise-row--${block.variant || "standard"}">
-      <div class="exercise-media">
-        <img src="${block.image}" alt="${block.alt || ""}" />
-      </div>
-      <div class="exercise-copy">
-        ${block.html}
-      </div>
-    </section>
-  `).join("");
+  const blocks = (page.blocks || []).map((block) => {
+    const media = block.image
+      ? `<div class="exercise-media"><img src="${escapeHtml(block.image)}" alt="${escapeHtml(block.alt || "")}" /></div>`
+      : "";
+    const copy = block.html || renderStructuredCopy(block) || '<div class="exercise-placeholder">Lesson content will appear here.</div>';
+
+    return `
+      <section class="exercise-row exercise-row--${escapeHtml(block.variant || "standard")} ${block.image ? "" : "exercise-row--text-only"}">
+        ${media}
+        <div class="exercise-copy">${copy}</div>
+      </section>
+    `;
+  }).join("");
 
   lessonContent.innerHTML = `
     <article class="exercise-page">
       <section class="exercise-title-card">
-        <h1 class="lesson-title">${page.title}</h1>
+        <h1 class="lesson-title">${escapeHtml(page.title || "Lesson")}</h1>
       </section>
       <div class="exercise-stack">
-        ${blocks}
+        ${blocks || '<div class="exercise-placeholder">No activities have been added yet.</div>'}
       </div>
     </article>
   `;
@@ -249,23 +259,124 @@ function renderLesson() {
   } else {
     renderWorkspacePage({
       title: current ? current.activity.name : "Lesson",
-      blocks: [
-        {
-          variant: "standard",
-          image: "https://flowstatic.s3.yandex.net/static/aloha-static/upload/cms/images/shinkovka/photos_camera.svg",
-          alt: "",
-          html: `<div class="exercise-placeholder">Здесь будет содержимое упражнения. Геометрия рабочего пространства уже остаётся такой же для всех заданий.</div>`
-        }
-      ]
+      blocks: [{
+        variant: "standard",
+        title: "Lesson activity",
+        text: "This reusable lesson is connected to the classroom. Content can be expanded in the lesson editor."
+      }]
     });
   }
 
   lessonContent.scrollTop = 0;
 }
 
+async function loadLibraryLesson(lessonId) {
+  const client = window.spaceWhaleSupabase;
+  if (!client || !lessonId) return false;
+
+  const { data: lesson, error: lessonError } = await client
+    .from("library_lessons")
+    .select("id,module_id,title,summary,status")
+    .eq("id", lessonId)
+    .single();
+  if (lessonError || !lesson) throw lessonError || new Error("Lesson material not found.");
+
+  const { data: module, error: moduleError } = await client
+    .from("library_modules")
+    .select("id,course_id,title")
+    .eq("id", lesson.module_id)
+    .single();
+  if (moduleError || !module) throw moduleError || new Error("Lesson module not found.");
+
+  const { data: course, error: courseError } = await client
+    .from("library_courses")
+    .select("id,title,level,source_type")
+    .eq("id", module.course_id)
+    .single();
+  if (courseError || !course) throw courseError || new Error("Course not found.");
+
+  const { data: activities, error: activityError } = await client
+    .from("library_activities")
+    .select("id,title,activity_type,content,status,sort_order")
+    .eq("lesson_id", lesson.id)
+    .neq("status", "archived")
+    .order("sort_order", { ascending: true });
+  if (activityError) throw activityError;
+
+  const normalizedActivities = (activities || []).map((activity) => ({
+    id: activity.id,
+    name: activity.title,
+    done: false,
+    content: activity.content || {}
+  }));
+
+  if (!normalizedActivities.length) {
+    normalizedActivities.push({
+      id: `overview-${lesson.id}`,
+      name: "Lesson overview",
+      done: false,
+      content: {
+        blocks: [{
+          title: lesson.title,
+          text: lesson.summary || "Lesson content has not been added yet."
+        }]
+      }
+    });
+  }
+
+  courseModules = [{
+    id: module.id,
+    title: module.title,
+    expanded: true,
+    active: true,
+    lessons: [{
+      id: lesson.id,
+      title: lesson.title,
+      expanded: true,
+      current: true,
+      activities: normalizedActivities
+    }]
+  }];
+
+  workspacePages = {};
+  normalizedActivities.forEach((activity) => {
+    const blocks = Array.isArray(activity.content?.blocks) && activity.content.blocks.length
+      ? activity.content.blocks
+      : [{
+          title: activity.name,
+          text: lesson.summary || "Lesson content has not been added yet."
+        }];
+    workspacePages[activity.id] = {
+      title: activity.name,
+      blocks: blocks.map((block) => ({
+        variant: block.variant || "standard",
+        title: block.title || "",
+        text: block.text || "",
+        image: block.image || null,
+        alt: block.alt || ""
+      }))
+    };
+  });
+
+  activeTaskId = normalizedActivities[0].id;
+
+  const levelLabel = document.querySelector(".level-selector span");
+  if (levelLabel) levelLabel.textContent = course.level || course.title;
+
+  const bannerTitle = document.querySelector(".module-banner__title");
+  const bannerSubtitle = document.querySelector(".module-banner__subtitle");
+  const bannerButton = document.querySelector(".module-banner .secondary-btn");
+  if (bannerTitle) bannerTitle.textContent = [course.title, module.title].filter(Boolean).join(" · ");
+  if (bannerSubtitle) bannerSubtitle.textContent = lesson.title;
+  if (bannerButton) bannerButton.hidden = true;
+
+  renderCourseTree();
+  renderLesson();
+  return true;
+}
+
 renderCourseTree();
 renderLesson();
-
 
 document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
   button.addEventListener("click", () => {
@@ -310,11 +421,23 @@ async function initLiveClassroom() {
     onLeave: () => renderPresence(classroom.state.channel?.presenceState?.() || {})
   });
 
+  if (result.session?.library_lesson_id) {
+    await loadLibraryLesson(result.session.library_lesson_id);
+  }
+
   const shared = await classroom.loadSharedState(sessionId);
-  if (shared?.current_exercise_id) {
+  if (shared?.current_exercise_id && findActivity(shared.current_exercise_id)) {
     selectActivity(shared.current_exercise_id, { remote: true });
-  } else if (result.role === "teacher") {
-    await classroom.navigate(activeTaskId);
+  } else {
+    const first = firstActivityId();
+    if (first) {
+      activeTaskId = first;
+      renderCourseTree();
+      renderLesson();
+      if (result.role === "teacher") {
+        await classroom.navigate(first);
+      }
+    }
   }
 
   renderCourseTree();
@@ -323,4 +446,15 @@ async function initLiveClassroom() {
 
 initLiveClassroom().catch((error) => {
   console.error("[Space Whale] Classroom connection failed", error);
+  const content = document.getElementById("lessonContent");
+  if (content) {
+    content.innerHTML = `
+      <article class="exercise-page">
+        <section class="exercise-title-card">
+          <h1 class="lesson-title">Couldn’t open lesson material</h1>
+        </section>
+        <div class="exercise-placeholder">${escapeHtml(error.message)}</div>
+      </article>
+    `;
+  }
 });
