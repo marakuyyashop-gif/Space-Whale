@@ -259,8 +259,18 @@ function responseSummaryHtml(payload) {
   const response = payload.response || {};
   let answer = "";
   if (response.option_text) answer = response.option_text;
-  else if (response.text) answer = response.text;
+  else if (response.text != null) answer = response.text;
   else answer = JSON.stringify(response);
+
+  if (payload.draft) {
+    return `
+      <div class="live-response-answer live-draft-answer">
+        <div><span class="response-verdict typing">Typing…</span></div>
+        <strong>${answer ? escapeHtml(answer) : '<span class="live-draft-empty">Student is editing…</span>'}</strong>
+        <small>Live</small>
+      </div>
+    `;
+  }
 
   const verdict = payload.is_correct === true
     ? '<span class="response-verdict correct">Correct</span>'
@@ -366,6 +376,16 @@ function renderInteractiveActivity(activity) {
     `;
 
     if (role === "student") {
+      document.querySelectorAll('[name="exerciseOption"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          const index = Number(input.value);
+          classroom.sendExerciseDraft(activity.id, {
+            option_index: index,
+            option_text: options[index]
+          }).catch((error) => console.error("[Space Whale] Draft sync failed", error));
+        });
+      });
+
       document.getElementById("checkExerciseButton")?.addEventListener("click", async () => {
         const selected = document.querySelector('[name="exerciseOption"]:checked');
         const feedback = document.getElementById("exerciseFeedback");
@@ -433,6 +453,13 @@ function renderInteractiveActivity(activity) {
     `;
 
     if (role === "student") {
+      const textArea = document.getElementById("shortTextAnswer");
+      textArea?.addEventListener("input", () => {
+        classroom.sendExerciseDraft(activity.id, {
+          text: textArea.value
+        }).catch((error) => console.error("[Space Whale] Live typing sync failed", error));
+      });
+
       document.getElementById("submitTextAnswer")?.addEventListener("click", async () => {
         const text = document.getElementById("shortTextAnswer").value.trim();
         const feedback = document.getElementById("exerciseFeedback");
@@ -639,10 +666,19 @@ async function initLiveClassroom() {
 
       const toast = document.getElementById("classroomToast");
       if (toast && classroom.state.role === "teacher") {
-        toast.textContent = "Student answer received";
+        toast.textContent = "Student answer submitted";
         toast.classList.add("show");
         clearTimeout(window.__spaceWhaleToastTimer);
         window.__spaceWhaleToastTimer = setTimeout(() => toast.classList.remove("show"),1800);
+      }
+    },
+    onExerciseDraft: (payload) => {
+      if (!payload?.exercise_id) return;
+      liveResponses.set(payload.exercise_id,payload);
+
+      if (payload.exercise_id === activeTaskId && classroom.state.role === "teacher") {
+        const panel = document.querySelector("[data-live-response]");
+        if (panel) panel.innerHTML = responseSummaryHtml(payload);
       }
     },
     onPresence: renderPresence,
