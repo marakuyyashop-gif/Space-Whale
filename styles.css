@@ -1912,3 +1912,17 @@ button{font:inherit;color:inherit}
     height:44px;
   }
 }
+
+.response-verdict.typing{
+  background:#e9edf7;
+  color:#52658a;
+}
+.live-draft-answer strong{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.live-draft-empty{
+  color:#9498a0;
+  font-style:italic;
+  font-weight:500;
+}
