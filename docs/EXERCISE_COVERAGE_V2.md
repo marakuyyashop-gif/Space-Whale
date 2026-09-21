@@ -55,7 +55,7 @@ Architecture to preserve:
 | Open writing | pp. 25, 67 | writing | Yes | IMPLEMENTED | Keep teacher-reviewed |
 | Presentation / reading / speaking | pp. 3–4, 8, 12–14, 26–27, 34, 38, 41–42, 46–47, 51–52, 59–60, 64, 75–76, 81–83, 85, 88 | presentation | Partial | PARTIAL | Split into approved pedagogical templates rather than one generic block |
 | Image labels / targets | pp. 22, 28, 35, 68, 87 | image-label | Yes | IMPLEMENTED | Review interaction and sizing with user |
-| Picture ordering | shown as a visual ordering variant in the PDF set | order can be extended | No | MISSING | Extend order tokens with image + alt |
+| Picture ordering | PDF p. 15 shows visual activity cards ordered after reading | order + image-grid layout | Yes | IMPLEMENTED | Review compact card sizing with user |
 | Image-based selection | present in single-choice/image tasks | choice + image-grid layout | Yes | IMPLEMENTED | Review compact card sizing with user |
 | Multi-select / choose several | visible in image/selection tasks; not represented by radio-only choice | none | No | MISSING | Add multi-choice primitive or explicit mode |
 | Audio player | pp. 7, 17, 33, 40, 44, 54, 62, 65, 71, 73, 78, 80 | none | No | MISSING | Add real audio block only with actual audio asset |
@@ -97,9 +97,8 @@ Transient UI in screenshots must stay transient:
 ## Work order from this checkpoint
 
 ### Phase A — finish gallery coverage before Workspace integration
-1. multi-select / choose several
-2. picture ordering
-4. real audio primitive + Listen & Repeat fixture
+1. multi-select / choose several (only if a clear source case requires it)
+2. real audio primitive + Listen & Repeat fixture
 5. vocabulary picture-word / picture-definition template
 6. rule/discovery template
 7. speaking template
