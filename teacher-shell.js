@@ -50,9 +50,17 @@
     const avatar = document.getElementById("sidebarAvatar");
     if (nameElement) nameElement.textContent = name;
     if (avatar) {
-      avatar.innerHTML = profile.avatar_url
-        ? `<img src="${profile.avatar_url}" alt="">`
-        : `<span>${initials(name)}</span>`;
+      avatar.replaceChildren();
+      if (profile.avatar_url) {
+        const image = document.createElement("img");
+        image.src = profile.avatar_url;
+        image.alt = "";
+        avatar.append(image);
+      } else {
+        const fallback = document.createElement("span");
+        fallback.textContent = initials(name);
+        avatar.append(fallback);
+      }
     }
   }
 
