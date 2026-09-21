@@ -1273,29 +1273,29 @@ button{font:inherit;color:inherit}
 }
 
 .class-area::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  background-image:url("https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/background?v=2");
-  background-position:center center;
-  background-size:cover;
-  background-repeat:no-repeat;
-  opacity:1;
+  content:none !important;
+  display:none !important;
 }
 
-.class-content,
+.class-content{
+  background:transparent !important;
+}
+
+.lesson-scroll{
+  background-color:#f7f7f8 !important;
+  background-image:url("493DABD0-09B5-4AA4-9D18-A6842C5B67D6.png") !important;
+  background-position:center top !important;
+  background-size:100% auto !important;
+  background-repeat:no-repeat !important;
+  background-attachment:local !important;
+}
+
 .module-banner,
 .session-bar{
   position:relative;
   z-index:1;
 }
 
-.class-content,
-.lesson-scroll{
-  background:transparent !important;
-}
 
 .exercise-row--text-only{
   grid-template-columns:minmax(0,760px);
