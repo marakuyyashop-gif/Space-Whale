@@ -12,6 +12,7 @@
   const cameraButton = document.getElementById("cameraToggle");
   const micButton = document.getElementById("micToggle");
   const leaveButton = document.getElementById("leaveClassroomButton");
+  const accountLink = document.getElementById("classroomAccountLink");
 
   function syncVideoElement() {
     if (video && video.srcObject !== state.stream) video.srcObject = state.stream;
@@ -106,6 +107,15 @@
     } catch (_) {}
 
     location.href = role === "teacher" ? "dashboard.html" : "student-dashboard.html";
+  });
+
+  accountLink?.addEventListener("click", () => {
+    const role = window.SpaceWhaleClassroom?.state?.role;
+    accountLink.href = role === "teacher"
+      ? "dashboard.html"
+      : role === "student"
+        ? "student-dashboard.html"
+        : "app.html";
   });
 
   window.addEventListener("pagehide", stopMedia);
