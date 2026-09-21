@@ -54,9 +54,9 @@ Architecture to preserve:
 | Ordering words/chunks | pp. 15, 58 | order | Yes | IMPLEMENTED | Add picture-order variant |
 | Open writing | pp. 25, 67 | writing | Yes | IMPLEMENTED | Keep teacher-reviewed |
 | Presentation / reading / speaking | pp. 3–4, 8, 12–14, 26–27, 34, 38, 41–42, 46–47, 51–52, 59–60, 64, 75–76, 81–83, 85, 88 | presentation | Partial | PARTIAL | Split into approved pedagogical templates rather than one generic block |
-| Image labels / targets | pp. 22, 28, 35, 68, 87 | none | No | MISSING | Build image-target primitive |
+| Image labels / targets | pp. 22, 28, 35, 68, 87 | image-label | Yes | IMPLEMENTED | Review interaction and sizing with user |
 | Picture ordering | shown as a visual ordering variant in the PDF set | order can be extended | No | MISSING | Extend order tokens with image + alt |
-| Image-based selection | present in single-choice/image tasks | choice technically accepts images | No approved fixture | PARTIAL | Add dedicated gallery fixture and layout |
+| Image-based selection | present in single-choice/image tasks | choice + image-grid layout | Yes | IMPLEMENTED | Review compact card sizing with user |
 | Multi-select / choose several | visible in image/selection tasks; not represented by radio-only choice | none | No | MISSING | Add multi-choice primitive or explicit mode |
 | Audio player | pp. 7, 17, 33, 40, 44, 54, 62, 65, 71, 73, 78, 80 | none | No | MISSING | Add real audio block only with actual audio asset |
 | Audio + choice | multiple PDF stages combine audio and response | composite stage | No | MISSING | Compose audio block + choice block in one stage |
@@ -97,9 +97,8 @@ Transient UI in screenshots must stay transient:
 ## Work order from this checkpoint
 
 ### Phase A — finish gallery coverage before Workspace integration
-1. image-based single/multi choice
-2. image targets / labels
-3. picture ordering
+1. multi-select / choose several
+2. picture ordering
 4. real audio primitive + Listen & Repeat fixture
 5. vocabulary picture-word / picture-definition template
 6. rule/discovery template
