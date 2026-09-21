@@ -187,21 +187,26 @@
   }
 
   async function ensurePersonalContainer(level) {
-    let course = courses.find((item) => item.source_type === "teacher" && item.workspace_id === workspaceId && item.code === `teacher-${session.user.id}-library`);
+    const normalizedLevel = level || "Custom";
+    let course = courses.find((item) =>
+      item.source_type === "teacher" &&
+      item.workspace_id === workspaceId &&
+      (item.level || "Custom") === normalizedLevel
+    );
 
     if (!course) {
       const { data, error } = await client
         .from("library_courses")
         .insert({
-          code: `teacher-${session.user.id}-library`,
-          title: "My lessons",
-          level: level || null,
+          code: `teacher-${session.user.id}-${crypto.randomUUID()}`,
+          title: normalizedLevel === "Custom" ? "My lessons" : `My ${normalizedLevel} lessons`,
+          level: normalizedLevel,
           description: "Personal reusable lesson templates",
           source_type: "teacher",
           workspace_id: workspaceId,
           owner_id: session.user.id,
           status: "published",
-          sort_order: 1000
+          sort_order: 1000 + courses.filter((item) => item.source_type === "teacher").length * 10
         })
         .select()
         .single();
@@ -209,9 +214,6 @@
       if (error) throw error;
       course = data;
       courses.push(course);
-    } else if (!course.level && level) {
-      await client.from("library_courses").update({ level }).eq("id",course.id);
-      course.level = level;
     }
 
     let module = modules.find((item) => item.course_id === course.id && item.code === "personal");
@@ -257,7 +259,7 @@
           summary: summary || null,
           estimated_minutes: 60,
           status: "published",
-          sort_order: Date.now()
+          sort_order: 1000 + lessons.filter((item) => item.module_id === module.id).length * 10
         })
         .select()
         .single();
