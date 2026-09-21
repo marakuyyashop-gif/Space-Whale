@@ -99,12 +99,12 @@
   micButton?.addEventListener("click", toggleMic);
 
   leaveButton?.addEventListener("click", async () => {
+    const role = window.SpaceWhaleClassroom?.state?.role;
     stopMedia();
     try {
       await window.SpaceWhaleClassroom?.disconnect?.();
     } catch (_) {}
 
-    const role = window.SpaceWhaleClassroom?.state?.role;
     location.href = role === "teacher" ? "dashboard.html" : "student-dashboard.html";
   });
 
