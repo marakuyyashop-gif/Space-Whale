@@ -43,13 +43,15 @@
     }
     if (def.kind === 'audio') {
       if (def.layout != null && !['player', 'listen-repeat'].includes(def.layout)) fail('Unsupported audio layout');
-      audioSource(def.audio);
       if (def.layout === 'listen-repeat') {
         ids(def.items, 'items');
         def.items.forEach(item => {
           text(item.text, 'listen-repeat text');
+          audioSource(item.audio);
           if (item.example != null && typeof item.example !== 'string') fail('listen-repeat example must be text');
         });
+      } else {
+        audioSource(def.audio);
       }
       return def;
     }
@@ -82,9 +84,19 @@
     }
     ids(def.items, 'items');
     if (def.kind === 'matching') {
+      if (def.layout != null && !['cards', 'picture-word', 'word-definition'].includes(def.layout)) fail('Unsupported matching layout');
       const valid = options(def.options);
       const assigned = new Set();
-      def.items.forEach(item => { text(item.text, 'card text'); media(item); key(item, valid); if (item.correctId != null) { if (assigned.has(item.correctId)) fail('Matching answer IDs must be unique'); assigned.add(item.correctId); } });
+      def.items.forEach(item => {
+        text(item.text, 'card text');
+        media(item);
+        if (def.layout === 'picture-word' && !item.image) fail('Picture-word items need images');
+        key(item, valid);
+        if (item.correctId != null) {
+          if (assigned.has(item.correctId)) fail('Matching answer IDs must be unique');
+          assigned.add(item.correctId);
+        }
+      });
       if (def.options.length < def.items.length) fail('Matching needs at least one option per card');
     }
     if (def.kind === 'choice') { if (def.layout != null && !['list', 'image-grid'].includes(def.layout)) fail('Unsupported choice layout'); def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); }); }
@@ -188,6 +200,22 @@
       wrap.append(audio, play, range, time);
       return wrap;
     };
+    const repeatAudioButton = (src, label) => {
+      const wrap = node('span', 'ek-repeat-audio');
+      const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
+      const play = button('▶', async () => {
+        host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
+        if (audio.paused) {
+          try { await audio.play(); } catch { announce('Audio could not be played.'); }
+        } else audio.pause();
+      }, 'ek-repeat-play');
+      play.setAttribute('aria-label', `Play ${label}`);
+      audio.addEventListener('play', () => { play.textContent = '❚❚'; });
+      audio.addEventListener('pause', () => { play.textContent = '▶'; });
+      audio.addEventListener('ended', () => { play.textContent = '▶'; });
+      wrap.append(audio, play);
+      return wrap;
+    };
     const announce = message => { status.textContent = message; };
     const save = () => { feedback = {}; config.onChange?.(clone(answers)); };
     const closeDialog = () => { if (dialog?.open) dialog.close(); };
@@ -239,25 +267,28 @@
         });
       }
       if (def.kind === 'audio') {
-        body.append(audioPlayer(def.audio, def.title));
         if (def.layout === 'listen-repeat') {
           const list = node('div', 'ek-repeat-list');
-          def.items.forEach((item, index) => {
+          def.items.forEach(item => {
             const row = node('article', 'ek-repeat-item');
-            row.append(node('span', 'ek-number', String(index + 1)), node('strong', 'ek-repeat-term', item.text));
+            row.append(repeatAudioButton(item.audio, item.text), node('strong', 'ek-repeat-term', item.text));
             if (item.example) row.append(node('p', 'ek-repeat-example', item.example));
             list.append(row);
           });
           body.append(list);
+        } else {
+          body.append(audioPlayer(def.audio, def.title));
         }
       }
       if (def.kind === 'matching') {
-        const grid = node('div', 'ek-card-grid');
+        const pictureWord = def.layout === 'picture-word';
+        const grid = node('div', pictureWord ? 'ek-card-grid ek-picture-word-grid' : 'ek-card-grid');
         def.items.forEach((item, index) => {
-          const card = node('article', 'ek-card');
-          card.append(node('span', 'ek-number', String(index + 1)));
+          const card = node('article', pictureWord ? 'ek-card ek-picture-word-card' : 'ek-card');
+          const number = node('span', pictureWord ? 'ek-number ek-picture-number' : 'ek-number', String(index + 1));
+          card.append(number);
           if (item.image) card.append(illustration(item));
-          card.append(node('p', 'ek-card-label', item.text));
+          if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
           const plus = button(chosen()?.text || '+', () => {
             const taken = new Set(Object.entries(answers).filter(([id]) => id !== item.id).map(([,value]) => value));
@@ -265,7 +296,7 @@
               changed(item.id, value); plus.textContent = chosen()?.text || '+';
               plus.setAttribute('aria-label', `Choose a match for ${item.text}${chosen() ? `: ${chosen().text}` : ''}`);
             }, plus);
-          }, 'ek-match-slot');
+          }, pictureWord ? 'ek-match-slot ek-picture-word-slot' : 'ek-match-slot');
           plus.setAttribute('aria-label', `Choose a match for ${item.text}`); plus.setAttribute('aria-haspopup', 'dialog');
           controls.set(item.id, plus); card.append(plus); grid.append(card);
         });
