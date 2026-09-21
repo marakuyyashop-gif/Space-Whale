@@ -74,6 +74,7 @@ button{font:inherit;color:inherit}
   cursor:pointer;
   border-radius:12px;
 }
+.sidebar-brand{text-decoration:none}
 
 .sidebar-brand:hover{background:var(--sidebar-hover)}
 
@@ -1810,6 +1811,14 @@ button{font:inherit;color:inherit}
   cursor:pointer;
   box-shadow:0 2px 12px rgba(31,32,35,.10);
 }
+.session-account-link{
+  color:#62666d;
+  padding:10px 4px;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+}
+.session-account-link:hover{color:#202124}
 .video-dock{
   position:absolute;
   right:18px;
