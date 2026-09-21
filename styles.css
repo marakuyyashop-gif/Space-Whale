@@ -1926,3 +1926,21 @@ button{font:inherit;color:inherit}
   font-style:italic;
   font-weight:500;
 }
+
+.live-sync-status{
+  font-size:10px;
+  color:#8d9198;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f0f1f3;
+  white-space:nowrap;
+}
+.live-sync-status.connected{
+  color:#477151;
+  background:#eaf4ed;
+}
+@media(max-width:768px){
+  .live-sync-status{
+    display:none;
+  }
+}
