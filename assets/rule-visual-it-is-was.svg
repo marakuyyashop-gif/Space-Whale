@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" role="img" aria-labelledby="t d">
+<title id="t">It is and It was grammar map</title>
+<desc id="d">A simple visual map comparing It is plus adjective plus to plus verb for now or in general with It was plus adjective plus to plus verb for the past.</desc>
+<rect width="820" height="360" rx="30" fill="#f3f3f1"/>
+<text x="410" y="54" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#292b2f">It is / It was + adjective + to + verb</text>
+<rect x="62" y="92" width="310" height="190" rx="24" fill="#fff" stroke="#d8d9dc" stroke-width="2"/>
+<rect x="448" y="92" width="310" height="190" rx="24" fill="#fff" stroke="#d8d9dc" stroke-width="2"/>
+<text x="217" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#292b2f">NOW / IN GENERAL</text>
+<text x="603" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#292b2f">PAST</text>
+<text x="217" y="178" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#292b2f">It is + adjective</text>
+<text x="217" y="210" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#292b2f">+ to + verb</text>
+<text x="603" y="178" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#292b2f">It was + adjective</text>
+<text x="603" y="210" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#292b2f">+ to + verb</text>
+<path d="M217 234v22M603 234v22" stroke="#92959a" stroke-width="3" stroke-linecap="round"/>
+<circle cx="217" cy="266" r="8" fill="#292b2f"/>
+<circle cx="603" cy="266" r="8" fill="#292b2f"/>
+<path d="M217 266h150M603 266H453" stroke="#292b2f" stroke-width="3" stroke-linecap="round"/>
+<text x="410" y="325" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#71747a">After the adjective: to + base form</text>
+</svg>
