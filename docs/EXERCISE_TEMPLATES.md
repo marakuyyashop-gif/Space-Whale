@@ -1,4 +1,4 @@
-# Exercise template system — checkpoint 1
+# Exercise template system — checkpoint 2 (2026-09-21)
 
 ## Scope / current priority
 
@@ -67,4 +67,31 @@ Reference: user-supplied `А2 ЦЕЛИКОМ(3).pdf`, 88 screenshot pages. All p
 - Layout works at desktop and phone widths; no clipping of long options.
 - Imported text is rendered as text, never executed as HTML.
 
-Status: reference catalog saved; no claim that every family or import/live integration is implemented.
+## Implemented and saved
+
+- PR #8 merged: `64127619c1e70d581fa5592b83208352fff73512`.
+- Public gallery: https://marakuyyashop-gif.github.io/Space-Whale/template-gallery.html
+- `exercise-kit.js`: shared validation, grading and renderer; 7 primitives: matching, gaps, choice, order, sort, writing, presentation.
+- `exercise-kit.css`: shared scoped design tokens. No existing classroom/background/sidebar styles changed.
+- `template-gallery.js`: 9 original synthetic fixtures including both gap variants and user format aliases. These are NOT imported course lessons.
+- `template-gallery.html`: isolated preview with links back to the existing site. No real student/session/database writes.
+- Attempts survive template switches in memory, but NOT reloads; JSON preview is NOT a lesson publishing/import workflow.
+- Bank gaps use native dropdowns; sort/order use clicks rather than drag. Native inline dropdowns do not promise pixel-identical popup appearance across browsers.
+
+## Verification performed
+
+`node --check` passed for both scripts. `node --test tests/exercise-kit.test.cjs`: 10/10 pass (grading, missing keys, ID/key validation, URL restrictions, source immutability, duplicate-label ordering).
+
+Public desktop browser smoke tests passed: matching initially has zero dialogs; plus opens one; selection and Escape close it; chosen value appears in its card; multi-gap normalized grading works; answers survive switches; reset clears the current attempt; inline dropdowns grade correctly; four-question Fox grades and clears stale feedback after a changed choice; token ordering/removal works; sorting selection/clear works and restores focus; writing is explicitly teacher-reviewed; disclosure is initially closed and opens on click; bank gaps grade; invalid JSON definition preserves the previous exercise. Shared size control survives switches. Matching modal visually inspected.
+
+Not claimed: full mobile/cross-browser/assistive-technology QA; image variants browser QA; complete keyboard flow for every control; classroom integration; exact replica of reference platform.
+
+## Next checkpoint — keep scope focused
+
+1. User approves or adjusts the interaction/layout of the existing samples (especially Fox options below vs inline).
+2. Implement a versioned lesson container: level → module → topic → way → ordered stages/blocks. Keep content and attempts separate.
+3. Add a validated authored-content import/publish path and connect the same renderer to Library/Workspace without duplicating exercise markup. Plain text is mapped by the assistant into structured data; ambiguous content requires clarification, not silent guessing.
+4. Finish image-target placement, picture ordering, actual audio assets and optional drag interactions; retain click/keyboard alternatives.
+5. Add durable per-student attempts and live collaboration only in their separately agreed phase. Do not divert into payments/cabinets now.
+
+Status: reference catalog and first reusable interactive foundation complete and published. Full template coverage and automatic course import remain unfinished.
