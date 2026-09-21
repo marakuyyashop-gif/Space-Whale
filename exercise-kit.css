@@ -499,3 +499,50 @@
   .exercise-kit .ek-rule-block { padding: 16px; }
   .exercise-kit .ek-rule-visual .ek-image { max-height: 280px; }
 }
+
+/* Fox/Rabbit reference: centered reading column, left-aligned content.
+   Width is an estimate from supplied screenshots, not the outer Inspect width. */
+.exercise-kit.ek-reading-width {
+  --ek-reading-width: 560px;
+  --ek-title-size: 18px;
+  width: 100%; max-width: var(--ek-reading-width); margin-inline: auto;
+  text-align: left;
+}
+.exercise-kit.ek-reading-width .ek-title { letter-spacing: -.02em; }
+.exercise-kit.ek-reading-width .ek-instruction { margin-bottom: 28px; }
+.exercise-kit.ek-reading-width > .ek-body { gap: 0; }
+.exercise-kit.ek-reading-width .ek-sentence { line-height: 1.85; }
+.exercise-kit.ek-reading-width .ek-numbered-sentence { padding-left: 1.55em; position: relative; }
+.exercise-kit .ek-sentence-number { position: absolute; left: 0; }
+.exercise-kit.ek-reading-width .ek-paragraph { margin: 0 0 14px; }
+.exercise-kit .ek-word-list { margin: 0 0 26px; line-height: 1.7; }
+.exercise-kit.ek-reading-width .ek-gap {
+  min-height: 26px; height: 26px; min-width: 52px; max-width: 100%;
+  margin: 0 3px; padding: 0 9px; border-radius: 999px;
+  vertical-align: baseline; line-height: 24px; background: white;
+}
+.exercise-kit .ek-inline-choice { display: inline-block; position: relative; max-width: 100%; }
+.exercise-kit.ek-reading-width .ek-choice-trigger {
+  width: auto; border: 0; box-shadow: 0 3px 12px #20212412;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.exercise-kit .ek-gap-number {
+  display: inline-grid; place-items: center; flex: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #bcbcc5; color: white; font-size: 9px; line-height: 1;
+}
+.exercise-kit .ek-inline-menu {
+  position: absolute; top: calc(100% + 7px); left: 0; z-index: 30;
+  min-width: 100px; width: max-content; max-width: min(260px, calc(100vw - 48px));
+  padding: 5px 0; border-radius: 16px; background: white;
+  box-shadow: 0 6px 20px #20212424; overflow: hidden; line-height: 1.4;
+}
+.exercise-kit .ek-inline-menu[hidden] { display: none; }
+.exercise-kit .ek-inline-option {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  border: 0; padding: 8px 10px; background: white; text-align: left;
+  font-size: .8em; white-space: normal; overflow-wrap: anywhere;
+}
+.exercise-kit .ek-inline-option:hover, .exercise-kit .ek-inline-option:focus-visible { background: #f1f1f3; outline-offset: -2px; }
+.exercise-kit .ek-inline-clear { color: var(--ek-muted); border-top: 1px solid #eee; }
+.exercise-kit.ek-reading-width .ek-typed-gap { border: 1px solid #bcbcc5; box-shadow: none; }
