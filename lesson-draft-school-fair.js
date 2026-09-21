@@ -117,9 +117,9 @@
         version: 1,
         id: 'fair-bank-gaps',
         kind: 'gaps',
-        inputMode: 'select',
+        inputMode: 'text',
         title: 'Complete the sentences.',
-        instruction: 'Choose a word from the bank.',
+        instruction: 'Use a word from the bank and type it into each gap.',
         bank: ['winner','ticket','decoration','music','invitation','food stall'],
         items: [
           { id:'b1', segments:['Anna sent me an ', {id:'b1g',answers:['invitation']}, ' to the school fair.'] },
