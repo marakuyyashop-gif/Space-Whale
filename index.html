@@ -1,8 +1,36 @@
-<div class="sidebar-brand-row">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Space Whale — Reference Clone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260921-realtime-v2" />
+</head>
+<body>
+  <div id="root" class="reference-app">
+    <button class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button class="mobile-menu-backdrop" type="button" aria-label="Close menu"></button>
+    <aside class="app-sidebar" aria-label="Space Whale navigation">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-row">
           <button class="sidebar-brand" type="button" aria-label="Space Whale home">
             <span class="brand-mark">SW</span>
             <span class="brand-name">Space Whale</span>
           </button>
+
+          <div class="sidebar-header-actions">
+            <button class="sidebar-icon-button" type="button" aria-label="Search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            </button>
+            <button class="sidebar-icon-button" type="button" aria-label="Collapse sidebar">
+              <svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M9 4v16"/></svg>
+            </button>
+          </div>
         </div>
 
         <nav class="sidebar-primary classroom-tabs" aria-label="Lesson sections">
@@ -79,7 +107,7 @@
           <video id="localVideo" autoplay muted playsinline></video>
           <div id="videoPlaceholder" class="video-placeholder">Turn on your camera to preview it here.</div>
         </div>
-        <div id="videoConnectionNote" class="video-connection-note">This preview is local. Two-way lesson video will use the production video connection.</div>
+        <div class="video-connection-note">Local preview for device testing.</div>
       </div>
       <div id="classroomToast" class="classroom-toast" aria-live="polite"></div>
 
@@ -111,8 +139,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
-  <script src="classroom-realtime.js?v=20260921-realtime-v1"></script>
-  <script src="classroom-media.js?v=20260921-v1"></script>
-  <script src="app.js?v=20260921-realtime-v1"></script>
+  <script src="classroom-realtime.js?v=20260921-realtime-v2"></script>
+  <script src="classroom-media.js?v=20260921-v2"></script>
+  <script src="app.js?v=20260921-realtime-v2"></script>
 </body>
 </html>
