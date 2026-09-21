@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Шаблоны упражнений</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exercise-kit.css?v=1">
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#f7f7f8;color:#292b2f;font-family:Onest,Arial,sans-serif} a{color:inherit} header{padding:22px 32px;border-bottom:1px solid #dedee1;display:flex;gap:24px;align-items:center;flex-wrap:wrap} header a{text-decoration:none;font-size:14px} header strong{margin-right:auto} .gallery{display:grid;grid-template-columns:255px minmax(0,1fr);max-width:1280px;margin:auto;min-height:85vh} aside{padding:28px 22px;border-right:1px solid #e2e2e5} main{padding:40px 42px;min-width:0} h1{font-size:27px;letter-spacing:-.04em;margin:0 0 12px} .intro{color:#72757c;font-size:13px;line-height:1.65;margin:0 0 28px} nav{display:grid;gap:5px} nav button{font:inherit;font-size:13px;text-align:left;border:0;background:transparent;border-radius:10px;padding:11px 12px;cursor:pointer;color:#565960} nav button[aria-current=true]{background:#292b2f;color:white} .settings{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:15px 0;border-top:1px solid #ddd;margin-top:35px;font-size:12px} .settings select{font:inherit;padding:6px;background:white;border:1px solid #ddd;border-radius:8px} details.import{margin-top:42px;border-top:1px solid #ddd;padding-top:20px;font-size:13px} summary{cursor:pointer} #source{width:100%;min-height:200px;font-family:monospace;font-size:12px;padding:12px;margin:14px 0;border:1px solid #ddd;border-radius:10px} #loadDefinition{background:#292b2f;color:#fff;border:0;border-radius:10px;padding:10px 15px;cursor:pointer} #importStatus{white-space:pre-wrap} @media(max-width:700px){header{padding:18px}.gallery{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid #ddd;padding:18px}nav{display:flex;overflow:auto}nav button{flex:none}main{padding:25px 18px}.settings{margin-top:18px}}
+  </style>
+</head>
+<body>
+  <header><strong>Space Whale · Template Lab</strong><a href="library.html">В библиотеку</a><a href="app.html">В кабинет</a><a href="index.html">На сайт</a></header>
+  <div class="gallery">
+    <aside>
+      <p class="intro">Образцы механик · v1<br>Тестовые тексты, не готовый урок.</p>
+      <nav id="templateMenu" aria-label="Типы упражнений"></nav>
+    </aside>
+    <main>
+      <h1>Шаблоны упражнений</h1>
+      <p class="intro">Один шаблон — любое количество заданий. Ответы здесь только демонстрационные: сохраняются при переключении до обновления страницы. В базу учеников ничего не отправляется.</p>
+      <div id="exercisePreview" lang="en"></div>
+      <div class="settings">
+        <label for="fontSize">Размер текста всех шаблонов</label>
+        <select id="fontSize"><option value="17">Обычный</option><option value="21">Крупный</option><option value="25">Для демонстрации</option></select>
+        <span>Фон рабочего пространства не меняется.</span>
+      </div>
+      <details class="import"><summary>Данные образца / проверить другой контент</summary>
+        <p>Технический предпросмотр JSON. Не загрузка в библиотеку. Текст из чата сначала преобразуется в этот формат; неоднозначные пропуски требуют уточнения.</p>
+        <textarea id="source" aria-label="Exercise definition JSON" spellcheck="false"></textarea>
+        <button id="loadDefinition" type="button">Проверить и показать</button>
+        <p id="importStatus" role="status"></p>
+      </details>
+    </main>
+  </div>
+  <script src="exercise-kit.js?v=1"></script>
+  <script src="template-gallery.js?v=1"></script>
+</body>
+</html>
