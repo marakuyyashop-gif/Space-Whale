@@ -1,6 +1,6 @@
 (function (scope) {
   'use strict';
-  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio'];
+  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
   function validate(def) {
@@ -53,6 +53,40 @@
       } else {
         audioSource(def.audio);
       }
+      return def;
+    }
+    if (def.kind === 'rule-page') {
+      array(def.blocks, 'blocks');
+      const blockIds = new Set();
+      def.blocks.forEach((block, index) => {
+        if (!block || !['text', 'rule', 'image', 'exercise'].includes(block.type)) fail('Unsupported rule-page block');
+        if (block.type === 'text') {
+          text(block.text, 'text block');
+          if (block.title != null && typeof block.title !== 'string') fail('text block title must be text');
+        }
+        if (block.type === 'rule') {
+          const hasContent = [block.title, block.text, block.formula].some(value => typeof value === 'string' && value.trim())
+            || (Array.isArray(block.examples) && block.examples.length);
+          if (!hasContent) fail('rule block needs content');
+          if (block.title != null && typeof block.title !== 'string') fail('rule title must be text');
+          if (block.text != null && typeof block.text !== 'string') fail('rule text must be text');
+          if (block.formula != null && typeof block.formula !== 'string') fail('rule formula must be text');
+          if (block.examples != null) { array(block.examples, 'rule examples'); block.examples.forEach(example => text(example, 'rule example')); }
+        }
+        if (block.type === 'image') {
+          text(block.image, 'image');
+          text(block.alt, 'image alt');
+          media(block);
+          if (block.caption != null && typeof block.caption !== 'string') fail('image caption must be text');
+        }
+        if (block.type === 'exercise') {
+          safeId(block.id, `blocks[${index}].id`);
+          if (blockIds.has(block.id)) fail(`rule-page: duplicate block id ${block.id}`);
+          blockIds.add(block.id);
+          if (!block.exercise || block.exercise.kind === 'rule-page') fail('rule-page exercises cannot contain another rule-page');
+          validate(block.exercise);
+        }
+      });
       return def;
     }
     if (def.kind === 'order') {
@@ -129,7 +163,7 @@
     validate(def);
     const results = {};
     const mark = (id, answered, correct) => { results[id] = !answered ? 'empty' : correct == null ? 'review' : correct ? 'correct' : 'retry'; };
-    if (def.kind === 'presentation' || def.kind === 'audio') return results;
+    if (def.kind === 'presentation' || def.kind === 'audio' || def.kind === 'rule-page') return results;
     if (def.kind === 'order') {
       const order = Array.isArray(answers.order) ? answers.order : [];
       mark('order', order.length === def.tokens.length, def.correctOrder ? JSON.stringify(order) === JSON.stringify(def.correctOrder) : null);
@@ -156,6 +190,7 @@
     let dialog;
     let trigger;
     const controls = new Map();
+    let nestedMounts = [];
     const node = (tag, className, text) => {
       const el = doc.createElement(tag);
       if (className) el.className = className;
@@ -258,6 +293,7 @@
       host.append(dialog); dialog.showModal();
     }
     function render() {
+      nestedMounts.forEach(instance => instance.destroy()); nestedMounts = [];
       body.replaceChildren(); controls.clear(); resultsBox.replaceChildren();
       if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
@@ -265,6 +301,50 @@
           else if (block.type === 'disclosure') { const detail = node('details', 'ek-disclosure'); detail.append(node('summary', '', block.title), node('p', 'ek-copy', block.text)); body.append(detail); }
           else body.append(node('p', 'ek-copy', block.text));
         });
+      }
+      if (def.kind === 'rule-page') {
+        const page = node('div', 'ek-rule-page');
+        def.blocks.forEach((block, index) => {
+          if (block.type === 'text') {
+            const section = node('section', 'ek-rule-section ek-rule-text-section');
+            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
+            section.append(node('p', 'ek-copy', block.text));
+            page.append(section);
+          }
+          if (block.type === 'rule') {
+            const section = node('section', 'ek-rule-section ek-rule-block');
+            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
+            if (block.text) section.append(node('p', 'ek-copy', block.text));
+            if (block.formula) section.append(node('div', 'ek-rule-formula', block.formula));
+            if (block.examples?.length) {
+              const examples = node('div', 'ek-rule-examples');
+              block.examples.forEach(example => examples.append(node('p', 'ek-rule-example', example)));
+              section.append(examples);
+            }
+            page.append(section);
+          }
+          if (block.type === 'image') {
+            const figure = node('figure', 'ek-rule-visual');
+            figure.append(illustration(block));
+            if (block.caption) figure.append(node('figcaption', 'ek-muted', block.caption));
+            page.append(figure);
+          }
+          if (block.type === 'exercise') {
+            const section = node('section', 'ek-discovery-block');
+            const child = node('div', 'ek-discovery-host');
+            section.append(child);
+            page.append(section);
+            const handle = mount(child, block.exercise, {
+              answers: answers[block.id] || {},
+              onChange: value => {
+                answers[block.id] = value;
+                save();
+              }
+            });
+            nestedMounts.push(handle);
+          }
+        });
+        body.append(page);
       }
       if (def.kind === 'audio') {
         if (def.layout === 'listen-repeat') {
@@ -408,7 +488,7 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
-    if (!['presentation', 'writing', 'audio'].includes(def.kind)) actions.append(button('Check', () => {
+    if (!['presentation', 'writing', 'audio', 'rule-page'].includes(def.kind)) actions.append(button('Check', () => {
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: 'Try again', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -416,12 +496,12 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     }));
-    if (!['presentation', 'audio'].includes(def.kind)) actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
+    if (!['presentation', 'audio', 'rule-page'].includes(def.kind)) actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
     if (def.kind === 'writing') announce('Open answer: reviewed by the teacher, not automatically graded.');
     host.addEventListener('keydown', onKeydown); render();
     return {
       getAnswers: () => clone(answers),
-      destroy: () => { closeDialog(); host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, kinds };
