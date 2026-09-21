@@ -107,3 +107,22 @@ test('picture ordering accepts image tokens and rejects unsupported layout', () 
   assert.equal(grade(def, { order: ['a', 'b'] }).order, 'correct');
   const bad = copy(def); bad.layout = 'carousel'; assert.throws(() => validate(bad));
 });
+
+test('audio Listen & Repeat accepts safe sources and is not graded', () => {
+  const def = {
+    version: 1,
+    id: 'lnr',
+    title: 'Listen and repeat',
+    kind: 'audio',
+    layout: 'listen-repeat',
+    audio: 'data:audio/mpeg;base64,SUQz',
+    items: [
+      { id: 'a', text: 'space', example: 'Space is quiet.' },
+      { id: 'b', text: 'a planet', example: 'Earth is a planet.' }
+    ]
+  };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, {}), {});
+  const bad = copy(def); bad.audio = 'javascript:alert(1)'; assert.throws(() => validate(bad));
+  const badLayout = copy(def); badLayout.layout = 'waveform-editor'; assert.throws(() => validate(badLayout));
+});
