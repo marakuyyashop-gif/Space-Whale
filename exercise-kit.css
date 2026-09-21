@@ -410,3 +410,92 @@
     min-height: 44px;
   }
 }
+
+/* Discovery + Rule page: one flexible vertical lesson page with optional lead-ins, rule text and visual support. */
+.exercise-kit .ek-rule-page {
+  width: min(760px,100%);
+  display: grid;
+  gap: 26px;
+}
+.exercise-kit .ek-rule-section,
+.exercise-kit .ek-discovery-block,
+.exercise-kit .ek-rule-visual {
+  margin: 0;
+}
+.exercise-kit .ek-rule-section-title {
+  margin: 0 0 10px;
+  font-size: 1.02em;
+  line-height: 1.35;
+  letter-spacing: -.02em;
+}
+.exercise-kit .ek-rule-text-section {
+  padding-bottom: 2px;
+}
+.exercise-kit .ek-rule-block {
+  padding: 20px 22px;
+  border: 1px solid #e1e2e5;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 3px 10px #20212408;
+}
+.exercise-kit .ek-rule-formula {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f2f2f3;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.exercise-kit .ek-rule-examples {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+}
+.exercise-kit .ek-rule-example {
+  margin: 0;
+  line-height: 1.5;
+}
+.exercise-kit .ek-rule-visual {
+  width: min(680px,100%);
+}
+.exercise-kit .ek-rule-visual .ek-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: #f3f3f1;
+}
+.exercise-kit .ek-rule-visual figcaption {
+  margin-top: 7px;
+}
+.exercise-kit .ek-discovery-block {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #ececef;
+}
+.exercise-kit .ek-discovery-block:last-child {
+  border-bottom: 0;
+}
+.exercise-kit .ek-discovery-host.exercise-kit {
+  --ek-title-size: 18px;
+  --ek-text-size: 15px;
+  --ek-gap: 14px;
+  line-height: 1.55;
+}
+.exercise-kit .ek-discovery-host .ek-title {
+  margin-bottom: 6px;
+}
+.exercise-kit .ek-discovery-host .ek-instruction {
+  margin-bottom: 20px;
+  font-size: .86em;
+}
+.exercise-kit .ek-discovery-host .ek-actions {
+  margin-top: 18px;
+}
+.exercise-kit .ek-discovery-host .ek-card {
+  min-height: 138px;
+}
+@media(max-width:600px) {
+  .exercise-kit .ek-rule-page { gap: 20px; }
+  .exercise-kit .ek-rule-block { padding: 16px; }
+  .exercise-kit .ek-rule-visual .ek-image { max-height: 280px; }
+}
