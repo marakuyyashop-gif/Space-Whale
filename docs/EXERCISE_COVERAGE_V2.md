@@ -63,7 +63,7 @@ Architecture to preserve:
 | Audio + gaps | multiple PDF stages combine listening and gaps | composite stage | No | MISSING | Compose audio block + gaps block |
 | Listen & Repeat | PDF p. 36 shows a separate speaker control beside each item | audio + listen-repeat layout with per-item audio | Yes | IMPLEMENTED | Final production files can later come from the voice workflow |
 | Picture–word / picture–definition vocabulary | Sources define WORD–PIC 3×2 and WORD–DEFINITION fallback | matching + picture-word / word-definition layouts | Yes | IMPLEMENTED | Review final sizing against approved web look |
-| Rule / discovery block | Sources / Сова formats | presentation currently too generic | No exact approved template | PARTIAL | Build dedicated rule/discovery template variants |
+| Rule / discovery block | СОВА 1 = complete the rule; СОВА 2 = match meanings/functions; rule may be text/formula/image | rule-page composite using existing child primitives | Yes | IMPLEMENTED | Review one-page spacing and visual support with user |
 | Dialogue / Медведь | Sources format | presentation/writing primitives usable | No exact approved template | PARTIAL | Build pedagogical template using shared primitives |
 | Speaking scenes | Sources format | presentation + optional writing | No exact approved template | PARTIAL | Build speaking template; retain image layout rules |
 | Composite stage: media + prompt + interaction | recurring PDF structure | primitives exist separately | No stage container yet | MISSING | Define stage schema that can hold ordered blocks |
@@ -98,8 +98,7 @@ Transient UI in screenshots must stay transient:
 
 ### Phase A — finish gallery coverage before Workspace integration
 1. multi-select / choose several (only if a clear source case requires it)
-2. rule/discovery template
-7. speaking template
+2. speaking template
 8. dialogue / Медведь template
 9. composite stage schema
 
