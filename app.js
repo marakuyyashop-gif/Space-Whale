@@ -596,22 +596,6 @@ async function loadLibraryLesson(lessonId) {
 renderCourseTree();
 renderLesson();
 
-document.querySelectorAll(".sidebar-nav-item").forEach((button) => {
-  button.addEventListener("click", () => {
-    const label = button.textContent.trim();
-    const role = window.SpaceWhaleClassroom?.state?.role;
-
-    if (label === "Session") return;
-    if (label === "Library") {
-      location.href = role === "teacher" ? "library.html" : "student-dashboard.html";
-      return;
-    }
-    if (label === "Students") {
-      location.href = role === "teacher" ? "students.html" : "student-dashboard.html";
-      return;
-    }
-  });
-});
 
 async function initLiveClassroom() {
   const classroom = window.SpaceWhaleClassroom;
@@ -730,3 +714,31 @@ initLiveClassroom().catch((error) => {
   });
 })();
 
+
+
+/* === CLASSROOM LESSON TABS === */
+(() => {
+  const tabs = Array.from(document.querySelectorAll("[data-classroom-tab]"));
+  const panels = Array.from(document.querySelectorAll("[data-classroom-panel]"));
+  if (!tabs.length || !panels.length) return;
+
+  const activateTab = (name) => {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.classroomTab === name;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+
+    panels.forEach((panel) => {
+      const active = panel.dataset.classroomPanel === name;
+      panel.hidden = !active;
+      panel.classList.toggle("active", active);
+    });
+  };
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => activateTab(tab.dataset.classroomTab));
+  });
+
+  activateTab("lesson");
+})();
