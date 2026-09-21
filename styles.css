@@ -1296,3 +1296,27 @@ button{font:inherit;color:inherit}
 .lesson-scroll{
   background:transparent !important;
 }
+
+.exercise-row--text-only{
+  grid-template-columns:minmax(0,760px);
+  justify-content:center;
+}
+.exercise-row--text-only .exercise-copy{
+  max-width:760px;
+  width:100%;
+  padding:34px 38px;
+  border:1px solid #e8e8eb;
+  border-radius:24px;
+  background:#fff;
+}
+.exercise-row--text-only .exercise-copy h3{
+  margin:0 0 12px;
+  font-size:26px;
+  line-height:1.2;
+  letter-spacing:-.025em;
+}
+@media(max-width:760px){
+  .exercise-row--text-only .exercise-copy{
+    padding:24px;
+  }
+}
