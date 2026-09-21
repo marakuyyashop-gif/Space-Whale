@@ -61,8 +61,8 @@ Architecture to preserve:
 | Audio player | pp. 7, 17, 33, 40, 44, 54, 62, 65, 71, 73, 78, 80 | audio | Yes | IMPLEMENTED | Reuse player in later composite listening stages |
 | Audio + choice | multiple PDF stages combine audio and response | composite stage | No | MISSING | Compose audio block + choice block in one stage |
 | Audio + gaps | multiple PDF stages combine listening and gaps | composite stage | No | MISSING | Compose audio block + gaps block |
-| Listen & Repeat | source-specific format + PDF example around p. 36 | audio + listen-repeat layout | Yes | IMPLEMENTED | Review typography and final production audio hosting |
-| Picture–word / picture–definition vocabulary | existing Sources format | matching / presentation can support data | No exact approved web template | PARTIAL | Build approved vocabulary template |
+| Listen & Repeat | PDF p. 36 shows a separate speaker control beside each item | audio + listen-repeat layout with per-item audio | Yes | IMPLEMENTED | Final production files can later come from the voice workflow |
+| Picture–word / picture–definition vocabulary | Sources define WORD–PIC 3×2 and WORD–DEFINITION fallback | matching + picture-word / word-definition layouts | Yes | IMPLEMENTED | Review final sizing against approved web look |
 | Rule / discovery block | Sources / Сова formats | presentation currently too generic | No exact approved template | PARTIAL | Build dedicated rule/discovery template variants |
 | Dialogue / Медведь | Sources format | presentation/writing primitives usable | No exact approved template | PARTIAL | Build pedagogical template using shared primitives |
 | Speaking scenes | Sources format | presentation + optional writing | No exact approved template | PARTIAL | Build speaking template; retain image layout rules |
@@ -98,8 +98,7 @@ Transient UI in screenshots must stay transient:
 
 ### Phase A — finish gallery coverage before Workspace integration
 1. multi-select / choose several (only if a clear source case requires it)
-2. vocabulary picture-word / picture-definition template
-6. rule/discovery template
+2. rule/discovery template
 7. speaking template
 8. dialogue / Медведь template
 9. composite stage schema
