@@ -12,6 +12,9 @@
   let entitlement;
   let lessons = [];
   let orders = [];
+  let libraryLessons = [];
+  let libraryModules = [];
+  let libraryCourses = [];
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -48,6 +51,39 @@
     if (error) throw error;
     if (!data?.workspace_id) throw new Error("Teaching space not found.");
     workspaceId = data.workspace_id;
+  }
+
+  async function loadLibrary() {
+    const [lessonResult,moduleResult,courseResult] = await Promise.all([
+      client.from("library_lessons")
+        .select("id,module_id,title,estimated_minutes,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true}),
+      client.from("library_modules")
+        .select("id,course_id,title,sort_order")
+        .order("sort_order",{ascending:true}),
+      client.from("library_courses")
+        .select("id,title,level,source_type,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true})
+    ]);
+    if (lessonResult.error) throw lessonResult.error;
+    if (moduleResult.error) throw moduleResult.error;
+    if (courseResult.error) throw courseResult.error;
+    libraryLessons = lessonResult.data || [];
+    libraryModules = moduleResult.data || [];
+    libraryCourses = courseResult.data || [];
+  }
+
+  function populateLibrary() {
+    const select = el("detailLibraryLesson");
+    const options = libraryLessons.map((lesson) => {
+      const module = libraryModules.find((item) => item.id === lesson.module_id);
+      const course = module ? libraryCourses.find((item) => item.id === module.course_id) : null;
+      const label = [course?.level || course?.title,module?.title,lesson.title].filter(Boolean).join(" · ");
+      return `<option value="${escapeHtml(lesson.id)}">${escapeHtml(label)}</option>`;
+    }).join("");
+    select.innerHTML = '<option value="">No material attached</option>' + options;
   }
 
   async function loadStudent() {
@@ -266,7 +302,8 @@
       scheduled_at: new Date(el("lessonTime").value).toISOString(),
       duration_minutes: Number(el("duration").value),
       join_window_minutes: 5,
-      status: "scheduled"
+      status: "scheduled",
+      library_lesson_id: el("detailLibraryLesson").value || null
     });
 
     button.disabled = false;
@@ -296,6 +333,13 @@
   el("studentRecordForm").addEventListener("submit", saveRecord);
   el("scheduleForm").addEventListener("submit", scheduleLesson);
   el("scheduleStudentLesson").addEventListener("click", openDialog);
+  el("detailLibraryLesson").addEventListener("change", () => {
+    const selected = libraryLessons.find((lesson) => lesson.id === el("detailLibraryLesson").value);
+    if (selected && !el("lessonTitle").value.trim()) el("lessonTitle").value = selected.title;
+    if (selected?.estimated_minutes && el("duration").querySelector(`option[value="${selected.estimated_minutes}"]`)) {
+      el("duration").value = String(selected.estimated_minutes);
+    }
+  });
   document.querySelectorAll("[data-close-dialog]").forEach((button) => button.addEventListener("click", closeDialog));
 
   async function init() {
@@ -308,7 +352,8 @@
     }
 
     await loadWorkspace();
-    await loadStudent();
+    await Promise.all([loadLibrary(), loadStudent()]);
+    populateLibrary();
     renderHeader();
     renderMetrics();
     renderRecord();
