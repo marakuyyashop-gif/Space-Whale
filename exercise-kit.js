@@ -1,6 +1,6 @@
 (function (scope) {
   'use strict';
-  const kinds = ['matching', 'gaps', 'choice', 'order', 'sort', 'writing', 'presentation'];
+  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
   function validate(def) {
@@ -38,6 +38,26 @@
     if (def.kind === 'order') {
       const valid = options(def.tokens);
       if (def.correctOrder != null && (!Array.isArray(def.correctOrder) || def.correctOrder.length !== valid.size || new Set(def.correctOrder).size !== valid.size || def.correctOrder.some(id => !valid.has(id)))) fail('correctOrder must contain every token ID exactly once');
+      return def;
+    }
+    if (def.kind === 'image-label') {
+      text(def.image, 'image');
+      text(def.alt, 'image alt');
+      media({ image: def.image, alt: def.alt });
+      const valid = options(def.options);
+      const assigned = new Set();
+      ids(def.items, 'items');
+      def.items.forEach((item, index) => {
+        if (!Number.isFinite(item.x) || item.x < 0 || item.x > 100) fail(`items[${index}].x must be between 0 and 100`);
+        if (!Number.isFinite(item.y) || item.y < 0 || item.y > 100) fail(`items[${index}].y must be between 0 and 100`);
+        if (item.prompt != null && typeof item.prompt !== 'string') fail('image-label prompt must be text');
+        key(item, valid);
+        if (item.correctId != null) {
+          if (assigned.has(item.correctId)) fail('Image-label answer IDs must be unique');
+          assigned.add(item.correctId);
+        }
+      });
+      if (def.options.length < def.items.length) fail('Image-label needs at least one option per target');
       return def;
     }
     ids(def.items, 'items');
@@ -216,6 +236,40 @@
           label.append(input, node('span', '', option.text)); if (option.image) label.append(illustration(option)); group.append(label);
         }); body.append(group); controls.set(item.id, group);
       });
+      if (def.kind === 'image-label') {
+        const wrap = node('div', 'ek-image-label-wrap');
+        const stage = node('div', 'ek-image-label-stage');
+        const image = illustration({ image: def.image, alt: def.alt });
+        image.classList.add('ek-image-label-image');
+        stage.append(image);
+        def.items.forEach((item, index) => {
+          const chosen = () => def.options.find(option => option.id === answers[item.id]);
+          const target = button(chosen()?.text || '+', () => {
+            const taken = new Set(Object.entries(answers).filter(([id]) => id !== item.id).map(([,value]) => value));
+            popover(
+              { text: item.prompt || `Target ${index + 1}` },
+              def.options.filter(option => !taken.has(option.id)),
+              answers[item.id],
+              value => {
+                changed(item.id, value);
+                target.textContent = chosen()?.text || '+';
+                target.setAttribute('aria-label', `${item.prompt || `Target ${index + 1}`}${chosen() ? `: ${chosen().text}` : ''}`);
+              },
+              target
+            );
+          }, 'ek-image-label-target');
+          target.style.left = `${item.x}%`;
+          target.style.top = `${item.y}%`;
+          target.setAttribute('aria-label', item.prompt || `Choose label for target ${index + 1}`);
+          target.setAttribute('aria-haspopup', 'dialog');
+          controls.set(item.id, target);
+          stage.append(target);
+        });
+        const bank = node('div', 'ek-image-label-bank');
+        def.options.forEach(option => bank.append(node('span', 'ek-token', option.text)));
+        wrap.append(stage, bank);
+        body.append(wrap);
+      }
       if (def.kind === 'order') {
         const picked = Array.isArray(answers.order) ? answers.order.filter(id => def.tokens.some(token => token.id === id)) : [];
         const ordered = node('div', 'ek-order-target'); ordered.setAttribute('aria-label', 'Your sentence');
