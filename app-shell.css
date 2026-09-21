@@ -403,3 +403,6 @@ a{color:inherit}
 .library-dialog{width:min(620px,100%)}
 @media(max-width:980px){.library-lessons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.library-page-header{align-items:flex-start;flex-direction:column}.library-toolbar{flex-direction:column}.library-lessons-grid{grid-template-columns:1fr}}
+
+.auth-link{display:block;text-align:right;margin-top:-4px;color:var(--sw-muted);font-size:12px;text-decoration:none}
+.auth-link:hover{color:var(--sw-text);text-decoration:underline}
