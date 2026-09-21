@@ -140,6 +140,8 @@
     }
     if (def.kind === 'writing') def.items.forEach(item => text(item.prompt, 'prompt'));
     if (def.kind === 'gaps') {
+      if (def.layout != null && !['sentences', 'paragraph'].includes(def.layout)) fail('Unsupported gaps layout');
+      if (def.inputMode != null && !['text', 'select'].includes(def.inputMode)) fail('Unsupported gaps inputMode');
       if (def.bank) { array(def.bank, 'bank'); def.bank.forEach(word => text(word, 'bank word')); }
       const used = new Set();
       def.items.forEach(item => {
@@ -189,6 +191,9 @@
     const doc = host.ownerDocument;
     let dialog;
     let trigger;
+    let closeInline;
+    const dismissInline = () => { closeInline?.(); closeInline = null; };
+    const onOutside = event => { if (!event.target.closest?.('.ek-inline-choice')) dismissInline(); };
     const controls = new Map();
     let nestedMounts = [];
     const node = (tag, className, text) => {
@@ -254,8 +259,9 @@
     const announce = message => { status.textContent = message; };
     const save = () => { feedback = {}; config.onChange?.(clone(answers)); };
     const closeDialog = () => { if (dialog?.open) dialog.close(); };
-    const onKeydown = event => { if (event.key === 'Escape') closeDialog(); };
+    const onKeydown = event => { if (event.key === 'Escape') { closeDialog(); dismissInline(); } };
     host.classList.add('exercise-kit');
+    host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.replaceChildren();
     host.append(node('h2', 'ek-title', def.title), node('p', 'ek-instruction', def.instruction || ''));
     const body = node('div', 'ek-body');
@@ -293,6 +299,7 @@
       host.append(dialog); dialog.showModal();
     }
     function render() {
+      dismissInline();
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = [];
       body.replaceChildren(); controls.clear(); resultsBox.replaceChildren();
       if (def.kind === 'presentation') {
@@ -384,22 +391,59 @@
       }
       if (def.kind === 'gaps') {
         if (def.bank) {
-          const bank = node('div', 'ek-bank'); bank.append(node('strong', '', 'Words to use: '));
-          def.bank.forEach(word => bank.append(node('span', 'ek-token', word))); body.append(bank);
+          const bank = node('p', 'ek-word-list', def.bank.join(', '));
+          bank.setAttribute('aria-label', 'Words to use'); body.append(bank);
         }
+        let gapNumber = 0;
         def.items.forEach((item, index) => {
-          const row = node('p', 'ek-sentence'); row.append(node('span', 'ek-number', `${index + 1}. `));
+          const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
+          if (def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
             if (typeof segment === 'string') { row.append(doc.createTextNode(segment)); return; }
-            const options = segment.options || def.bank;
-            const field = node(options ? 'select' : 'input', 'ek-gap');
+            gapNumber += 1;
+            const number = gapNumber;
+            const label = `Sentence ${index + 1}, gap ${segment.id}`;
+            const options = def.inputMode === 'text' ? null : segment.options || def.bank;
             if (options) {
-              const empty = node('option', '', '…'); empty.value = ''; field.append(empty);
-              options.forEach(value => { const option = node('option', '', value); option.value = value; field.append(option); });
-            } else { field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false; }
-            field.setAttribute('aria-label', `Sentence ${index + 1}, gap ${segment.id}`);
+              const wrap = node('span', 'ek-inline-choice');
+              const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
+              menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
+              const paint = () => {
+                opener.replaceChildren(node('span', 'ek-gap-number', String(number)), doc.createTextNode(answers[segment.id] || '\u00a0'));
+                opener.setAttribute('aria-label', `${label}: ${answers[segment.id] || 'choose an answer'}`);
+              };
+              const shut = () => { menu.hidden = true; opener.setAttribute('aria-expanded', 'false'); };
+              const opener = button('', () => {
+                if (!menu.hidden) { dismissInline(); return; }
+                dismissInline(); menu.hidden = false; opener.setAttribute('aria-expanded', 'true');
+                closeInline = shut;
+                menu.querySelector('button')?.focus();
+              }, 'ek-gap ek-choice-trigger');
+              opener.setAttribute('aria-expanded', 'false');
+              options.forEach((value, optionIndex) => {
+                const option = button('', () => { changed(segment.id, value); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option');
+                option.append(node('span', 'ek-gap-number', String(optionIndex + 1)), doc.createTextNode(value));
+                menu.append(option);
+              });
+              menu.append(button('Clear', () => { changed(segment.id, ''); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option ek-inline-clear'));
+              wrap.addEventListener('keydown', event => {
+                if (event.key === 'Escape') { event.stopPropagation(); dismissInline(); opener.focus(); }
+                if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+                  event.preventDefault();
+                  if (menu.hidden) opener.click();
+                  else { const buttons = [...menu.querySelectorAll('button')]; const i = buttons.indexOf(doc.activeElement); buttons[(i + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length].focus(); }
+                }
+              });
+              wrap.addEventListener('focusout', event => { if (!wrap.contains(event.relatedTarget)) shut(); });
+              paint(); wrap.append(opener, menu); row.append(wrap); controls.set(segment.id, opener); return;
+            }
+            const field = node('input', 'ek-gap ek-typed-gap');
+            field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false;
+            field.setAttribute('aria-label', label);
             field.value = answers[segment.id] || '';
-            field.addEventListener(options ? 'change' : 'input', () => changed(segment.id, field.value));
+            const resize = () => { field.style.width = `${Math.max(5, Math.min(28, field.value.length + 2))}ch`; };
+            resize();
+            field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
             controls.set(segment.id, field); row.append(field);
           }); body.append(row);
         });
@@ -498,10 +542,10 @@
     }));
     if (!['presentation', 'audio', 'rule-page'].includes(def.kind)) actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
     if (def.kind === 'writing') announce('Open answer: reviewed by the teacher, not automatically graded.');
-    host.addEventListener('keydown', onKeydown); render();
+    host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside); render();
     return {
       getAnswers: () => clone(answers),
-      destroy: () => { closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, kinds };
