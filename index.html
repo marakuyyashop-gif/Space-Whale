@@ -1,147 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Space Whale — Reference Clone</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260921-live-typing-v2" />
+  <link rel="stylesheet" href="app-shell.css?v=20260921-app-entry-v1">
 </head>
 <body>
-  <div id="root" class="reference-app">
-    <button class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    </button>
-    <button class="mobile-menu-backdrop" type="button" aria-label="Close menu"></button>
-    <aside class="app-sidebar" aria-label="Space Whale navigation">
-      <div class="sidebar-header">
-        <div class="sidebar-brand-row">
-          <button class="sidebar-brand" type="button" aria-label="Space Whale home">
-            <span class="brand-mark">SW</span>
-            <span class="brand-name">Space Whale</span>
-          </button>
-
-          <div class="sidebar-header-actions">
-            <button class="sidebar-icon-button" type="button" aria-label="Search">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-            </button>
-            <button class="sidebar-icon-button" type="button" aria-label="Collapse sidebar">
-              <svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M9 4v16"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <nav class="sidebar-primary classroom-tabs" aria-label="Lesson sections">
-          <button class="sidebar-nav-item classroom-tab active" type="button" data-classroom-tab="lesson">
-            <svg viewBox="0 0 24 24"><path d="M5 4.5h14v15H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-            <span>Lesson</span>
-          </button>
-
-          <button class="sidebar-nav-item classroom-tab" type="button" data-classroom-tab="language">
-            <svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M8 9h8M8 13h5"/></svg>
-            <span>Language</span>
-          </button>
-
-          <button class="sidebar-nav-item classroom-tab" type="button" data-classroom-tab="practice">
-            <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="m8 12 2.2 2.2L16.5 8"/></svg>
-            <span>Practice</span>
-          </button>
-        </nav>
+  <main class="login-wrap" aria-live="polite">
+    <section class="login-card">
+      <div class="sw-brand">Space Whale</div>
+      <h1>Opening your workspace</h1>
+      <p id="entryStatus">Checking your account…</p>
+      <div id="entryFallback" class="sw-form" hidden>
+        <a class="sw-button" href="login.html">Go to sign in</a>
       </div>
-
-      <div class="sidebar-scroll">
-        <div class="sidebar-section-heading">
-          <span>Course</span>
-          <button class="level-selector" type="button">
-            <span>A2.1</span>
-            <svg viewBox="0 0 24 24"><path d="m7 9 5 5 5-5"/></svg>
-          </button>
-        </div>
-
-        <div class="classroom-tab-panel active" data-classroom-panel="lesson">
-          <div id="courseTree" class="course-tree"></div>
-        </div>
-
-        <div class="classroom-tab-panel" data-classroom-panel="language" hidden>
-          <div class="lesson-reference-panel">
-            <h3>Language</h3>
-            <p class="lesson-reference-copy">Words, useful language and grammar from this lesson will appear here.</p>
-            <div id="languageContent" class="lesson-reference-content"></div>
-          </div>
-        </div>
-
-        <div class="classroom-tab-panel" data-classroom-panel="practice" hidden>
-          <div class="lesson-reference-panel">
-            <h3>Practice</h3>
-            <p class="lesson-reference-copy">Independent practice connected to this lesson will appear here.</p>
-            <div id="practiceContent" class="lesson-reference-content"></div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <section class="class-area">
-      <div class="module-banner">
-        <div class="module-banner__copy">
-          <div class="sparkle" aria-hidden="true">✦</div>
-          <div>
-            <div class="module-banner__title">Вы открыли задание модуля "A2.1 Модуль 2", сделать этот модуль текущим?</div>
-            <div class="module-banner__subtitle">Сейчас у студента текущий модуль не выбран</div>
-          </div>
-        </div>
-        <button type="button" class="secondary-btn">Да, сделать</button>
-      </div>
-
-      <main class="class-content">
-        <div class="lesson-scroll" id="lessonContent"></div>
-      </main>
-
-      <div id="videoDock" class="video-dock" hidden>
-        <div class="video-dock-head">
-          <strong>Camera preview</strong>
-          <span id="mediaStatus">Camera and microphone are off</span>
-        </div>
-        <div class="local-video-wrap">
-          <video id="localVideo" autoplay muted playsinline></video>
-          <div id="videoPlaceholder" class="video-placeholder">Turn on your camera to preview it here.</div>
-        </div>
-        <div class="video-connection-note">Local preview for device testing.</div>
-      </div>
-      <div id="classroomToast" class="classroom-toast" aria-live="polite"></div>
-
-      <div class="session-bar">
-        <div class="session-left">
-          <div class="session-state">
-            <span class="session-state__icon">
-              <svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><path d="M2.5 19c.7-3.8 2.5-5.7 5.5-5.7s4.8 1.9 5.5 5.7"/><path d="m16.5 8 4 4m0-4-4 4"/></svg>
-            </span>
-            <span>Student has not joined yet</span>
-          </div>
-          <span id="liveSyncStatus" class="live-sync-status">Live sync connecting…</span>
-
-          <div class="media-controls">
-            <button id="micToggle" type="button" class="media-control off" aria-label="Microphone" aria-pressed="false">
-              <svg viewBox="0 0 24 24"><path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
-            </button>
-            <button id="cameraToggle" type="button" class="media-control off" aria-label="Camera" aria-pressed="false">
-              <svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="12.5" height="11" rx="2"/><path d="m16 10 4.5-2.5v9L16 14"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="session-right">
-          <button id="leaveClassroomButton" type="button" class="session-exit-button">Leave lesson</button>
-        </div>
-      </div>
+      <noscript>
+        <p>JavaScript is required to open Space Whale.</p>
+        <a class="sw-button" href="login.html">Go to sign in</a>
+      </noscript>
     </section>
-  </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
-  <script src="classroom-realtime.js?v=20260921-live-typing-v2"></script>
-  <script src="classroom-media.js?v=20260921-v2"></script>
-  <script src="app.js?v=20260921-live-typing-v2"></script>
+  <script src="entry.js?v=20260921-app-entry-v1"></script>
 </body>
 </html>
