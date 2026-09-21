@@ -6,7 +6,8 @@
     { key: "library", label: "Library", href: "library.html", icon: '<path d="M5 4.5h5.5v15H5zM13.5 4.5H19v15h-5.5z"/>' },
     { key: "homework", label: "Homework", href: "homework.html", icon: '<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h5M8 16h4"/>' },
     { key: "subscription", label: "Subscription", href: "subscription.html", icon: '<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M3.5 10h17M7 15h4"/>' },
-    { key: "settings", label: "Settings", href: "teacher-settings.html", icon: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4.8l-.4 3.1a7 7 0 0 0-1.7 1L5 6.1 3 9.5 5 11a7 7 0 0 0 0 2l-2 1.5L5 18l2.5-1a7 7 0 0 0 1.7 1l.4 3h4.8l.4-3a7 7 0 0 0 0-2Z"/>' }
+    { key: "settings", label: "Settings", href: "teacher-settings.html", icon: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4.8l-.4 3.1a7 7 0 0 0-1.7 1L5 6.1 3 9.5 5 11a7 7 0 0 0 0 2l-2 1.5L5 18l2.5-1a7 7 0 0 0 1.7 1l.4 3h4.8l.4-3a7 7 0 0 0 0-2Z"/>' },
+    { key: "website", label: "Website", href: "index.html", icon: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a13 13 0 0 1 0 16M12 4a13 13 0 0 0 0 16"/>' }
   ];
 
   function initials(value) {

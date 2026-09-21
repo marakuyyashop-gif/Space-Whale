@@ -9,6 +9,7 @@
   const copy = document.getElementById("waitingCopy");
   const presenceRow = document.getElementById("presenceRow");
   const startButton = document.getElementById("startButton");
+  const backButton = document.getElementById("backButton");
   const message = document.getElementById("waitingMessage");
 
   let authSession;
@@ -63,6 +64,9 @@
         : null;
 
     if (!role) throw new Error("You are not a participant in this lesson.");
+
+    backButton.href = role === "teacher" ? "dashboard.html" : "student-dashboard.html";
+    backButton.textContent = role === "teacher" ? "Back to teacher home" : "Back to student home";
 
     title.textContent = lesson.title || "English lesson";
 

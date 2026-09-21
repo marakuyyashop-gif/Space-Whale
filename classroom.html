@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260921-live-typing-v2" />
+  <link rel="stylesheet" href="styles.css?v=20260921-navigation-v1" />
 </head>
 <body>
   <div id="root" class="reference-app">
@@ -18,10 +18,10 @@
     <aside class="app-sidebar" aria-label="Space Whale navigation">
       <div class="sidebar-header">
         <div class="sidebar-brand-row">
-          <button class="sidebar-brand" type="button" aria-label="Space Whale home">
+          <a class="sidebar-brand" href="index.html" aria-label="Space Whale website">
             <span class="brand-mark">SW</span>
             <span class="brand-name">Space Whale</span>
-          </button>
+          </a>
 
           <div class="sidebar-header-actions">
             <button class="sidebar-icon-button" type="button" aria-label="Search">
@@ -132,6 +132,7 @@
         </div>
 
         <div class="session-right">
+          <a id="classroomAccountLink" class="session-account-link" href="app.html">Back to account</a>
           <button id="leaveClassroomButton" type="button" class="session-exit-button">Leave lesson</button>
         </div>
       </div>
@@ -141,7 +142,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="classroom-realtime.js?v=20260921-live-typing-v2"></script>
-  <script src="classroom-media.js?v=20260921-v2"></script>
+  <script src="classroom-media.js?v=20260921-navigation-v1"></script>
   <script src="app.js?v=20260921-live-typing-v2"></script>
 </body>
 </html>
