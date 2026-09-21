@@ -16,7 +16,7 @@
   let role;
 
   function goToClassroom() {
-    location.href = `index.html?session=${encodeURIComponent(sessionId)}`;
+    location.href = `classroom.html?session=${encodeURIComponent(sessionId)}`;
   }
 
   function formatDate(value) {
