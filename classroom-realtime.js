@@ -178,6 +178,26 @@
     return broadcast("audio", payload);
   }
 
+  async function loadExerciseResponse(exerciseId) {
+    if (!state.session || !state.user) return null;
+
+    let query = client
+      .from("exercise_responses")
+      .select("id,session_id,student_id,exercise_id,response,is_correct,submitted_at,updated_at")
+      .eq("session_id", state.session.id)
+      .eq("exercise_id", exerciseId)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    if (state.role === "student") {
+      query = query.eq("student_id", state.user.id);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    if (error) throw error;
+    return data || null;
+  }
+
   async function saveExerciseResponse(exerciseId, response, options = {}) {
     if (state.role !== "student") {
       throw new Error("Exercise responses are saved by the student.");
@@ -203,7 +223,9 @@
     await broadcast("exercise_response", {
       exercise_id: exerciseId,
       response,
-      submitted_at: record.submitted_at
+      is_correct: record.is_correct,
+      submitted_at: record.submitted_at,
+      student_id: state.user.id
     });
 
     return data;
@@ -223,6 +245,7 @@
     getCurrentUser,
     loadSession,
     loadSharedState,
+    loadExerciseResponse,
     navigate,
     startLesson,
     syncAudio,
