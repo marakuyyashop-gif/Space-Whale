@@ -458,3 +458,30 @@ initLiveClassroom().catch((error) => {
     `;
   }
 });
+
+
+/* === MOBILE SIDEBAR TOGGLE === */
+(() => {
+  const root = document.querySelector(".reference-app");
+  const toggle = document.querySelector(".mobile-menu-toggle");
+  const backdrop = document.querySelector(".mobile-menu-backdrop");
+  if (!root || !toggle || !backdrop) return;
+
+  const setOpen = (open) => {
+    root.classList.toggle("mobile-sidebar-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+  };
+
+  toggle.addEventListener("click", () => {
+    setOpen(!root.classList.contains("mobile-sidebar-open"));
+  });
+
+  backdrop.addEventListener("click", () => setOpen(false));
+
+  document.querySelectorAll(".sidebar-nav-item, .course-activity").forEach((el) => {
+    el.addEventListener("click", () => {
+      if (window.matchMedia("(max-width: 768px)").matches) setOpen(false);
+    });
+  });
+})();
+
