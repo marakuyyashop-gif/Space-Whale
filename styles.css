@@ -1267,9 +1267,9 @@ button{font:inherit;color:inherit}
   :root{--sidebar-width:280px}
 }
 
-/* === WORKSPACE SPACE PRINT === */
+/* === WORKSPACE SOLID BACKGROUND === */
 .class-area{
-  background:#f7f7f8 !important;
+  background:#f5f5f2 !important;
   position:relative;
 }
 
@@ -1279,16 +1279,12 @@ button{font:inherit;color:inherit}
 }
 
 .class-content{
-  background:transparent !important;
+  background:#f5f5f2 !important;
 }
 
 .lesson-scroll{
-  background-color:#f7f7f8 !important;
-  background-image:url("493DABD0-09B5-4AA4-9D18-A6842C5B67D6.png") !important;
-  background-position:center top !important;
-  background-size:100% auto !important;
-  background-repeat:no-repeat !important;
-  background-attachment:local !important;
+  background:#f5f5f2 !important;
+  background-image:none !important;
 }
 
 .module-banner,
@@ -1418,8 +1414,8 @@ button{font:inherit;color:inherit}
 
   .lesson-scroll{
     padding:62px 0 92px !important;
-    background-position:center top !important;
-    background-size:100% auto !important;
+    background:#f5f5f2 !important;
+    background-image:none !important;
     overflow-x:hidden !important;
   }
 
