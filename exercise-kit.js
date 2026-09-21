@@ -62,6 +62,7 @@
         if (!block || !['text', 'rule', 'image', 'exercise'].includes(block.type)) fail('Unsupported rule-page block');
         if (block.type === 'text') {
           text(block.text, 'text block');
+          if (block.highlights != null) { array(block.highlights, 'highlights'); block.highlights.forEach(part => { text(part, 'highlight'); if (!block.text.includes(part)) fail('Highlight missing from text'); }); }
           if (block.title != null && typeof block.title !== 'string') fail('text block title must be text');
         }
         if (block.type === 'rule') {
@@ -90,6 +91,7 @@
       return def;
     }
     if (def.kind === 'order') {
+      if (def.source != null) { if (!def.source.text && !def.source.audio) fail('Ordering source needs text or audio'); if (def.source.text != null) text(def.source.text, 'source text'); if (def.source.audio != null) audioSource(def.source.audio); }
       if (def.layout != null && !['tokens', 'image-grid'].includes(def.layout)) fail('Unsupported order layout');
       const valid = options(def.tokens);
       def.tokens.forEach(token => media(token));
@@ -133,7 +135,7 @@
       });
       if (def.options.length < def.items.length) fail('Matching needs at least one option per card');
     }
-    if (def.kind === 'choice') { if (def.layout != null && !['list', 'image-grid'].includes(def.layout)) fail('Unsupported choice layout'); def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); }); }
+    if (def.kind === 'choice') { if (def.layout != null && !['list', 'image-grid', 'dropdown'].includes(def.layout)) fail('Unsupported choice layout'); def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); }); }
     if (def.kind === 'sort') {
       const valid = options(def.groups);
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
@@ -186,6 +188,7 @@
   function mount(host, definition, config = {}) {
     validate(definition);
     const def = clone(definition);
+    if (config.discovery && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
     let answers = clone(config.answers || {});
     let feedback = {};
     const doc = host.ownerDocument;
@@ -298,6 +301,18 @@
       }, { once: true });
       host.append(dialog); dialog.showModal();
     }
+    function richText(value, highlights = []) {
+      const el = node('p', 'ek-copy');
+      const pieces = [...highlights].filter(part => typeof part === 'string' && part.length).sort((a,b) => b.length - a.length);
+      let rest = value;
+      while (rest) {
+        let at = -1, match = '';
+        for (const part of pieces) { const i = rest.indexOf(part); if (i >= 0 && (at < 0 || i < at)) { at = i; match = part; } }
+        if (at < 0) { el.append(doc.createTextNode(rest)); break; }
+        el.append(doc.createTextNode(rest.slice(0, at)), node('strong', '', match)); rest = rest.slice(at + match.length);
+      }
+      return el;
+    }
     function render() {
       dismissInline();
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = [];
@@ -315,13 +330,13 @@
           if (block.type === 'text') {
             const section = node('section', 'ek-rule-section ek-rule-text-section');
             if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
-            section.append(node('p', 'ek-copy', block.text));
+            section.append(richText(block.text, block.highlights));
             page.append(section);
           }
           if (block.type === 'rule') {
             const section = node('section', 'ek-rule-section ek-rule-block');
             if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
-            if (block.text) section.append(node('p', 'ek-copy', block.text));
+            if (block.text) section.append(richText(block.text, block.highlights));
             if (block.formula) section.append(node('div', 'ek-rule-formula', block.formula));
             if (block.examples?.length) {
               const examples = node('div', 'ek-rule-examples');
@@ -342,6 +357,7 @@
             section.append(child);
             page.append(section);
             const handle = mount(child, block.exercise, {
+              discovery: true,
               answers: answers[block.id] || {},
               onChange: value => {
                 answers[block.id] = value;
@@ -449,6 +465,17 @@
         });
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
+        if (def.layout === 'dropdown') {
+          const row = node('label', 'ek-discovery-choice');
+          row.append(doc.createTextNode(`${index + 1}. ${item.prompt} `));
+          const select = node('select', 'ek-gap ek-discovery-select');
+          select.setAttribute('aria-label', item.prompt);
+          const empty = node('option', '', '…'); empty.value = ''; select.append(empty);
+          item.options.forEach(option => { const el = node('option', '', option.text); el.value = option.id; select.append(el); });
+          select.value = answers[item.id] || '';
+          select.addEventListener('change', () => changed(item.id, select.value));
+          row.append(select); body.append(row); return;
+        }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
         item.options.forEach(option => {
           const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = answers[item.id] === option.id;
@@ -491,6 +518,8 @@
         body.append(wrap);
       }
       if (def.kind === 'order') {
+        if (def.source?.text) body.append(richText(def.source.text));
+        if (def.source?.audio) body.append(audioPlayer(def.source.audio, 'Listening'));
         const picked = Array.isArray(answers.order) ? answers.order.filter(id => def.tokens.some(token => token.id === id)) : [];
         const imageMode = def.layout === 'image-grid';
         const ordered = node('div', imageMode ? 'ek-order-target ek-order-images-target' : 'ek-order-target');
@@ -512,7 +541,7 @@
         });
         const bank = node('div', imageMode ? 'ek-bank ek-order-image-bank' : 'ek-bank');
         def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => bank.append(tokenButton(token, () => { changed('order', [...picked, token.id]); render(); }, index)));
-        body.append(ordered, bank, node('p', 'ek-muted', imageMode ? 'Click a picture to add it to the sequence. Click a chosen picture to return it.' : 'Click a chosen word to return it to the bank.')); controls.set('order', ordered);
+        body.append(ordered, bank); controls.set('order', ordered);
       }
       if (def.kind === 'sort') {
         const bank = node('div', 'ek-bank'); const groups = node('div', 'ek-group-grid');
@@ -525,7 +554,7 @@
           def.items.filter(item => answers[item.id] === group.id).forEach(item => box.append(itemButton(item))); groups.append(box);
         });
         def.items.filter(item => !answers[item.id]).forEach(item => bank.append(itemButton(item)));
-        body.append(groups, bank, node('p', 'ek-muted', 'Click a card to choose or change its group.'));
+        body.append(groups, bank);
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
@@ -540,8 +569,11 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     }));
-    if (!['presentation', 'audio', 'rule-page'].includes(def.kind)) actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
-    if (def.kind === 'writing') announce('Open answer: reviewed by the teacher, not automatically graded.');
+    if (!['presentation', 'audio', 'rule-page'].includes(def.kind)) {
+      const reset = button('↻', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
+      reset.setAttribute('aria-label', 'Reset exercise'); reset.title = 'Reset exercise'; actions.append(reset);
+    }
+
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside); render();
     return {
       getAnswers: () => clone(answers),

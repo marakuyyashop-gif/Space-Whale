@@ -65,7 +65,7 @@
           {
             type: 'text',
             title: 'Look at the examples.',
-            text: 'Welcome to our class!\nLet me introduce Ms Green, our principal.\nPleased to meet you.'
+            text: 'Welcome to our class!\nLet me introduce Ms Green, our principal.\nPleased to meet you.', highlights: ['Welcome to', 'Let me introduce', 'Pleased to meet you']
           },
           {
             type: 'exercise',
@@ -199,11 +199,11 @@
 
   const menu = document.getElementById('lessonMenu');
   const host = document.getElementById('lessonStage');
-  const title = document.getElementById('stageTitle');
-  const indexLabel = document.getElementById('stageIndex');
-  const counter = document.getElementById('stageCounter');
-  const prev = document.getElementById('prevStage');
-  const next = document.getElementById('nextStage');
+
+
+
+
+
 
   const answers = new Map();
   let current = 0;
@@ -223,9 +223,9 @@
     if (mounted) mounted.destroy();
 
     const stage = stages[current];
-    title.textContent = stage.title;
-    indexLabel.textContent = `Stage ${current + 1}`;
-    counter.textContent = `${current + 1} / ${stages.length}`;
+
+
+
 
     [...menu.children].forEach((button, i) => {
       if (i === current) button.setAttribute('aria-current', 'true');
@@ -237,12 +237,12 @@
       onChange: value => answers.set(stage.exercise.id, value)
     });
 
-    prev.disabled = current === 0;
-    next.disabled = current === stages.length - 1;
+
+
   }
 
-  prev.addEventListener('click', () => show(current - 1));
-  next.addEventListener('click', () => show(current + 1));
+
+
 
   show(0);
 })();
