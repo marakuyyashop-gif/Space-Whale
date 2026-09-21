@@ -62,3 +62,68 @@
   .exercise-kit .ek-card { padding: 12px; overflow-wrap: anywhere; }
   .exercise-kit .ek-dialog { padding: 18px; }
 }
+
+/* Image-label template: compact central illustration + small overlay targets, based on the PDF reference family. */
+.exercise-kit .ek-image-label-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.exercise-kit .ek-image-label-stage {
+  position: relative;
+  width: min(560px,100%);
+  border-radius: 22px;
+  overflow: hidden;
+  background: #ececef;
+  box-shadow: 0 4px 14px #2021240a;
+}
+.exercise-kit .ek-image-label-image {
+  width: 100%;
+  max-height: none;
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+  border-radius: 0;
+}
+.exercise-kit .ek-image-label-target {
+  position: absolute;
+  transform: translate(-50%,-50%);
+  min-width: 78px;
+  max-width: 128px;
+  min-height: 34px;
+  padding: 5px 10px;
+  border: 1px dashed #888b91;
+  border-radius: 10px;
+  background: #fffffff2;
+  box-shadow: 0 2px 7px #20212414;
+  font-size: .76em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.exercise-kit .ek-image-label-target:hover {
+  border-style: solid;
+  background: #fff;
+}
+.exercise-kit .ek-image-label-bank {
+  width: min(560px,100%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.exercise-kit .ek-image-label-bank .ek-token {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: .78em;
+  box-shadow: 0 1px 4px #20212408;
+}
+@media(max-width:600px) {
+  .exercise-kit .ek-image-label-stage,
+  .exercise-kit .ek-image-label-bank { width: 100%; }
+  .exercise-kit .ek-image-label-target {
+    min-width: 58px;
+    max-width: 92px;
+    min-height: 30px;
+    padding: 4px 7px;
+    font-size: .66em;
+  }
+}
