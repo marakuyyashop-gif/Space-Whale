@@ -9,6 +9,9 @@
   let lessons = [];
   let entitlements = [];
   let products = [];
+  let homeLibraryLessons = [];
+  let homeLibraryModules = [];
+  let homeLibraryCourses = [];
   let studentMap = new Map();
 
   const el = (id) => document.getElementById(id);
@@ -190,6 +193,40 @@
 
     if (error) throw error;
     entitlements = data || [];
+  }
+
+  async function loadHomeLibrary() {
+    const [lessonResult,moduleResult,courseResult] = await Promise.all([
+      client.from("library_lessons")
+        .select("id,module_id,title,estimated_minutes,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true}),
+      client.from("library_modules")
+        .select("id,course_id,title,sort_order")
+        .order("sort_order",{ascending:true}),
+      client.from("library_courses")
+        .select("id,title,level,source_type,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true})
+    ]);
+    if (lessonResult.error) throw lessonResult.error;
+    if (moduleResult.error) throw moduleResult.error;
+    if (courseResult.error) throw courseResult.error;
+    homeLibraryLessons = lessonResult.data || [];
+    homeLibraryModules = moduleResult.data || [];
+    homeLibraryCourses = courseResult.data || [];
+  }
+
+  function populateHomeLibrary() {
+    const select = el("homeLibraryLesson");
+    if (!select) return;
+    const options = homeLibraryLessons.map((lesson) => {
+      const module = homeLibraryModules.find((item) => item.id === lesson.module_id);
+      const course = module ? homeLibraryCourses.find((item) => item.id === module.course_id) : null;
+      const label = [course?.level || course?.title,module?.title,lesson.title].filter(Boolean).join(" · ");
+      return `<option value="${escapeHtml(lesson.id)}">${escapeHtml(label)}</option>`;
+    }).join("");
+    select.innerHTML = '<option value="">No material attached</option>' + options;
   }
 
   async function loadProducts() {
@@ -518,7 +555,8 @@
       scheduled_at: new Date(localTime).toISOString(),
       duration_minutes: Number(el("duration").value),
       join_window_minutes: 5,
-      status: "scheduled"
+      status: "scheduled",
+      library_lesson_id: el("homeLibraryLesson")?.value || null
     });
 
     if (error) {
@@ -634,6 +672,13 @@
 
     el("scheduleForm").addEventListener("submit", createLesson);
     el("productForm").addEventListener("submit", createProduct);
+    el("homeLibraryLesson")?.addEventListener("change", () => {
+      const selected = homeLibraryLessons.find((lesson) => lesson.id === el("homeLibraryLesson").value);
+      if (selected && !el("lessonTitle").value.trim()) el("lessonTitle").value = selected.title;
+      if (selected?.estimated_minutes && el("duration").querySelector(`option[value="${selected.estimated_minutes}"]`)) {
+        el("duration").value = String(selected.estimated_minutes);
+      }
+    });
   }
 
   async function init() {
@@ -656,10 +701,12 @@
       loadLessons(),
       loadEntitlements(),
       loadProducts(),
+      loadHomeLibrary(),
       loadAdminStatus()
     ]);
 
     populateStudentSelect();
+    populateHomeLibrary();
     renderAll();
     bindEvents();
 
