@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-library-v1">
+</head>
+<body class="teacher-home-body">
+  <div id="teacherApp" class="teacher-app" hidden>
+    <aside class="teacher-sidebar">
+      <a class="teacher-brand" href="dashboard.html">
+        <span class="teacher-brand-mark">SW</span>
+        <span>Space Whale</span>
+      </a>
+      <nav class="teacher-nav">
+        <a class="teacher-nav-item" href="dashboard.html">
+          <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9 20v-6h6v6"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="teacher-nav-item" href="schedule.html">
+          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/></svg>
+          <span>Schedule</span>
+        </a>
+        <a class="teacher-nav-item active" href="library.html">
+          <svg viewBox="0 0 24 24"><path d="M5 4.5h5.5v15H5zM13.5 4.5H19v15h-5.5z"/></svg>
+          <span>Library</span>
+        </a>
+        <a class="teacher-nav-item" href="students.html">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.7-4.1 2.6-6.2 5.5-6.2s4.8 2.1 5.5 6.2"/><circle cx="17" cy="9" r="2.4"/><path d="M14.5 19c.4-2.5 1.6-3.8 3.7-3.8 1.1 0 2.1.4 2.8 1.1"/></svg>
+          <span>Students</span>
+        </a>
+        <a class="teacher-nav-item" href="dashboard.html#payments">
+          <svg viewBox="0 0 24 24"><rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M3.5 10h17M7 15h4"/></svg>
+          <span>Payments</span>
+        </a>
+        <a class="teacher-nav-item" href="teacher-settings.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4.8l-.4 3.1a7 7 0 0 0-1.7 1L5 6.1 3 9.5 5 11a7 7 0 0 0 0 2l-2 1.5L5 18l2.5-1a7 7 0 0 0 1.7 1l.4 3h4.8l.4-3a7 7 0 0 0 1.7-1l2.5 1 2-3.5-2-1.5a7 7 0 0 0 0-2Z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+      <div class="teacher-sidebar-bottom">
+        <div class="teacher-account">
+          <div class="teacher-avatar" id="sidebarAvatar"><span>T</span></div>
+          <div class="teacher-account-copy">
+            <strong id="sidebarName">Teacher</strong>
+            <span>Lesson library</span>
+          </div>
+        </div>
+        <button id="logoutButton" class="teacher-logout" type="button">Log out</button>
+      </div>
+    </aside>
+
+    <main class="teacher-main library-main">
+      <header class="library-page-header">
+        <div>
+          <span class="teacher-eyebrow">TEACHING MATERIALS</span>
+          <h1>Library</h1>
+          <p>Choose a Space Whale lesson or keep your own reusable lesson templates.</p>
+        </div>
+        <button id="newPersonalLesson" class="sw-button" type="button">New personal lesson</button>
+      </header>
+
+      <section class="library-toolbar">
+        <div class="students-search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <input id="librarySearch" type="search" placeholder="Search lessons">
+        </div>
+        <select id="libraryLevel" class="students-filter">
+          <option value="all">All levels</option>
+        </select>
+      </section>
+
+      <section class="library-tabs">
+        <button class="library-tab active" type="button" data-tab="platform">Space Whale</button>
+        <button class="library-tab" type="button" data-tab="teacher">My lessons</button>
+      </section>
+
+      <section id="libraryContent" class="library-content"></section>
+    </main>
+  </div>
+
+  <div id="pageLoading" class="page-loading">Loading library…</div>
+
+  <dialog id="previewDialog" class="sw-dialog library-dialog">
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <div>
+          <span class="teacher-eyebrow" id="previewMeta">LESSON</span>
+          <h2 id="previewTitle">Lesson</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close="previewDialog">×</button>
+      </div>
+      <p id="previewSummary" class="dialog-help"></p>
+      <div id="previewActivities" class="library-preview-activities"></div>
+      <div class="dialog-actions">
+        <button class="sw-button secondary" type="button" data-close="previewDialog">Close</button>
+        <a id="previewUseLink" class="sw-button" href="schedule.html">Use in schedule</a>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="personalLessonDialog" class="sw-dialog">
+    <form id="personalLessonForm" class="dialog-card">
+      <div class="dialog-header">
+        <div>
+          <span class="teacher-eyebrow">MY LIBRARY</span>
+          <h2>Create personal lesson</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close="personalLessonDialog">×</button>
+      </div>
+      <div class="sw-field">
+        <label for="personalTitle">Lesson title</label>
+        <input id="personalTitle" type="text" required placeholder="Conversation practice">
+      </div>
+      <div class="sw-field">
+        <label for="personalLevel">Level</label>
+        <input id="personalLevel" type="text" placeholder="A2.1">
+      </div>
+      <div class="sw-field">
+        <label for="personalSummary">Short description</label>
+        <textarea id="personalSummary" rows="4" placeholder="What this lesson is for"></textarea>
+      </div>
+      <div class="dialog-actions">
+        <button class="sw-button secondary" type="button" data-close="personalLessonDialog">Cancel</button>
+        <button id="personalLessonSubmit" class="sw-button" type="submit">Create lesson</button>
+      </div>
+      <div id="personalLessonMessage" class="sw-message"></div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="library.js?v=20260921-v1"></script>
+</body>
+</html>
