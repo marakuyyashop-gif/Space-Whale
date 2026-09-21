@@ -5,7 +5,8 @@
     { key: "homework", label: "Homework", href: "student-homework.html", icon: '<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h5M8 16h4"/>' },
     { key: "notebook", label: "Notebook", href: "student-notebook.html", icon: '<path d="M6 4h12v16H6z"/><path d="M9 4v16M12 8h3M12 12h3"/>' },
     { key: "progress", label: "Progress", href: "student-progress.html", icon: '<path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/>' },
-    { key: "profile", label: "Profile", href: "student-profile.html", icon: '<circle cx="12" cy="8" r="3"/><path d="M5 20c.8-4.4 3.1-6.5 7-6.5s6.2 2.1 7 6.5"/>' }
+    { key: "profile", label: "Profile", href: "student-profile.html", icon: '<circle cx="12" cy="8" r="3"/><path d="M5 20c.8-4.4 3.1-6.5 7-6.5s6.2 2.1 7 6.5"/>' },
+    { key: "website", label: "Website", href: "index.html", icon: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a13 13 0 0 1 0 16M12 4a13 13 0 0 0 0 16"/>' }
   ];
 
   function initials(value) {
