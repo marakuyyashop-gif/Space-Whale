@@ -77,6 +77,7 @@
       .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
+      .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
       .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
       .on("broadcast", { event: "lesson_started" }, ({ payload }) => handlers.onLessonStarted?.(payload))
       .on("presence", { event: "sync" }, () => handlers.onPresence?.(channel.presenceState()))
@@ -198,6 +199,20 @@
     return data || null;
   }
 
+  async function sendExerciseDraft(exerciseId, response) {
+    if (state.role !== "student") {
+      throw new Error("Exercise drafts are sent by the student.");
+    }
+
+    return broadcast("exercise_draft", {
+      exercise_id: exerciseId,
+      response,
+      student_id: state.user.id,
+      draft: true,
+      sent_at: Date.now()
+    });
+  }
+
   async function saveExerciseResponse(exerciseId, response, options = {}) {
     if (state.role !== "student") {
       throw new Error("Exercise responses are saved by the student.");
@@ -249,6 +264,7 @@
     navigate,
     startLesson,
     syncAudio,
+    sendExerciseDraft,
     saveExerciseResponse,
     broadcast,
     state
