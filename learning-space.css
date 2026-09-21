@@ -1,0 +1,41 @@
+:root { --learning-column-width: 560px; }
+.learning-space .reference-app { min-width: 0; }
+.learning-space .learning-heading { margin: 22px 6px 12px; font: 500 16px/1.4 Onest,Arial,sans-serif; }
+.learning-menu { overflow-y: auto; flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
+.learning-menu button { border: 0; background: transparent; text-align: left; border-radius: 12px; padding: 11px 12px; font: 400 13px/1.5 Onest,Arial,sans-serif; cursor: pointer; color: #36383d; }
+.learning-menu button[aria-current=true] { background: #292b2f; color: white; }
+.learning-menu .draft-menu-number { margin-right: 10px; }
+.learning-links { padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; }
+.learning-links a { color: inherit; text-decoration: none; }
+.learning-space .lesson-scroll { padding: 48px 24px 80px; }
+.exercise-kit, .exercise-kit.ek-reading-width, #lessonContent > .exercise-page {
+  --ek-title-size: 18px;
+  box-sizing: border-box; width: 100%; max-width: var(--learning-column-width,560px); margin-inline: auto; text-align: left;
+}
+#lessonContent > .exercise-page { width: calc(100% - 48px); padding-inline: 0; }
+#lessonContent > * { max-width: var(--learning-column-width); margin-inline: auto; }
+#lessonContent .lesson-title-card, #lessonContent .lesson-stage, #lessonContent .followup-blocks, #lessonContent .placeholder-page { width: 100% !important; max-width: 100%; box-sizing: border-box; }
+#lessonContent .exercise-title-card, #lessonContent .interactive-exercise-card { padding: 0 !important; min-height: 0; border: 0; box-shadow: none; background: transparent; border-radius: 0; }
+#lessonContent .lesson-title { font-size: 18px !important; line-height: 1.4 !important; text-align: left; }
+#lessonContent .interactive-question { font-size: 17px; line-height: 1.7; }
+.exercise-kit .exercise-kit { width: 100%; max-width: none; margin: 0; }
+.exercise-kit .ek-rule-page, .exercise-kit .ek-rule-visual { width: 100%; }
+.exercise-kit .ek-discovery-host.exercise-kit { --ek-text-size: 17px; --ek-title-size: 18px; }
+.exercise-kit .ek-discovery-select { min-width: 80px; max-width: 100%; width: auto; border-radius: 999px; background: white; }
+.exercise-kit .ek-discovery-choice { line-height: 2; }
+.exercise-kit .ek-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.exercise-kit .ek-option { width: 100%; min-width: 0; height: 100%; }
+.exercise-kit .ek-reset { width: 42px; padding: 5px; font-size: 24px; line-height: 1; }
+.exercise-kit .ek-status:empty, .exercise-kit .ek-results:empty, .exercise-kit .ek-instruction:empty { display: none; }
+.exercise-kit .ek-actions:empty { display: none; }
+.exercise-kit .ek-rule-visual .ek-image { max-height: none; }
+@media(max-width:700px) {
+  .learning-space .reference-app { display: flex; flex-direction: column; height: 100dvh; }
+  .learning-space .app-sidebar { position: relative; transform: none; width: 100%; min-width: 0; height: auto; max-height: 35dvh; flex: none; }
+  .learning-space .sidebar-header { display: none; }
+  .learning-menu { flex-direction: row; overflow-x: auto; }
+  .learning-menu button { flex: none; max-width: 220px; }
+  .learning-links { padding: 8px 16px; }
+  .learning-space .class-area { flex: 1; height: auto; }
+  .learning-space .lesson-scroll { padding: 28px 18px 60px; }
+}
