@@ -299,7 +299,8 @@ async function hydrateExerciseResponse(exerciseId) {
       response: saved.response,
       is_correct: saved.is_correct,
       submitted_at: saved.submitted_at,
-      student_id: saved.student_id
+      student_id: saved.student_id,
+      draft: Boolean(saved.is_draft)
     };
     liveResponses.set(exerciseId, payload);
 
@@ -681,6 +682,23 @@ async function initLiveClassroom() {
         if (panel) panel.innerHTML = responseSummaryHtml(payload);
       }
     },
+    onExerciseDatabaseChange: (row) => {
+      if (!row?.exercise_id) return;
+      const payload = {
+        exercise_id: row.exercise_id,
+        response: row.response,
+        is_correct: row.is_correct,
+        submitted_at: row.submitted_at,
+        student_id: row.student_id,
+        draft: Boolean(row.is_draft)
+      };
+      liveResponses.set(row.exercise_id,payload);
+
+      if (row.exercise_id === activeTaskId && classroom.state.role === "teacher") {
+        const panel = document.querySelector("[data-live-response]");
+        if (panel) panel.innerHTML = responseSummaryHtml(payload);
+      }
+    },
     onPresence: renderPresence,
     onJoin: () => renderPresence(classroom.state.channel?.presenceState?.() || {}),
     onLeave: () => renderPresence(classroom.state.channel?.presenceState?.() || {})
@@ -707,6 +725,12 @@ async function initLiveClassroom() {
 
   renderCourseTree();
   renderPresence(classroom.state.channel.presenceState());
+
+  const liveSyncStatus = document.getElementById("liveSyncStatus");
+  if (liveSyncStatus) {
+    liveSyncStatus.textContent = "Live sync connected";
+    liveSyncStatus.classList.add("connected");
+  }
 }
 
 initLiveClassroom().catch((error) => {
