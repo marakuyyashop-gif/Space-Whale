@@ -4,6 +4,21 @@ const { validate, grade } = require('../exercise-kit.js');
 const gaps = { version: 1, id: 'gaps', title: 'Test', kind: 'gaps', items: [{ id: 's1', segments: ['I ', { id: 'g1', answers: ['was'] }, ' and they ', { id: 'g2', answers: ['were'] }] }] };
 const choice = { version: 1, id: 'choice', title: 'Test', kind: 'choice', items: [{ id: 'q1', prompt: 'Choose', options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }], correctId: 'b' }] };
 const copy = value => JSON.parse(JSON.stringify(value));
+test('Fox reference accepts 4, 5 and 8 sentences without a fixed count', () => {
+  for (const count of [4, 5, 8]) {
+    const def = { version: 1, id: 'fox', kind: 'gaps', title: 'Complete', layout: 'sentences', inputMode: 'select', items: Array.from({ length: count }, (_, i) => ({ id: `s${i}`, segments: ['A longer sentence before ', { id: `g${i}`, options: ['is', 'was'], answers: ['was'] }, ' the ending.'] })) };
+    const answers = Object.fromEntries(def.items.map((_, i) => [`g${i}`, 'was']));
+    assert.equal(Object.keys(grade(def, answers)).length, count);
+    assert.ok(Object.values(grade(def, answers)).every(result => result === 'correct'));
+  }
+});
+test('Rabbit supports a continuous paragraph with typed bank answers', () => {
+  const def = { ...copy(gaps), layout: 'paragraph', inputMode: 'text', bank: ['were', 'was'] };
+  assert.equal(validate(def), def);
+  assert.deepEqual(grade(def, { g1: 'was', g2: 'were' }), { g1: 'correct', g2: 'correct' });
+  def.layout = 'unknown'; assert.throws(() => validate(def));
+  def.layout = 'paragraph'; def.inputMode = 'unknown'; assert.throws(() => validate(def));
+});
 test('multiple gaps grade independently and normalize case/space', () => {
   assert.deepEqual(grade(gaps, { g1: ' WAS ', g2: 'were' }), { g1: 'correct', g2: 'correct' });
   assert.deepEqual(grade(gaps, { g1: 'were' }), { g1: 'retry', g2: 'empty' });
