@@ -241,3 +241,74 @@
     max-height: 76px;
   }
 }
+
+.exercise-kit .ek-audio-player {
+  width: min(560px,100%);
+  display: grid;
+  grid-template-columns: 42px minmax(120px,1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ek-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px #20212408;
+}
+.exercise-kit .ek-audio-player audio { display: none; }
+.exercise-kit .ek-audio-play {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--ek-ink);
+  color: #fff;
+  font-size: .82em;
+  line-height: 1;
+}
+.exercise-kit .ek-audio-range {
+  width: 100%;
+  accent-color: var(--ek-ink);
+}
+.exercise-kit .ek-audio-time {
+  min-width: 74px;
+  color: var(--ek-muted);
+  font-size: .72em;
+  text-align: right;
+}
+.exercise-kit .ek-repeat-list {
+  width: min(560px,100%);
+  display: grid;
+  gap: 0;
+}
+.exercise-kit .ek-repeat-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: 10px;
+  padding: 13px 2px;
+  border-bottom: 1px solid #ededee;
+}
+.exercise-kit .ek-repeat-item:last-child { border-bottom: 0; }
+.exercise-kit .ek-repeat-term {
+  font-weight: 600;
+  line-height: 1.35;
+}
+.exercise-kit .ek-repeat-example {
+  grid-column: 2;
+  margin: 5px 0 0;
+  color: var(--ek-muted);
+  font-size: .86em;
+  line-height: 1.45;
+}
+@media(max-width:600px) {
+  .exercise-kit .ek-audio-player {
+    grid-template-columns: 38px 1fr;
+    gap: 9px;
+  }
+  .exercise-kit .ek-audio-time {
+    grid-column: 2;
+    text-align: left;
+    min-width: 0;
+  }
+}
