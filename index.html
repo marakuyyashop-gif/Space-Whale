@@ -1,36 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Space Whale — Reference Clone</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260921-classroom-tabs-v1" />
-</head>
-<body>
-  <div id="root" class="reference-app">
-    <button class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    </button>
-    <button class="mobile-menu-backdrop" type="button" aria-label="Close menu"></button>
-    <aside class="app-sidebar" aria-label="Space Whale navigation">
-      <div class="sidebar-header">
-        <div class="sidebar-brand-row">
+<div class="sidebar-brand-row">
           <button class="sidebar-brand" type="button" aria-label="Space Whale home">
             <span class="brand-mark">SW</span>
             <span class="brand-name">Space Whale</span>
           </button>
-
-          <div class="sidebar-header-actions">
-            <button class="sidebar-icon-button" type="button" aria-label="Search">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-            </button>
-            <button class="sidebar-icon-button" type="button" aria-label="Collapse sidebar">
-              <svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M9 4v16"/></svg>
-            </button>
-          </div>
         </div>
 
         <nav class="sidebar-primary classroom-tabs" aria-label="Lesson sections">
@@ -98,6 +70,19 @@
         <div class="lesson-scroll" id="lessonContent"></div>
       </main>
 
+      <div id="videoDock" class="video-dock" hidden>
+        <div class="video-dock-head">
+          <strong>Camera preview</strong>
+          <span id="mediaStatus">Camera and microphone are off</span>
+        </div>
+        <div class="local-video-wrap">
+          <video id="localVideo" autoplay muted playsinline></video>
+          <div id="videoPlaceholder" class="video-placeholder">Turn on your camera to preview it here.</div>
+        </div>
+        <div id="videoConnectionNote" class="video-connection-note">This preview is local. Two-way lesson video will use the production video connection.</div>
+      </div>
+      <div id="classroomToast" class="classroom-toast" aria-live="polite"></div>
+
       <div class="session-bar">
         <div class="session-left">
           <div class="session-state">
@@ -107,36 +92,18 @@
             <span>Student has not joined yet</span>
           </div>
 
-          <div class="canvas-controls">
-            <button type="button" class="canvas-control color-dot" aria-label="Color"></button>
-            <button type="button" class="canvas-control" aria-label="Delete">
-              <svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>
+          <div class="media-controls">
+            <button id="micToggle" type="button" class="media-control off" aria-label="Microphone" aria-pressed="false">
+              <svg viewBox="0 0 24 24"><path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
             </button>
-            <button type="button" class="canvas-control muted" aria-label="Undo">
-              <svg viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M5 12h8a6 6 0 0 1 6 6"/></svg>
-            </button>
-            <button type="button" class="canvas-control muted" aria-label="Redo">
-              <svg viewBox="0 0 24 24"><path d="m15 7 5 5-5 5m4-5h-8a6 6 0 0 0-6 6"/></svg>
-            </button>
-            <button type="button" class="canvas-control" aria-label="Remove participant">
-              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.7 2.5-5.6 5.5-5.6s4.8 1.9 5.5 5.6M17 9h5"/></svg>
+            <button id="cameraToggle" type="button" class="media-control off" aria-label="Camera" aria-pressed="false">
+              <svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="12.5" height="11" rx="2"/><path d="m16 10 4.5-2.5v9L16 14"/></svg>
             </button>
           </div>
         </div>
 
         <div class="session-right">
-          <div class="session-controls">
-            <button type="button" class="round-control" aria-label="Settings">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="m4.8 13.7-1.5-1.7 1.5-1.7.5-1.6-.6-2.2 2.2-1.2 1.6 1 1.7-.5L11 3h2l.8 2.8 1.7.5 1.6-1 2.2 1.2-.6 2.2.5 1.6 1.5 1.7-1.5 1.7-.5 1.6.6 2.2-2.2 1.2-1.6-1-1.7.5L13 21h-2l-.8-2.8-1.7-.5-1.6 1-2.2-1.2.6-2.2-.5-1.6Z"/></svg>
-            </button>
-            <button type="button" class="round-control" aria-label="Chat">
-              <svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H9l-5 3v-14Z"/></svg>
-            </button>
-            <button type="button" class="round-control" aria-label="Participant">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-4.1 3-6.2 6.5-6.2s5.7 2.1 6.5 6.2"/></svg>
-            </button>
-          </div>
-          <button type="button" class="support-btn" aria-label="Support">?</button>
+          <button id="leaveClassroomButton" type="button" class="session-exit-button">Leave lesson</button>
         </div>
       </div>
     </section>
