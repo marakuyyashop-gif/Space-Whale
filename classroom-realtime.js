@@ -80,6 +80,12 @@
       .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
       .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
       .on("broadcast", { event: "lesson_started" }, ({ payload }) => handlers.onLessonStarted?.(payload))
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "exercise_responses",
+        filter: `session_id=eq.${session.id}`
+      }, ({ new: row }) => handlers.onExerciseDatabaseChange?.(row))
       .on("presence", { event: "sync" }, () => handlers.onPresence?.(channel.presenceState()))
       .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
       .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
@@ -184,7 +190,7 @@
 
     let query = client
       .from("exercise_responses")
-      .select("id,session_id,student_id,exercise_id,response,is_correct,submitted_at,updated_at")
+      .select("id,session_id,student_id,exercise_id,response,is_correct,submitted_at,updated_at,is_draft")
       .eq("session_id", state.session.id)
       .eq("exercise_id", exerciseId)
       .order("updated_at", { ascending: false })
@@ -199,18 +205,49 @@
     return data || null;
   }
 
+  const draftTimers = new Map();
+
+  async function persistDraftSnapshot(exerciseId, response) {
+    const record = {
+      session_id: state.session.id,
+      student_id: state.user.id,
+      exercise_id: exerciseId,
+      response,
+      is_correct: null,
+      submitted_at: null,
+      is_draft: true
+    };
+
+    const { error } = await client
+      .from("exercise_responses")
+      .upsert(record, { onConflict: "session_id,student_id,exercise_id" });
+
+    if (error) throw error;
+  }
+
   async function sendExerciseDraft(exerciseId, response) {
     if (state.role !== "student") {
       throw new Error("Exercise drafts are sent by the student.");
     }
 
-    return broadcast("exercise_draft", {
+    const payload = {
       exercise_id: exerciseId,
       response,
       student_id: state.user.id,
       draft: true,
       sent_at: Date.now()
-    });
+    };
+
+    const sendPromise = broadcast("exercise_draft", payload);
+
+    clearTimeout(draftTimers.get(exerciseId));
+    draftTimers.set(exerciseId, setTimeout(() => {
+      persistDraftSnapshot(exerciseId, response).catch((error) => {
+        console.error("[Space Whale] Draft snapshot failed", error);
+      });
+    }, 120));
+
+    return sendPromise;
   }
 
   async function saveExerciseResponse(exerciseId, response, options = {}) {
@@ -224,7 +261,8 @@
       exercise_id: exerciseId,
       response,
       is_correct: options.isCorrect ?? null,
-      submitted_at: options.submitted ? new Date().toISOString() : null
+      submitted_at: options.submitted ? new Date().toISOString() : null,
+      is_draft: false
     };
 
     const { data, error } = await client
