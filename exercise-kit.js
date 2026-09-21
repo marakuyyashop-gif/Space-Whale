@@ -36,7 +36,9 @@
       return def;
     }
     if (def.kind === 'order') {
+      if (def.layout != null && !['tokens', 'image-grid'].includes(def.layout)) fail('Unsupported order layout');
       const valid = options(def.tokens);
+      def.tokens.forEach(token => media(token));
       if (def.correctOrder != null && (!Array.isArray(def.correctOrder) || def.correctOrder.length !== valid.size || new Set(def.correctOrder).size !== valid.size || def.correctOrder.some(id => !valid.has(id)))) fail('correctOrder must contain every token ID exactly once');
       return def;
     }
@@ -272,12 +274,27 @@
       }
       if (def.kind === 'order') {
         const picked = Array.isArray(answers.order) ? answers.order.filter(id => def.tokens.some(token => token.id === id)) : [];
-        const ordered = node('div', 'ek-order-target'); ordered.setAttribute('aria-label', 'Your sentence');
-        if (!picked.length) ordered.append(node('span', 'ek-muted', 'Choose the words below in order.'));
-        picked.forEach((id, index) => { const token = def.tokens.find(item => item.id === id); ordered.append(button(token.text, () => { changed('order', picked.filter((_, position) => position !== index)); render(); }, 'ek-token')); });
-        const bank = node('div', 'ek-bank');
-        def.tokens.filter(token => !picked.includes(token.id)).forEach(token => bank.append(button(token.text, () => { changed('order', [...picked, token.id]); render(); }, 'ek-token')));
-        body.append(ordered, bank, node('p', 'ek-muted', 'Click a chosen word to return it to the bank.')); controls.set('order', ordered);
+        const imageMode = def.layout === 'image-grid';
+        const ordered = node('div', imageMode ? 'ek-order-target ek-order-images-target' : 'ek-order-target');
+        ordered.setAttribute('aria-label', imageMode ? 'Your picture order' : 'Your sentence');
+        if (!picked.length) ordered.append(node('span', 'ek-muted', imageMode ? 'Choose the pictures below in order.' : 'Choose the words below in order.'));
+        const tokenButton = (token, handler, index) => {
+          if (!imageMode) return button(token.text, handler, 'ek-token');
+          const card = button('', handler, 'ek-order-image-card');
+          card.setAttribute('aria-label', token.text || token.alt || `Picture ${index + 1}`);
+          const number = node('span', 'ek-order-number', String(index + 1));
+          if (token.image) card.append(illustration(token));
+          if (token.text) card.append(node('span', 'ek-order-image-label', token.text));
+          card.prepend(number);
+          return card;
+        };
+        picked.forEach((id, index) => {
+          const token = def.tokens.find(item => item.id === id);
+          ordered.append(tokenButton(token, () => { changed('order', picked.filter((_, position) => position !== index)); render(); }, index));
+        });
+        const bank = node('div', imageMode ? 'ek-bank ek-order-image-bank' : 'ek-bank');
+        def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => bank.append(tokenButton(token, () => { changed('order', [...picked, token.id]); render(); }, index)));
+        body.append(ordered, bank, node('p', 'ek-muted', imageMode ? 'Click a picture to add it to the sequence. Click a chosen picture to return it.' : 'Click a chosen word to return it to the bank.')); controls.set('order', ordered);
       }
       if (def.kind === 'sort') {
         const bank = node('div', 'ek-bank'); const groups = node('div', 'ek-group-grid');
