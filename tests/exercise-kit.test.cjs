@@ -89,3 +89,21 @@ test('choice image-grid layout is validated', () => {
   def.layout = 'giant-cards';
   assert.throws(() => validate(def));
 });
+
+test('picture ordering accepts image tokens and rejects unsupported layout', () => {
+  const def = {
+    version: 1,
+    id: 'picture-order',
+    title: 'Order the pictures',
+    kind: 'order',
+    layout: 'image-grid',
+    tokens: [
+      { id: 'a', text: 'A', image: '/assets/choice-hiking.svg', alt: 'Hiking' },
+      { id: 'b', text: 'B', image: '/assets/choice-reading.svg', alt: 'Reading' }
+    ],
+    correctOrder: ['a', 'b']
+  };
+  assert.equal(validate(def), def);
+  assert.equal(grade(def, { order: ['a', 'b'] }).order, 'correct');
+  const bad = copy(def); bad.layout = 'carousel'; assert.throws(() => validate(bad));
+});
