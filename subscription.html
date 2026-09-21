@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Space Whale — Subscription</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app-shell.css?v=20260921-shell-v1">
+</head>
+<body class="teacher-home-body">
+  <div id="teacherApp" class="teacher-app" hidden>
+    <aside class="teacher-sidebar" data-teacher-sidebar data-active="subscription"></aside>
+    <main class="teacher-main placeholder-main">
+      <header class="placeholder-page-header">
+        <span class="teacher-eyebrow">PLAN &amp; BILLING</span>
+        <h1>Subscription</h1>
+        <p>Manage access to the Space Whale platform.</p>
+      </header>
+      <section class="placeholder-card">
+        <h2>Platform subscription</h2>
+        <p>Teacher plans and billing will be connected here in a later stage. The platform owner account will retain full access without purchasing its own subscription.</p>
+      </section>
+    </main>
+  </div>
+  <div id="pageLoading" class="page-loading">Loading subscription…</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=20260920-backend-v1"></script>
+  <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="teacher-shell.js?v=20260921-shell-v1"></script>
+  <script src="teacher-placeholder.js?v=20260921-shell-v1"></script>
+</body>
+</html>

@@ -107,6 +107,17 @@ a{color:inherit}
 .teacher-logout{border:0;background:transparent;color:#aeb1b6;text-align:left;padding:8px;font:inherit;font-size:13px;cursor:pointer}
 .teacher-logout:hover{color:#fff}
 .teacher-main{min-width:0;padding:38px 42px 60px;max-width:1440px;width:100%;margin:0 auto}
+.settings-main,.placeholder-main{max-width:1100px}
+.settings-page-header,.placeholder-page-header{margin-bottom:22px}
+.settings-page-header h1,.placeholder-page-header h1{font-size:36px;line-height:1.08;letter-spacing:-.045em;margin:3px 0 7px}
+.settings-page-header p,.placeholder-page-header p{margin:0;color:var(--sw-muted)}
+.placeholder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.placeholder-stat{background:#fff;border:1px solid var(--sw-line);border-radius:18px;padding:18px;display:grid;gap:8px}
+.placeholder-stat span{font-size:12px;color:var(--sw-muted)}
+.placeholder-stat strong{font-size:30px;letter-spacing:-.04em}
+.placeholder-card{background:#fff;border:1px solid var(--sw-line);border-radius:22px;padding:28px}
+.placeholder-card h2{margin:0 0 8px;font-size:21px;letter-spacing:-.025em}
+.placeholder-card p{max-width:650px;margin:0;color:var(--sw-muted);font-size:13px;line-height:1.6}
 .teacher-home-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px}
 .teacher-home-header h1{font-size:36px;line-height:1.08;letter-spacing:-.045em;margin:4px 0 7px}
 .teacher-home-header p{margin:0;color:var(--sw-muted)}
@@ -190,6 +201,7 @@ a{color:inherit}
   .teacher-nav-item{white-space:nowrap}
   .teacher-sidebar-bottom{display:none}
   .teacher-main{padding:24px 16px 44px}
+  .placeholder-grid{grid-template-columns:1fr}
   .teacher-home-header{align-items:flex-start;flex-direction:column}
   .teacher-header-actions{width:100%}
   .teacher-header-actions .sw-button{flex:1}

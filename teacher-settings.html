@@ -9,18 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app-shell.css?v=20260921-teacher-settings-v1">
 </head>
-<body>
-  <main class="sw-page">
-    <div class="sw-shell settings-shell">
-      <header class="sw-topbar">
-        <div>
-          <div class="sw-brand">Space Whale</div>
-          <h1 class="sw-title">Teacher settings</h1>
-          <p class="sw-subtitle">Your profile and teaching preferences.</p>
-        </div>
-        <div class="sw-user">
-          <a class="sw-button secondary" href="dashboard.html">Back to dashboard</a>
-        </div>
+<body class="teacher-home-body">
+  <div id="teacherApp" class="teacher-app" hidden>
+    <aside class="teacher-sidebar" data-teacher-sidebar data-active="settings"></aside>
+    <main class="teacher-main settings-main">
+      <header class="settings-page-header">
+        <span class="teacher-eyebrow">ACCOUNT</span>
+        <h1>Settings</h1>
+        <p>Your profile and teaching preferences.</p>
       </header>
 
       <section class="sw-card settings-card">
@@ -64,12 +60,15 @@
           <div id="settingsMessage" class="sw-message"></div>
         </form>
       </section>
-    </div>
-  </main>
+    </main>
+  </div>
+
+  <div id="pageLoading" class="page-loading">Loading settings…</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=20260920-backend-v1"></script>
   <script src="auth.js?v=20260921-teacher-settings-v1"></script>
+  <script src="teacher-shell.js?v=20260921-shell-v1"></script>
   <script src="teacher-settings.js?v=20260921-v1"></script>
 </body>
 </html>

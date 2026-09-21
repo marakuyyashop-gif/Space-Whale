@@ -203,10 +203,15 @@
     loadTimezoneOptions(profile.timezone);
     renderAvatar(profile.avatar_url, profile.display_name);
     await loadWorkspace();
+    window.SpaceWhaleTeacherShell?.setAccount(profile);
+    document.getElementById("logoutButton")?.addEventListener("click", () => auth.signOut());
+    document.getElementById("pageLoading").hidden = true;
+    document.getElementById("teacherApp").hidden = false;
   }
 
   init().catch((error) => {
     console.error(error);
     message.textContent = error.message;
+    document.getElementById("pageLoading").textContent = error.message;
   });
 })();
