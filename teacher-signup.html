@@ -45,7 +45,7 @@
     const message = document.getElementById("signupMessage");
 
     window.spaceWhaleSupabase.auth.getSession().then(({ data }) => {
-      if (data.session) location.href = "dashboard.html";
+      if (data.session) location.href = "app.html";
     });
 
     form.addEventListener("submit", async (event) => {
@@ -66,7 +66,7 @@
             account_type: "teacher",
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Vilnius"
           },
-          emailRedirectTo: new URL("dashboard.html", location.href).href
+          emailRedirectTo: new URL("app.html", location.href).href
         }
       });
 
@@ -78,7 +78,7 @@
       }
 
       if (data.session) {
-        location.href = "dashboard.html";
+        location.href = "app.html";
         return;
       }
 
