@@ -15,6 +15,9 @@
   let lessons = [];
   let students = [];
   let entitlements = [];
+  let libraryLessons = [];
+  let libraryModules = [];
+  let libraryCourses = [];
   let studentMap = new Map();
   let calendarStartHour = DEFAULT_START_HOUR;
   let calendarEndHour = DEFAULT_END_HOUR;
@@ -200,6 +203,47 @@
     studentMap = new Map(students.map((student) => [student.id, student]));
   }
 
+  async function loadLibrary() {
+    const [lessonResult,moduleResult,courseResult] = await Promise.all([
+      client.from("library_lessons")
+        .select("id,module_id,title,summary,estimated_minutes,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true}),
+      client.from("library_modules")
+        .select("id,course_id,title,sort_order")
+        .order("sort_order",{ascending:true}),
+      client.from("library_courses")
+        .select("id,title,level,source_type,status,sort_order")
+        .neq("status","archived")
+        .order("sort_order",{ascending:true})
+    ]);
+
+    if (lessonResult.error) throw lessonResult.error;
+    if (moduleResult.error) throw moduleResult.error;
+    if (courseResult.error) throw courseResult.error;
+
+    libraryLessons = lessonResult.data || [];
+    libraryModules = moduleResult.data || [];
+    libraryCourses = courseResult.data || [];
+  }
+
+  function libraryLabel(lesson) {
+    const module = libraryModules.find((item) => item.id === lesson.module_id);
+    const course = module ? libraryCourses.find((item) => item.id === module.course_id) : null;
+    return [course?.level || course?.title, module?.title, lesson.title].filter(Boolean).join(" · ");
+  }
+
+  function populateLibrarySelect(selectedId = "") {
+    const select = el("libraryLessonSelect");
+    const options = libraryLessons
+      .filter((lesson) => lesson.status !== "archived")
+      .map((lesson) => `<option value="${escapeHtml(lesson.id)}" ${lesson.id === selectedId ? "selected" : ""}>${escapeHtml(libraryLabel(lesson))}</option>`)
+      .join("");
+
+    select.innerHTML = '<option value="">No material attached</option>' + options;
+    if (selectedId) select.value = selectedId;
+  }
+
   async function loadLessons() {
     const from = zonedLocalToUtc(`${weekStartKey}T00:00`);
     const afterWeek = addDays(weekStartKey, 7);
@@ -207,7 +251,7 @@
 
     const { data, error } = await client
       .from("lesson_sessions")
-      .select("id,student_id,title,status,scheduled_at,duration_minutes,join_window_minutes,series_id,series_index,cancelled_at,cancellation_reason")
+      .select("id,student_id,title,status,scheduled_at,duration_minutes,join_window_minutes,series_id,series_index,cancelled_at,cancellation_reason,library_lesson_id")
       .eq("workspace_id", workspaceId)
       .eq("teacher_id", session.user.id)
       .gte("scheduled_at", from.toISOString())
@@ -357,6 +401,7 @@
     el("lessonSubmit").textContent = "Schedule";
     el("lessonMessage").textContent = "";
     populateStudentSelect();
+    populateLibrarySelect();
   }
 
   function openNewLesson(localDateTime = "") {
@@ -384,6 +429,7 @@
     resetLessonForm();
     el("lessonId").value = lesson.id;
     populateStudentSelect(lesson.student_id);
+    populateLibrarySelect(lesson.library_lesson_id || "");
     el("lessonTitle").value = lesson.title || "";
     el("lessonTime").value = toDatetimeLocal(new Date(lesson.scheduled_at));
     el("duration").value = String(lesson.duration_minutes || 60);
@@ -431,7 +477,8 @@
           student_id: studentId,
           title: el("lessonTitle").value.trim() || "English lesson",
           scheduled_at: scheduledAt.toISOString(),
-          duration_minutes: Number(el("duration").value)
+          duration_minutes: Number(el("duration").value),
+          library_lesson_id: el("libraryLessonSelect").value || null
         })
         .eq("id", lessonId)
         .eq("workspace_id", workspaceId)
@@ -462,6 +509,7 @@
           duration_minutes: Number(el("duration").value),
           join_window_minutes: 5,
           status: "scheduled",
+          library_lesson_id: el("libraryLessonSelect").value || null,
           series_id: seriesId,
           series_index: seriesId ? index : null
         };
@@ -533,6 +581,16 @@
     openNewLesson(`${column.dataset.dayKey}T${pad(hour)}:${pad(minute)}`);
   }
 
+  el("libraryLessonSelect").addEventListener("change", () => {
+    const selected = libraryLessons.find((lesson) => lesson.id === el("libraryLessonSelect").value);
+    if (selected && !el("lessonTitle").value.trim()) {
+      el("lessonTitle").value = selected.title;
+    }
+    if (selected?.estimated_minutes && el("duration").querySelector(`option[value="${selected.estimated_minutes}"]`)) {
+      el("duration").value = String(selected.estimated_minutes);
+    }
+  });
+
   el("repeatMode").addEventListener("change", () => {
     el("repeatCountField").hidden = el("repeatMode").value !== "weekly";
   });
@@ -578,12 +636,26 @@
       : `<span>${escapeHtml((profile.display_name || "T").charAt(0).toUpperCase())}</span>`;
 
     await loadWorkspace();
-    await Promise.all([loadStudentsAndAccess(), loadLessons()]);
+    await Promise.all([loadStudentsAndAccess(), loadLibrary(), loadLessons()]);
     populateStudentSelect();
+    populateLibrarySelect();
     renderAll();
 
     el("pageLoading").hidden = true;
     el("teacherApp").hidden = false;
+
+    const requestedLessonId = new URLSearchParams(location.search).get("lesson");
+    if (requestedLessonId && libraryLessons.some((lesson) => lesson.id === requestedLessonId)) {
+      openNewLesson();
+      populateLibrarySelect(requestedLessonId);
+      const selected = libraryLessons.find((lesson) => lesson.id === requestedLessonId);
+      if (selected) {
+        el("lessonTitle").value = selected.title;
+        if (selected.estimated_minutes && el("duration").querySelector(`option[value="${selected.estimated_minutes}"]`)) {
+          el("duration").value = String(selected.estimated_minutes);
+        }
+      }
+    }
   }
 
   init().catch((error) => {
