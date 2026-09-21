@@ -19,6 +19,11 @@
         text(item.image, 'image'); text(item.alt, 'image alt');
         const url = new URL(item.image, 'https://preview.invalid/');
         if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) fail('Unsupported image URL');
+        if (item.crop != null) {
+          const crop = item.crop;
+          if (!crop || !['x','y','w','h'].every(key => Number.isFinite(crop[key]))) fail('Image crop needs x, y, w and h');
+          if (crop.x < 0 || crop.y < 0 || crop.w <= 0 || crop.h <= 0 || crop.x + crop.w > 100 || crop.y + crop.h > 100) fail('Image crop must stay within 0–100 percent');
+        }
       }
     };
     const audioSource = value => {
@@ -47,7 +52,8 @@
         ids(def.items, 'items');
         def.items.forEach(item => {
           text(item.text, 'listen-repeat text');
-          audioSource(item.audio);
+          if (item.audio != null) audioSource(item.audio);
+          else if (!def.audioPending) fail('Listen & Repeat item needs audio unless audioPending is true');
           if (item.example != null && typeof item.example !== 'string') fail('listen-repeat example must be text');
         });
       } else {
@@ -209,6 +215,17 @@
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
     };
     const illustration = item => {
+      if (item.crop) {
+        const crop = node('div', 'ek-image ek-crop-image');
+        crop.setAttribute('role', 'img');
+        crop.setAttribute('aria-label', item.alt || item.text || '');
+        crop.style.backgroundImage = `url("${String(item.image).replace(/"/g, '%22')}")`;
+        crop.style.backgroundSize = `${10000 / item.crop.w}% ${10000 / item.crop.h}%`;
+        const x = item.crop.x / Math.max(0.0001, 100 - item.crop.w) * 100;
+        const y = item.crop.y / Math.max(0.0001, 100 - item.crop.h) * 100;
+        crop.style.backgroundPosition = `${x}% ${y}%`;
+        return crop;
+      }
       const image = node('img', 'ek-image'); image.src = item.image; image.alt = item.alt || item.text || ''; image.loading = 'lazy'; return image;
     };
     const formatTime = value => {
@@ -245,6 +262,13 @@
     };
     const repeatAudioButton = (src, label) => {
       const wrap = node('span', 'ek-repeat-audio');
+      if (!src) {
+        const pending = button('▶', () => announce('Audio will be connected to this item when its file is added.'), 'ek-repeat-play ek-audio-pending');
+        pending.setAttribute('aria-label', `Audio pending for ${label}`);
+        pending.title = 'Audio pending';
+        wrap.append(pending);
+        return wrap;
+      }
       const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
       const play = button('▶', async () => {
         host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
