@@ -1575,3 +1575,340 @@ button{font:inherit;color:inherit}
     padding-right:10px;
   }
 }
+
+/* === REALTIME EXERCISES + MEDIA === */
+.interactive-page{
+  width:min(980px,calc(100% - 56px));
+  margin:0 auto;
+}
+.interactive-exercise-card{
+  margin-top:54px;
+  padding:30px;
+  border:1px solid #e4e5e8;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(24,28,36,.05);
+}
+.interactive-question{
+  font-size:24px;
+  line-height:1.35;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+.exercise-options{
+  display:grid;
+  gap:12px;
+  margin-top:24px;
+}
+.exercise-option{
+  display:grid;
+  grid-template-columns:auto auto 1fr;
+  align-items:center;
+  gap:12px;
+  padding:14px 16px;
+  border:1px solid #e2e3e7;
+  border-radius:16px;
+  cursor:pointer;
+  font-size:17px;
+  line-height:1.4;
+}
+.exercise-option:hover{
+  background:#fafafb;
+}
+.exercise-option input{
+  width:18px;
+  height:18px;
+}
+.exercise-option-marker{
+  width:29px;
+  height:29px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:#f0f1f4;
+  font-size:12px;
+  font-weight:700;
+}
+.interactive-actions{
+  margin-top:22px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.exercise-action-button{
+  border:0;
+  border-radius:13px;
+  background:#202124;
+  color:#fff;
+  padding:11px 17px;
+  font:inherit;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.exercise-action-button:hover{
+  background:#2d2f33;
+}
+.exercise-feedback{
+  font-size:13px;
+  color:#676b72;
+}
+.exercise-text-answer{
+  width:100%;
+  margin-top:22px;
+  border:1px solid #dfe0e4;
+  border-radius:16px;
+  padding:15px 16px;
+  resize:vertical;
+  font:inherit;
+  font-size:17px;
+  line-height:1.45;
+  outline:none;
+}
+.exercise-text-answer:focus{
+  border-color:#a6a8af;
+  box-shadow:0 0 0 3px rgba(90,94,105,.07);
+}
+.teacher-live-response{
+  margin-top:26px;
+  padding:17px;
+  border:1px solid #e1e2e6;
+  border-radius:17px;
+  background:#fafafb;
+}
+.teacher-live-response-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:10px;
+  letter-spacing:.09em;
+  color:#7b7f87;
+  font-weight:700;
+}
+.live-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#5f9a6b;
+  box-shadow:0 0 0 4px rgba(95,154,107,.12);
+}
+.live-response-empty{
+  margin-top:12px;
+  color:#8b8e95;
+  font-size:13px;
+}
+.live-response-answer{
+  margin-top:12px;
+  display:grid;
+  gap:7px;
+}
+.live-response-answer strong{
+  font-size:16px;
+  line-height:1.4;
+}
+.live-response-answer small{
+  color:#8b8e95;
+  font-size:11px;
+}
+.response-verdict{
+  display:inline-flex;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:10px;
+  font-weight:700;
+}
+.response-verdict.correct{
+  background:#eaf4ed;
+  color:#477151;
+}
+.response-verdict.incorrect{
+  background:#f6eaea;
+  color:#8a5050;
+}
+.response-verdict.neutral{
+  background:#eceef2;
+  color:#646870;
+}
+.teacher-note{
+  margin:13px 0 0;
+  padding-top:12px;
+  border-top:1px solid #e6e7ea;
+  color:#73777f;
+  font-size:12px;
+  line-height:1.45;
+}
+.classroom-toast{
+  position:fixed;
+  left:50%;
+  bottom:88px;
+  z-index:80;
+  transform:translate(-50%,18px);
+  opacity:0;
+  pointer-events:none;
+  border-radius:999px;
+  background:#202124;
+  color:#fff;
+  padding:10px 15px;
+  font-size:12px;
+  font-weight:700;
+  transition:opacity .18s ease,transform .18s ease;
+  box-shadow:0 10px 30px rgba(20,22,26,.18);
+}
+.classroom-toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+.media-controls{
+  height:48px;
+  padding:0 9px;
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 2px 12px rgba(31,32,35,.10);
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.media-control{
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  padding:0;
+}
+.media-control svg{
+  width:18px;
+  height:18px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.media-control.off{
+  background:#f0f1f3;
+  color:#62666d;
+}
+.media-control.on{
+  background:#202124;
+  color:#fff;
+}
+.session-exit-button{
+  height:44px;
+  border:0;
+  border-radius:999px;
+  background:#fff;
+  color:#33363b;
+  padding:0 16px;
+  font:inherit;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 2px 12px rgba(31,32,35,.10);
+}
+.video-dock{
+  position:absolute;
+  right:18px;
+  top:18px;
+  z-index:25;
+  width:270px;
+  padding:12px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 12px 38px rgba(22,24,29,.16);
+  border:1px solid rgba(30,32,38,.08);
+}
+.video-dock-head{
+  display:grid;
+  gap:2px;
+  margin-bottom:9px;
+}
+.video-dock-head strong{
+  font-size:12px;
+}
+.video-dock-head span{
+  font-size:10px;
+  color:#868a92;
+}
+.local-video-wrap{
+  position:relative;
+  overflow:hidden;
+  aspect-ratio:4/3;
+  border-radius:13px;
+  background:#17191d;
+}
+.local-video-wrap video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transform:scaleX(-1);
+}
+.video-placeholder{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:22px;
+  color:#cfd2d8;
+  font-size:11px;
+  line-height:1.45;
+}
+.video-placeholder[hidden]{
+  display:none;
+}
+.video-connection-note{
+  margin-top:8px;
+  font-size:9px;
+  line-height:1.4;
+  color:#92969d;
+}
+@media(max-width:768px){
+  .interactive-page{
+    width:calc(100% - 24px);
+  }
+  .interactive-exercise-card{
+    margin-top:30px;
+    padding:20px 16px;
+    border-radius:19px;
+  }
+  .interactive-question{
+    font-size:20px;
+  }
+  .exercise-option{
+    grid-template-columns:auto 1fr;
+    font-size:15px;
+  }
+  .exercise-option-marker{
+    display:none;
+  }
+  .video-dock{
+    top:10px;
+    right:10px;
+    width:170px;
+    padding:8px;
+    border-radius:14px;
+  }
+  .video-dock-head strong{
+    font-size:10px;
+  }
+  .video-dock-head span,
+  .video-connection-note{
+    display:none;
+  }
+  .session-left{
+    display:flex !important;
+    left:8px !important;
+  }
+  .session-state{
+    display:none !important;
+  }
+  .media-controls{
+    height:44px;
+  }
+}
