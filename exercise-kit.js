@@ -67,7 +67,7 @@
       def.items.forEach(item => { text(item.text, 'card text'); media(item); key(item, valid); if (item.correctId != null) { if (assigned.has(item.correctId)) fail('Matching answer IDs must be unique'); assigned.add(item.correctId); } });
       if (def.options.length < def.items.length) fail('Matching needs at least one option per card');
     }
-    if (def.kind === 'choice') def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); });
+    if (def.kind === 'choice') { if (def.layout != null && !['list', 'image-grid'].includes(def.layout)) fail('Unsupported choice layout'); def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); }); }
     if (def.kind === 'sort') {
       const valid = options(def.groups);
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
@@ -229,9 +229,9 @@
         });
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
-        const group = node('fieldset', 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
+        const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
         item.options.forEach(option => {
-          const label = node('label', 'ek-radio'); const input = node('input'); input.type = 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = answers[item.id] === option.id;
+          const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = answers[item.id] === option.id;
           input.addEventListener('change', () => changed(item.id, option.id));
           label.append(input, node('span', '', option.text)); if (option.image) label.append(illustration(option)); group.append(label);
         }); body.append(group); controls.set(item.id, group);
