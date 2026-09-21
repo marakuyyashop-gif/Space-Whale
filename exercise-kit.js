@@ -1,6 +1,6 @@
 (function (scope) {
   'use strict';
-  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation'];
+  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
   function validate(def) {
@@ -21,6 +21,12 @@
         if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) fail('Unsupported image URL');
       }
     };
+    const audioSource = value => {
+      text(value, 'audio');
+      if (/^data:audio\/(mpeg|mp3|wav|x-wav|ogg);base64,/i.test(value)) return;
+      const url = new URL(value, 'https://preview.invalid/');
+      if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) fail('Unsupported audio URL');
+    };
     const options = items => { const valid = ids(items, 'options'); items.forEach(item => { text(item.text, 'option text'); media(item); }); return valid; };
     const key = (item, valid) => { if (item.correctId != null && !valid.has(item.correctId)) fail(`Unknown answer ID: ${item.correctId}`); };
     if (!def || def.version !== 1 || !kinds.includes(def.kind)) fail('Expected version 1 and a supported kind');
@@ -33,6 +39,18 @@
         if (block.type === 'image') { text(block.image, 'image'); media(block); }
         else { text(block.text, 'block text'); if (block.type === 'disclosure') text(block.title, 'disclosure title'); }
       });
+      return def;
+    }
+    if (def.kind === 'audio') {
+      if (def.layout != null && !['player', 'listen-repeat'].includes(def.layout)) fail('Unsupported audio layout');
+      audioSource(def.audio);
+      if (def.layout === 'listen-repeat') {
+        ids(def.items, 'items');
+        def.items.forEach(item => {
+          text(item.text, 'listen-repeat text');
+          if (item.example != null && typeof item.example !== 'string') fail('listen-repeat example must be text');
+        });
+      }
       return def;
     }
     if (def.kind === 'order') {
@@ -99,7 +117,7 @@
     validate(def);
     const results = {};
     const mark = (id, answered, correct) => { results[id] = !answered ? 'empty' : correct == null ? 'review' : correct ? 'correct' : 'retry'; };
-    if (def.kind === 'presentation') return results;
+    if (def.kind === 'presentation' || def.kind === 'audio') return results;
     if (def.kind === 'order') {
       const order = Array.isArray(answers.order) ? answers.order : [];
       mark('order', order.length === def.tokens.length, def.correctOrder ? JSON.stringify(order) === JSON.stringify(def.correctOrder) : null);
@@ -137,6 +155,38 @@
     };
     const illustration = item => {
       const image = node('img', 'ek-image'); image.src = item.image; image.alt = item.alt || item.text || ''; image.loading = 'lazy'; return image;
+    };
+    const formatTime = value => {
+      const seconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    };
+    const audioPlayer = (src, label = 'Audio') => {
+      const wrap = node('div', 'ek-audio-player');
+      const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
+      const play = button('▶', async () => {
+        if (audio.paused) {
+          try { await audio.play(); } catch { announce('Audio could not be played.'); }
+        } else audio.pause();
+      }, 'ek-audio-play');
+      play.setAttribute('aria-label', 'Play audio');
+      const range = node('input', 'ek-audio-range'); range.type = 'range'; range.min = '0'; range.max = '100'; range.step = '0.1'; range.value = '0'; range.setAttribute('aria-label', 'Audio position');
+      const time = node('span', 'ek-audio-time', '0:00 / 0:00');
+      const sync = () => {
+        const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+        const current = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+        range.value = duration ? String((current / duration) * 100) : '0';
+        time.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+      };
+      audio.addEventListener('play', () => { play.textContent = '❚❚'; play.setAttribute('aria-label', 'Pause audio'); });
+      audio.addEventListener('pause', () => { play.textContent = '▶'; play.setAttribute('aria-label', 'Play audio'); });
+      audio.addEventListener('ended', () => { play.textContent = '▶'; play.setAttribute('aria-label', 'Play audio'); sync(); });
+      audio.addEventListener('loadedmetadata', sync);
+      audio.addEventListener('timeupdate', sync);
+      range.addEventListener('input', () => {
+        if (Number.isFinite(audio.duration) && audio.duration > 0) audio.currentTime = (Number(range.value) / 100) * audio.duration;
+      });
+      wrap.append(audio, play, range, time);
+      return wrap;
     };
     const announce = message => { status.textContent = message; };
     const save = () => { feedback = {}; config.onChange?.(clone(answers)); };
@@ -187,6 +237,19 @@
           else if (block.type === 'disclosure') { const detail = node('details', 'ek-disclosure'); detail.append(node('summary', '', block.title), node('p', 'ek-copy', block.text)); body.append(detail); }
           else body.append(node('p', 'ek-copy', block.text));
         });
+      }
+      if (def.kind === 'audio') {
+        body.append(audioPlayer(def.audio, def.title));
+        if (def.layout === 'listen-repeat') {
+          const list = node('div', 'ek-repeat-list');
+          def.items.forEach((item, index) => {
+            const row = node('article', 'ek-repeat-item');
+            row.append(node('span', 'ek-number', String(index + 1)), node('strong', 'ek-repeat-term', item.text));
+            if (item.example) row.append(node('p', 'ek-repeat-example', item.example));
+            list.append(row);
+          });
+          body.append(list);
+        }
       }
       if (def.kind === 'matching') {
         const grid = node('div', 'ek-card-grid');
@@ -314,7 +377,7 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
-    if (!['presentation', 'writing'].includes(def.kind)) actions.append(button('Check', () => {
+    if (!['presentation', 'writing', 'audio'].includes(def.kind)) actions.append(button('Check', () => {
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: 'Try again', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -322,7 +385,7 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     }));
-    if (def.kind !== 'presentation') actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
+    if (!['presentation', 'audio'].includes(def.kind)) actions.append(button('Reset this exercise', () => { closeDialog(); answers = {}; save(); render(); announce('Exercise reset.'); }, 'ek-button ek-secondary'));
     if (def.kind === 'writing') announce('Open answer: reviewed by the teacher, not automatically graded.');
     host.addEventListener('keydown', onKeydown); render();
     return {
