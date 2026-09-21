@@ -635,7 +635,7 @@ async function initLiveClassroom() {
 
   const user = await classroom.getCurrentUser();
   if (!user) {
-    const next = encodeURIComponent("index.html" + location.search);
+    const next = encodeURIComponent("classroom.html" + location.search);
     location.href = `login.html?next=${next}`;
     return;
   }
