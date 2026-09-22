@@ -400,14 +400,14 @@
         if (def.layout === 'listen-repeat') {
           const list = node('div', 'ek-repeat-list');
           def.items.forEach(item => {
-            const row = node('article', 'ek-repeat-item');
-            row.append(repeatAudioButton(item.audio, item.text), node('strong', 'ek-repeat-term', item.text));
+            const wordRow = node('article', 'ek-repeat-item');
+            wordRow.append(repeatAudioButton(item.audio, item.text), node('span', 'ek-repeat-line', item.text));
+            list.append(wordRow);
             if (item.example) {
-              const example = node('div', 'ek-repeat-example');
-              example.append(repeatAudioButton(item.exampleAudio, item.example), node('span', 'ek-repeat-example-text', item.example));
-              row.append(example);
+              const exampleRow = node('article', 'ek-repeat-item');
+              exampleRow.append(repeatAudioButton(item.exampleAudio, item.example), node('span', 'ek-repeat-line', item.example));
+              list.append(exampleRow);
             }
-            list.append(row);
           });
           body.append(list);
         } else {
