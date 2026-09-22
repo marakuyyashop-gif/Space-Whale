@@ -260,4 +260,5 @@ test('unified live Workspace streams drafts, applies remote answers and keeps te
   });
   assert.ok(student.location.search.includes('exercise=fair-bank-gaps'));
   assert.ok(student.location.search.includes('session=session-1'));
+  assert.equal(student.mounts.at(-1).exercise.id, 'fair-bank-gaps');
 });
