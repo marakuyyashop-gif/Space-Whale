@@ -263,7 +263,7 @@
             {
               type: 'rule',
               title: 'Rule',
-              text: 'very / really + adjective — the quality is strong.\na little / a bit + adjective — the quality is present in a small amount.\ntoo + adjective — the quality is stronger than you want, need or find suitable.',
+              text: 'very / really + adjective — признак выражен сильно.\na little / a bit + adjective — признак выражен немного.\ntoo + adjective — признак сильнее, чем нужно или подходит в ситуации.',
               formula: 'modifier + adjective',
               examples: ['very bright', 'really pretty', 'a little dark', 'a bit strange', 'too bright', 'too colorful']
             }
