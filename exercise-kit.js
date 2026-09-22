@@ -3,6 +3,22 @@
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
+  const POSSIBLE_ANSWERS_TITLE = 'Possible answers';
+  const possibleAnswerAliases = new Set([
+    'possible answer', 'possible answers',
+    'answer', 'answers',
+    'sample answer', 'sample answers',
+    'suggested answer', 'suggested answers',
+    'model answer', 'model answers',
+    'possible response', 'possible responses',
+    'sample response', 'sample responses',
+    'suggested response', 'suggested responses',
+    'response', 'responses',
+    'possible', 'respond'
+  ]);
+  const isPossibleAnswersBlock = block =>
+    block?.role === 'possible-answers' || possibleAnswerAliases.has(normalize(block?.title));
+
   function validate(def) {
     const fail = message => { throw new Error(message); };
     const text = (value, name) => { if (typeof value !== 'string' || !value.trim()) fail(`${name}: expected non-empty text`); };
@@ -347,7 +363,12 @@
       if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
           if (block.type === 'image') body.append(illustration(block));
-          else if (block.type === 'disclosure') { const detail = node('details', 'ek-disclosure'); detail.append(node('summary', '', block.title), node('p', 'ek-copy', block.text)); body.append(detail); }
+          else if (block.type === 'disclosure') {
+            const detail = node('details', 'ek-disclosure');
+            const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : block.title;
+            detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
+            body.append(detail);
+          }
           else body.append(node('p', 'ek-copy', block.text));
         });
       }
@@ -361,8 +382,12 @@
             page.append(section);
           }
           if (block.type === 'rule') {
-            const section = node('section', 'ek-rule-section ek-rule-block');
-            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
+            const possibleAnswers = isPossibleAnswersBlock(block);
+            const section = possibleAnswers
+              ? node('details', 'ek-disclosure')
+              : node('section', 'ek-rule-section ek-rule-block');
+            if (possibleAnswers) section.append(node('summary', '', POSSIBLE_ANSWERS_TITLE));
+            else if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
             if (block.text) section.append(richText(block.text, block.highlights));
             if (block.formula) section.append(node('div', 'ek-rule-formula', block.formula));
             if (block.examples?.length) {
