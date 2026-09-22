@@ -5,7 +5,14 @@
     channel: null,
     session: null,
     user: null,
-    role: null
+    role: null,
+    clientId: (globalThis.crypto?.randomUUID?.() || `client-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+  };
+  const exerciseSequences = new Map();
+  const nextSequence = (exerciseId) => {
+    const next = (exerciseSequences.get(exerciseId) || 0) + 1;
+    exerciseSequences.set(exerciseId, next);
+    return next;
   };
 
   async function getCurrentUser() {
@@ -79,6 +86,8 @@
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
       .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
       .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
+      .on("broadcast", { event: "state_request" }, ({ payload }) => handlers.onStateRequest?.(payload))
+      .on("broadcast", { event: "state_snapshot" }, ({ payload }) => handlers.onStateSnapshot?.(payload))
       .on("broadcast", { event: "lesson_started" }, ({ payload }) => handlers.onLessonStarted?.(payload))
       .on("postgres_changes", {
         event: "*",
@@ -235,6 +244,8 @@
       response,
       student_id: state.user.id,
       draft: true,
+      source_id: state.clientId,
+      seq: nextSequence(exerciseId),
       sent_at: Date.now()
     };
 
@@ -245,7 +256,7 @@
       persistDraftSnapshot(exerciseId, response).catch((error) => {
         console.error("[Space Whale] Draft snapshot failed", error);
       });
-    }, 120));
+    }, 750));
 
     return sendPromise;
   }
@@ -278,10 +289,36 @@
       response,
       is_correct: record.is_correct,
       submitted_at: record.submitted_at,
-      student_id: state.user.id
+      student_id: state.user.id,
+      source_id: state.clientId,
+      seq: nextSequence(exerciseId),
+      sent_at: Date.now()
     });
 
     return data;
+  }
+
+  async function requestExerciseState(exerciseId) {
+    if (!state.channel || !exerciseId) return;
+    return broadcast("state_request", {
+      exercise_id: exerciseId,
+      requested_by: state.user?.id || null,
+      source_id: state.clientId,
+      sent_at: Date.now()
+    });
+  }
+
+  async function sendExerciseSnapshot(exerciseId, response) {
+    if (state.role !== "student" || !state.channel || !exerciseId) return;
+    return broadcast("state_snapshot", {
+      exercise_id: exerciseId,
+      response,
+      student_id: state.user.id,
+      draft: true,
+      source_id: state.clientId,
+      seq: nextSequence(exerciseId),
+      sent_at: Date.now()
+    });
   }
 
   async function disconnect() {
@@ -304,6 +341,8 @@
     syncAudio,
     sendExerciseDraft,
     saveExerciseResponse,
+    requestExerciseState,
+    sendExerciseSnapshot,
     broadcast,
     state
   };
