@@ -30,10 +30,29 @@ test('Whales are isolated by level; publishing a topic only needs content metada
   const route = catalog.normalize('?view=library&level=A2.1&whale=5&lesson=first-day-school');
   assert.equal(catalog.topics(route)[0].id, 'first-day-school');
   assert.equal(route.exercise, lessons[0].stages[0].exercise.id);
-  assert.deepEqual(catalog.topics({ ...route, level: 'A1.1' }), []);
+  const a11Whale5 = catalog.topics({ ...route, level: 'A1.1' });
+  assert.equal(a11Whale5.length, 8);
+  assert.ok(a11Whale5.every(lesson => lesson.outline));
   assert.deepEqual(catalog.topics({ ...route, whale: 4 }), []);
   assert.deepEqual(catalog.topics({view:'unassigned'}).map(lesson => lesson.id), ['school-fair']);
   assert.deepEqual(catalog.normalize(catalog.query(route)), route);
+});
+
+test('A1 course outline exposes real Whale names and catalog-only lesson titles', () => {
+  const { lessons, templates } = content();
+  const catalog = createCatalog(lessons, templates);
+  assert.equal(levels.find(level => level.id === 'A1.1').whales[0].title, 'Whale 1 · Short Talk');
+  assert.equal(levels.find(level => level.id === 'A1.2').whales[6].title, 'Whale 7 · Итоговое повторение A1');
+  const a11w1 = catalog.topics({view:'library',level:'A1.1',whale:1});
+  assert.deepEqual(a11w1.map(lesson => lesson.title), [
+    'Как я рад встрече!','Рад знакомству','Как вас зовут?','Заполняем анкету','Давайте обменяемся контактами','Какая замечательная сегодня погода!','Знакомимся и обмениваемся информацией'
+  ]);
+  assert.ok(a11w1.every(lesson => lesson.outline && lesson.stages.length === 0));
+  const a12w1 = catalog.topics({view:'library',level:'A1.2',whale:1});
+  assert.equal(a12w1.length, 9);
+  const route = catalog.normalize('?view=library&level=A1.1&whale=1&lesson=a1-1-w1-l1');
+  assert.equal(route.lesson, 'a1-1-w1-l1');
+  assert.equal(route.exercise, '');
 });
 
 test('stale or malformed deep links recover without selecting another course lesson', () => {
