@@ -288,3 +288,60 @@ test('unified live Workspace streams drafts, applies remote answers and keeps te
   assert.ok(student.location.search.includes('session=session-1'));
   assert.equal(student.mounts.at(-1).exercise.id, 'fair-bank-gaps');
 });
+
+
+test('temporary guest Workspace limits the room to the two allowed lessons and keeps live sync', async () => {
+  const flush = () => new Promise(resolve => setImmediate(resolve));
+  const makeGuest = role => {
+    const handlers = {};
+    const calls = [];
+    const channel = {presenceState: () => ({teacher:[{role:'teacher'}],student:[{role:'student'}]})};
+    const classroom = {
+      state: {channel},
+      async connectGuest(_token, nextHandlers) {
+        Object.assign(handlers, nextHandlers);
+        return {
+          role,
+          session:{
+            id:'guest:test',
+            allowed_lesson_ids:['a1-2-w4-l1','a1-2-w4-l2'],
+            guest:true
+          }
+        };
+      },
+      async loadSharedState() { return {current_page_id:null,current_exercise_id:null}; },
+      async loadExerciseResponse() { return null; },
+      async requestExerciseState(exerciseId) { calls.push(['request',exerciseId]); },
+      async sendExerciseSnapshot(exerciseId, answers) { calls.push(['snapshot',exerciseId,answers]); },
+      async sendExerciseDraft(exerciseId, answers) { calls.push(['draft',exerciseId,answers]); },
+      async navigate(exerciseId, page) { calls.push(['navigate',exerciseId,page]); }
+    };
+    return {classroom,handlers,calls};
+  };
+
+  const token = 'guest-token';
+  const teacherLive = makeGuest('teacher');
+  const teacher = app(`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-opening&panel=library&section=tasks`, new Map(), teacherLive);
+  await flush(); await flush();
+  assert.equal(teacher.nodes.get('workspaceCourse').disabled, true);
+  const topicLabels = buttons(teacher).map(button => button.textContent);
+  assert.ok(topicLabels.includes('Описываем одежду'));
+  assert.ok(topicLabels.includes('Описываем внешний вид одежды'));
+  assert.ok(!topicLabels.includes('Объясняем свой выбор'));
+  assert.ok(teacher.location.search.includes('guest=guest-token'));
+
+  const studentLive = makeGuest('student');
+  const student = app(`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-picture-word&panel=library&section=tasks`, new Map(), studentLive);
+  await flush(); await flush();
+  const studentMount = student.mounts.at(-1);
+  studentMount.config.onChange({pw1:'bright'});
+  await flush();
+  assert.deepEqual(studentLive.calls.find(call => call[0] === 'draft'), ['draft','a12w4l1-picture-word',{pw1:'bright'}]);
+
+  studentLive.handlers.onNavigate({
+    current_page_id:`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l2&exercise=a12w4l2-opening&panel=library&section=tasks`,
+    current_exercise_id:'a12w4l2-opening'
+  });
+  assert.ok(student.location.search.includes('lesson=a1-2-w4-l2'));
+  assert.equal(student.mounts.at(-1).exercise.id, 'a12w4l2-opening');
+});
