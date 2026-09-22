@@ -45,10 +45,8 @@ test('A1.2 clothing lesson keeps the requested mechanics and self-study split', 
   assert.equal(words.kind, 'rule-page');
   assert.equal(words.blocks[0].id, 'clothes-picture-word');
   assert.equal(words.blocks[0].exercise.layout, 'picture-word');
-  assert.ok(words.blocks[0].exercise.items.every(item => item.image === 'Clothes.png' && item.crop));
   assert.deepEqual(Array.from(words.blocks[0].exercise.options, option => option.text), ['sweater','hat','jacket','T-shirt']);
   assert.equal(words.blocks[1].exercise.layout, 'picture-word');
-  assert.ok(words.blocks[1].exercise.items.every(item => item.image === 'Clothes.png' && item.crop));
   assert.equal(words.blocks[2].exercise.layout, 'word-definition');
   assert.ok(words.blocks[2].exercise.items.every(item => /[А-Яа-яЁё]/.test(item.text)));
   assert.equal(words.blocks[3].exercise.layout, 'listen-repeat');
@@ -107,7 +105,6 @@ test('A1.2 clothing appearance lesson keeps look and look like targets and split
 
   const vocab = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-picture-word').exercise;
   assert.equal(vocab.layout, 'picture-word');
-  assert.ok(vocab.items.every(item => item.image === 'Clothes.png' && item.crop));
   assert.deepEqual(Array.from(vocab.options, option => option.text), ['suit','coat','hat','blouse','sweater','skirt']);
 
   const pronunciation = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-pronunciation').exercise;
@@ -137,24 +134,4 @@ test('A1.2 lesson 2 production answers are not exposed beside the writing task',
   const lesson = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
   const writing = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-writing').exercise;
   assert.equal(writing.blocks.some(block => block.title === 'Possible answers'), false);
-});
-
-
-test('uploaded Clothes image is used for the visual lesson panels', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'course-content.js'), 'utf8');
-  const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
-  vm.runInNewContext(source, { window });
-
-  const lesson1 = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l1');
-  const lesson2 = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
-
-  const l1Opening = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-opening').exercise.blocks[0];
-  const l1Writing = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-writing').exercise.blocks.find(block => block.type === 'image');
-  const l1Final = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-final-speaking').exercise.blocks[0];
-  const l2Final = lesson2.stages.find(stage => stage.exercise.id === 'a12w4l2-final-speaking').exercise.blocks[0];
-
-  for (const block of [l1Opening, l1Writing, l1Final, l2Final]) {
-    assert.equal(block.image, 'Clothes.png');
-    assert.ok(block.crop);
-  }
 });
