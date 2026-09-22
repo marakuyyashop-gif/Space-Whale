@@ -1,49 +1,13 @@
 /* Sidebar structure only. Artwork, workspace background and exercise width stay in shared styles. */
-.unified-workspace {
-  --workspace-font: Onest, "Helvetica Neue", Arial, sans-serif;
-  --workspace-topic-size: 20px;
-  --workspace-topic-line: 32px;
-  --workspace-nav-size: 16px;
-  --workspace-nav-line: 24px;
-}
 .workspace-session-heading { flex: none; padding: 10px 12px; border-bottom: 1px solid rgba(31,32,35,.06); text-align: center; font-size: 11px; line-height: 1.5; }
 .workspace-session-heading a { color: inherit; text-decoration: none; }
 .workspace-course-bar { flex: none; padding: 8px 12px 12px; border-bottom: 1px solid rgba(31,32,35,.06); }
-.workspace-course-bar select {
-  width: 100%;
-  padding: 9px 24px 9px 8px;
-  border: 0;
-  background: transparent;
-  color: #242424;
-  font-family: var(--workspace-font);
-  font-size: var(--workspace-nav-size);
-  font-weight: 700;
-  line-height: var(--workspace-nav-line);
-  text-align: center;
-  cursor: pointer;
-  text-overflow: ellipsis;
-}
+.workspace-course-bar select { width: 100%; padding: 9px 24px 9px 8px; border: 0; background: transparent; color: #25272b; font: 700 13px/20px Onest,Arial,sans-serif; text-align: center; cursor: pointer; text-overflow: ellipsis; }
 .workspace-course-bar optgroup, .workspace-course-bar option { color: #25272b; background: white; text-align: left; }
 .workspace-tree { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 10px 6px; scrollbar-width: thin; scrollbar-color: #aaa transparent; }
 .workspace-topic { background: #fff; border-radius: 20px; padding: 12px 10px; margin-bottom: 9px; }
 .workspace-topic-heading { display: flex; gap: 6px; align-items: flex-start; }
-.workspace-topic-toggle {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  text-align: left;
-  font-family: var(--workspace-font);
-  font-size: var(--workspace-topic-size);
-  font-weight: 700;
-  line-height: var(--workspace-topic-line);
-  color: #242424;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.workspace-topic-toggle { flex: 1; min-width: 0; border: 0; padding: 0; background: transparent; text-align: left; font: 700 16px/24px Onest,Arial,sans-serif; color: #25272b; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-add { flex: none; border: 0; border-radius: 999px; background: #f5f5f6; padding: 5px 8px; font-size: 9px; cursor: pointer; }
 .workspace-add:disabled { opacity: .45; cursor: default; }
 .workspace-topic-arrow { display: grid; place-items: center; width: 30px; height: 30px; margin-top: 12px; padding: 0; border: 0; border-radius: 50%; background: #f5f5f6; font-size: 20px; line-height: 1; cursor: pointer; }
@@ -53,21 +17,9 @@
 .workspace-stages { display: grid; gap: 8px; padding: 2px 0; }
 .workspace-stage { border-radius: 17px; background: #fff; box-shadow: 0 2px 8px rgba(31,32,35,.12); overflow: hidden; }
 .workspace-stage.is-active { box-shadow: 0 2px 9px rgba(31,32,35,.16); }
-.workspace-stage-link {
-  display: block;
-  color: #242424;
-  text-decoration: none;
-  padding: 10px 12px;
-  font-family: var(--workspace-font);
-  font-size: var(--workspace-nav-size);
-  font-weight: 700;
-  line-height: var(--workspace-nav-line);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.workspace-stage-link { display: block; color: #292b2f; text-decoration: none; padding: 10px 12px; font: 600 13px/20px Onest,Arial,sans-serif; overflow-wrap: anywhere; }
 .workspace-stage-link:hover { background: #f8f8f9; }
-.workspace-guide { padding: 0 12px 11px; color: #292b2f; font-size: 11px; line-height: 1.55; }
+.workspace-guide { padding: 0 12px 11px; color: #292b2f; font-size: 12px; line-height: 18px; }
 .workspace-guide:empty { display: none; }
 .workspace-guide p { margin: 6px 0 0; }
 .workspace-guide strong { font-weight: 600; }
@@ -102,9 +54,4 @@
   .unified-workspace .class-area { flex: 1 1 0; width: 100%; height: auto !important; min-height: 0; }
   .unified-workspace .class-content { inset: 0; }
   .unified-workspace .lesson-scroll { padding: 28px 18px 60px !important; }
-}
-
-.unified-workspace .app-sidebar {
-  font-family: var(--workspace-font);
-  -webkit-font-smoothing: antialiased;
 }
