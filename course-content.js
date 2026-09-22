@@ -4,8 +4,6 @@
   const kit = window.SpaceWhaleExerciseKit;
   if (!kit) throw new Error('SpaceWhaleExerciseKit is required.');
 
-  const vocabImage = 'assets/a1-2-w4-l1-vocab.svg';
-  const clothes2Image = 'assets/a1-2-w4-l2-clothes.svg';
   const clothesImage = 'Clothes.png';
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
   const lesson1Audio = courseAudioBase + '/a1-2/w4/l1';
