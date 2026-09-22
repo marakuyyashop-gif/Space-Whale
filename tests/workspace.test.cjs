@@ -30,6 +30,7 @@ test('Whales are isolated by level; publishing a topic only needs content metada
   const route = catalog.normalize('?view=library&level=A2.1&whale=5&lesson=first-day-school');
   assert.equal(catalog.topics(route)[0].id, 'first-day-school');
   assert.equal(route.exercise, lessons[0].stages[0].exercise.id);
+  assert.ok(!catalog.topics({ ...route, level: 'A1.1' }).some(lesson => lesson.id === 'first-day-school'));
   const a11Whale5 = catalog.topics({ ...route, level: 'A1.1' });
   assert.equal(a11Whale5.length, 8);
   assert.ok(a11Whale5.every(lesson => lesson.outline));
@@ -102,36 +103,81 @@ function app(search = '', storage = new Map()) {
 function descendants(el) { return el.children.flatMap(child => [child, ...descendants(child)]); }
 function anchors(app) { return descendants(app.nodes.get('workspaceTopics')).filter(el => el.tagName === 'a'); }
 
-test('lesson/template switches reuse one host, destroy previous mount, and preserve answers', () => {
+function buttons(state) { return descendants(state.nodes.get('workspaceTopics')).filter(el => el.tagName === 'button'); }
+
+test('sidebar accordions and guides do not remount an active exercise or lose answers', () => {
   const state = app('?view=unassigned&lesson=first-day-school');
   const first = state.mounts.at(-1);
   first.config.onChange({m1:'o5'});
-  anchors(state).find(el => el.textContent.startsWith('2.')).click();
+  state.nodes.get('taskGuide').click();
+  assert.equal(state.mounts.length, 1);
+  assert.equal(state.nodes.get('taskGuide').attrs['aria-pressed'], 'false');
+  buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
+  assert.equal(anchors(state).length, 0);
+  assert.equal(state.mounts.length, 1);
+  buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
+  anchors(state).find(el => el.textContent === 'Stage 2').click();
   assert.ok(first.destroyed);
   assert.equal(state.mounts.at(-1).host, first.host);
-  anchors(state).find(el => el.textContent.startsWith('1.')).click();
+  anchors(state).find(el => el.textContent === 'Stage 1').click();
   assert.deepEqual(state.mounts.at(-1).config.answers, {m1:'o5'});
-  state.nodes.get('templatesTab').click();
-  assert.equal(anchors(state).length, 16);
-  assert.equal(state.mounts.at(-1).exercise.id, 'matching-demo');
-  state.nodes.get('libraryTab').click();
-  assert.equal(state.mounts.at(-1).exercise.id, first.exercise.id);
   const restored = app(state.location.search, state.storage);
   assert.equal(JSON.stringify(restored.mounts.at(-1).config.answers), '{"m1":"o5"}');
   restored.mounts.at(-1).config.onChange({});
   assert.equal(JSON.stringify(app(restored.location.search, restored.storage).mounts.at(-1).config.answers), '{}');
 });
 
-test('level/Whale selection, history and content changes do not leak answers', () => {
-  const state = app('?view=unassigned&lesson=school-fair');
-  state.nodes.get('workspaceLevel').change('A2.2');
-  assert.equal(state.nodes.get('workspaceWhale').children.length, 8);
-  state.nodes.get('workspaceWhale').change('8');
+test('combined dropdown uses actual catalog titles; outlines expand without fake exercises', () => {
+  const state = app();
+  assert.equal(state.nodes.get('libraryTab').attrs['aria-pressed'], 'true');
+  const groups = state.nodes.get('workspaceCourse').children;
+  assert.equal(groups[0].label, 'A1.1');
+  assert.equal(groups[0].children.length, 7);
+  assert.match(groups[0].children[0].textContent, /Short Talk/);
+  buttons(state).find(el => el.textContent === 'Как я рад встрече!').click();
+  assert.equal(state.mounts.length, 0);
+  assert.ok(buttons(state).find(el => el.textContent === 'Tasks'));
+  state.nodes.get('workspaceCourse').change('A2.2|8');
   assert.ok(state.location.search.includes('whale=8'));
+  state.nodes.get('workspaceCourse').change('templates');
+  assert.equal(anchors(state).length, 16);
+  assert.equal(state.mounts.at(-1).exercise.id, 'matching-demo');
+  assert.equal(state.nodes.get('startLesson').disabled, true);
+  state.nodes.get('self-studyTab').click();
+  assert.equal(anchors(state).length, 0);
   assert.ok(state.mounts.at(-1).destroyed);
-  state.location.search = '?view=unassigned&lesson=school-fair'; state.events.popstate();
+});
+
+test('Add to class and Start lesson keep local selection; empty Self Study is explicit', () => {
+  const state = app('?view=unassigned&lesson=school-fair');
+  buttons(state).find(el => el.textContent === 'Add to class').click();
+  assert.ok(buttons(state).find(el => el.textContent === 'Added ✓'));
+  state.nodes.get('classTab').click();
+  assert.equal(state.nodes.get('classTab').attrs['aria-pressed'], 'true');
+  assert.ok(buttons(state).find(el => el.textContent === 'Готовим школьную ярмарку'));
   assert.equal(state.mounts.at(-1).exercise.id, 'fair-reading');
-  state.nodes.get('templatesTab').click();
+  state.nodes.get('self-studyTab').click();
+  assert.equal(anchors(state).length, 0);
+  assert.ok(state.mounts.at(-1).destroyed);
+  state.nodes.get('libraryTab').click();
+  state.nodes.get('startLesson').click();
+  assert.equal(state.nodes.get('classTab').attrs['aria-pressed'], 'true');
+  const restored = app(state.location.search, state.storage);
+  assert.ok(buttons(restored).find(el => el.textContent === 'Added ✓'));
+  buttons(restored).find(el => el.textContent === 'Added ✓').click();
+  assert.equal(anchors(restored).length, 0);
+  assert.ok(restored.mounts.at(-1).destroyed);
+});
+
+test('topic tabs and Back/Forward restore selection without moving learning content to another page', () => {
+  const state = app('?view=unassigned&lesson=school-fair');
+  const before = state.location.search;
+  buttons(state).find(el => el.textContent === 'Language input').click();
+  assert.ok(state.location.search.includes('section=language'));
+  assert.equal(anchors(state).length, 0);
+  state.location.search = before; state.events.popstate();
+  assert.equal(state.mounts.at(-1).exercise.id, 'fair-reading');
+  assert.ok(anchors(state).every(el => el.href.startsWith('classroom.html?')));
   const key = 'space-whale:workspace:v1:templates:matching-demo';
   state.storage.set(key, JSON.stringify({signature:'old exercise', answers:{m1:'o1'}}));
   assert.equal(JSON.stringify(app('?view=templates', state.storage).mounts.at(-1).config.answers), '{}');
