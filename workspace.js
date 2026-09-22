@@ -348,7 +348,7 @@
 
     mounted = kit.mount(host, exercise, {
       answers: initialAnswers,
-      readOnly: Boolean(sessionId && liveRole === 'teacher'),
+      readOnly: false,
       onChange: answers => {
         storeAnswers(storageKey, signature, answers);
         if (sessionId && liveReady && liveRole === 'student') {
