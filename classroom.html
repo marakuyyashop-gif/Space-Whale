@@ -9,26 +9,28 @@ if (new URLSearchParams(location.search).get('session')) location.replace('class
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
 <link rel="stylesheet" href="exercise-kit.css?v=20260922">
 <link rel="stylesheet" href="learning-space.css?v=10">
-<link rel="stylesheet" href="workspace.css?v=1">
+<link rel="stylesheet" href="workspace.css?v=2">
 </head><body class="learning-space unified-workspace">
 <div class="reference-app">
 <aside class="app-sidebar" aria-label="Библиотека и задания">
-<div class="sidebar-header">
-<a class="sidebar-brand" href="index.html"><span class="brand-mark">SW</span><span class="brand-name">Space Whale</span></a>
-<div class="workspace-tabs" role="group" aria-label="Материалы">
-<button id="libraryTab" type="button" aria-pressed="true">Библиотека</button>
-<button id="templatesTab" type="button" aria-pressed="false">Шаблоны</button>
-</div></div>
-<div id="libraryControls" class="workspace-sidebar-controls">
-<label class="workspace-selector" for="workspaceLevel">Уровень<select id="workspaceLevel"></select></label>
-<label class="workspace-selector" for="workspaceWhale">Whale<select id="workspaceWhale"></select></label>
-<button id="unassignedTopics" class="workspace-unassigned" type="button" aria-pressed="false">Уроки без Whale</button>
-</div>
+<div class="workspace-session-heading"><a href="schedule.html" title="Открыть расписание">Свободное занятие · ученик не выбран</a></div>
+<div class="workspace-course-bar"><label class="workspace-visually-hidden" for="workspaceCourse">Выберите уровень и Whale</label><select id="workspaceCourse"></select></div>
 <div id="workspaceTopics" class="workspace-tree" aria-label="Темы и упражнения"></div>
 <p id="workspaceNotice" class="workspace-notice" role="status"></p>
-<nav class="learning-links" aria-label="Навигация">
-<a href="index.html">На главную</a><a href="app.html">Кабинет</a><a href="library-manage.html">Мои материалы</a>
+<div class="workspace-footer">
+<nav class="workspace-bottom-nav" aria-label="Разделы рабочей среды">
+<button id="classTab" type="button" aria-pressed="false">Class</button>
+<button id="libraryTab" type="button" aria-pressed="true">Library</button>
+<button id="self-studyTab" type="button" aria-pressed="false">Self Study</button>
+<a class="workspace-icon" href="library-manage.html" aria-label="Управление материалами" title="Управление материалами"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 16 11-11 3 3-11 11-4 1zM14 7l3 3"/></svg></a>
+<a class="workspace-icon" href="app.html" aria-label="Личный кабинет" title="Личный кабинет"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20c0-8 14-8 14 0"/></svg></a>
 </nav>
+<div class="workspace-bottom-tools">
+<a class="workspace-icon" href="index.html" aria-label="На главную" title="На главную"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7M6 10v10h12V10M10 20v-6h4v6"/></svg></a>
+<button id="taskGuide" type="button" aria-pressed="true">Task Guide <span aria-hidden="true">⌄</span></button>
+<button id="startLesson" type="button" disabled title="Открыть выбранный урок во вкладке Class">Start lesson</button>
+</div>
+</div>
 </aside>
 <section class="class-area"><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
 </div>
@@ -38,5 +40,5 @@ if (new URLSearchParams(location.search).get('session')) location.replace('class
 <script src="lesson-draft-first-day-school.js?v=20260922"></script>
 <script src="lesson-draft-school-fair.js?v=20260922"></script>
 <script src="workspace-catalog.js?v=1"></script>
-<script src="workspace.js?v=1"></script>
+<script src="workspace.js?v=2"></script>
 </body></html>
