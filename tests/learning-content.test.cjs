@@ -119,6 +119,19 @@ test('A1.2 clothing appearance lesson keeps look and look like targets and split
 
   const controlled = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-controlled').exercise;
   assert.ok(controlled.blocks.some(block => block.id === 'fox'));
-  assert.ok(controlled.blocks.some(block => block.id === 'choose-question'));
+  const questionChoice = controlled.blocks.find(block => block.id === 'choose-question').exercise;
+  assert.equal(questionChoice.kind, 'gaps');
+  assert.equal(questionChoice.inputMode, 'select');
+  assert.equal(typeof questionChoice.items[0].segments[0], 'object');
+  assert.equal(questionChoice.items[0].segments[1], ' — It looks nice.');
   assert.equal(controlled.blocks.filter(block => block.id?.startsWith('unscramble-')).length, 4);
+});
+
+test('A1.2 lesson 2 production answers are not exposed beside the writing task', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'course-content.js'), 'utf8');
+  const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
+  vm.runInNewContext(source, { window });
+  const lesson = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
+  const writing = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-writing').exercise;
+  assert.equal(writing.blocks.some(block => block.title === 'Possible answers'), false);
 });
