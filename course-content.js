@@ -4,7 +4,8 @@
   const kit = window.SpaceWhaleExerciseKit;
   if (!kit) throw new Error('SpaceWhaleExerciseKit is required.');
 
-  const clothesImage = 'Clothes.png';
+  const vocabImage = 'assets/a1-2-w4-l1-vocab.svg';
+  const clothes2Image = 'assets/a1-2-w4-l2-clothes.svg';
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
   const lesson1Audio = courseAudioBase + '/a1-2/w4/l1';
   const lesson2Audio = courseAudioBase + '/a1-2/w4/l2';
@@ -31,9 +32,8 @@
           blocks: [
             {
               type: 'image',
-              image: clothesImage,
-              alt: 'A clothes rack with a coat, denim jacket, sweater, T-shirt and green dress',
-              crop: { x: 57.5, y: 5.0, w: 40.5, h: 45.4 }
+              image: 'assets/a1-2-w4-l1-opening.svg',
+              alt: 'Four different clothes: a blue dress, a pink shirt, a green skirt and a brown jacket'
             },
             {
               type: 'text',
@@ -73,10 +73,10 @@
                 title: 'Match the pictures with the words.',
                 instruction: 'Сначала закрепи названия одежды.',
                 items: [
-                  { id: 'cpw1', text: 'Jacket', image: clothesImage, alt: 'A bright yellow jacket', crop: { x: 3.0, y: 5.1, w: 15.0, h: 22.0 }, correctId: 'jacket' },
-                  { id: 'cpw2', text: 'Sweater', image: clothesImage, alt: 'A dark sweater', crop: { x: 20.3, y: 5.1, w: 15.2, h: 21.2 }, correctId: 'sweater' },
-                  { id: 'cpw3', text: 'T-shirt', image: clothesImage, alt: 'A simple white T-shirt', crop: { x: 3.0, y: 28.3, w: 15.0, h: 21.5 }, correctId: 'tshirt' },
-                  { id: 'cpw4', text: 'Hat', image: clothesImage, alt: 'A strange purple hat', crop: { x: 37.8, y: 29.2, w: 16.4, h: 19.0 }, correctId: 'hat' }
+                  { id: 'cpw1', text: 'Jacket', image: vocabImage, alt: 'A jacket', crop: { x: 0, y: 0, w: 33.333, h: 50 }, correctId: 'jacket' },
+                  { id: 'cpw2', text: 'Sweater', image: vocabImage, alt: 'A sweater', crop: { x: 33.333, y: 0, w: 33.333, h: 50 }, correctId: 'sweater' },
+                  { id: 'cpw3', text: 'T-shirt', image: vocabImage, alt: 'A plain T-shirt', crop: { x: 0, y: 50, w: 33.333, h: 50 }, correctId: 'tshirt' },
+                  { id: 'cpw4', text: 'Hat', image: vocabImage, alt: 'A hat', crop: { x: 66.667, y: 50, w: 33.333, h: 50 }, correctId: 'hat' }
                 ],
                 options: [
                   { id: 'sweater', text: 'sweater' },
@@ -97,12 +97,12 @@
                 title: 'Match the pictures with the words.',
                 instruction: 'Click the box and choose the correct word.',
                 items: [
-                  { id: 'pw1', text: 'Bright jacket', image: clothesImage, alt: 'A very bright yellow jacket', crop: { x: 3.0, y: 5.1, w: 15.0, h: 22.0 }, correctId: 'bright' },
-                  { id: 'pw2', text: 'Dark sweater', image: clothesImage, alt: 'A very dark sweater', crop: { x: 20.3, y: 5.1, w: 15.2, h: 21.2 }, correctId: 'dark' },
-                  { id: 'pw3', text: 'Colorful skirt', image: clothesImage, alt: 'A skirt with many different bright colors', crop: { x: 37.8, y: 5.1, w: 15.5, h: 22.2 }, correctId: 'colorful' },
-                  { id: 'pw4', text: 'Simple T-shirt', image: clothesImage, alt: 'A simple plain white T-shirt', crop: { x: 3.0, y: 28.3, w: 15.0, h: 21.5 }, correctId: 'simple' },
-                  { id: 'pw5', text: 'Pretty blouse', image: clothesImage, alt: 'A pretty pink blouse', crop: { x: 20.1, y: 28.2, w: 16.6, h: 21.0 }, correctId: 'pretty' },
-                  { id: 'pw6', text: 'Strange hat', image: clothesImage, alt: 'A strange purple hat', crop: { x: 37.8, y: 29.2, w: 16.4, h: 19.0 }, correctId: 'strange' }
+                  { id: 'pw1', text: 'Bright jacket', image: vocabImage, alt: 'A very bright neon orange jacket', crop: { x: 0, y: 0, w: 33.333, h: 50 }, correctId: 'bright' },
+                  { id: 'pw2', text: 'Dark sweater', image: vocabImage, alt: 'A very dark navy sweater', crop: { x: 33.333, y: 0, w: 33.333, h: 50 }, correctId: 'dark' },
+                  { id: 'pw3', text: 'Colorful skirt', image: vocabImage, alt: 'A skirt with many different bright colors', crop: { x: 66.667, y: 0, w: 33.333, h: 50 }, correctId: 'colorful' },
+                  { id: 'pw4', text: 'Simple T-shirt', image: vocabImage, alt: 'A simple plain T-shirt with no print or decoration', crop: { x: 0, y: 50, w: 33.333, h: 50 }, correctId: 'simple' },
+                  { id: 'pw5', text: 'Pretty blouse', image: vocabImage, alt: 'A neat attractive pink blouse', crop: { x: 33.333, y: 50, w: 33.333, h: 50 }, correctId: 'pretty' },
+                  { id: 'pw6', text: 'Strange hat', image: vocabImage, alt: 'A hat with a clearly unusual shape and design', crop: { x: 66.667, y: 50, w: 33.333, h: 50 }, correctId: 'strange' }
                 ],
                 options: [
                   { id: 'strange', text: 'strange' },
@@ -342,9 +342,8 @@
           blocks: [
             {
               type: 'image',
-              image: clothesImage,
-              alt: 'Clothes laid out on a wooden surface for writing practice',
-              crop: { x: 1.7, y: 58.0, w: 30.3, h: 37.8 }
+              image: 'assets/a1-2-w4-l1-writing.svg',
+              alt: 'Three clothes: a bright green jacket, a slightly unusual purple skirt and a colorful office suit'
             },
             {
               type: 'exercise',
@@ -386,9 +385,8 @@
           blocks: [
             {
               type: 'image',
-              image: clothesImage,
-              alt: 'Six clothes showing bright, dark, colorful, simple, pretty and strange styles',
-              crop: { x: 1.7, y: 4.8, w: 52.5, h: 45.5 }
+              image: vocabImage,
+              alt: 'Six different clothes showing bright, dark, colorful, simple, pretty and strange styles'
             },
             {
               type: 'text',
@@ -493,12 +491,12 @@
           title: 'Match the pictures with the words.',
           instruction: 'Click the box and choose the correct word.',
           items: [
-            { id: 'pw1', text: 'coat', image: clothesImage, alt: 'A brown coat', crop: { x: 34.0, y: 58.3, w: 10.8, h: 21.5 }, correctId: 'coat' },
-            { id: 'pw2', text: 'sweater', image: clothesImage, alt: 'A cream sweater', crop: { x: 45.0, y: 58.4, w: 11.2, h: 17.2 }, correctId: 'sweater' },
-            { id: 'pw3', text: 'blouse', image: clothesImage, alt: 'A blue blouse', crop: { x: 56.5, y: 58.3, w: 11.0, h: 18.2 }, correctId: 'blouse' },
-            { id: 'pw4', text: 'skirt', image: clothesImage, alt: 'A pink skirt', crop: { x: 33.8, y: 79.0, w: 12.0, h: 15.2 }, correctId: 'skirt' },
-            { id: 'pw5', text: 'suit', image: clothesImage, alt: 'A dark blue suit', crop: { x: 45.5, y: 74.7, w: 10.5, h: 23.0 }, correctId: 'suit' },
-            { id: 'pw6', text: 'hat', image: clothesImage, alt: 'A straw hat with a black bow', crop: { x: 56.5, y: 78.8, w: 12.5, h: 14.0 }, correctId: 'hat' }
+            { id: 'pw1', text: 'coat', image: clothes2Image, alt: 'A coat', crop: { x: 0, y: 0, w: 33.333, h: 50 }, correctId: 'coat' },
+            { id: 'pw2', text: 'sweater', image: clothes2Image, alt: 'A sweater', crop: { x: 33.333, y: 0, w: 33.333, h: 50 }, correctId: 'sweater' },
+            { id: 'pw3', text: 'blouse', image: clothes2Image, alt: 'A blouse', crop: { x: 66.667, y: 0, w: 33.333, h: 50 }, correctId: 'blouse' },
+            { id: 'pw4', text: 'skirt', image: clothes2Image, alt: 'A skirt', crop: { x: 0, y: 50, w: 33.333, h: 50 }, correctId: 'skirt' },
+            { id: 'pw5', text: 'suit', image: clothes2Image, alt: 'A suit', crop: { x: 33.333, y: 50, w: 33.333, h: 50 }, correctId: 'suit' },
+            { id: 'pw6', text: 'hat', image: clothes2Image, alt: 'A hat', crop: { x: 66.667, y: 50, w: 33.333, h: 50 }, correctId: 'hat' }
           ],
           options: [
             { id: 'suit', text: 'suit' },
@@ -914,9 +912,8 @@
           blocks: [
             {
               type: 'image',
-              image: clothesImage,
-              alt: 'Six clothes for speaking practice: coat, sweater, blouse, skirt, suit and hat',
-              crop: { x: 70.7, y: 58.0, w: 29.0, h: 39.5 }
+              image: clothes2Image,
+              alt: 'Six clothes for speaking practice: coat, sweater, blouse, skirt, suit and hat'
             },
             {
               type: 'text',
