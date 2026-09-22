@@ -5,6 +5,7 @@
   if (!kit) throw new Error('SpaceWhaleExerciseKit is required.');
 
   const vocabImage = 'assets/a1-2-w4-l1-vocab.svg';
+  const clothes2Image = 'assets/a1-2-w4-l2-clothes.svg';
 
   const lesson = {
     id: 'a1-2-w4-l1',
@@ -444,7 +445,570 @@
     ]
   };
 
-  lesson.stages.forEach(stage => kit.validate(stage.exercise));
+
+  const lesson2 = {
+    id: 'a1-2-w4-l2',
+    title: 'Описываем внешний вид одежды',
+    level: 'A1.2',
+    whale: 4,
+    stages: [
+      {
+        menu: 'Opening Speaking',
+        section: 'tasks',
+        guide: {
+          aim: 'Войти в ситуацию урока: одежда и внешний вид, без проверки нового материала.',
+          time: '2 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-opening',
+          kind: 'presentation',
+          title: 'Talk about clothes.',
+          instruction: '',
+          blocks: [
+            {
+              type: 'text',
+              text: '1. What clothes do you know in English?\n2. What clothes do you wear often?\n3. What clothes do you like?'
+            }
+          ]
+        }
+      },
+      {
+        menu: 'New Words',
+        section: 'tasks',
+        guide: {
+          aim: 'Познакомиться с six clothing words текущего урока.',
+          tl: 'coat, sweater, blouse, skirt, suit, hat',
+          time: '4 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-picture-word',
+          kind: 'matching',
+          layout: 'picture-word',
+          title: 'Match the pictures with the words.',
+          instruction: 'Click the box and choose the correct word.',
+          items: [
+            { id: 'pw1', text: 'coat', image: clothes2Image, alt: 'A coat', crop: { x: 0, y: 0, w: 33.333, h: 50 }, correctId: 'coat' },
+            { id: 'pw2', text: 'sweater', image: clothes2Image, alt: 'A sweater', crop: { x: 33.333, y: 0, w: 33.333, h: 50 }, correctId: 'sweater' },
+            { id: 'pw3', text: 'blouse', image: clothes2Image, alt: 'A blouse', crop: { x: 66.667, y: 0, w: 33.333, h: 50 }, correctId: 'blouse' },
+            { id: 'pw4', text: 'skirt', image: clothes2Image, alt: 'A skirt', crop: { x: 0, y: 50, w: 33.333, h: 50 }, correctId: 'skirt' },
+            { id: 'pw5', text: 'suit', image: clothes2Image, alt: 'A suit', crop: { x: 33.333, y: 50, w: 33.333, h: 50 }, correctId: 'suit' },
+            { id: 'pw6', text: 'hat', image: clothes2Image, alt: 'A hat', crop: { x: 66.667, y: 50, w: 33.333, h: 50 }, correctId: 'hat' }
+          ],
+          options: [
+            { id: 'suit', text: 'suit' },
+            { id: 'coat', text: 'coat' },
+            { id: 'hat', text: 'hat' },
+            { id: 'blouse', text: 'blouse' },
+            { id: 'sweater', text: 'sweater' },
+            { id: 'skirt', text: 'skirt' }
+          ]
+        }
+      },
+      {
+        menu: 'Pronunciation + fixation',
+        section: 'tasks',
+        guide: {
+          aim: 'Закрепить звучание новых Words и их русские значения, не вводя новую Grammar раньше времени.',
+          tl: 'coat, sweater, blouse, skirt, suit, hat',
+          time: '4 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-pronunciation',
+          kind: 'rule-page',
+          title: 'Pronunciation + fixation',
+          instruction: '',
+          blocks: [
+            {
+              type: 'exercise',
+              id: 'listen-repeat',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-listen-repeat',
+                kind: 'audio',
+                layout: 'listen-repeat',
+                audioPending: true,
+                title: 'Listen and repeat.',
+                instruction: '',
+                items: [
+                  { id: 'lr1', text: 'coat', audio: null, example: 'This is a coat.', exampleAudio: null },
+                  { id: 'lr2', text: 'sweater', audio: null, example: 'This is a sweater.', exampleAudio: null },
+                  { id: 'lr3', text: 'blouse', audio: null, example: 'This is a blouse.', exampleAudio: null },
+                  { id: 'lr4', text: 'skirt', audio: null, example: 'This is a skirt.', exampleAudio: null },
+                  { id: 'lr5', text: 'suit', audio: null, example: 'This is a suit.', exampleAudio: null },
+                  { id: 'lr6', text: 'hat', audio: null, example: 'This is a hat.', exampleAudio: null }
+                ]
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'translation',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-translation',
+                kind: 'matching',
+                layout: 'word-definition',
+                title: 'Match the words with the Russian meanings.',
+                instruction: 'Make six pairs.',
+                items: [
+                  { id: 'tr1', text: 'coat', correctId: 'coat-ru' },
+                  { id: 'tr2', text: 'sweater', correctId: 'sweater-ru' },
+                  { id: 'tr3', text: 'blouse', correctId: 'blouse-ru' },
+                  { id: 'tr4', text: 'skirt', correctId: 'skirt-ru' },
+                  { id: 'tr5', text: 'suit', correctId: 'suit-ru' },
+                  { id: 'tr6', text: 'hat', correctId: 'hat-ru' }
+                ],
+                options: [
+                  { id: 'hat-ru', text: 'шляпа' },
+                  { id: 'suit-ru', text: 'костюм' },
+                  { id: 'sweater-ru', text: 'свитер' },
+                  { id: 'skirt-ru', text: 'юбка' },
+                  { id: 'coat-ru', text: 'пальто' },
+                  { id: 'blouse-ru', text: 'блузка' }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        menu: 'First Context',
+        section: 'tasks',
+        guide: {
+          aim: 'Впервые встретить look/looks + adjective и look/looks like + noun в понятной ситуации.',
+          tl: 'looks + adjective; looks like + noun',
+          time: '3 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-context',
+          kind: 'rule-page',
+          title: 'Read the dialogue.',
+          instruction: '',
+          blocks: [
+            {
+              type: 'text',
+              text: 'Anna: Look at this blouse.\nTom: It looks nice.\nAnna: What does it look like?\nTom: It looks like a shirt.\n\nAnna: And this hat?\nTom: It looks strange.\nAnna: What does it look like?\nTom: It looks like a flower.',
+              highlights: ['looks nice', 'What does it look like?', 'looks like a shirt', 'looks strange', 'looks like a flower']
+            },
+            {
+              type: 'exercise',
+              id: 'notice-models',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-context-choice',
+                kind: 'gaps',
+                inputMode: 'select',
+                title: 'Choose.',
+                instruction: 'Choose the correct option in each sentence.',
+                items: [
+                  { id: 'c1', segments: ['The blouse ', { id: 'c1g', answers: ['looks'], options: ['looks', 'looks like'] }, ' nice.'] },
+                  { id: 'c2', segments: ['The blouse ', { id: 'c2g', answers: ['looks like'], options: ['looks', 'looks like'] }, ' a shirt.'] },
+                  { id: 'c3', segments: ['The hat ', { id: 'c3g', answers: ['looks'], options: ['looks like', 'looks'] }, ' strange.'] },
+                  { id: 'c4', segments: ['The hat ', { id: 'c4g', answers: ['looks like'], options: ['looks', 'looks like'] }, ' a flower.'] }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        menu: 'Discovery + Rule',
+        section: 'tasks',
+        guide: {
+          aim: 'Понять разницу двух моделей, look/looks по subject, два вопроса, do/does и a/an после like.',
+          tl: 'look/looks + adjective; look/looks like + noun; How does it look?; What does it look like?; do/does; a/an',
+          time: '6 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-discovery',
+          kind: 'rule-page',
+          title: 'Discovery + Rule',
+          instruction: '',
+          blocks: [
+            {
+              type: 'text',
+              title: 'Посмотри на примеры.',
+              text: 'The blouse looks nice.\nThe blouse looks like a shirt.\nThe hat looks strange.\nThe hat looks like a flower.',
+              highlights: ['looks nice', 'looks like a shirt', 'looks strange', 'looks like a flower']
+            },
+            {
+              type: 'exercise',
+              id: 'discover-difference',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-discover-difference',
+                kind: 'gaps',
+                inputMode: 'select',
+                title: 'Complete the rule.',
+                instruction: 'Выбери вариант прямо в пропуске.',
+                items: [
+                  { id: 'd1', segments: ['Если после look / looks идёт описание предмета, используем ', { id: 'd1g', answers: ['adjective'], options: ['adjective', 'noun'] }, '.'] },
+                  { id: 'd2', segments: ['Если говорим, на что предмет похож, используем look / looks ', { id: 'd2g', answers: ['like'], options: ['like', 'at'] }, ' + noun.'] },
+                  { id: 'd3', segments: ['С it / one thing используем ', { id: 'd3g', answers: ['looks'], options: ['looks', 'look'] }, '.'] },
+                  { id: 'd4', segments: ['С they / several things используем ', { id: 'd4g', answers: ['look'], options: ['look', 'looks'] }, '.'] }
+                ]
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'question-meaning',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-question-meaning',
+                kind: 'matching',
+                title: 'Match the question with the type of answer.',
+                instruction: 'Make two pairs.',
+                items: [
+                  { id: 'q1', text: 'How does it look?', correctId: 'b' },
+                  { id: 'q2', text: 'What does it look like?', correctId: 'a' }
+                ],
+                options: [
+                  { id: 'a', text: 'It looks like a shirt.' },
+                  { id: 'b', text: 'It looks nice.' }
+                ]
+              }
+            },
+            {
+              type: 'rule',
+              title: 'look / looks + adjective',
+              text: 'Используем, когда говорим, каким выглядит предмет.',
+              examples: ['The coat looks nice.', 'The hats look strange.']
+            },
+            {
+              type: 'rule',
+              title: 'look / looks like + noun',
+              text: 'Используем, когда говорим, на что предмет похож.',
+              examples: ['The blouse looks like a shirt.', 'The hat looks like a flower.']
+            },
+            {
+              type: 'rule',
+              title: 'look / looks',
+              formula: 'it / the coat → looks\nthey / the coats → look'
+            },
+            {
+              type: 'rule',
+              title: 'Questions',
+              text: 'How does it look? → Как это выглядит?\nWhat does it look like? → На что это похоже?\n\nОдин предмет: does\nНесколько предметов: do'
+            },
+            {
+              type: 'rule',
+              title: 'After like',
+              text: 'Перед одним исчисляемым существительным нужен a/an.',
+              examples: ['It looks like a coat.', 'It looks like an old coat.']
+            }
+          ]
+        }
+      },
+      {
+        menu: 'Controlled Practice',
+        section: 'tasks',
+        guide: {
+          aim: 'Различать две конструкции, выбирать нужный вопрос и закрепить do/does с порядком слов.',
+          time: '6 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-controlled',
+          kind: 'rule-page',
+          title: 'Controlled Practice',
+          instruction: '',
+          blocks: [
+            {
+              type: 'exercise',
+              id: 'fox',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-fox',
+                kind: 'gaps',
+                inputMode: 'select',
+                title: 'Choose the correct option.',
+                instruction: 'Choose the correct form in each sentence.',
+                items: [
+                  { id: 'f1', segments: ['The coat ', { id: 'f1g', answers: ['looks'], options: ['looks like', 'looks'] }, ' nice.'] },
+                  { id: 'f2', segments: ['This sweater ', { id: 'f2g', answers: ['looks like'], options: ['looks like', 'looks'] }, ' a coat.'] },
+                  { id: 'f3', segments: ['The blouse ', { id: 'f3g', answers: ['looks'], options: ['looks', 'looks like'] }, ' pretty.'] },
+                  { id: 'f4', segments: ['This skirt ', { id: 'f4g', answers: ['looks like'], options: ['looks', 'looks like'] }, ' a dress.'] },
+                  { id: 'f5', segments: ['The suit ', { id: 'f5g', answers: ['looks'], options: ['looks like', 'looks'] }, ' good.'] },
+                  { id: 'f6', segments: ['This hat ', { id: 'f6g', answers: ['looks like'], options: ['looks like', 'looks'] }, ' a flower.'] }
+                ]
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'choose-question',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-choose-question',
+                kind: 'choice',
+                title: 'Choose the question.',
+                instruction: 'Choose the question that matches the answer.',
+                items: [
+                  {
+                    id: 'qq1',
+                    prompt: 'It looks nice.',
+                    options: [
+                      { id: 'what', text: 'What does it look like?' },
+                      { id: 'how', text: 'How does it look?' }
+                    ],
+                    correctId: 'how'
+                  },
+                  {
+                    id: 'qq2',
+                    prompt: 'It looks like a dress.',
+                    options: [
+                      { id: 'what', text: 'What does it look like?' },
+                      { id: 'how', text: 'How does it look?' }
+                    ],
+                    correctId: 'what'
+                  },
+                  {
+                    id: 'qq3',
+                    prompt: 'It looks strange.',
+                    options: [
+                      { id: 'how', text: 'How does it look?' },
+                      { id: 'what', text: 'What does it look like?' }
+                    ],
+                    correctId: 'how'
+                  },
+                  {
+                    id: 'qq4',
+                    prompt: 'It looks like a shirt.',
+                    options: [
+                      { id: 'how', text: 'How does it look?' },
+                      { id: 'what', text: 'What does it look like?' }
+                    ],
+                    correctId: 'what'
+                  }
+                ]
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'unscramble-1',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-unscramble-1',
+                kind: 'order',
+                title: '1. Put the words in order.',
+                instruction: 'Build the question.',
+                tokens: [
+                  { id: 'u1a', text: 'does' },
+                  { id: 'u1b', text: 'the coat' },
+                  { id: 'u1c', text: 'How' },
+                  { id: 'u1d', text: 'look' },
+                  { id: 'u1e', text: '?' }
+                ],
+                correctOrder: ['u1c','u1a','u1b','u1d','u1e']
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'unscramble-2',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-unscramble-2',
+                kind: 'order',
+                title: '2. Put the words in order.',
+                instruction: 'Build the question.',
+                tokens: [
+                  { id: 'u2a', text: 'look' },
+                  { id: 'u2b', text: 'What' },
+                  { id: 'u2c', text: 'the blouse' },
+                  { id: 'u2d', text: 'does' },
+                  { id: 'u2e', text: 'like' },
+                  { id: 'u2f', text: '?' }
+                ],
+                correctOrder: ['u2b','u2d','u2c','u2a','u2e','u2f']
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'unscramble-3',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-unscramble-3',
+                kind: 'order',
+                title: '3. Put the words in order.',
+                instruction: 'Build the question.',
+                tokens: [
+                  { id: 'u3a', text: 'the hats' },
+                  { id: 'u3b', text: 'How' },
+                  { id: 'u3c', text: 'do' },
+                  { id: 'u3d', text: 'look' },
+                  { id: 'u3e', text: '?' }
+                ],
+                correctOrder: ['u3b','u3c','u3a','u3d','u3e']
+              }
+            },
+            {
+              type: 'exercise',
+              id: 'unscramble-4',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-unscramble-4',
+                kind: 'order',
+                title: '4. Put the words in order.',
+                instruction: 'Build the question.',
+                tokens: [
+                  { id: 'u4a', text: 'do' },
+                  { id: 'u4b', text: 'the suits' },
+                  { id: 'u4c', text: 'What' },
+                  { id: 'u4d', text: 'look' },
+                  { id: 'u4e', text: 'like' },
+                  { id: 'u4f', text: '?' }
+                ],
+                correctOrder: ['u4c','u4a','u4b','u4d','u4e','u4f']
+              }
+            }
+          ]
+        }
+      },
+      {
+        menu: 'a / an',
+        section: 'tasks',
+        guide: {
+          aim: 'Проверить наличие и выбор article после like.',
+          time: '2 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-articles',
+          kind: 'gaps',
+          inputMode: 'select',
+          title: 'Choose the correct option.',
+          instruction: 'Choose a, an or —.',
+          items: [
+            { id: 'a1', segments: ['It looks like ', { id: 'a1g', answers: ['a'], options: ['a', '—'] }, ' coat.'] },
+            { id: 'a2', segments: ['It looks like ', { id: 'a2g', answers: ['a'], options: ['—', 'a'] }, ' skirt.'] },
+            { id: 'a3', segments: ['It looks like ', { id: 'a3g', answers: ['an'], options: ['an', 'a'] }, ' old coat.'] },
+            { id: 'a4', segments: ['It looks like ', { id: 'a4g', answers: ['a'], options: ['a', '—'] }, ' suit.'] }
+          ]
+        }
+      },
+      {
+        menu: 'Write two sentences',
+        section: 'tasks',
+        guide: {
+          aim: 'Самостоятельно построить обе модели по prompts.',
+          time: '3 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-writing',
+          kind: 'rule-page',
+          title: 'Write two sentences.',
+          instruction: 'Use the prompts.',
+          blocks: [
+            {
+              type: 'text',
+              text: '1. blouse → nice\nblouse → shirt\n\n2. hat → strange\nhat → flower\n\n3. sweater → good\nsweater → coat'
+            },
+            {
+              type: 'exercise',
+              id: 'production',
+              exercise: {
+                version: 1,
+                id: 'a12w4l2-writing-production',
+                kind: 'writing',
+                title: 'Write two sentences for each set.',
+                instruction: '',
+                items: [
+                  { id: 'w1', prompt: '1. The blouse ... / It ...' },
+                  { id: 'w2', prompt: '2. The hat ... / It ...' },
+                  { id: 'w3', prompt: '3. The sweater ... / It ...' }
+                ]
+              }
+            },
+            {
+              type: 'rule',
+              title: 'Possible answers',
+              examples: [
+                'The blouse looks nice. / It looks like a shirt.',
+                'The hat looks strange. / It looks like a flower.',
+                'The sweater looks good. / It looks like a coat.'
+              ]
+            }
+          ]
+        }
+      },
+      {
+        menu: 'Final Speaking',
+        section: 'tasks',
+        guide: {
+          aim: 'Назвать вещь, описать её внешний вид и сказать, на что она похожа.',
+          time: '4 min'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-final-speaking',
+          kind: 'presentation',
+          title: 'Look at the clothes and talk about them.',
+          instruction: '',
+          blocks: [
+            {
+              type: 'image',
+              image: clothes2Image,
+              alt: 'Six clothes for speaking practice: coat, sweater, blouse, skirt, suit and hat'
+            },
+            {
+              type: 'text',
+              text: 'For each picture:\n\nWhat is it?\nIt’s a ...\n\nHow does it look?\nIt looks ...\n\nWhat does it look like?\nIt looks like a/an ...\n\nThen change roles: ask the questions and listen to the answers.'
+            }
+          ]
+        }
+      },
+      {
+        menu: 'Homework 1',
+        section: 'self-study',
+        guide: {
+          aim: 'Перевести предложения с look/looks + adjective.',
+          time: 'Self study'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-homework-1',
+          kind: 'writing',
+          title: 'Translate into English.',
+          instruction: '',
+          items: [
+            { id: 'h1', prompt: 'Это пальто выглядит хорошо.' },
+            { id: 'h2', prompt: 'Эта блузка выглядит красивой.' },
+            { id: 'h3', prompt: 'Эта шляпа выглядит странно.' },
+            { id: 'h4', prompt: 'Эти костюмы выглядят хорошо.' },
+            { id: 'h5', prompt: 'Эти юбки выглядят странно.' }
+          ]
+        }
+      },
+      {
+        menu: 'Homework 2',
+        section: 'self-study',
+        guide: {
+          aim: 'Перевести look like и два типа вопросов.',
+          time: 'Self study'
+        },
+        exercise: {
+          version: 1,
+          id: 'a12w4l2-homework-2',
+          kind: 'writing',
+          title: 'Translate into English.',
+          instruction: '',
+          items: [
+            { id: 'h1', prompt: 'Эта блузка похожа на рубашку.' },
+            { id: 'h2', prompt: 'Эта шляпа похожа на цветок.' },
+            { id: 'h3', prompt: 'Как это выглядит?' },
+            { id: 'h4', prompt: 'На что это похоже?' },
+            { id: 'h5', prompt: 'На что похожи эти пальто?' }
+          ]
+        }
+      }
+    ]
+  };
+
+  [lesson, lesson2].forEach(item => item.stages.forEach(stage => kit.validate(stage.exercise)));
   window.SpaceWhaleContent = window.SpaceWhaleContent || [];
-  window.SpaceWhaleContent.push(lesson);
+  window.SpaceWhaleContent.push(lesson, lesson2);
 })();

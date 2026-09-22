@@ -92,3 +92,33 @@ test('Listen Repeat accepts separate word and example audio tracks', () => {
   delete missingExample.items[0].exampleAudio;
   assert.throws(() => kit.validate(missingExample), /example needs its own audio/);
 });
+
+test('A1.2 clothing appearance lesson keeps look and look like targets and split audio slots', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'course-content.js'), 'utf8');
+  const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
+  vm.runInNewContext(source, { window });
+  const lesson = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
+  assert.equal(lesson.title, 'Описываем внешний вид одежды');
+  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 9);
+  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
+  lesson.stages.forEach(stage => kit.validate(stage.exercise));
+
+  const vocab = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-picture-word').exercise;
+  assert.equal(vocab.layout, 'picture-word');
+  assert.deepEqual(Array.from(vocab.options, option => option.text), ['suit','coat','hat','blouse','sweater','skirt']);
+
+  const pronunciation = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-pronunciation').exercise;
+  const listen = pronunciation.blocks.find(block => block.id === 'listen-repeat').exercise;
+  assert.equal(listen.layout, 'listen-repeat');
+  assert.ok(listen.items.every(item => 'audio' in item && 'exampleAudio' in item));
+
+  const discovery = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-discovery').exercise;
+  assert.ok(discovery.blocks.some(block => block.id === 'discover-difference' && block.exercise.kind === 'gaps'));
+  assert.ok(discovery.blocks.some(block => block.id === 'question-meaning' && block.exercise.kind === 'matching'));
+  assert.ok(discovery.blocks.some(block => block.type === 'rule' && block.title === 'After like'));
+
+  const controlled = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-controlled').exercise;
+  assert.ok(controlled.blocks.some(block => block.id === 'fox'));
+  assert.ok(controlled.blocks.some(block => block.id === 'choose-question'));
+  assert.equal(controlled.blocks.filter(block => block.id?.startsWith('unscramble-')).length, 4);
+});
