@@ -1,4 +1,4 @@
-:root { --learning-column-width: 680px; }
+:root { --learning-column-width: 560px; }
 .learning-space .reference-app { min-width: 0; }
 .learning-space .learning-heading { margin: 22px 6px 12px; font: 500 16px/1.4 Onest,Arial,sans-serif; }
 .learning-menu { overflow-y: auto; flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
@@ -9,22 +9,8 @@
 .learning-links a { color: inherit; text-decoration: none; }
 .learning-space .lesson-scroll { padding: 48px 24px 80px; }
 .exercise-kit, .exercise-kit.ek-reading-width, #lessonContent > .exercise-page {
-  --ek-text-size: 16px;
-  --ek-title-size: 20px;
-  box-sizing: border-box; width: 100%; max-width: var(--learning-column-width,680px); margin-inline: auto; text-align: left;
-}
-.exercise-kit > .ek-title {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 28px;
-  letter-spacing: 0;
-}
-.exercise-kit > .ek-instruction {
-  margin-bottom: 28px;
-  color: #565a60;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
+  --ek-title-size: 18px;
+  box-sizing: border-box; width: 100%; max-width: var(--learning-column-width,560px); margin-inline: auto; text-align: left;
 }
 #lessonContent > .exercise-page { width: calc(100% - 48px); padding-inline: 0; }
 #lessonContent > * { max-width: var(--learning-column-width); margin-inline: auto; }
@@ -34,25 +20,10 @@
 #lessonContent .interactive-question { font-size: 17px; line-height: 1.7; }
 .exercise-kit .exercise-kit { width: 100%; max-width: none; margin: 0; }
 .exercise-kit .ek-rule-page, .exercise-kit .ek-rule-visual { width: 100%; }
-.exercise-kit .ek-discovery-host.exercise-kit {
-  --ek-text-size: 16px;
-  --ek-title-size: 18px;
-  line-height: 24px;
-}
-.exercise-kit .ek-discovery-host > .ek-title {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 26px;
-  letter-spacing: 0;
-}
-.exercise-kit .ek-discovery-host > .ek-instruction {
-  color: #565a60;
-  font-size: 15px;
-  line-height: 22px;
-}
+.exercise-kit .ek-discovery-host.exercise-kit { --ek-text-size: 17px; --ek-title-size: 18px; }
 .exercise-kit .ek-discovery-select { min-width: 80px; max-width: 100%; width: auto; border-radius: 999px; background: white; }
 .exercise-kit .ek-discovery-choice { line-height: 2; }
-.exercise-kit .ek-options { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 12px; }
+.exercise-kit .ek-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
 .exercise-kit .ek-option { width: 100%; min-width: 0; height: 100%; }
 .exercise-kit .ek-reset { width: 42px; padding: 5px; font-size: 24px; line-height: 1; }
 .exercise-kit .ek-status:empty, .exercise-kit .ek-results:empty, .exercise-kit .ek-instruction:empty { display: none; }
