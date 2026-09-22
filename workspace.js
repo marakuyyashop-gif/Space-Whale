@@ -164,7 +164,10 @@
 
     const source = route.panel === 'class' ? catalog.lessons : catalog.topics(route);
     const topics = source.filter(lesson => {
-      if (route.panel === 'class') return classIds.has(lesson.id);
+      if (route.panel === 'class') {
+        if (sessionId && liveReady) return classIds.has(lesson.id) || lesson.id === route.lesson;
+        return classIds.has(lesson.id);
+      }
       if (route.panel === 'self-study') return visibleStages(lesson, 'self-study').length;
       return true;
     });
@@ -317,7 +320,7 @@
   function renderContent() {
     const selected = selectedLesson();
     const stage = selected?.stages.find(stage => stage.exercise.id === route.exercise && stageSection(stage) === route.section);
-    const visible = route.panel !== 'class' || classIds.has(selected?.id);
+    const visible = route.panel !== 'class' || Boolean(sessionId && liveReady) || classIds.has(selected?.id);
     const liveIdentity = sessionId ? `${sessionId}:${liveRole || 'connecting'}` : 'standalone';
     const key = stage && visible ? `${liveIdentity}:${selected.id}:${stage.exercise.id}` : `${liveIdentity}:${route.view}:${route.panel}:${route.lesson}:${route.section}:empty`;
 
