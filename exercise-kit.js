@@ -53,8 +53,10 @@
         def.items.forEach(item => {
           text(item.text, 'listen-repeat text');
           if (item.audio != null) audioSource(item.audio);
-          else if (!def.audioPending) fail('Listen & Repeat item needs audio unless audioPending is true');
+          else if (!def.audioPending) fail('Listen & Repeat item needs word audio unless audioPending is true');
           if (item.example != null && typeof item.example !== 'string') fail('listen-repeat example must be text');
+          if (item.exampleAudio != null) audioSource(item.exampleAudio);
+          else if (item.example && !def.audioPending) fail('Listen & Repeat example needs its own audio unless audioPending is true');
         });
       } else {
         audioSource(def.audio);
@@ -400,7 +402,11 @@
           def.items.forEach(item => {
             const row = node('article', 'ek-repeat-item');
             row.append(repeatAudioButton(item.audio, item.text), node('strong', 'ek-repeat-term', item.text));
-            if (item.example) row.append(node('p', 'ek-repeat-example', item.example));
+            if (item.example) {
+              const example = node('div', 'ek-repeat-example');
+              example.append(repeatAudioButton(item.exampleAudio, item.example), node('span', 'ek-repeat-example-text', item.example));
+              row.append(example);
+            }
             list.append(row);
           });
           body.append(list);
