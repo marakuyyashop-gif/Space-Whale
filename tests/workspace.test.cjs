@@ -79,18 +79,33 @@ class Element {
   click() { this.listeners.click?.({button:0,preventDefault(){}}); }
   change(value) { this.value = value; this.listeners.change(); }
 }
-function app(search = '', storage = new Map()) {
+function app(search = '', storage = new Map(), live = null) {
   const data = content();
   const nodes = new Map();
   const mounts = [];
   const location = {search};
   const events = {};
   const setURL = (_state, _unused, url) => { location.search = new URL(url, 'https://example.com/Space-Whale/').search; };
-  const document = {getElementById(id) { if(!nodes.has(id)) nodes.set(id,new Element('div')); return nodes.get(id); }, createElement(tag) {return new Element(tag);} };
+  const sessionHeading = new Element('a');
+  const document = {
+    getElementById(id) { if(!nodes.has(id)) nodes.set(id,new Element('div')); return nodes.get(id); },
+    createElement(tag) {return new Element(tag);},
+    querySelector(selector) { return selector === '.workspace-session-heading a' ? sessionHeading : null; }
+  };
   const window = {
     SpaceWhaleContent:data.lessons, SpaceWhaleTemplates:data.templates,
     SpaceWhaleCatalog:{createCatalog},
-    SpaceWhaleExerciseKit:{mount(host, exercise, config) {kit.validate(exercise); const record={host,exercise,config,destroy(){this.destroyed=true;}}; mounts.push(record); return record;}},
+    SpaceWhaleExerciseKit:{mount(host, exercise, config) {
+      kit.validate(exercise);
+      const record={
+        host,exercise,config,answers:config.answers || {},
+        getAnswers(){return this.answers;},
+        setAnswers(value){this.answers=value;this.remoteAnswers=value;},
+        destroy(){this.destroyed=true;}
+      };
+      mounts.push(record); return record;
+    }},
+    SpaceWhaleClassroom: live?.classroom || null,
     addEventListener(name, cb) {events[name]=cb;}
   };
   vm.runInNewContext(fs.readFileSync(path.join(root,'workspace.js'),'utf8'), {
@@ -98,7 +113,7 @@ function app(search = '', storage = new Map()) {
     history:{pushState:setURL,replaceState:setURL},
     sessionStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)}
   });
-  return {nodes,mounts,location,events,storage};
+  return {nodes,mounts,location,events,storage,sessionHeading};
 }
 function descendants(el) { return el.children.flatMap(child => [child, ...descendants(child)]); }
 function anchors(app) { return descendants(app.nodes.get('workspaceTopics')).filter(el => el.tagName === 'a'); }
@@ -193,6 +208,57 @@ test('all former standalone lesson routes point into the canonical Workspace', (
   for(const match of html.matchAll(/(?:src|href)="([^"?#]+)(?:[^\"]*)"/g)) {
     if(!match[1].startsWith('http')) assert.ok(fs.existsSync(path.join(root,match[1])), match[1]);
   }
-  assert.match(html, /classroom-session.html.*location.search/);
+  assert.doesNotMatch(html, /classroom-session.html.*location.search/);
+  assert.match(html, /classroom-realtime\.js/);
+  assert.match(html, /supabase-client\.js/);
   assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'), /href="classroom.html"/);
+});
+
+
+test('unified live Workspace streams drafts, applies remote answers and keeps teacher navigation authoritative', async () => {
+  const makeLive = role => {
+    const handlers = {};
+    const calls = [];
+    const channel = {presenceState: () => ({teacher:[{role:'teacher'}],student:[{role:'student'}]})};
+    const classroom = {
+      state: {channel},
+      async getCurrentUser() { return {id: role === 'teacher' ? 'teacher-1' : 'student-1'}; },
+      async connect(_sessionId, nextHandlers) { Object.assign(handlers, nextHandlers); this.state.channel = channel; return {role,session:{id:'session-1'}}; },
+      async loadSharedState() { return {current_page_id:null,current_exercise_id:null}; },
+      async loadExerciseResponse() { return null; },
+      async requestExerciseState(exerciseId) { calls.push(['request',exerciseId]); },
+      async sendExerciseSnapshot(exerciseId, answers) { calls.push(['snapshot',exerciseId,answers]); },
+      async sendExerciseDraft(exerciseId, answers) { calls.push(['draft',exerciseId,answers]); },
+      async navigate(exerciseId, page) { calls.push(['navigate',exerciseId,page]); }
+    };
+    return {classroom,handlers,calls};
+  };
+  const flush = () => new Promise(resolve => setImmediate(resolve));
+
+  const teacherLive = makeLive('teacher');
+  const teacher = app('?session=session-1&view=unassigned&lesson=school-fair&exercise=fair-typed-gaps&panel=library&section=tasks', new Map(), teacherLive);
+  await flush(); await flush();
+  const teacherMount = teacher.mounts.at(-1);
+  assert.equal(teacherMount.config.readOnly, true);
+  teacherLive.handlers.onExerciseDraft({exercise_id:'fair-typed-gaps',response:{a1:'invitations'},source_id:'student-tab',seq:1});
+  assert.deepEqual(teacherMount.remoteAnswers, {a1:'invitations'});
+  assert.ok(teacher.location.search.includes('session=session-1'));
+  assert.ok(teacherLive.calls.some(call => call[0] === 'navigate'));
+
+  const studentLive = makeLive('student');
+  const student = app('?session=session-1&view=unassigned&lesson=school-fair&exercise=fair-typed-gaps&panel=library&section=tasks', new Map(), studentLive);
+  await flush(); await flush();
+  const studentMount = student.mounts.at(-1);
+  assert.equal(student.nodes.get('workspaceCourse').disabled, true);
+  studentMount.config.onChange({a1:'i'});
+  await flush();
+  assert.deepEqual(studentLive.calls.find(call => call[0] === 'draft'), ['draft','fair-typed-gaps',{a1:'i'}]);
+
+  studentLive.handlers.onNavigate({
+    current_page_id:'?view=unassigned&lesson=school-fair&exercise=fair-bank-gaps&panel=class&section=tasks',
+    current_exercise_id:'fair-bank-gaps'
+  });
+  assert.ok(student.location.search.includes('exercise=fair-bank-gaps'));
+  assert.ok(student.location.search.includes('session=session-1'));
+  assert.equal(student.mounts.at(-1).exercise.id, 'fair-bank-gaps');
 });
