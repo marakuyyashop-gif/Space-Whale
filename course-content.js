@@ -47,8 +47,8 @@
         menu: 'Words',
         section: 'tasks',
         guide: {
-          aim: 'Понять и начать извлекать из памяти bright, dark, colorful, simple, pretty, strange.',
-          tl: 'bright, dark, colorful, simple, pretty, strange',
+          aim: 'Сначала закрепить четыре нужных названия одежды, затем понять и начать извлекать из памяти bright, dark, colorful, simple, pretty, strange.',
+          tl: 'jacket, sweater, T-shirt, hat; bright, dark, colorful, simple, pretty, strange',
           time: '7 min'
         },
         exercise: {
@@ -58,6 +58,30 @@
           title: 'Words',
           instruction: '',
           blocks: [
+            {
+              type: 'exercise',
+              id: 'clothes-picture-word',
+              exercise: {
+                version: 1,
+                id: 'a12w4l1-clothes-picture-word',
+                kind: 'matching',
+                layout: 'picture-word',
+                title: 'Match the pictures with the words.',
+                instruction: 'Сначала закрепи названия одежды.',
+                items: [
+                  { id: 'cpw1', text: 'Jacket', image: vocabImage, alt: 'A jacket', crop: { x: 0, y: 0, w: 33.333, h: 50 }, correctId: 'jacket' },
+                  { id: 'cpw2', text: 'Sweater', image: vocabImage, alt: 'A sweater', crop: { x: 33.333, y: 0, w: 33.333, h: 50 }, correctId: 'sweater' },
+                  { id: 'cpw3', text: 'T-shirt', image: vocabImage, alt: 'A plain T-shirt', crop: { x: 0, y: 50, w: 33.333, h: 50 }, correctId: 'tshirt' },
+                  { id: 'cpw4', text: 'Hat', image: vocabImage, alt: 'A hat', crop: { x: 66.667, y: 50, w: 33.333, h: 50 }, correctId: 'hat' }
+                ],
+                options: [
+                  { id: 'sweater', text: 'sweater' },
+                  { id: 'hat', text: 'hat' },
+                  { id: 'jacket', text: 'jacket' },
+                  { id: 'tshirt', text: 'T-shirt' }
+                ]
+              }
+            },
             {
               type: 'exercise',
               id: 'picture-word',
@@ -94,23 +118,23 @@
                 id: 'a12w4l1-word-definition',
                 kind: 'matching',
                 layout: 'word-definition',
-                title: 'Match the words with their meanings.',
-                instruction: 'Make six pairs.',
+                title: 'Match the descriptions with the words.',
+                instruction: 'Прочитай описание и выбери английское слово.',
                 items: [
-                  { id: 'wd1', text: 'bright', correctId: 'b' },
-                  { id: 'wd2', text: 'dark', correctId: 'e' },
-                  { id: 'wd3', text: 'colorful', correctId: 'd' },
-                  { id: 'wd4', text: 'simple', correctId: 'f' },
-                  { id: 'wd5', text: 'pretty', correctId: 'a' },
-                  { id: 'wd6', text: 'strange', correctId: 'c' }
+                  { id: 'wd1', text: 'яркий, насыщенный по цвету', correctId: 'bright' },
+                  { id: 'wd2', text: 'тёмный по цвету', correctId: 'dark' },
+                  { id: 'wd3', text: 'разноцветный, с большим количеством цветов', correctId: 'colorful' },
+                  { id: 'wd4', text: 'простой, без лишних деталей', correctId: 'simple' },
+                  { id: 'wd5', text: 'симпатичный, красивый на вид', correctId: 'pretty' },
+                  { id: 'wd6', text: 'странный, необычный', correctId: 'strange' }
                 ],
                 options: [
-                  { id: 'a', text: 'nice and attractive to look at' },
-                  { id: 'b', text: 'with a strong, easy-to-see color' },
-                  { id: 'c', text: 'unusual or not normal' },
-                  { id: 'd', text: 'with many different colors' },
-                  { id: 'e', text: 'not light in color' },
-                  { id: 'f', text: 'with few details and not complicated' }
+                  { id: 'simple', text: 'simple' },
+                  { id: 'pretty', text: 'pretty' },
+                  { id: 'dark', text: 'dark' },
+                  { id: 'strange', text: 'strange' },
+                  { id: 'bright', text: 'bright' },
+                  { id: 'colorful', text: 'colorful' }
                 ]
               }
             },
@@ -126,12 +150,12 @@
                 title: 'Listen and repeat.',
                 instruction: '',
                 items: [
-                  { id: 'lr1', text: 'bright', example: 'This shirt is bright.' },
-                  { id: 'lr2', text: 'dark', example: 'My coat is dark.' },
-                  { id: 'lr3', text: 'colorful', example: 'Her skirt is colorful.' },
-                  { id: 'lr4', text: 'simple', example: 'This dress is simple.' },
-                  { id: 'lr5', text: 'pretty', example: 'The blouse is pretty.' },
-                  { id: 'lr6', text: 'strange', example: 'That hat is strange.' }
+                  { id: 'lr1', text: 'bright', audio: null, example: 'This shirt is bright.', exampleAudio: null },
+                  { id: 'lr2', text: 'dark', audio: null, example: 'My coat is dark.', exampleAudio: null },
+                  { id: 'lr3', text: 'colorful', audio: null, example: 'Her skirt is colorful.', exampleAudio: null },
+                  { id: 'lr4', text: 'simple', audio: null, example: 'This dress is simple.', exampleAudio: null },
+                  { id: 'lr5', text: 'pretty', audio: null, example: 'The blouse is pretty.', exampleAudio: null },
+                  { id: 'lr6', text: 'strange', audio: null, example: 'That hat is strange.', exampleAudio: null }
                 ]
               }
             }
@@ -204,16 +228,16 @@
                 id: 'a12w4l1-discovery-meaning',
                 kind: 'matching',
                 title: 'Match the groups with their meanings.',
-                instruction: 'Make three pairs.',
+                instruction: 'Соедини английские группы с их значениями.',
                 items: [
                   { id: 'm1', text: 'very / really', correctId: 'b' },
                   { id: 'm2', text: 'a little / a bit', correctId: 'c' },
                   { id: 'm3', text: 'too', correctId: 'a' }
                 ],
                 options: [
-                  { id: 'a', text: 'The quality is stronger than you want or need.' },
-                  { id: 'b', text: 'The quality is strong.' },
-                  { id: 'c', text: 'The quality is present, but only a small amount.' }
+                  { id: 'a', text: 'признак сильнее, чем нужно или подходит' },
+                  { id: 'b', text: 'признак выражен сильно' },
+                  { id: 'c', text: 'признак выражен немного' }
                 ]
               }
             },
@@ -223,16 +247,16 @@
               exercise: {
                 version: 1,
                 id: 'a12w4l1-complete-rule',
-                kind: 'choice',
-                layout: 'dropdown',
+                kind: 'gaps',
+                inputMode: 'select',
                 title: 'Complete the rule.',
-                instruction: 'Choose the correct option.',
+                instruction: 'Выбери вариант прямо в пропуске.',
                 items: [
-                  { id: 'r1', prompt: 'Very and really show a ___ degree.', options: [{id:'strong',text:'strong'},{id:'small',text:'small'}], correctId: 'strong' },
-                  { id: 'r2', prompt: 'A little and a bit show a ___ degree.', options: [{id:'strong',text:'strong'},{id:'small',text:'small'}], correctId: 'small' },
-                  { id: 'r3', prompt: 'Too means the quality is ___.', options: [{id:'need',text:'stronger than you need'},{id:'little',text:'only a little present'}], correctId: 'need' },
-                  { id: 'r4', prompt: 'The modifier goes ___ the adjective.', options: [{id:'before',text:'before'},{id:'after',text:'after'}], correctId: 'before' },
-                  { id: 'r5', prompt: 'A little and a bit contain ___.', options: [{id:'one',text:'one word'},{id:'two',text:'two words'}], correctId: 'two' }
+                  { id: 'r1', segments: ['Very и really показывают ', { id: 'r1g', answers: ['сильную'], options: ['сильную', 'небольшую'] }, ' степень признака.'] },
+                  { id: 'r2', segments: ['A little и a bit показывают ', { id: 'r2g', answers: ['небольшую'], options: ['сильную', 'небольшую'] }, ' степень признака.'] },
+                  { id: 'r3', segments: ['Too значит, что признак ', { id: 'r3g', answers: ['сильнее, чем нужно'], options: ['сильнее, чем нужно', 'выражен совсем немного'] }, '.'] },
+                  { id: 'r4', segments: ['Модификатор ставится ', { id: 'r4g', answers: ['перед'], options: ['перед', 'после'] }, ' прилагательным.'] },
+                  { id: 'r5', segments: ['A little и a bit состоят из ', { id: 'r5g', answers: ['двух слов'], options: ['одного слова', 'двух слов'] }, '.'] }
                 ]
               }
             },
