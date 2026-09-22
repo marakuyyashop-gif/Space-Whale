@@ -17,7 +17,7 @@ function content() {
 test('existing lessons and 16 templates load as data without page-specific DOM', () => {
   const { lessons, templates } = content();
   assert.equal(templates.length, 16);
-  assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1']);
+  assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1', 'a1-2-w4-l2']);
   lessons.forEach(lesson => lesson.stages.forEach(stage => kit.validate(stage.exercise)));
   assert.equal(lessons.find(lesson => lesson.id === 'school-fair').stages[0].exercise.id, 'fair-reading');
 });
@@ -67,6 +67,19 @@ test('A1.2 clothing lesson replaces its catalog outline with eight class stages 
   lesson.stages.forEach(stage => kit.validate(stage.exercise));
   assert.equal(lesson.stages[0].exercise.id, 'a12w4l1-opening');
   assert.equal(lesson.stages[7].exercise.id, 'a12w4l1-final-speaking');
+});
+
+test('A1.2 clothing appearance lesson replaces its second outline with nine class stages and two self-study blocks', () => {
+  const { lessons, templates } = content();
+  const catalog = createCatalog(lessons, templates);
+  const lesson = catalog.topics({view:'library',level:'A1.2',whale:4}).find(item => item.id === 'a1-2-w4-l2');
+  assert.equal(lesson.title, 'Описываем внешний вид одежды');
+  assert.equal(lesson.outline, undefined);
+  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 9);
+  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
+  lesson.stages.forEach(stage => kit.validate(stage.exercise));
+  assert.equal(lesson.stages[0].exercise.id, 'a12w4l2-opening');
+  assert.equal(lesson.stages[8].exercise.id, 'a12w4l2-final-speaking');
 });
 
 test('stale or malformed deep links recover without selecting another course lesson', () => {
