@@ -196,53 +196,8 @@
   ];
 
   stages.forEach(stage => kit.validate(stage.exercise));
-
-  const menu = document.getElementById('lessonMenu');
-  const host = document.getElementById('lessonStage');
-
-
-
-
-
-
-  const answers = new Map();
-  let current = 0;
-  let mounted = null;
-
-  stages.forEach((stage, index) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.innerHTML = `<span class="draft-menu-number">${index + 1}</span><span class="draft-menu-title"></span>`;
-    button.querySelector('.draft-menu-title').textContent = stage.menu;
-    button.addEventListener('click', () => show(index));
-    menu.append(button);
+  window.SpaceWhaleContent = window.SpaceWhaleContent || [];
+  window.SpaceWhaleContent.push({
+    id: 'first-day-school', title: 'Первый день в новой школе', level: null, whale: null, stages
   });
-
-  function show(index) {
-    current = Math.max(0, Math.min(stages.length - 1, index));
-    if (mounted) mounted.destroy();
-
-    const stage = stages[current];
-
-
-
-
-    [...menu.children].forEach((button, i) => {
-      if (i === current) button.setAttribute('aria-current', 'true');
-      else button.removeAttribute('aria-current');
-    });
-
-    mounted = kit.mount(host, stage.exercise, {
-      answers: answers.get(stage.exercise.id) || {},
-      onChange: value => answers.set(stage.exercise.id, value)
-    });
-
-
-
-  }
-
-
-
-
-  show(0);
 })();
