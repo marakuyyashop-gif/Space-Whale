@@ -2,9 +2,6 @@
 <html lang="ru"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Space Whale — Learning Space</title>
-<script>
-if (new URLSearchParams(location.search).get('session')) location.replace('classroom-session.html' + location.search + location.hash);
-</script>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
 <link rel="stylesheet" href="exercise-kit.css?v=20260922">
@@ -35,7 +32,10 @@ if (new URLSearchParams(location.search).get('session')) location.replace('class
 <section class="class-area"><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
 </div>
 <noscript>Для открытия упражнений включите JavaScript.</noscript>
-<script src="exercise-kit.js?v=20260922"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js?v=20260920-backend-v1"></script>
+<script src="classroom-realtime.js?v=20260922-live-workspace"></script>
+<script src="exercise-kit.js?v=20260922-live-workspace"></script>
 <script src="template-gallery.js?v=20260922"></script>
 <script src="lesson-draft-first-day-school.js?v=20260922"></script>
 <script src="lesson-draft-school-fair.js?v=20260922"></script>
