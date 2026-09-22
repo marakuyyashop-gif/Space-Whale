@@ -1,34 +1,109 @@
-/* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
+/* Shared exercise design system. All lesson content inherits these tokens. */
 .exercise-kit {
-  --ek-font: Onest, Arial, sans-serif;
-  --ek-text-size: 17px;
-  --ek-title-size: 23px;
-  --ek-gap: 18px;
-  --ek-radius: 16px;
-  --ek-ink: #292b2f;
-  --ek-muted: #71747a;
-  --ek-line: #d9dade;
+  --ek-font: Onest, "Helvetica Neue", Arial, sans-serif;
+  --ek-text-size: 16px;
+  --ek-text-line: 24px;
+  --ek-title-size: 24px;
+  --ek-title-line: 32px;
+  --ek-instruction-size: 20px;
+  --ek-instruction-line: 32px;
+  --ek-subtitle-size: 20px;
+  --ek-subtitle-line: 32px;
+  --ek-gap: 24px;
+  --ek-radius: 24px;
+  --ek-card-padding: 16px;
+  --ek-card-shadow: 0 8px 24px rgba(36,36,36,.15);
+  --ek-ink: #242424;
+  --ek-muted: #666a70;
+  --ek-line: #e2e3e6;
   --ek-card: #fff;
-  font-family: var(--ek-font); color: var(--ek-ink); font-size: var(--ek-text-size); line-height: 1.7;
+  font-family: var(--ek-font);
+  color: var(--ek-ink);
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
+  letter-spacing: normal;
+  -webkit-font-smoothing: antialiased;
 }
 .exercise-kit *, .exercise-kit *::before, .exercise-kit *::after { box-sizing: border-box; }
 .exercise-kit button, .exercise-kit input, .exercise-kit select, .exercise-kit textarea { font: inherit; color: inherit; }
 .exercise-kit button { cursor: pointer; }
 .exercise-kit :focus-visible { outline: 2px solid var(--ek-ink); outline-offset: 4px; }
-.exercise-kit .ek-title { font-size: var(--ek-title-size); line-height: 1.3; letter-spacing: -.035em; margin: 0 0 8px; }
-.exercise-kit .ek-instruction { color: var(--ek-muted); margin: 0 0 32px; font-size: .9em; }
+.exercise-kit .ek-title {
+  margin: 0 0 8px;
+  font-size: var(--ek-title-size);
+  font-weight: 700;
+  line-height: var(--ek-title-line);
+  letter-spacing: normal;
+}
+.exercise-kit .ek-instruction {
+  margin: 0 0 32px;
+  color: var(--ek-muted);
+  font-size: var(--ek-instruction-size);
+  font-weight: 400;
+  line-height: var(--ek-instruction-line);
+  letter-spacing: normal;
+}
 .exercise-kit .ek-body { display: grid; gap: var(--ek-gap); }
-.exercise-kit .ek-card-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 14px; }
-.exercise-kit .ek-card { display: flex; flex-direction: column; min-height: 170px; background: var(--ek-card); border: 1px solid #ededee; border-radius: var(--ek-radius); padding: 16px; box-shadow: 0 3px 8px #20212408; }
+.exercise-kit .ek-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,208px));
+  gap: 32px;
+  justify-content: start;
+}
+.exercise-kit .ek-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  background: var(--ek-card);
+  border: 1px solid transparent;
+  border-radius: var(--ek-radius);
+  padding: var(--ek-card-padding);
+  box-shadow: var(--ek-card-shadow);
+}
 .exercise-kit .ek-number { font-size: .8em; color: var(--ek-muted); }
 .exercise-kit .ek-card-label { margin: 8px 0 18px; }
-.exercise-kit .ek-match-slot { margin-top: auto; width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #f5f5f6; padding: 8px 12px; }
+.exercise-kit .ek-match-slot {
+  margin-top: auto;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 16px;
+  background: #f5f5f6;
+  padding: 8px 12px;
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
+}
 .exercise-kit .ek-dialog { width: min(580px,calc(100vw - 32px)); max-height: 85dvh; overflow: auto; border: 1px solid var(--ek-line); border-radius: 22px; padding: 26px; box-shadow: 0 16px 60px #20212424; color: var(--ek-ink); background: var(--ek-card); }
 .exercise-kit .ek-dialog::backdrop { background: #fff9; }
 .exercise-kit .ek-close { display: block; margin-left: auto; margin-bottom: 10px; border: 0; background: transparent; font-size: 14px; }
-.exercise-kit .ek-prompt { margin: 20px 0; padding: 14px; border: 1px solid var(--ek-line); border-radius: 12px; }
-.exercise-kit .ek-options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.exercise-kit .ek-option { flex: 1 1 120px; padding: 12px 14px; border: 1px solid var(--ek-line); background: #fff; border-radius: 12px; text-align: left; overflow-wrap: anywhere; }
+.exercise-kit .ek-prompt {
+  margin: 20px 0 24px;
+  padding: var(--ek-card-padding);
+  border: 1px solid transparent;
+  border-radius: var(--ek-radius);
+  background: #fff;
+  box-shadow: var(--ek-card-shadow);
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
+}
+.exercise-kit .ek-options { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 18px; }
+.exercise-kit .ek-option {
+  flex: 1 1 180px;
+  min-height: 72px;
+  padding: var(--ek-card-padding);
+  border: 1px solid transparent;
+  background: #fff;
+  border-radius: var(--ek-radius);
+  box-shadow: var(--ek-card-shadow);
+  text-align: left;
+  overflow-wrap: anywhere;
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
+}
 .exercise-kit .ek-option[aria-pressed=true] { border: 2px solid var(--ek-ink); }
 .exercise-kit .ek-option-used {
   background: #f1f1f2;
@@ -57,17 +132,31 @@
 .exercise-kit .ek-writing { display: grid; gap: 12px; }
 .exercise-kit textarea { width: 100%; resize: vertical; padding: 12px; border: 1px solid var(--ek-line); border-radius: 12px; background: #fff; }
 .exercise-kit .ek-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
-.exercise-kit .ek-button { border: 1px solid var(--ek-ink); border-radius: 12px; padding: 9px 17px; background: var(--ek-ink); color: #fff; font-size: .85em; }
+.exercise-kit .ek-button {
+  border: 1px solid var(--ek-ink);
+  border-radius: 14px;
+  padding: 9px 17px;
+  background: var(--ek-ink);
+  color: #fff;
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
+}
 .exercise-kit .ek-secondary { background: transparent; color: var(--ek-ink); border-color: var(--ek-line); }
-.exercise-kit .ek-status, .exercise-kit .ek-muted { color: var(--ek-muted); font-size: .85em; }
-.exercise-kit .ek-results { padding-left: 20px; font-size: .9em; }
+.exercise-kit .ek-status, .exercise-kit .ek-muted { color: var(--ek-muted); font-size: var(--ek-text-size); line-height: var(--ek-text-line); }
+.exercise-kit .ek-results { padding-left: 20px; font-size: var(--ek-text-size); line-height: var(--ek-text-line); }
 .exercise-kit .ek-image { display: block; width: 100%; max-height: 420px; object-fit: contain; border-radius: var(--ek-radius); }
 .exercise-kit .ek-radio .ek-image { width: 110px; }
 .exercise-kit .ek-copy { margin: 0; white-space: pre-wrap; }
 .exercise-kit .ek-disclosure { border-top: 1px solid var(--ek-line); padding: 16px 0; }
 .exercise-kit .ek-disclosure summary { cursor: pointer; }
 @media(max-width:600px) {
-  .exercise-kit { --ek-text-size: 16px; --ek-title-size: 21px; }
+  .exercise-kit {
+    --ek-title-size: 22px;
+    --ek-title-line: 30px;
+    --ek-instruction-size: 18px;
+    --ek-instruction-line: 28px;
+  }
   .exercise-kit .ek-card-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .exercise-kit .ek-card { padding: 12px; overflow-wrap: anywhere; }
   .exercise-kit .ek-dialog { padding: 18px; }
@@ -157,11 +246,11 @@
     "image image";
   gap: 7px 8px;
   align-items: center;
-  padding: 10px;
-  border: 1px solid var(--ek-line);
-  border-radius: 14px;
+  padding: var(--ek-card-padding);
+  border: 1px solid transparent;
+  border-radius: var(--ek-radius);
   background: #fff;
-  box-shadow: 0 2px 7px #20212408;
+  box-shadow: var(--ek-card-shadow);
 }
 .exercise-kit .ek-image-choice-option input { grid-area: radio; margin: 0; }
 .exercise-kit .ek-image-choice-option > span { grid-area: text; font-size: .78em; }
@@ -204,11 +293,11 @@
   gap: 7px;
   width: 100%;
   min-height: 116px;
-  padding: 8px;
-  border: 1px solid var(--ek-line);
-  border-radius: 14px;
+  padding: var(--ek-card-padding);
+  border: 1px solid transparent;
+  border-radius: var(--ek-radius);
   background: #fff;
-  box-shadow: 0 2px 7px #20212408;
+  box-shadow: var(--ek-card-shadow);
   text-align: left;
 }
 .exercise-kit .ek-order-image-card .ek-image {
@@ -315,9 +404,9 @@
 .exercise-kit .ek-repeat-play:hover { background: #f1f1f2; color: var(--ek-ink); }
 .exercise-kit .ek-repeat-line {
   min-width: 0;
-  font-size: 1em;
-  font-weight: 500;
-  line-height: 1.35;
+  font-size: var(--ek-text-size);
+  font-weight: 400;
+  line-height: var(--ek-text-line);
   color: var(--ek-ink);
 }
 @media(max-width:600px) {
@@ -430,19 +519,20 @@
 }
 .exercise-kit .ek-rule-section-title {
   margin: 0 0 10px;
-  font-size: 1.02em;
-  line-height: 1.35;
-  letter-spacing: -.02em;
+  font-size: var(--ek-subtitle-size);
+  font-weight: 700;
+  line-height: var(--ek-subtitle-line);
+  letter-spacing: normal;
 }
 .exercise-kit .ek-rule-text-section {
   padding-bottom: 2px;
 }
 .exercise-kit .ek-rule-block {
-  padding: 20px 22px;
-  border: 1px solid #e1e2e5;
-  border-radius: 18px;
+  padding: var(--ek-card-padding);
+  border: 1px solid transparent;
+  border-radius: var(--ek-radius);
   background: #fff;
-  box-shadow: 0 3px 10px #20212408;
+  box-shadow: var(--ek-card-shadow);
 }
 .exercise-kit .ek-rule-formula {
   margin-top: 14px;
@@ -482,10 +572,7 @@
   border-bottom: 0;
 }
 .exercise-kit .ek-discovery-host.exercise-kit {
-  --ek-title-size: 18px;
-  --ek-text-size: 15px;
-  --ek-gap: 14px;
-  line-height: 1.55;
+  --ek-gap: 18px;
 }
 .exercise-kit .ek-discovery-host .ek-title {
   margin-bottom: 6px;
@@ -510,11 +597,9 @@
    Width is an estimate from supplied screenshots, not the outer Inspect width. */
 .exercise-kit.ek-reading-width {
   --ek-reading-width: 560px;
-  --ek-title-size: 18px;
   width: 100%; max-width: var(--ek-reading-width); margin-inline: auto;
   text-align: left;
 }
-.exercise-kit.ek-reading-width .ek-title { letter-spacing: -.02em; }
 .exercise-kit.ek-reading-width .ek-instruction { margin-bottom: 28px; }
 .exercise-kit.ek-reading-width > .ek-body { gap: 0; }
 .exercise-kit.ek-reading-width .ek-sentence { line-height: 1.85; }
