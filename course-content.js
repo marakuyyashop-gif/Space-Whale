@@ -6,6 +6,9 @@
 
   const vocabImage = 'assets/a1-2-w4-l1-vocab.svg';
   const clothes2Image = 'assets/a1-2-w4-l2-clothes.svg';
+  const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const lesson1Audio = courseAudioBase + '/a1-2/w4/l1';
+  const lesson2Audio = courseAudioBase + '/a1-2/w4/l2';
 
   const lesson = {
     id: 'a1-2-w4-l1',
@@ -147,16 +150,15 @@
                 id: 'a12w4l1-listen-repeat',
                 kind: 'audio',
                 layout: 'listen-repeat',
-                audioPending: true,
                 title: 'Listen and repeat.',
                 instruction: '',
                 items: [
-                  { id: 'lr1', text: 'bright', audio: null, example: 'This shirt is bright.', exampleAudio: null },
-                  { id: 'lr2', text: 'dark', audio: null, example: 'My coat is dark.', exampleAudio: null },
-                  { id: 'lr3', text: 'colorful', audio: null, example: 'Her skirt is colorful.', exampleAudio: null },
-                  { id: 'lr4', text: 'simple', audio: null, example: 'This dress is simple.', exampleAudio: null },
-                  { id: 'lr5', text: 'pretty', audio: null, example: 'The blouse is pretty.', exampleAudio: null },
-                  { id: 'lr6', text: 'strange', audio: null, example: 'That hat is strange.', exampleAudio: null }
+                  { id: 'lr1', text: 'bright', audio: lesson1Audio + '/bright.mp3', example: 'This shirt is bright.', exampleAudio: lesson1Audio + '/this-shirt-is-bright.mp3' },
+                  { id: 'lr2', text: 'dark', audio: lesson1Audio + '/dark.mp3', example: 'My coat is dark.', exampleAudio: lesson1Audio + '/my-coat-is-dark.mp3' },
+                  { id: 'lr3', text: 'colorful', audio: lesson1Audio + '/colorful.mp3', example: 'Her skirt is colorful.', exampleAudio: lesson1Audio + '/her-skirt-is-colorful.mp3' },
+                  { id: 'lr4', text: 'simple', audio: lesson1Audio + '/simple.mp3', example: 'This dress is simple.', exampleAudio: lesson1Audio + '/this-dress-is-simple.mp3' },
+                  { id: 'lr5', text: 'pretty', audio: lesson1Audio + '/pretty.mp3', example: 'The blouse is pretty.', exampleAudio: lesson1Audio + '/the-blouse-is-pretty.mp3' },
+                  { id: 'lr6', text: 'strange', audio: lesson1Audio + '/strange.mp3', example: 'That hat is strange.', exampleAudio: lesson1Audio + '/that-hat-is-strange.mp3' }
                 ]
               }
             }
@@ -529,16 +531,15 @@
                 id: 'a12w4l2-listen-repeat',
                 kind: 'audio',
                 layout: 'listen-repeat',
-                audioPending: true,
                 title: 'Listen and repeat.',
                 instruction: '',
                 items: [
-                  { id: 'lr1', text: 'coat', audio: null, example: 'This is a coat.', exampleAudio: null },
-                  { id: 'lr2', text: 'sweater', audio: null, example: 'This is a sweater.', exampleAudio: null },
-                  { id: 'lr3', text: 'blouse', audio: null, example: 'This is a blouse.', exampleAudio: null },
-                  { id: 'lr4', text: 'skirt', audio: null, example: 'This is a skirt.', exampleAudio: null },
-                  { id: 'lr5', text: 'suit', audio: null, example: 'This is a suit.', exampleAudio: null },
-                  { id: 'lr6', text: 'hat', audio: null, example: 'This is a hat.', exampleAudio: null }
+                  { id: 'lr1', text: 'coat', audio: lesson2Audio + '/coat.mp3', example: 'This is a coat.', exampleAudio: lesson2Audio + '/this-is-a-coat.mp3' },
+                  { id: 'lr2', text: 'sweater', audio: lesson2Audio + '/sweater.mp3', example: 'This is a sweater.', exampleAudio: lesson2Audio + '/this-is-a-sweater.mp3' },
+                  { id: 'lr3', text: 'blouse', audio: lesson2Audio + '/blouse.mp3', example: 'This is a blouse.', exampleAudio: lesson2Audio + '/this-is-a-blouse.mp3' },
+                  { id: 'lr4', text: 'skirt', audio: lesson2Audio + '/skirt.mp3', example: 'This is a skirt.', exampleAudio: lesson2Audio + '/this-is-a-skirt.mp3' },
+                  { id: 'lr5', text: 'suit', audio: lesson2Audio + '/suit.mp3', example: 'This is a suit.', exampleAudio: lesson2Audio + '/this-is-a-suit.mp3' },
+                  { id: 'lr6', text: 'hat', audio: lesson2Audio + '/hat.mp3', example: 'This is a hat.', exampleAudio: lesson2Audio + '/this-is-a-hat.mp3' }
                 ]
               }
             },
