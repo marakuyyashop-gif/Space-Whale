@@ -318,7 +318,7 @@
     function changed(id, value) {
       answers[id] = value; save(); resultsBox.replaceChildren(); announce('');
     }
-    function popover(item, available, selected, onPick, opener) {
+    function popover(item, available, selected, onPick, opener, used = new Set()) {
       trigger = opener;
       dialog = node('dialog', 'ek-dialog');
       dialog.setAttribute('aria-label', def.title);
@@ -331,6 +331,10 @@
         const choice = button(option.text, () => { onPick(option.id); dialog.close(); }, 'ek-option');
         if (option.image) choice.prepend(illustration(option));
         choice.setAttribute('aria-pressed', String(selected === option.id));
+        if (used.has(option.id) && selected !== option.id) {
+          choice.classList.add('ek-option-used');
+          choice.title = 'Already used — click to move it here';
+        }
         choices.append(choice);
       });
       dialog.append(choices);
@@ -451,14 +455,41 @@
           if (item.image) card.append(illustration(item));
           if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
+          const promptText = pictureWord ? `Picture ${index + 1}` : item.text;
+          const refreshSlot = (matchItem, matchIndex, control) => {
+            if (!control) return;
+            const option = def.options.find(candidate => candidate.id === answers[matchItem.id]);
+            const label = pictureWord ? `picture ${matchIndex + 1}` : matchItem.text;
+            control.textContent = option?.text || '+';
+            control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
+          };
           const plus = button(chosen()?.text || '+', () => {
-            const taken = new Set(Object.entries(answers).filter(([id]) => id !== item.id).map(([,value]) => value));
-            popover(item, def.options.filter(option => !taken.has(option.id)), answers[item.id], value => {
-              changed(item.id, value); plus.textContent = chosen()?.text || '+';
-              plus.setAttribute('aria-label', `Choose a match for ${item.text}${chosen() ? `: ${chosen().text}` : ''}`);
-            }, plus);
+            const takenBy = new Map(
+              Object.entries(answers)
+                .filter(([id, value]) => id !== item.id && value)
+                .map(([id, value]) => [value, id])
+            );
+            popover(
+              { ...item, text: promptText, alt: pictureWord ? promptText : item.alt },
+              def.options,
+              answers[item.id],
+              value => {
+                if (value) {
+                  const previousId = takenBy.get(value);
+                  if (previousId) {
+                    delete answers[previousId];
+                    const previousIndex = def.items.findIndex(candidate => candidate.id === previousId);
+                    if (previousIndex >= 0) refreshSlot(def.items[previousIndex], previousIndex, controls.get(previousId));
+                  }
+                }
+                changed(item.id, value);
+                refreshSlot(item, index, plus);
+              },
+              plus,
+              new Set(takenBy.keys())
+            );
           }, pictureWord ? 'ek-match-slot ek-picture-word-slot' : 'ek-match-slot');
-          plus.setAttribute('aria-label', `Choose a match for ${item.text}`); plus.setAttribute('aria-haspopup', 'dialog');
+          plus.setAttribute('aria-label', `Choose a match for ${promptText.toLowerCase()}`); plus.setAttribute('aria-haspopup', 'dialog');
           controls.set(item.id, plus); card.append(plus); grid.append(card);
         });
         body.append(grid);
@@ -549,18 +580,36 @@
         stage.append(image);
         def.items.forEach((item, index) => {
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
+          const refreshTarget = (targetItem, targetIndex, control) => {
+            if (!control) return;
+            const option = def.options.find(candidate => candidate.id === answers[targetItem.id]);
+            control.textContent = option?.text || '+';
+            control.setAttribute('aria-label', `${targetItem.prompt || `Target ${targetIndex + 1}`}${option ? `: ${option.text}` : ''}`);
+          };
           const target = button(chosen()?.text || '+', () => {
-            const taken = new Set(Object.entries(answers).filter(([id]) => id !== item.id).map(([,value]) => value));
+            const takenBy = new Map(
+              Object.entries(answers)
+                .filter(([id, value]) => id !== item.id && value)
+                .map(([id, value]) => [value, id])
+            );
             popover(
               { text: item.prompt || `Target ${index + 1}` },
-              def.options.filter(option => !taken.has(option.id)),
+              def.options,
               answers[item.id],
               value => {
+                if (value) {
+                  const previousId = takenBy.get(value);
+                  if (previousId) {
+                    delete answers[previousId];
+                    const previousIndex = def.items.findIndex(candidate => candidate.id === previousId);
+                    if (previousIndex >= 0) refreshTarget(def.items[previousIndex], previousIndex, controls.get(previousId));
+                  }
+                }
                 changed(item.id, value);
-                target.textContent = chosen()?.text || '+';
-                target.setAttribute('aria-label', `${item.prompt || `Target ${index + 1}`}${chosen() ? `: ${chosen().text}` : ''}`);
+                refreshTarget(item, index, target);
               },
-              target
+              target,
+              new Set(takenBy.keys())
             );
           }, 'ek-image-label-target');
           target.style.left = `${item.x}%`;
