@@ -292,53 +292,8 @@
   ];
 
   stages.forEach(stage => kit.validate(stage.exercise));
-
-  const menu = document.getElementById('lessonMenu');
-  const host = document.getElementById('lessonStage');
-  const title = document.getElementById('stageTitle');
-  const indexLabel = document.getElementById('stageIndex');
-  const counter = document.getElementById('stageCounter');
-  const prev = document.getElementById('prevStage');
-  const next = document.getElementById('nextStage');
-
-  const answers = new Map();
-  let current = 0;
-  let mounted = null;
-
-  stages.forEach((stage, index) => {
-    const control = document.createElement('button');
-    control.type = 'button';
-    control.innerHTML = `<span class="draft-menu-number">${index + 1}</span><span class="draft-menu-title"></span>`;
-    control.querySelector('.draft-menu-title').textContent = stage.menu;
-    control.addEventListener('click', () => show(index));
-    menu.append(control);
+  window.SpaceWhaleContent = window.SpaceWhaleContent || [];
+  window.SpaceWhaleContent.push({
+    id: 'school-fair', title: 'Готовим школьную ярмарку', level: null, whale: null, stages
   });
-
-  function show(index) {
-    current = Math.max(0, Math.min(stages.length - 1, index));
-    if (mounted) mounted.destroy();
-
-    const stage = stages[current];
-    title.textContent = stage.title;
-    indexLabel.textContent = `Stage ${current + 1}`;
-    counter.textContent = `${current + 1} / ${stages.length}`;
-
-    [...menu.children].forEach((control, i) => {
-      if (i === current) control.setAttribute('aria-current','true');
-      else control.removeAttribute('aria-current');
-    });
-
-    mounted = kit.mount(host, stage.exercise, {
-      answers: answers.get(stage.exercise.id) || {},
-      onChange: value => answers.set(stage.exercise.id, value)
-    });
-
-    prev.disabled = current === 0;
-    next.disabled = current === stages.length - 1;
-  }
-
-  prev.addEventListener('click', () => show(current - 1));
-  next.addEventListener('click', () => show(current + 1));
-
-  show(0);
 })();

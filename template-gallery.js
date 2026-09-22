@@ -43,21 +43,6 @@
     ] }
   ];
   const kit = window.SpaceWhaleExerciseKit;
-  const host = document.getElementById('exercisePreview');
-  const menu = document.getElementById('templateMenu');
-  const attempts = new Map();
-  let active;
-  let instance;
-  function show(def) {
-    kit.validate(def);
-    instance?.destroy(); active = def;
-    const signature = JSON.stringify(def);
-    instance = kit.mount(host, def, { answers: attempts.get(signature) || {}, onChange: answers => attempts.set(signature, answers) });
-    menu.querySelectorAll('button').forEach(button => button.setAttribute('aria-current', String(button.dataset.id === def.id)));
-  }
-  examples.forEach(example => {
-    const button = document.createElement('button'); button.type = 'button'; button.textContent = example.label; button.dataset.id = example.id;
-    button.addEventListener('click', () => { show(example); }); menu.append(button);
-  });
-  show(examples[0]);
+  examples.forEach(definition => kit.validate(definition));
+  window.SpaceWhaleTemplates = examples;
 })();

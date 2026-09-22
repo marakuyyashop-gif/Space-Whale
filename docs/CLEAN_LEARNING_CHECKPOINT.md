@@ -13,3 +13,5 @@ Implementation:
 - No browser use: syntax and Node validation/grading/fixture tests only. Visual acceptance remains with user screenshots; do not claim pixel-perfect or browser-verified behavior.
 
 Preserve backgrounds/sidebar artwork and current pilot content. Next: user reviews all families at the shared width; then connect approved templates to the lesson publishing path. Do not start payments/account work.
+
+Superseded for page routing by docs/UNIFIED_WORKSPACE_CHECKPOINT.md (2026-09-22): gallery and both lesson pages now redirect into classroom.html. Their definitions share one controller. Existing authenticated sessions are preserved separately.
