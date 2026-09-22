@@ -382,6 +382,7 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
+              readOnly: Boolean(config.readOnly),
               answers: answers[block.id] || {},
               onChange: value => {
                 answers[block.id] = value;
@@ -598,9 +599,26 @@
       reset.setAttribute('aria-label', 'Reset exercise'); reset.title = 'Reset exercise'; actions.append(reset);
     }
 
+    const setAnswers = next => {
+      answers = clone(next || {});
+      feedback = {};
+      render();
+    };
+    const renderReadOnly = () => {
+      if (!config.readOnly) return;
+      body.querySelectorAll('button,input,textarea,select').forEach(control => {
+        if (control.closest('.ek-audio-player,.ek-repeat-audio')) return;
+        control.disabled = true;
+      });
+      actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
+    };
+    const originalRender = render;
+    render = () => { originalRender(); renderReadOnly(); };
+
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside); render();
     return {
       getAnswers: () => clone(answers),
+      setAnswers,
       destroy: () => { dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
