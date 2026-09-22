@@ -207,6 +207,7 @@
     const onOutside = event => { if (!event.target.closest?.('.ek-inline-choice')) dismissInline(); };
     const controls = new Map();
     let nestedMounts = [];
+    const nestedMountsByBlock = new Map();
     const node = (tag, className, text) => {
       const el = doc.createElement(tag);
       if (className) el.className = className;
@@ -341,7 +342,7 @@
     }
     function render() {
       dismissInline();
-      nestedMounts.forEach(instance => instance.destroy()); nestedMounts = [];
+      nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
       body.replaceChildren(); controls.clear(); resultsBox.replaceChildren();
       if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
@@ -392,6 +393,7 @@
               }
             });
             nestedMounts.push(handle);
+            nestedMountsByBlock.set(block.id, handle);
           }
         });
         body.append(page);
@@ -608,6 +610,39 @@
     const setAnswers = next => {
       answers = clone(next || {});
       feedback = {};
+      resultsBox.replaceChildren();
+      announce('');
+
+      if (def.kind === 'rule-page') {
+        def.blocks.forEach(block => {
+          if (block.type !== 'exercise') return;
+          nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {});
+        });
+        return;
+      }
+
+      if (def.kind === 'writing') {
+        def.items.forEach(item => {
+          const field = controls.get(item.id);
+          if (!field) return;
+          const value = answers[item.id] == null ? '' : String(answers[item.id]);
+          if (field.value !== value) field.value = value;
+        });
+        return;
+      }
+
+      if (def.kind === 'gaps') {
+        let canPatchWithoutRender = true;
+        for (const [id, control] of controls.entries()) {
+          const isTypedGap = control?.classList?.contains?.('ek-typed-gap');
+          if (!isTypedGap) { canPatchWithoutRender = false; break; }
+          const value = answers[id] == null ? '' : String(answers[id]);
+          if (control.value !== value) control.value = value;
+          control.style.width = `${Math.max(5, Math.min(28, value.length + 2))}ch`;
+        }
+        if (canPatchWithoutRender) return;
+      }
+
       render();
     };
     const renderReadOnly = () => {
