@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const kit = require('../exercise-kit.js');
 const { createCatalog, levels } = require('../workspace-catalog.js');
 const root = path.join(__dirname, '..');
-const dataFiles = ['template-gallery.js', 'lesson-draft-first-day-school.js', 'lesson-draft-school-fair.js'];
+const dataFiles = ['template-gallery.js', 'lesson-draft-first-day-school.js', 'lesson-draft-school-fair.js', 'course-content.js'];
 function content() {
   const window = { SpaceWhaleExerciseKit: kit };
   const context = vm.createContext({ window });
@@ -17,7 +17,7 @@ function content() {
 test('existing lessons and 16 templates load as data without page-specific DOM', () => {
   const { lessons, templates } = content();
   assert.equal(templates.length, 16);
-  assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair']);
+  assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1']);
   lessons.forEach(lesson => lesson.stages.forEach(stage => kit.validate(stage.exercise)));
   assert.equal(lessons.find(lesson => lesson.id === 'school-fair').stages[0].exercise.id, 'fair-reading');
 });
@@ -54,6 +54,19 @@ test('A1 course outline exposes real Whale names and catalog-only lesson titles'
   const route = catalog.normalize('?view=library&level=A1.1&whale=1&lesson=a1-1-w1-l1');
   assert.equal(route.lesson, 'a1-1-w1-l1');
   assert.equal(route.exercise, '');
+});
+
+test('A1.2 clothing lesson replaces its catalog outline with eight class stages and two self-study blocks', () => {
+  const { lessons, templates } = content();
+  const catalog = createCatalog(lessons, templates);
+  const lesson = catalog.topics({view:'library',level:'A1.2',whale:4}).find(item => item.id === 'a1-2-w4-l1');
+  assert.equal(lesson.title, 'Описываем одежду');
+  assert.equal(lesson.outline, undefined);
+  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 8);
+  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
+  lesson.stages.forEach(stage => kit.validate(stage.exercise));
+  assert.equal(lesson.stages[0].exercise.id, 'a12w4l1-opening');
+  assert.equal(lesson.stages[7].exercise.id, 'a12w4l1-final-speaking');
 });
 
 test('stale or malformed deep links recover without selecting another course lesson', () => {
@@ -239,7 +252,7 @@ test('unified live Workspace streams drafts, applies remote answers and keeps te
   const teacher = app('?session=session-1&view=unassigned&lesson=school-fair&exercise=fair-typed-gaps&panel=library&section=tasks', new Map(), teacherLive);
   await flush(); await flush();
   const teacherMount = teacher.mounts.at(-1);
-  assert.equal(teacherMount.config.readOnly, true);
+  assert.equal(teacherMount.config.readOnly, false);
   teacherLive.handlers.onExerciseDraft({exercise_id:'fair-typed-gaps',response:{a1:'invitations'},source_id:'student-tab',seq:1});
   assert.deepEqual(teacherMount.remoteAnswers, {a1:'invitations'});
   assert.ok(teacher.location.search.includes('session=session-1'));
