@@ -743,46 +743,15 @@
               exercise: {
                 version: 1,
                 id: 'a12w4l2-choose-question',
-                kind: 'choice',
+                kind: 'gaps',
+                inputMode: 'select',
                 title: 'Choose the question.',
-                instruction: 'Choose the question that matches the answer.',
+                instruction: 'Choose the question first, then read the answer.',
                 items: [
-                  {
-                    id: 'qq1',
-                    prompt: 'It looks nice.',
-                    options: [
-                      { id: 'what', text: 'What does it look like?' },
-                      { id: 'how', text: 'How does it look?' }
-                    ],
-                    correctId: 'how'
-                  },
-                  {
-                    id: 'qq2',
-                    prompt: 'It looks like a dress.',
-                    options: [
-                      { id: 'what', text: 'What does it look like?' },
-                      { id: 'how', text: 'How does it look?' }
-                    ],
-                    correctId: 'what'
-                  },
-                  {
-                    id: 'qq3',
-                    prompt: 'It looks strange.',
-                    options: [
-                      { id: 'how', text: 'How does it look?' },
-                      { id: 'what', text: 'What does it look like?' }
-                    ],
-                    correctId: 'how'
-                  },
-                  {
-                    id: 'qq4',
-                    prompt: 'It looks like a shirt.',
-                    options: [
-                      { id: 'how', text: 'How does it look?' },
-                      { id: 'what', text: 'What does it look like?' }
-                    ],
-                    correctId: 'what'
-                  }
+                  { id: 'qq1', segments: [{ id: 'qq1g', answers: ['How does it look?'], options: ['What does it look like?', 'How does it look?'] }, ' — It looks nice.'] },
+                  { id: 'qq2', segments: [{ id: 'qq2g', answers: ['What does it look like?'], options: ['What does it look like?', 'How does it look?'] }, ' — It looks like a dress.'] },
+                  { id: 'qq3', segments: [{ id: 'qq3g', answers: ['How does it look?'], options: ['How does it look?', 'What does it look like?'] }, ' — It looks strange.'] },
+                  { id: 'qq4', segments: [{ id: 'qq4g', answers: ['What does it look like?'], options: ['How does it look?', 'What does it look like?'] }, ' — It looks like a shirt.'] }
                 ]
               }
             },
@@ -922,15 +891,6 @@
                   { id: 'w3', prompt: '3. The sweater ... / It ...' }
                 ]
               }
-            },
-            {
-              type: 'rule',
-              title: 'Possible answers',
-              examples: [
-                'The blouse looks nice. / It looks like a shirt.',
-                'The hat looks strange. / It looks like a flower.',
-                'The sweater looks good. / It looks like a coat.'
-              ]
             }
           ]
         }
