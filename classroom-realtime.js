@@ -6,6 +6,7 @@
     session: null,
     user: null,
     role: null,
+    guestToken: null,
     clientId: (globalThis.crypto?.randomUUID?.() || `client-${Date.now()}-${Math.random().toString(36).slice(2)}`)
   };
   const exerciseSequences = new Map();
@@ -46,8 +47,19 @@
   }
 
   async function loadSharedState(sessionId) {
-    if (!client || !sessionId) return null;
+    if (!client) return null;
 
+    if (state.guestToken) {
+      const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: state.guestToken });
+      if (error) throw error;
+      if (!data) return null;
+      return {
+        current_page_id: data.current_page_id || null,
+        current_exercise_id: data.current_exercise_id || null
+      };
+    }
+
+    if (!sessionId) return null;
     const { data, error } = await client
       .from("lesson_state")
       .select("*")
@@ -120,6 +132,78 @@
     return { session, role: state.role };
   }
 
+
+  async function resolveGuestLink(token) {
+    if (!client || !token) return null;
+    const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: token });
+    if (error) throw error;
+    return data || null;
+  }
+
+  async function connectGuest(token, handlers = {}) {
+    if (!client) throw new Error("Supabase client is not ready.");
+    const meta = await resolveGuestLink(token);
+    if (!meta) throw new Error("Guest lesson link is invalid or has expired.");
+
+    const signedInUser = await getCurrentUser();
+    state.guestToken = token;
+    state.role = meta.is_host ? "teacher" : "student";
+    state.user = signedInUser || { id: `guest-${state.clientId}` };
+    state.session = {
+      id: `guest:${token.slice(0, 8)}`,
+      room_topic: meta.room_topic,
+      allowed_lesson_ids: Array.isArray(meta.allowed_lesson_ids) ? meta.allowed_lesson_ids : [],
+      expires_at: meta.expires_at,
+      guest: true
+    };
+
+    if (state.channel) {
+      await client.removeChannel(state.channel);
+      state.channel = null;
+    }
+
+    const channel = client.channel(meta.room_topic, {
+      config: {
+        private: false,
+        broadcast: { self: false, ack: true },
+        presence: { key: state.role === "teacher" ? `teacher-${state.clientId}` : `guest-${state.clientId}` }
+      }
+    });
+
+    channel
+      .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
+      .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
+      .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
+      .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
+      .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
+      .on("broadcast", { event: "state_request" }, ({ payload }) => handlers.onStateRequest?.(payload))
+      .on("broadcast", { event: "state_snapshot" }, ({ payload }) => handlers.onStateSnapshot?.(payload))
+      .on("presence", { event: "sync" }, () => handlers.onPresence?.(channel.presenceState()))
+      .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
+      .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
+
+    await new Promise((resolve, reject) => {
+      channel.subscribe(async (status, error) => {
+        if (error) reject(error);
+        if (status === "SUBSCRIBED") {
+          await channel.track({
+            user_id: state.user.id,
+            role: state.role,
+            guest: true,
+            online_at: new Date().toISOString()
+          });
+          resolve();
+        }
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          reject(error || new Error(status));
+        }
+      });
+    });
+
+    state.channel = channel;
+    return { session: state.session, role: state.role, meta };
+  }
+
   async function broadcast(event, payload) {
     if (!state.channel) throw new Error("Lesson realtime channel is not connected.");
     return state.channel.send({
@@ -163,6 +247,17 @@
       updated_by: state.user.id
     };
 
+    if (state.guestToken) {
+      const { data, error } = await client.rpc("save_guest_lesson_navigation", {
+        p_token: state.guestToken,
+        p_current_page_id: currentPageId,
+        p_current_exercise_id: currentExerciseId
+      });
+      if (error) throw error;
+      if (!data) throw new Error("Guest lesson navigation is no longer authorized.");
+      return broadcast("navigate", payload);
+    }
+
     const { error } = await client
       .from("lesson_state")
       .update(payload)
@@ -182,6 +277,8 @@
       sent_at: Date.now()
     };
 
+    if (state.guestToken) return broadcast("audio", payload);
+
     const { error } = await client
       .from("lesson_state")
       .update({
@@ -196,6 +293,13 @@
 
   async function loadExerciseResponse(exerciseId) {
     if (!state.session || !state.user) return null;
+
+    if (state.guestToken) {
+      const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: state.guestToken });
+      if (error) throw error;
+      const response = data?.responses?.[exerciseId];
+      return response ? { exercise_id: exerciseId, response, is_draft: true } : null;
+    }
 
     let query = client
       .from("exercise_responses")
@@ -217,6 +321,17 @@
   const draftTimers = new Map();
 
   async function persistDraftSnapshot(exerciseId, response) {
+    if (state.guestToken) {
+      const { data, error } = await client.rpc("save_guest_lesson_response", {
+        p_token: state.guestToken,
+        p_exercise_id: exerciseId,
+        p_response: response
+      });
+      if (error) throw error;
+      if (!data) throw new Error("Guest lesson link is no longer active.");
+      return;
+    }
+
     const record = {
       session_id: state.session.id,
       student_id: state.user.id,
@@ -264,6 +379,22 @@
   async function saveExerciseResponse(exerciseId, response, options = {}) {
     if (state.role !== "student") {
       throw new Error("Exercise responses are saved by the student.");
+    }
+
+    if (state.guestToken) {
+      await persistDraftSnapshot(exerciseId, response);
+      const payload = {
+        exercise_id: exerciseId,
+        response,
+        is_correct: options.isCorrect ?? null,
+        submitted_at: options.submitted ? new Date().toISOString() : null,
+        student_id: state.user.id,
+        source_id: state.clientId,
+        seq: nextSequence(exerciseId),
+        sent_at: Date.now()
+      };
+      await broadcast("exercise_response", payload);
+      return payload;
     }
 
     const record = {
@@ -327,10 +458,13 @@
     state.channel = null;
     state.session = null;
     state.role = null;
+    state.guestToken = null;
   }
 
   window.SpaceWhaleClassroom = {
     connect,
+    connectGuest,
+    resolveGuestLink,
     disconnect,
     getCurrentUser,
     loadSession,

@@ -5,6 +5,8 @@
   const catalog = window.SpaceWhaleCatalog.createCatalog(window.SpaceWhaleContent || [], window.SpaceWhaleTemplates || []);
   const classroom = window.SpaceWhaleClassroom || null;
   const sessionId = new URLSearchParams(location.search).get('session');
+  const guestToken = new URLSearchParams(location.search).get('guest');
+  const liveMode = Boolean(sessionId || guestToken);
 
   const host = document.getElementById('workspaceExercise');
   const tree = document.getElementById('workspaceTopics');
@@ -29,6 +31,7 @@
   let liveReady = false;
   let liveRole = null;
   let liveSession = null;
+  let guestAllowedLessons = null;
 
   let classIds;
   try { classIds = new Set(JSON.parse(sessionStorage.getItem('space-whale:class-topics')) || []); }
@@ -53,12 +56,14 @@
     params.set('panel', next.panel || 'library');
     params.set('section', next.section || 'tasks');
     if (sessionId) params.set('session', sessionId);
+    if (guestToken) params.set('guest', guestToken);
     return `?${params}`;
   }
 
   function routeForExercise(exerciseId) {
     if (!exerciseId) return null;
     for (const lesson of catalog.lessons) {
+      if (guestAllowedLessons && !guestAllowedLessons.has(lesson.id)) continue;
       const stage = lesson.stages.find(item => item.exercise.id === exerciseId);
       if (!stage) continue;
       const location = lessonLocation(lesson);
@@ -75,7 +80,7 @@
   }
 
   async function syncTeacherNavigation() {
-    if (!sessionId || !liveReady || liveRole !== 'teacher' || !classroom?.state?.channel) return;
+    if (!liveMode || !liveReady || liveRole !== 'teacher' || !classroom?.state?.channel) return;
     try {
       await classroom.navigate(route.exercise || null, query(route));
     } catch (error) {
@@ -85,7 +90,7 @@
   }
 
   function go(next, options = {}) {
-    if (sessionId && liveReady && liveRole === 'student' && !options.remote) return;
+    if (liveMode && liveReady && liveRole === 'student' && !options.remote) return;
     route = readRoute(query(next));
     if (route.lesson) expanded.add(route.lesson);
     history[options.remote ? 'replaceState' : 'pushState'](null, '', `classroom.html${query(route)}`);
@@ -108,7 +113,7 @@
   function link(text, next, active, className) {
     const el = node('a', text, className); el.href = `classroom.html${query(next)}`;
     if (active) el.setAttribute('aria-current', 'page');
-    if (sessionId && liveReady && liveRole === 'student') el.setAttribute('aria-disabled', 'true');
+    if (liveMode && liveReady && liveRole === 'student') el.setAttribute('aria-disabled', 'true');
     el.addEventListener('click', event => {
       if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); go(next);
@@ -124,7 +129,11 @@
 
   function stageSection(stage) { return stage.section || 'tasks'; }
   function visibleStages(lesson, section) { return lesson.stages.filter(stage => stageSection(stage) === section); }
-  function selectedLesson() { return catalog.topics(route).find(lesson => lesson.id === route.lesson); }
+  function selectedLesson() {
+    const lesson = catalog.topics(route).find(item => item.id === route.lesson);
+    if (guestAllowedLessons && lesson && !guestAllowedLessons.has(lesson.id)) return null;
+    return lesson;
+  }
 
   function saveClass() {
     try { sessionStorage.setItem('space-whale:class-topics', JSON.stringify([...classIds])); }
@@ -132,7 +141,7 @@
   }
 
   function toggleClass(lesson) {
-    if (sessionId && liveReady && liveRole === 'student') return;
+    if (liveMode && liveReady && liveRole === 'student') return;
     if (classIds.has(lesson.id)) classIds.delete(lesson.id); else classIds.add(lesson.id);
     saveClass(); render();
   }
@@ -153,8 +162,8 @@
     tree.replaceChildren();
     course.value = route.view === 'library' ? `${route.level}|${route.whale}` : route.view;
 
-    const studentLocked = Boolean(sessionId && liveReady && liveRole === 'student');
-    course.disabled = studentLocked;
+    const studentLocked = Boolean(liveMode && liveReady && liveRole === 'student');
+    course.disabled = studentLocked || Boolean(guestToken && liveReady);
     panels.forEach(panel => {
       const tab = document.getElementById(`${panel}Tab`);
       tab.setAttribute('aria-pressed', String(route.panel === panel));
@@ -164,8 +173,9 @@
 
     const source = route.panel === 'class' ? catalog.lessons : catalog.topics(route);
     const topics = source.filter(lesson => {
+      if (guestAllowedLessons && !guestAllowedLessons.has(lesson.id)) return false;
       if (route.panel === 'class') {
-        if (sessionId && liveReady) return classIds.has(lesson.id) || lesson.id === route.lesson;
+        if (liveMode && liveReady) return classIds.has(lesson.id) || lesson.id === route.lesson || Boolean(guestToken);
         return classIds.has(lesson.id);
       }
       if (route.panel === 'self-study') return visibleStages(lesson, 'self-study').length;
@@ -188,7 +198,7 @@
       toggle.setAttribute('aria-controls', `topic-${lesson.id}`);
       heading.append(toggle);
 
-      if (open && !isTemplate) {
+      if (open && !isTemplate && !guestToken) {
         const add = button(classIds.has(lesson.id) ? 'Added ✓' : 'Add to class', () => toggleClass(lesson), 'workspace-add');
         add.disabled = studentLocked || !lesson.stages.length;
         add.setAttribute('aria-pressed', String(classIds.has(lesson.id)));
@@ -244,7 +254,7 @@
     }
 
     const selected = selectedLesson();
-    start.disabled = studentLocked || !selected?.stages.length || route.view === 'templates';
+    start.disabled = Boolean(guestToken) || studentLocked || !selected?.stages.length || route.view === 'templates';
     tree.scrollTop = sidebarScroll;
   }
 
@@ -290,7 +300,7 @@
   }
 
   async function hydrateLiveExercise(exerciseId, localAnswers) {
-    if (!sessionId || !liveReady || !exerciseId || liveHydrated.has(exerciseId)) return;
+    if (!liveMode || !liveReady || !exerciseId || liveHydrated.has(exerciseId)) return;
     liveHydrated.add(exerciseId);
 
     if (liveRole === 'teacher') {
@@ -320,8 +330,13 @@
   function renderContent() {
     const selected = selectedLesson();
     const stage = selected?.stages.find(stage => stage.exercise.id === route.exercise && stageSection(stage) === route.section);
-    const visible = route.panel !== 'class' || Boolean(sessionId && liveReady) || classIds.has(selected?.id);
-    const liveIdentity = sessionId ? `${sessionId}:${liveRole || 'connecting'}` : 'standalone';
+    const allowedSelected = !selected || !guestAllowedLessons || guestAllowedLessons.has(selected.id);
+    const visible = allowedSelected && (route.panel !== 'class' || Boolean(liveMode && liveReady) || classIds.has(selected?.id));
+    const liveIdentity = sessionId
+      ? `${sessionId}:${liveRole || 'connecting'}`
+      : guestToken
+        ? `guest:${guestToken.slice(0, 8)}:${liveRole || 'connecting'}`
+        : 'standalone';
     const key = stage && visible ? `${liveIdentity}:${selected.id}:${stage.exercise.id}` : `${liveIdentity}:${route.view}:${route.panel}:${route.lesson}:${route.section}:empty`;
 
     if (key === mountedKey) return;
@@ -339,10 +354,12 @@
     document.title = `${selected.title} — Space Whale`;
     const storageKey = sessionId
       ? `space-whale:workspace:live:v1:${sessionId}:${selected.id}:${exercise.id}`
-      : `space-whale:workspace:v1:${selected.id}:${exercise.id}`;
+      : guestToken
+        ? `space-whale:workspace:guest:v1:${guestToken.slice(0, 12)}:${selected.id}:${exercise.id}`
+        : `space-whale:workspace:v1:${selected.id}:${exercise.id}`;
     const signature = JSON.stringify(exercise);
     const localAnswers = readAnswers(storageKey, signature);
-    const initialAnswers = sessionId && liveRole === 'teacher'
+    const initialAnswers = liveMode && liveRole === 'teacher'
       ? (liveAnswers.get(exercise.id) || {})
       : localAnswers;
 
@@ -351,7 +368,7 @@
       readOnly: false,
       onChange: answers => {
         storeAnswers(storageKey, signature, answers);
-        if (sessionId && liveReady && liveRole === 'student') {
+        if (liveMode && liveReady && liveRole === 'student') {
           classroom.sendExerciseDraft(exercise.id, answers)
             .catch(error => console.error('[Space Whale] Live answer sync failed', error));
         }
@@ -364,7 +381,7 @@
   function render() { renderSidebar(); renderContent(); }
 
   function applyRemoteNavigation(payload) {
-    if (!sessionId || liveRole !== 'student') return;
+    if (!liveMode || liveRole !== 'student') return;
     let next = null;
     if (payload?.current_page_id) next = readRoute(payload.current_page_id);
     if ((!next || !next.exercise) && payload?.current_exercise_id) next = routeForExercise(payload.current_exercise_id);
@@ -372,7 +389,7 @@
   }
 
   function renderPresence(presenceState) {
-    if (!sessionId || !sessionHeading) return;
+    if (!liveMode || !sessionHeading) return;
     const presences = Object.values(presenceState || {}).flat();
     const studentOnline = presences.some(item => item.role === 'student');
     const teacherOnline = presences.some(item => item.role === 'teacher');
@@ -382,19 +399,21 @@
   }
 
   async function initLiveSession() {
-    if (!sessionId) return;
+    if (!liveMode) return;
     if (!classroom) throw new Error('Realtime classroom module is unavailable.');
 
-    if (sessionHeading) sessionHeading.textContent = 'Live lesson · подключение…';
+    if (sessionHeading) sessionHeading.textContent = guestToken ? 'Guest lesson · подключение…' : 'Live lesson · подключение…';
 
-    const user = await classroom.getCurrentUser();
-    if (!user) {
-      const next = encodeURIComponent(`classroom.html${location.search}`);
-      location.href = `login.html?next=${next}`;
-      return;
+    if (!guestToken) {
+      const user = await classroom.getCurrentUser();
+      if (!user) {
+        const next = encodeURIComponent(`classroom.html${location.search}`);
+        location.href = `login.html?next=${next}`;
+        return;
+      }
     }
 
-    const result = await classroom.connect(sessionId, {
+    const handlers = {
       onNavigate: applyRemoteNavigation,
       onExerciseDraft: payload => acceptLivePayload(payload),
       onExerciseResponse: payload => acceptLivePayload(payload),
@@ -416,13 +435,36 @@
       onPresence: renderPresence,
       onJoin: () => renderPresence(classroom.state.channel?.presenceState?.() || {}),
       onLeave: () => renderPresence(classroom.state.channel?.presenceState?.() || {})
-    });
+    };
+
+    const result = guestToken
+      ? await classroom.connectGuest(guestToken, handlers)
+      : await classroom.connect(sessionId, handlers);
 
     liveReady = true;
     liveRole = result.role;
     liveSession = result.session;
+    guestAllowedLessons = guestToken ? new Set(result.session.allowed_lesson_ids || []) : null;
 
     if (!liveRole) throw new Error('This account is not a participant in the lesson session.');
+
+    if (guestAllowedLessons && (!route.lesson || !guestAllowedLessons.has(route.lesson))) {
+      const firstLessonId = [...guestAllowedLessons][0];
+      const firstLesson = catalog.lessons.find(item => item.id === firstLessonId);
+      if (firstLesson) {
+        const firstStage = visibleStages(firstLesson, 'tasks')[0];
+        route = readRoute(query({
+          ...route,
+          ...lessonLocation(firstLesson),
+          panel: 'library',
+          lesson: firstLesson.id,
+          section: 'tasks',
+          exercise: firstStage?.exercise.id || ''
+        }));
+        expanded.clear();
+        expanded.add(firstLesson.id);
+      }
+    }
 
     renderPresence(classroom.state.channel.presenceState());
     mountedKey = '';
@@ -482,13 +524,13 @@
 
   start.addEventListener('click', () => {
     const selected = selectedLesson();
-    if (!selected?.stages.length || (sessionId && liveReady && liveRole === 'student')) return;
+    if (!selected?.stages.length || guestToken || (liveMode && liveReady && liveRole === 'student')) return;
     classIds.add(selected.id); saveClass();
     go({ ...route, panel: 'class', section: stageSection(selected.stages[0]), exercise: selected.stages[0].exercise.id });
   });
 
   window.addEventListener('popstate', () => {
-    if (sessionId && liveReady && liveRole === 'student') {
+    if (liveMode && liveReady && liveRole === 'student') {
       history.replaceState(null, '', `classroom.html${query(route)}`);
       return;
     }
@@ -504,6 +546,6 @@
   initLiveSession().catch(error => {
     console.error('[Space Whale] Live Workspace connection failed', error);
     notice.textContent = error.message;
-    if (sessionHeading) sessionHeading.textContent = 'Live lesson · ошибка подключения';
+    if (sessionHeading) sessionHeading.textContent = guestToken ? 'Guest lesson · ссылка недействительна' : 'Live lesson · ошибка подключения';
   });
 })();
