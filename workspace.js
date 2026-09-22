@@ -73,7 +73,7 @@
       if (current) selected = lesson;
       const group = node('div', '', 'workspace-topic');
       if (route.view !== 'templates') group.append(link(lesson.title, { ...route, lesson: lesson.id, exercise: '' }, current, 'workspace-topic-link'));
-      if (current) {
+      if (current && lesson.stages.length) {
         const stages = node('nav', '', 'workspace-stages');
         stages.setAttribute('aria-label', `Задания: ${lesson.title}`);
         lesson.stages.forEach((stage, index) => {
@@ -90,6 +90,12 @@
       empty.append(node('h1', topics.length ? 'Выберите тему' : `${route.level} · Whale ${route.whale}`));
       empty.append(node('p', topics.length ? 'Откройте урок в библиотеке слева.' : 'В этом Whale пока нет уроков.'));
       host.append(empty); document.title = 'Space Whale — Learning Space'; return;
+    }
+    if (!selected.stages.length) {
+      const empty = node('section', '', 'workspace-empty');
+      empty.append(node('h1', selected.title));
+      empty.append(node('p', 'Урок пока размечен в каталоге, но упражнения ещё не добавлены.'));
+      host.append(empty); document.title = `${selected.title} — Space Whale`; return;
     }
     const exercise = selected.stages.find(stage => stage.exercise.id === route.exercise).exercise;
     document.title = `${selected.title} — Space Whale`;
