@@ -1,3 +1,5 @@
+> Current implementation and authoring contract: [TEMPLATE_FACTORY.md](TEMPLATE_FACTORY.md). The historical checkpoint below is retained for context.
+
 # Exercise coverage registry v2 — current scope
 
 Status: analysis checkpoint only. No exercise renderer code changed in this checkpoint.

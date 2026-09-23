@@ -1,0 +1,20 @@
+/* SPACE WHALE — edit shared appearance here.
+   Lessons contain content only. Every host imports these tokens through exercise-kit.css.
+   Keep type-specific changes under their named tokens; never style one lesson ID. */
+:root {
+  --sw-exercise-font: Onest, Arial, sans-serif;
+  --sw-exercise-text-size: 17px;
+  --sw-exercise-title-size: 23px;
+  --sw-exercise-compact-text-size: 15px;
+  --sw-exercise-compact-title-size: 18px;
+  --sw-exercise-mobile-text-size: 16px;
+  --sw-exercise-mobile-title-size: 21px;
+  --sw-exercise-radius: 16px;
+  --sw-matching-min-height: 170px;
+  --sw-matching-ratio: auto;
+  --sw-picture-word-ratio: 0.72 / 1;
+  --sw-picture-word-radius: 20px;
+  --sw-exercise-accent: #ed8a42;
+  --sw-exercise-correct: #25734b;
+  --sw-exercise-incorrect: #b13b3b;
+}

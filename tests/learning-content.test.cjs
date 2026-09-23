@@ -9,17 +9,17 @@ function definitions(file, name, end) {
   const start = source.indexOf(`  const ${name} = [`);
   return vm.runInNewContext(`(() => { ${source.slice(start, source.indexOf(end, start))} return ${name}; })()`);
 }
-test('all 16 gallery definitions and pilot stages remain valid', () => {
-  const gallery = definitions('template-gallery.js', 'examples', '  const kit');
-  assert.equal(gallery.length, 16);
+test('factory fixtures and pilot stages remain valid', () => {
+  const window = {SpaceWhaleExerciseKit:kit};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../template-gallery.js'),'utf8'), {window});
+  const gallery = window.SpaceWhaleTemplates;
+  assert.equal(gallery.length, 31);
   gallery.forEach(def => kit.validate(def));
   definitions('lesson-draft-first-day-school.js', 'stages', '  stages.forEach').forEach(stage => kit.validate(stage.exercise));
-  const order = gallery.find(def => def.id === 'picture-order-demo');
-  assert.ok(order.source.text.includes('went hiking first'));
-  const discovery = gallery.find(def => def.kind === 'rule-page');
-  assert.deepEqual(Array.from(discovery.blocks[0].highlights), ['is easy to get', 'was difficult to find']);
-  assert.ok(discovery.blocks.some(block => block.type === 'image'));
-  assert.ok(!discovery.blocks.some(block => block.type === 'rule'));
+  assert.ok(gallery.some(def => def.kind === 'choice' && def.multiple));
+  assert.ok(gallery.some(def => def.kind === 'stage' && def.progressive));
+  assert.ok(gallery.some(def => def.kind === 'audio' && def.transcript));
+  assert.equal(gallery.find(def => def.id === 'bank-demo').inputMode, 'text');
 });
 test('discovery dropdown grades option IDs and preserves prompt data', () => {
   const def = { version: 1, id: 'd', kind: 'choice', layout: 'dropdown', title: 'Complete', items: [{ id: 'q', prompt: 'We use this form...', options: [{ id: 'a', text: 'now' }, { id: 'b', text: 'in the past' }], correctId: 'b' }] };

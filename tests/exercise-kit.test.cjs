@@ -65,9 +65,12 @@ test('sort and open writing have distinct grading', () => {
   assert.equal(grade(def, { s1: 'past' }).s1, 'correct');
   assert.equal(grade({ version: 1, id: 'w', title: 'Write', kind: 'writing', items: [{ id: 'w1', prompt: 'Why?' }] }, { w1: 'My answer' }).w1, 'review');
 });
-test('gap bank must include all accepted answers', () => {
-  const def = copy(gaps); def.bank = ['was']; assert.throws(() => validate(def));
-  def.bank.push('were'); assert.equal(validate(def), def);
+test('typed word bank is a hint; only dropdown options constrain accepted answers', () => {
+  const def = copy(gaps); def.bank = ['be']; def.inputMode = 'text';
+  assert.equal(validate(def), def);
+  assert.equal(grade(def, {g1:'was',g2:'were'}).g1,'correct');
+  def.inputMode = 'select'; assert.throws(() => validate(def));
+  def.bank = ['was','were']; assert.equal(validate(def), def);
 });
 
 test('image-label validates coordinates and grades each target', () => {
@@ -131,8 +134,8 @@ test('audio Listen & Repeat requires one safe audio source per item and is not g
     kind: 'audio',
     layout: 'listen-repeat',
     items: [
-      { id: 'a', text: 'space', audio: 'data:audio/mpeg;base64,SUQz', example: 'Space is quiet.' },
-      { id: 'b', text: 'a planet', audio: 'data:audio/mpeg;base64,SUQz', example: 'Earth is a planet.' }
+      { id: 'a', text: 'space', audio: 'data:audio/mpeg;base64,SUQz', exampleAudio: 'data:audio/mpeg;base64,SUQz', example: 'Space is quiet.' },
+      { id: 'b', text: 'a planet', audio: 'data:audio/mpeg;base64,SUQz', exampleAudio: 'data:audio/mpeg;base64,SUQz', example: 'Earth is a planet.' }
     ]
   };
   assert.equal(validate(def), def);
@@ -249,4 +252,22 @@ test('Listen & Repeat can reserve per-item audio slots without fake audio', () =
   assert.equal(validate(def), def);
   assert.deepEqual(grade(def, {}), {});
   const strict = copy(def); delete strict.audioPending; assert.throws(() => validate(strict));
+});
+
+test('multiple choice compares exact sets and rejects malformed keys', () => {
+  const def = copy(choice); def.multiple = true;
+  delete def.items[0].correctId; def.items[0].correctIds = ['a','b'];
+  assert.equal(grade(def,{q1:['b','a']}).q1,'correct');
+  assert.equal(grade(def,{q1:['a']}).q1,'retry');
+  assert.equal(grade(def,{q1:['a','a']}).q1,'retry');
+  assert.equal(grade(def,{q1:[]}).q1,'empty');
+  assert.equal(grade(def,{q1:'a'}).q1,'empty');
+  def.items[0].correctIds = ['a','missing']; assert.throws(() => validate(def));
+});
+test('stage validates children, preserves content and has no fake aggregate grading', () => {
+  const def = {version:1,id:'stage',kind:'stage',title:'Stage',progressive:true,exercises:[{id:'one',exercise:copy(gaps)},{id:'two',exercise:copy(choice)}]};
+  const before = JSON.stringify(def); validate(def); assert.deepEqual(grade(def),{});
+  assert.equal(JSON.stringify(def),before);
+  def.exercises[1].id = 'one'; assert.throws(() => validate(def));
+  def.exercises[1].id = 'revealed'; assert.throws(() => validate(def));
 });

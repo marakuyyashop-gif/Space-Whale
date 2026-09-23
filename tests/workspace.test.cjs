@@ -14,9 +14,9 @@ function content() {
   return JSON.parse(JSON.stringify({ lessons: window.SpaceWhaleContent, templates: window.SpaceWhaleTemplates }));
 }
 
-test('existing lessons and 16 templates load as data without page-specific DOM', () => {
+test('existing lessons and 31 templates load as data without page-specific DOM', () => {
   const { lessons, templates } = content();
-  assert.equal(templates.length, 16);
+  assert.equal(templates.length, 31);
   assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1', 'a1-2-w4-l2']);
   lessons.forEach(lesson => lesson.stages.forEach(stage => kit.validate(stage.exercise)));
   assert.equal(lessons.find(lesson => lesson.id === 'school-fair').stages[0].exercise.id, 'fair-reading');
@@ -181,7 +181,7 @@ test('combined dropdown uses actual catalog titles; outlines expand without fake
   state.nodes.get('workspaceCourse').change('A2.2|8');
   assert.ok(state.location.search.includes('whale=8'));
   state.nodes.get('workspaceCourse').change('templates');
-  assert.equal(anchors(state).length, 16);
+  assert.equal(anchors(state).length, 31);
   assert.equal(state.mounts.at(-1).exercise.id, 'matching-demo');
   assert.equal(state.nodes.get('startLesson').disabled, true);
   state.nodes.get('self-studyTab').click();
@@ -331,12 +331,12 @@ test('temporary guest Workspace limits the room to the two allowed lessons and k
   assert.ok(teacher.location.search.includes('guest=guest-token'));
 
   const studentLive = makeGuest('student');
-  const student = app(`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-picture-word&panel=library&section=tasks`, new Map(), studentLive);
+  const student = app(`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-words&panel=library&section=tasks`, new Map(), studentLive);
   await flush(); await flush();
   const studentMount = student.mounts.at(-1);
   studentMount.config.onChange({pw1:'bright'});
   await flush();
-  assert.deepEqual(studentLive.calls.find(call => call[0] === 'draft'), ['draft','a12w4l1-picture-word',{pw1:'bright'}]);
+  assert.deepEqual(studentLive.calls.find(call => call[0] === 'draft'), ['draft','a12w4l1-words',{pw1:'bright'}]);
 
   studentLive.handlers.onNavigate({
     current_page_id:`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l2&exercise=a12w4l2-opening&panel=library&section=tasks`,

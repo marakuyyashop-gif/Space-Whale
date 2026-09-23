@@ -1,3 +1,5 @@
+> Current implementation and authoring contract: [TEMPLATE_FACTORY.md](TEMPLATE_FACTORY.md). The historical checkpoint below is retained for context.
+
 # Exercise template system — checkpoint 2 (2026-09-21)
 
 ## Scope / current priority

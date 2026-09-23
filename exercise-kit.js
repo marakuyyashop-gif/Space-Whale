@@ -1,6 +1,6 @@
 (function (scope) {
   'use strict';
-  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page'];
+  const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
   const POSSIBLE_ANSWERS_TITLE = 'Possible answers';
@@ -53,6 +53,16 @@
     if (!def || def.version !== 1 || !kinds.includes(def.kind)) fail('Expected version 1 and a supported kind');
     safeId(def.id, 'id'); text(def.title, 'title');
     if (def.instruction != null && typeof def.instruction !== 'string') fail('instruction must be text');
+    if (def.kind === 'stage') {
+      ids(def.exercises, 'exercises');
+      if (def.progressive != null && typeof def.progressive !== 'boolean') fail('progressive must be boolean');
+      def.exercises.forEach(block => {
+        if (block.id === 'revealed') fail('Reserved stage state key');
+        if (block.exercise?.kind === 'stage') fail('Stage containers cannot be nested');
+        validate(block.exercise);
+      });
+      return def;
+    }
     if (def.kind === 'presentation') {
       array(def.blocks, 'blocks');
       def.blocks.forEach(block => {
@@ -63,6 +73,7 @@
       return def;
     }
     if (def.kind === 'audio') {
+      if (def.transcript != null) text(def.transcript, 'transcript');
       if (def.layout != null && !['player', 'listen-repeat'].includes(def.layout)) fail('Unsupported audio layout');
       if (def.layout === 'listen-repeat') {
         ids(def.items, 'items');
@@ -159,7 +170,21 @@
       });
       if (def.options.length < def.items.length) fail('Matching needs at least one option per card');
     }
-    if (def.kind === 'choice') { if (def.layout != null && !['list', 'image-grid', 'dropdown'].includes(def.layout)) fail('Unsupported choice layout'); def.items.forEach(item => { text(item.prompt, 'prompt'); key(item, options(item.options)); }); }
+    if (def.kind === 'choice') {
+      if (def.layout != null && !['list', 'image-grid', 'dropdown'].includes(def.layout)) fail('Unsupported choice layout');
+      if (def.multiple != null && typeof def.multiple !== 'boolean') fail('multiple must be boolean');
+      if (def.multiple && def.layout === 'dropdown') fail('Multiple choice needs visible checkboxes');
+      def.items.forEach(item => {
+        text(item.prompt, 'prompt'); const valid = options(item.options); key(item, valid);
+        if (def.multiple) {
+          if (item.correctId != null) fail('Multiple choice uses correctIds');
+          if (item.correctIds != null) {
+            array(item.correctIds, 'correctIds');
+            if (new Set(item.correctIds).size !== item.correctIds.length || item.correctIds.some(id => !valid.has(id))) fail('Invalid correctIds');
+          }
+        } else if (item.correctIds != null) fail('correctIds requires multiple choice');
+      });
+    }
     if (def.kind === 'sort') {
       const valid = options(def.groups);
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
@@ -179,7 +204,7 @@
           used.add(segment.id);
           if (segment.answers) { array(segment.answers, 'answers'); segment.answers.forEach(answer => text(answer, 'answer')); }
           if (segment.options) { array(segment.options, 'gap options'); segment.options.forEach(option => text(option, 'gap option')); }
-          const choices = segment.options || def.bank;
+          const choices = def.inputMode === 'select' ? segment.options || def.bank : segment.options;
           if (choices && segment.answers?.some(answer => !choices.some(choice => normalize(choice) === normalize(answer)))) fail('Gap answer missing from its options/bank');
         });
       });
@@ -191,7 +216,7 @@
     validate(def);
     const results = {};
     const mark = (id, answered, correct) => { results[id] = !answered ? 'empty' : correct == null ? 'review' : correct ? 'correct' : 'retry'; };
-    if (def.kind === 'presentation' || def.kind === 'audio' || def.kind === 'rule-page') return results;
+    if (def.kind === 'presentation' || def.kind === 'audio' || def.kind === 'rule-page' || def.kind === 'stage') return results;
     if (def.kind === 'order') {
       const order = Array.isArray(answers.order) ? answers.order : [];
       mark('order', order.length === def.tokens.length, def.correctOrder ? JSON.stringify(order) === JSON.stringify(def.correctOrder) : null);
@@ -204,6 +229,11 @@
     } else {
       def.items.forEach(item => {
         const value = answers[item.id];
+        if (def.kind === 'choice' && def.multiple) {
+          const selected = Array.isArray(value) ? value : [];
+          mark(item.id, selected.length > 0, item.correctIds ? selected.length === item.correctIds.length && new Set(selected).size === selected.length && item.correctIds.every(id => selected.includes(id)) : null);
+          return;
+        }
         mark(item.id, value != null && String(value).trim() !== '', def.kind === 'writing' || item.correctId == null ? null : value === item.correctId);
       });
     }
@@ -212,7 +242,7 @@
   function mount(host, definition, config = {}) {
     validate(definition);
     const def = clone(definition);
-    if (config.discovery && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
+    if (config.discovery && !def.multiple && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
     let answers = clone(config.answers || {});
     let feedback = {};
     const doc = host.ownerDocument;
@@ -222,6 +252,8 @@
     const dismissInline = () => { closeInline?.(); closeInline = null; };
     const onOutside = event => { if (!event.target.closest?.('.ek-inline-choice')) dismissInline(); };
     const controls = new Map();
+    let visibleCount = 0;
+    let draggedId = null;
     let nestedMounts = [];
     const nestedMountsByBlock = new Map();
     const node = (tag, className, text) => {
@@ -256,6 +288,7 @@
       const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
       const play = button('▶', async () => {
         if (audio.paused) {
+          doc.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
           try { await audio.play(); } catch { announce('Audio could not be played.'); }
         } else audio.pause();
       }, 'ek-audio-play');
@@ -292,6 +325,7 @@
       const play = button('▶', async () => {
         host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
         if (audio.paused) {
+          doc.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
           try { await audio.play(); } catch { announce('Audio could not be played.'); }
         } else audio.pause();
       }, 'ek-repeat-play');
@@ -303,7 +337,29 @@
       return wrap;
     };
     const announce = message => { status.textContent = message; };
-    const save = () => { feedback = {}; config.onChange?.(clone(answers)); };
+    const clearFeedback = () => {
+      feedback = {};
+      controls.forEach(control => control.removeAttribute('data-feedback'));
+      resultsBox.replaceChildren(); announce('');
+    };
+    const save = () => { clearFeedback(); config.onChange?.(clone(answers)); };
+    // Drag actions update the same answers object as keyboard/click actions.
+    const draggable = (el, id) => {
+      el.draggable = !config.readOnly;
+      el.addEventListener('dragstart', event => {
+        if (config.readOnly) { event.preventDefault(); return; }
+        draggedId = id; event.dataTransfer.setData('text/plain', id); event.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => { draggedId = null; });
+    };
+    const dropzone = (el, accept) => {
+      el.classList.add('ek-dropzone');
+      el.addEventListener('dragover', event => { if (!config.readOnly && draggedId != null) { event.preventDefault(); event.stopPropagation(); event.dataTransfer.dropEffect = 'move'; } });
+      el.addEventListener('drop', event => {
+        if (config.readOnly || draggedId == null) return;
+        event.preventDefault(); event.stopPropagation(); const id = draggedId; draggedId = null; accept(id);
+      });
+    };
     const closeDialog = () => { if (dialog?.open) dialog.close(); };
     const onKeydown = event => { if (event.key === 'Escape') { closeDialog(); dismissInline(); } };
     host.classList.add('exercise-kit');
@@ -363,6 +419,7 @@
     function render() {
       dismissInline();
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
+      body.querySelectorAll('audio').forEach(audio => audio.pause());
       body.replaceChildren(); controls.clear(); resultsBox.replaceChildren();
       if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
@@ -370,11 +427,36 @@
           else if (block.type === 'disclosure') {
             const detail = node('details', 'ek-disclosure');
             const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : block.title;
+            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || normalize(block.title) === 'useful language');
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
           else body.append(node('p', 'ek-copy', block.text));
         });
+      }
+      if (def.kind === 'stage') {
+        const stack = node('div', 'ek-stage-stack');
+        visibleCount = def.progressive ? Math.max(1, Math.min(def.exercises.length, Number(answers.revealed) || 1)) : def.exercises.length;
+        const reveal = () => {
+          const index = nestedMounts.length;
+          const block = def.exercises[index];
+          const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
+          const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
+          const handle = mount(child, block.exercise, { readOnly: Boolean(config.readOnly), answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
+          nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
+          if (def.progressive && index < def.exercises.length - 1) {
+            const next = button('↓', () => {
+              if (config.readOnly) return;
+              next.remove(); visibleCount += 1; answers.revealed = visibleCount; save();
+              reveal().scrollIntoView?.({behavior:'smooth', block:'start'});
+            }, 'ek-button ek-secondary ek-next-exercise');
+            next.setAttribute('aria-label', 'Show next exercise');
+            if (index === visibleCount - 1) section.append(next);
+          }
+          return section;
+        };
+        while (nestedMounts.length < visibleCount) reveal();
+        body.append(stack);
       }
       if (def.kind === 'rule-page') {
         const page = node('div', 'ek-rule-page');
@@ -444,6 +526,10 @@
         } else {
           body.append(audioPlayer(def.audio, def.title));
         }
+        if (def.transcript) {
+          const script = node('details', 'ek-disclosure');
+          script.append(node('summary', '', 'See the script'), node('p', 'ek-copy', def.transcript)); body.append(script);
+        }
       }
       if (def.kind === 'matching') {
         const pictureWord = def.layout === 'picture-word';
@@ -508,7 +594,7 @@
             gapNumber += 1;
             const number = gapNumber;
             const label = `Sentence ${index + 1}, gap ${segment.id}`;
-            const options = def.inputMode === 'text' ? null : segment.options || def.bank;
+            const options = def.inputMode === 'text' ? null : segment.options || (def.inputMode === 'select' ? def.bank : null);
             if (options) {
               const wrap = node('span', 'ek-inline-choice');
               const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
@@ -563,66 +649,46 @@
           item.options.forEach(option => { const el = node('option', '', option.text); el.value = option.id; select.append(el); });
           select.value = answers[item.id] || '';
           select.addEventListener('change', () => changed(item.id, select.value));
-          row.append(select); body.append(row); return;
+          row.append(select); body.append(row); controls.set(item.id, select); return;
         }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
         item.options.forEach(option => {
-          const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = answers[item.id] === option.id;
-          input.addEventListener('change', () => changed(item.id, option.id));
+          const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = def.multiple ? 'checkbox' : 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = def.multiple ? (Array.isArray(answers[item.id]) && answers[item.id].includes(option.id)) : answers[item.id] === option.id;
+          input.addEventListener('change', () => {
+            if (!def.multiple) { changed(item.id, option.id); return; }
+            const selected = new Set(Array.isArray(answers[item.id]) ? answers[item.id] : []);
+            if (input.checked) selected.add(option.id); else selected.delete(option.id);
+            changed(item.id, [...selected]);
+          });
           label.append(input, node('span', '', option.text)); if (option.image) label.append(illustration(option)); group.append(label);
         }); body.append(group); controls.set(item.id, group);
       });
       if (def.kind === 'image-label') {
         const wrap = node('div', 'ek-image-label-wrap');
         const stage = node('div', 'ek-image-label-stage');
-        const image = illustration({ image: def.image, alt: def.alt });
-        image.classList.add('ek-image-label-image');
-        stage.append(image);
+        const image = illustration({image:def.image, alt:def.alt}); image.classList.add('ek-image-label-image'); stage.append(image);
+        const assign = (targetId, optionId) => {
+          if (optionId && !def.options.some(option => option.id === optionId)) return;
+          Object.keys(answers).forEach(id => { if (answers[id] === optionId) delete answers[id]; });
+          changed(targetId, optionId); render();
+        };
         def.items.forEach((item, index) => {
-          const chosen = () => def.options.find(option => option.id === answers[item.id]);
-          const refreshTarget = (targetItem, targetIndex, control) => {
-            if (!control) return;
-            const option = def.options.find(candidate => candidate.id === answers[targetItem.id]);
-            control.textContent = option?.text || '+';
-            control.setAttribute('aria-label', `${targetItem.prompt || `Target ${targetIndex + 1}`}${option ? `: ${option.text}` : ''}`);
-          };
-          const target = button(chosen()?.text || '+', () => {
-            const takenBy = new Map(
-              Object.entries(answers)
-                .filter(([id, value]) => id !== item.id && value)
-                .map(([id, value]) => [value, id])
-            );
-            popover(
-              { text: item.prompt || `Target ${index + 1}` },
-              def.options,
-              answers[item.id],
-              value => {
-                if (value) {
-                  const previousId = takenBy.get(value);
-                  if (previousId) {
-                    delete answers[previousId];
-                    const previousIndex = def.items.findIndex(candidate => candidate.id === previousId);
-                    if (previousIndex >= 0) refreshTarget(def.items[previousIndex], previousIndex, controls.get(previousId));
-                  }
-                }
-                changed(item.id, value);
-                refreshTarget(item, index, target);
-              },
-              target,
-              new Set(takenBy.keys())
-            );
-          }, 'ek-image-label-target');
-          target.style.left = `${item.x}%`;
-          target.style.top = `${item.y}%`;
-          target.setAttribute('aria-label', item.prompt || `Choose label for target ${index + 1}`);
+          const selected = def.options.find(option => option.id === answers[item.id]);
+          const target = button(selected?.text || '+', () => popover({text:item.prompt || `Target ${index + 1}`}, def.options, answers[item.id], value => assign(item.id, value), target, new Set(Object.values(answers))), 'ek-image-label-target');
+          target.style.left = `${item.x}%`; target.style.top = `${item.y}%`;
+          target.setAttribute('aria-label', item.prompt || `Target ${index + 1}`);
           target.setAttribute('aria-haspopup', 'dialog');
-          controls.set(item.id, target);
-          stage.append(target);
+          if (selected) draggable(target, selected.id);
+          dropzone(target, id => assign(item.id, id));
+          controls.set(item.id, target); stage.append(target);
         });
-        const bank = node('div', 'ek-image-label-bank');
-        def.options.forEach(option => bank.append(node('span', 'ek-token', option.text)));
-        wrap.append(stage, bank);
-        body.append(wrap);
+        const bank = node('div', 'ek-image-label-bank'); bank.setAttribute('aria-label', 'Label bank');
+        def.options.filter(option => !Object.values(answers).includes(option.id)).forEach(option => {
+          const label = button(option.text, () => popover({text:option.text}, def.items.map((item,index) => ({id:item.id,text:item.prompt || `Target ${index+1}`})), '', targetId => { if (targetId) assign(targetId, option.id); }, label), 'ek-token');
+          draggable(label, option.id); bank.append(label);
+        });
+        dropzone(bank, id => { Object.keys(answers).forEach(key => { if (answers[key] === id) delete answers[key]; }); save(); render(); });
+        wrap.append(stage, bank); body.append(wrap);
       }
       if (def.kind === 'order') {
         if (def.source?.text) body.append(richText(def.source.text));
@@ -642,25 +708,47 @@
           card.prepend(number);
           return card;
         };
+        const move = (id, before = null) => {
+          if (!def.tokens.some(token => token.id === id) || id === before) return;
+          const next = picked.filter(value => value !== id);
+          const at = before == null ? next.length : next.indexOf(before);
+          next.splice(at < 0 ? next.length : at, 0, id); changed('order', next); render();
+        };
         picked.forEach((id, index) => {
           const token = def.tokens.find(item => item.id === id);
-          ordered.append(tokenButton(token, () => { changed('order', picked.filter((_, position) => position !== index)); render(); }, index));
+          const control = tokenButton(token, () => { changed('order', picked.filter(value => value !== id)); render(); }, index);
+          draggable(control, id); dropzone(control, moved => move(moved, id));
+          control.title = 'Click to return; drag to reorder; Alt + arrow to move';
+          control.addEventListener('keydown', event => {
+            if (!event.altKey || !['ArrowLeft','ArrowRight'].includes(event.key) || config.readOnly) return;
+            event.preventDefault();
+            const target = index + (event.key === 'ArrowLeft' ? -1 : 1);
+            if (target < 0 || target >= picked.length) return;
+            const next = [...picked]; [next[index],next[target]] = [next[target],next[index]];
+            changed('order', next); render(); body.querySelector('.ek-order-target')?.focus();
+          });
+          ordered.append(control);
         });
+        ordered.tabIndex = 0; dropzone(ordered, id => move(id));
         const bank = node('div', imageMode ? 'ek-bank ek-order-image-bank' : 'ek-bank');
-        def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => bank.append(tokenButton(token, () => { changed('order', [...picked, token.id]); render(); }, index)));
+        def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => {
+          const control = tokenButton(token, () => move(token.id), index); draggable(control, token.id); bank.append(control);
+        });
+        dropzone(bank, id => { changed('order', picked.filter(value => value !== id)); render(); });
         body.append(ordered, bank); controls.set('order', ordered);
       }
       if (def.kind === 'sort') {
         const bank = node('div', 'ek-bank'); const groups = node('div', 'ek-group-grid');
         const itemButton = item => {
           const b = button(item.text, () => popover(item, def.groups, answers[item.id], value => { changed(item.id, value); render(); }, b), 'ek-token');
-          b.setAttribute('aria-label', `Choose group for ${item.text}`); return b;
+          b.setAttribute('aria-label', `Choose group for ${item.text}`); draggable(b, item.id); controls.set(item.id, b); return b;
         };
         def.groups.forEach(group => {
-          const box = node('section', 'ek-sort-group'); box.append(node('h3', '', group.text));
+          const box = node('section', 'ek-sort-group'); dropzone(box, id => { changed(id, group.id); render(); }); box.append(node('h3', '', group.text));
           def.items.filter(item => answers[item.id] === group.id).forEach(item => box.append(itemButton(item))); groups.append(box);
         });
         def.items.filter(item => !answers[item.id]).forEach(item => bank.append(itemButton(item)));
+        dropzone(bank, id => { delete answers[id]; save(); render(); });
         body.append(groups, bank);
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
@@ -668,11 +756,31 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
-    if (!['presentation', 'writing', 'audio', 'rule-page'].includes(def.kind)) actions.append(button('Check', () => {
+    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button('Check', () => {
       feedback = grade(def, answers);
-      const labels = { correct: '✓ Correct', retry: 'Try again', empty: 'Not answered yet', review: 'Teacher review' };
+      const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
-      Object.entries(feedback).forEach(([id, result], index) => { resultsBox.append(node('li', '', `${index + 1}. ${labels[result]}`)); });
+      Object.entries(feedback).forEach(([id, result], index) => {
+        controls.get(id)?.setAttribute('data-feedback', result);
+        const line = node('li', '', `${index + 1}. ${labels[result]}`); line.setAttribute('data-feedback', result); resultsBox.append(line);
+      });
+      if (Object.values(feedback).some(result => result === 'retry' || result === 'empty')) {
+        const correction = node('li', 'ek-correction'); correction.append(node('strong', '', 'Correct solution'));
+        if (def.kind === 'gaps') def.items.forEach(item => {
+          if (!item.segments.some(segment => typeof segment !== 'string' && ['retry','empty'].includes(feedback[segment.id]) && segment.answers)) return;
+          const line = node('p', 'ek-correction-line');
+          item.segments.forEach(segment => line.append(typeof segment === 'string' ? node('span','ek-muted',segment) : node('strong','',segment.answers?.[0] || '…'))); correction.append(line);
+        });
+        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',def.correctOrder.map(id => def.tokens.find(token => token.id === id).text).join(' → ')));
+        else if (def.kind !== 'order') def.items.forEach((item,index) => {
+          if (!['retry','empty'].includes(feedback[item.id])) return;
+          const choices = item.options || def.options || def.groups || [];
+          const ids = def.multiple ? item.correctIds : item.correctId == null ? [] : [item.correctId];
+          const correct = (ids || []).map(id => choices.find(option => option.id === id)?.text).filter(Boolean).join(' + ');
+          if (correct) correction.append(node('p','',`${item.text || item.prompt || `Target ${index+1}`} → ${correct}`));
+        });
+        if (correction.children.length > 1) resultsBox.append(correction);
+      }
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     }));
@@ -683,9 +791,14 @@
 
     const setAnswers = next => {
       answers = clone(next || {});
-      feedback = {};
-      resultsBox.replaceChildren();
-      announce('');
+      clearFeedback();
+
+      if (def.kind === 'stage') {
+        const count = def.progressive ? Math.max(1, Math.min(def.exercises.length, Number(answers.revealed) || 1)) : def.exercises.length;
+        if (count !== visibleCount) render();
+        else def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
+        return;
+      }
 
       if (def.kind === 'rule-page') {
         def.blocks.forEach(block => {
