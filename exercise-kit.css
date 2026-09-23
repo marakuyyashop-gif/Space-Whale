@@ -596,3 +596,7 @@
 .exercise-kit .ek-audio-range { accent-color: var(--ek-accent); }
 .exercise-kit .ek-question { min-width: 0; }
 .exercise-kit .ek-token, .exercise-kit .ek-radio { overflow-wrap: anywhere; }
+
+.exercise-kit [draggable=true] { touch-action: none; user-select: none; }
+.exercise-kit .ek-dragging { opacity: .55; }
+.exercise-kit .ek-drag-over { box-shadow: inset 0 0 0 2px var(--ek-accent); }

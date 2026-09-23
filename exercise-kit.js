@@ -254,6 +254,8 @@
     const controls = new Map();
     let visibleCount = 0;
     let draggedId = null;
+    let pointerDrag = null, suppressDragClick = false;
+    const dropTargets = new WeakMap();
     let nestedMounts = [];
     const nestedMountsByBlock = new Map();
     const node = (tag, className, text) => {
@@ -345,20 +347,50 @@
     const save = () => { clearFeedback(); config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
     const draggable = (el, id) => {
+      el.addEventListener('pointerdown', event => {
+        suppressDragClick = false;
+        if (config.readOnly || (event.button != null && event.button !== 0)) return;
+        pointerDrag = {id, el, x:event.clientX, y:event.clientY, pointerId:event.pointerId, moved:false};
+      });
       el.draggable = !config.readOnly;
       el.addEventListener('dragstart', event => {
         if (config.readOnly) { event.preventDefault(); return; }
+        if (pointerDrag) { event.preventDefault(); return; }
         draggedId = id; event.dataTransfer.setData('text/plain', id); event.dataTransfer.effectAllowed = 'move';
       });
       el.addEventListener('dragend', () => { draggedId = null; });
     };
     const dropzone = (el, accept) => {
-      el.classList.add('ek-dropzone');
+      el.classList.add('ek-dropzone'); dropTargets.set(el, accept);
       el.addEventListener('dragover', event => { if (!config.readOnly && draggedId != null) { event.preventDefault(); event.stopPropagation(); event.dataTransfer.dropEffect = 'move'; } });
       el.addEventListener('drop', event => {
         if (config.readOnly || draggedId == null) return;
         event.preventDefault(); event.stopPropagation(); const id = draggedId; draggedId = null; accept(id);
       });
+    };
+    const pointerTarget = event => doc.elementFromPoint?.(event.clientX,event.clientY)?.closest('.ek-dropzone');
+    const pointerMove = event => {
+      if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+      if (!pointerDrag.moved && Math.hypot(event.clientX-pointerDrag.x,event.clientY-pointerDrag.y) < 6) return;
+      pointerDrag.moved = true; pointerDrag.el.classList.add('ek-dragging');
+      if (event.cancelable) event.preventDefault();
+      body.querySelectorAll('.ek-drag-over').forEach(el => el.classList.remove('ek-drag-over'));
+      const target = pointerTarget(event);
+      if (target && dropTargets.has(target)) target.classList.add('ek-drag-over');
+    };
+    const pointerEnd = event => {
+      if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+      const drag = pointerDrag; pointerDrag = null;
+      drag.el.classList.remove('ek-dragging');
+      body.querySelectorAll('.ek-drag-over').forEach(el => el.classList.remove('ek-drag-over'));
+      if (!drag.moved || event.type === 'pointercancel') return;
+      suppressDragClick = true;
+      const target = pointerTarget(event);
+      if (!config.readOnly && target && dropTargets.has(target)) dropTargets.get(target)(drag.id);
+    };
+    const dragClick = event => {
+      if (!suppressDragClick) return;
+      suppressDragClick = false; event.preventDefault(); event.stopImmediatePropagation();
     };
     const closeDialog = () => { if (dialog?.open) dialog.close(); };
     const onKeydown = event => { if (event.key === 'Escape') { closeDialog(); dismissInline(); } };
@@ -843,11 +875,15 @@
     const originalRender = render;
     render = () => { originalRender(); renderReadOnly(); };
 
-    host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside); render();
+    host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
+    host.addEventListener('click', dragClick, true);
+    doc.addEventListener('pointermove', pointerMove, {passive:false});
+    doc.addEventListener('pointerup', pointerEnd); doc.addEventListener('pointercancel', pointerEnd);
+    render();
     return {
       getAnswers: () => clone(answers),
       setAnswers,
-      destroy: () => { dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { pointerDrag = null; doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, kinds };

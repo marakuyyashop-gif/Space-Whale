@@ -155,3 +155,15 @@ test('starting another repeat item stops the first audio', async () => {
   assert.equal(audio[0].paused,true);assert.equal(audio[1].paused,false);
   s.mount.destroy();assert.equal(audio[1].paused,true);
 });
+
+test('pointer drag moves item through the actual gesture path and blocks accidental click', () => {
+  const s = setup('sort-demo'); const source = s.button('[Item 1]'); const target = s.host.querySelector('.ek-sort-group');
+  s.document.elementFromPoint = () => target;
+  s.fire(source,'pointerdown',{pointerId:1,button:0,clientX:10,clientY:100});
+  s.fire(s.document,'pointermove',{pointerId:1,clientX:10,clientY:20});
+  assert.equal(source.classList.contains('ek-dragging'),true);
+  s.fire(s.document,'pointerup',{pointerId:1,clientX:10,clientY:20});
+  assert.deepEqual(s.mount.getAnswers(),{item1:'A'});
+  assert.equal(s.host.querySelectorAll('.ek-token').length,2);
+  assert.equal(s.changes.length,1);
+});

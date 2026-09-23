@@ -65,7 +65,7 @@ Useful Language disclosures open initially. Possible Answers and audio transcrip
 
 - All answer changes emit `onChange` with the same serializable answers state, including drag/drop and reorder.
 - Matching is single-use: picking an occupied option moves it, preserving card order.
-- Sort, order and labels use native drag/drop with click/keyboard alternatives. Native touch dragging is browser-dependent; click assignment works on touch devices.
+- Sort, order and labels share pointer-based dragging for mouse/touch, with native drop handlers and click/keyboard alternatives. Each drop updates the same answers state.
 - Order: click to append/return, drag before another item or to the end, Alt+Left/Right to reorder.
 - Image labels stay where placed, even when wrong. Only Check evaluates them.
 - Feedback appears only after Check; editing clears stale feedback and corrections. Reset clears answers and feedback.
