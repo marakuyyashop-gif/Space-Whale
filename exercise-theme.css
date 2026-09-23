@@ -11,6 +11,9 @@
   --sw-exercise-mobile-title-size: 21px;
   --sw-exercise-radius: 16px;
   --sw-stage-gap: 48px;
+  --sw-component-gap: 24px;
+  --sw-audio-idle: #c5c7ce;
+  --sw-audio-progress: #7970bb;
   --sw-matching-min-height: 170px;
   --sw-matching-ratio: auto;
   --sw-picture-word-ratio: 0.72 / 1;

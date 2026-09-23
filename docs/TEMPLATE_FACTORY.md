@@ -53,7 +53,7 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | presentation | `blocks` with text, image or disclosure | no automatic grade |
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
-| stage | `exercises[{id,exercise}]`, `progressive:true/false` | child answers under block ID, plus `revealed` count |
+| stage | `exercises[{id,exercise}]`, `progressive:true/false`, optional `layout:"grouped"` | child answers under block ID, plus `revealed` count |
 
 Typed gaps default to keyboard input. A bank is only a hint and may contain a base form different from the accepted answer. For a dropdown set `inputMode:'select'` and explicit options. Correct keys in the bank do not determine displayed option order.
 
@@ -78,3 +78,12 @@ Useful Language disclosures open initially. Possible Answers and audio transcrip
 Examples: change `--sw-exercise-font` globally; adjust the desktop/compact/mobile type scales together for a global size change; set `--sw-matching-ratio: 1 / 1` for square text cards; adjust `--sw-picture-word-ratio` for picture cards. More substantial layout changes belong in exercise-kit.css and apply wherever that layout is used.
 
 After a shared change, run `npm ci` once, then `npm test`, then check the changed interactions in the preview and one existing lesson. Update stylesheet/script cache versions when publishing. Structural schema changes require separate compatibility work; visual changes do not.
+
+## Audio and grouped exercises (2026-09-23)
+
+- The shared player uses decorative waveform bars, not measured signal amplitudes. Its fill follows actual media time. Play fills progressively, Pause greys the track without rewinding, natural completion leaves it fully filled, and replay starts at zero. The overlaid native range supports mouse/touch seeking and keyboard arrows; unavailable duration disables seeking. Starting another player pauses the previous one.
+- Change `--sw-audio-progress` / `--sw-audio-idle` in exercise-theme.css for all full players. Listen & Repeat remains a separate compact control.
+- Use `kind:"stage", layout:"grouped"` for components belonging to ONE exercise (audio/text plus one or more response components). Set the common title and instruction on the stage; child titles are hidden, optional child instructions remain available. Components keep their own answer state and local Check/Reset. Do not combine grouped layout with progressive reveal. Ordinary/progressive stages keep the large separation between independent exercises.
+- Grouped spacing: `--sw-component-gap`; independent exercise spacing: `--sw-stage-gap`.
+- The single `uiLabels.check` value in exercise-kit.js controls the validation button label for every shared exercise, including nested ones. Changing it to Done updates them on the next page load without changing validation behavior or lesson data. Exported as SpaceWhaleExerciseKit.uiLabels for configuration before mounting.
+- Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior remains in the separate Audio + script preview.

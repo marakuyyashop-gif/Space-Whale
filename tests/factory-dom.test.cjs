@@ -233,3 +233,56 @@ test('drag trailing click is suppressed, but keyboard Check is never swallowed',
   assert.equal(s.fire(s.button('Check'),'click',{detail:0}).defaultPrevented,false);
   assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
 });
+
+test('audio waveform tracks time, greys on pause, retains seek and fills at the end', async () => {
+  const s = setup('audio-demo');
+  const audio = s.host.querySelector('audio');
+  const player = s.host.querySelector('.ek-audio-player');
+  const track = s.host.querySelector('.ek-audio-track');
+  const range = s.host.querySelector('.ek-audio-range');
+  assert.equal(player.dataset.state,'paused');assert.equal(range.disabled,true);
+  audio.duration = 10;s.fire(audio,'loadedmetadata');assert.equal(range.disabled,false);
+  s.click('Play audio');await Promise.resolve();
+  assert.equal(player.dataset.state,'playing');assert.ok(s.button('Pause audio'));
+  audio.currentTime=4;s.fire(audio,'timeupdate');
+  assert.equal(track.style.getPropertyValue('--audio-progress'),'40%');
+  s.click('Pause audio');assert.equal(player.dataset.state,'paused');assert.equal(audio.currentTime,4);
+  s.click('Play audio');await Promise.resolve();
+  assert.equal(track.style.getPropertyValue('--audio-progress'),'40%');
+  range.value='70';s.fire(range,'input');assert.equal(audio.currentTime,7);
+  assert.equal(track.style.getPropertyValue('--audio-progress'),'70%');
+  audio.currentTime=10;audio.paused=true;s.fire(audio,'ended');
+  assert.equal(player.dataset.state,'ended');assert.equal(track.style.getPropertyValue('--audio-progress'),'100%');
+  s.click('Play audio');await Promise.resolve();
+  assert.equal(audio.currentTime,0);assert.equal(player.dataset.state,'playing');
+  assert.equal(track.style.getPropertyValue('--audio-progress'),'0%');
+  s.mount.destroy();assert.equal(audio.paused,true);
+});
+test('audio with unknown duration cannot seek, and starting another player pauses the first', async () => {
+  const s = setup('audio-demo');const first = s.host.querySelector('audio');
+  first.duration=NaN;s.fire(first,'loadedmetadata');
+  const range=s.host.querySelector('.ek-audio-range');assert.equal(range.disabled,true);
+  range.value='50';s.fire(range,'input');assert.equal(first.currentTime,0);
+  s.click('Play audio');await Promise.resolve();
+  const host=s.document.createElement('div');s.document.body.append(host);
+  const secondMount=kit.mount(host,fixture('audio-demo'));
+  s.fire(host.querySelector('.ek-audio-play'),'click');await Promise.resolve();
+  assert.equal(first.paused,true);assert.equal(s.host.querySelector('.ek-audio-player').dataset.state,'paused');
+  secondMount.destroy();s.mount.destroy();
+});
+test('grouped listening keeps independent components and answers; Check label is global', () => {
+  const old=kit.uiLabels.check;
+  try {
+    kit.uiLabels.check='Done';
+    const s=setup('listening-choice-demo');
+    assert.equal(s.host.classList.contains('ek-stage-grouped'),true);
+    assert.equal(s.host.querySelectorAll('.ek-audio-player').length,1);
+    assert.ok(s.button('Done'));assert.equal(s.button('Check'),undefined);
+    const input=s.host.querySelectorAll('input[type=radio]')[1];input.checked=true;s.fire(input,'change');
+    s.click('Done');assert.equal(s.mount.getAnswers().block2.question1,'B');
+    assert.ok(s.host.querySelector('[data-feedback=correct]'));
+    s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers().block2,{});
+    assert.ok(s.host.querySelector('audio'));
+  } finally { kit.uiLabels.check=old; }
+  assert.equal(setup('progressive-stage-demo').host.classList.contains('ek-stage-grouped'),false);
+});

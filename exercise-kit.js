@@ -1,5 +1,6 @@
 (function (scope) {
   'use strict';
+  const uiLabels = { check: 'Check' }; // Shared button copy for every exercise.
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
@@ -55,6 +56,8 @@
     if (def.instruction != null && typeof def.instruction !== 'string') fail('instruction must be text');
     if (def.kind === 'stage') {
       ids(def.exercises, 'exercises');
+      if (def.layout != null && !['separate', 'grouped'].includes(def.layout)) fail('Unsupported stage layout');
+      if (def.layout === 'grouped' && def.progressive) fail('Grouped components cannot reveal as separate exercises');
       if (def.progressive != null && typeof def.progressive !== 'boolean') fail('progressive must be boolean');
       def.exercises.forEach(block => {
         if (block.id === 'revealed') fail('Reserved stage state key');
@@ -290,32 +293,53 @@
       return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
     };
     const audioPlayer = (src, label = 'Audio') => {
-      const wrap = node('div', 'ek-audio-player');
+      const wrap = node('div', 'ek-audio-player'); wrap.dataset.state = 'paused';
       const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
+      let completed = false;
       const play = button('▶', async () => {
-        if (audio.paused) {
+        if (audio.paused || completed) {
+          if (completed) { audio.currentTime = 0; completed = false; sync(); }
           doc.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
-          try { await audio.play(); } catch { announce('Audio could not be played.'); }
+          try { await audio.play(); } catch { announce('Audio could not be played.'); sync(); }
         } else audio.pause();
       }, 'ek-audio-play');
       play.setAttribute('aria-label', 'Play audio');
-      const range = node('input', 'ek-audio-range'); range.type = 'range'; range.min = '0'; range.max = '100'; range.step = '0.1'; range.value = '0'; range.setAttribute('aria-label', 'Audio position');
+      const track = node('div', 'ek-audio-track');
+      // Decorative waveform: progress follows real media time; bars do not claim signal amplitude.
+      for (const layer of ['base', 'fill']) {
+        const wave = node('div', `ek-audio-wave ek-audio-wave-${layer}`); wave.setAttribute('aria-hidden', 'true');
+        for (let i = 0; i < 64; i++) {
+          const bar = node('span'); bar.style.height = `${18 + ((i * 17 + i * i * 7) % 77)}%`; wave.append(bar);
+        }
+        track.append(wave);
+      }
+      const range = node('input', 'ek-audio-range'); range.type = 'range'; range.min = '0'; range.max = '100'; range.step = '0.1'; range.value = '0'; range.disabled = true; range.setAttribute('aria-label', 'Audio position');
       const time = node('span', 'ek-audio-time', '0:00 / 0:00');
       const sync = () => {
-        const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
-        const current = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
-        range.value = duration ? String((current / duration) * 100) : '0';
+        const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
+        const current = Number.isFinite(audio.currentTime) ? Math.max(0, audio.currentTime) : 0;
+        const progress = completed ? 100 : duration ? Math.min(100, current / duration * 100) : 0;
+        range.value = String(progress); range.disabled = !duration;
+        range.setAttribute('aria-valuetext', `${formatTime(current)} of ${formatTime(duration)}`);
+        track.style.setProperty('--audio-progress', `${progress}%`);
+        wrap.dataset.state = completed ? 'ended' : audio.paused ? 'paused' : 'playing';
+        play.textContent = audio.paused || completed ? '▶' : '❚❚';
+        play.setAttribute('aria-label', audio.paused || completed ? 'Play audio' : 'Pause audio');
         time.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
       };
-      audio.addEventListener('play', () => { play.textContent = '❚❚'; play.setAttribute('aria-label', 'Pause audio'); });
-      audio.addEventListener('pause', () => { play.textContent = '▶'; play.setAttribute('aria-label', 'Play audio'); });
-      audio.addEventListener('ended', () => { play.textContent = '▶'; play.setAttribute('aria-label', 'Play audio'); sync(); });
+      audio.addEventListener('play', () => { completed = false; sync(); });
+      audio.addEventListener('pause', sync);
+      audio.addEventListener('ended', () => { completed = true; sync(); });
       audio.addEventListener('loadedmetadata', sync);
+      audio.addEventListener('durationchange', sync);
       audio.addEventListener('timeupdate', sync);
+      audio.addEventListener('error', () => { audio.pause(); announce('Audio could not be loaded.'); });
       range.addEventListener('input', () => {
-        if (Number.isFinite(audio.duration) && audio.duration > 0) audio.currentTime = (Number(range.value) / 100) * audio.duration;
+        if (Number.isFinite(audio.duration) && audio.duration > 0) {
+          completed = false; audio.currentTime = (Number(range.value) / 100) * audio.duration; sync();
+        }
       });
-      wrap.append(audio, play, range, time);
+      track.append(range); wrap.append(audio, play, track, time);
       return wrap;
     };
     const repeatAudioButton = (src, label) => {
@@ -401,6 +425,7 @@
     const onKeydown = event => { if (event.key === 'Escape') { closeDialog(); dismissInline(); } };
     host.classList.add('exercise-kit');
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
+    host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
     host.replaceChildren();
     host.append(node('h2', 'ek-title', def.title), node('p', 'ek-instruction', def.instruction || ''));
     const body = node('div', 'ek-body');
@@ -815,7 +840,7 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
-    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button('Check', () => {
+    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button(uiLabels.check, () => {
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -913,7 +938,7 @@
       destroy: () => { pointerDrag = null; doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
-  const api = { validate, grade, mount, kinds };
+  const api = { validate, grade, mount, kinds, uiLabels };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.SpaceWhaleExerciseKit = api;
 })(typeof window !== 'undefined' ? window : globalThis);

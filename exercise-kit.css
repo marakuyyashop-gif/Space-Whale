@@ -1,4 +1,4 @@
-@import url("exercise-theme.css?v=20260923-stage-collapse");
+@import url("exercise-theme.css?v=20260923-audio-wave");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
@@ -278,10 +278,14 @@
   font-size: .82em;
   line-height: 1;
 }
-.exercise-kit .ek-audio-range {
-  width: 100%;
-  accent-color: var(--ek-ink);
-}
+.exercise-kit .ek-audio-track { position: relative; min-width: 0; height: 44px; --audio-progress: 0%; }
+.exercise-kit .ek-audio-wave { position: absolute; inset: 4px 0; display: flex; align-items: center; gap: 2px; pointer-events: none; }
+.exercise-kit .ek-audio-wave span { flex: 1; min-width: 0; border-radius: 3px; background: var(--sw-audio-idle, #c5c7ce); }
+.exercise-kit .ek-audio-wave-fill { clip-path: inset(0 calc(100% - var(--audio-progress)) 0 0); }
+.exercise-kit .ek-audio-wave-fill span { background: var(--sw-audio-progress, #7970bb); }
+.exercise-kit .ek-audio-player[data-state=paused] .ek-audio-wave-fill { opacity: 0; }
+.exercise-kit .ek-audio-track .ek-audio-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.exercise-kit .ek-audio-track:focus-within { outline: 2px solid var(--ek-ink); outline-offset: 4px; border-radius: 5px; }
 .exercise-kit .ek-audio-time {
   min-width: 74px;
   color: var(--ek-muted);
@@ -605,3 +609,9 @@
 .exercise-kit [draggable=true] { touch-action: none; user-select: none; }
 .exercise-kit .ek-dragging { opacity: .55; }
 .exercise-kit .ek-drag-over { box-shadow: inset 0 0 0 2px var(--ek-accent); }
+
+/* Components belonging to one exercise stay together; independent exercises keep the large gap. */
+.exercise-kit.ek-stage-grouped > .ek-body > .ek-stage-stack { gap: var(--sw-component-gap, 24px); }
+.exercise-kit.ek-stage-grouped > .ek-body > .ek-stage-stack > .ek-stage-section { border: 0; padding-top: 0; }
+.exercise-kit.ek-stage-grouped > .ek-body > .ek-stage-stack > .ek-stage-section > .ek-stage-host > .ek-title { display: none; }
+.exercise-kit .ek-instruction:empty, .exercise-kit .ek-actions:empty, .exercise-kit .ek-status:empty, .exercise-kit .ek-results:empty { display: none; }

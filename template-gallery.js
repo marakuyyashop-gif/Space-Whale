@@ -27,9 +27,9 @@
     instruction:'Перетащите 1 в A, 2 в B. Можно менять группу или возвращать элемент в набор. Нажатие открывает выбор группы.',
     groups:[option('A','[Category A]'),option('B','[Category B]')],items:[{id:'item1',text:'[Item 1]',correctId:'A'},{id:'item2',text:'[Item 2]',correctId:'B'}]
   });
-  const audio = (id, script = false) => base(id,'audio','Global Audio', {audio:sound,instruction:'Технический звуковой сигнал для проверки Play, Pause и перемотки.',...(script ? {transcript:'[Audio script: three test tones]'} : {})});
+  const audio = (id, script = false) => base(id,'audio','Global Audio', {audio:sound,instruction:'[Listening instruction]',...(script ? {transcript:'[Audio script: three test tones]'} : {})});
   const reading = id => base(id,'presentation','Reading', {blocks:[{type:'text',text:'[Reading text / dialogue]'}]});
-  const stage = (id, title, definitions, progressive = false) => base(id,'stage',title,{progressive,exercises:definitions.map((exercise,i) => ({id:`block${i+1}`,exercise}))});
+  const stage = (id, title, definitions, progressive = false) => base(id,'stage',title,{progressive,...(!progressive ? {layout:'grouped',instruction:'[Exercise instruction]'} : {}),exercises:definitions.map((exercise,i) => ({id:`block${i+1}`,exercise:progressive ? exercise : {...exercise,instruction:''}}))});
   const examples = [
     matching('matching-demo'),
     gaps('inline-demo',false,true),
@@ -57,10 +57,10 @@
     base('reference-demo','rule-page','Rule / Language Reference',{blocks:[{type:'rule',title:'[Rule title]',text:'[Language reference]',formula:'[Form] + [Form]',examples:['[Example 1]','[Example 2]']}]}),
     stage('reading-choice-demo','Reading + Choice',[reading('rc-source'),choice('rc-task')]),
     stage('reading-gap-demo','Reading + Gap',[reading('rg-source'),gaps('rg-task')]),
-    stage('listening-choice-demo','Listening + Choice',[audio('lc-source',true),choice('lc-task')]),
-    stage('listening-gap-demo','Listening + Gap',[audio('lg-source',true),gaps('lg-task')]),
-    stage('listening-sort-demo','Listening + Sort / Speaker Attribution',[audio('ls-source',true),sort('ls-task')]),
-    stage('listening-order-demo','Listening + Order',[audio('lo-source',true),order('lo-task')]),
+    stage('listening-choice-demo','Listening + Choice',[audio('lc-source'),choice('lc-task')]),
+    stage('listening-gap-demo','Listening + Gap',[audio('lg-source'),gaps('lg-task')]),
+    stage('listening-sort-demo','Listening + Sort / Speaker Attribution',[audio('ls-source'),sort('ls-task')]),
+    stage('listening-order-demo','Listening + Order',[audio('lo-source'),order('lo-task')]),
     stage('progressive-stage-demo','Stage · последовательное раскрытие',[reading('ps-source'),choice('ps-choice'),gaps('ps-gaps')],true)
   ];
   const kit = window.SpaceWhaleExerciseKit;
