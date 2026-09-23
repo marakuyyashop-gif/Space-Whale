@@ -130,17 +130,56 @@ test('open tasks have no Check; useful language open, possible answers and scrip
     if (details) assert.equal(Boolean(details.open),id === 'speaking-language-demo');
   }
 });
-test('progressive stage preserves earlier answers, restores remote reveal and resets all', () => {
+test('progressive stage collapses and reopens without losing hidden or earlier answers', () => {
   const s = setup('progressive-stage-demo');
   assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
-  s.click('Show next exercise'); assert.equal(s.host.querySelectorAll('.ek-stage-section').length,2);
+  assert.equal(s.button('Hide last exercise'),undefined);
+  assert.equal(s.host.querySelector(':scope > .ek-actions .ek-reset'),null);
+  s.click('Show next exercise');
+  const choiceSection = s.host.querySelectorAll('.ek-stage-section')[1];
   const input = s.host.querySelectorAll('input')[1]; input.checked=true;s.fire(input,'change');
-  s.click('Show next exercise');assert.equal(s.host.querySelectorAll('.ek-stage-section').length,3);
-  assert.equal(s.mount.getAnswers().block2.question1,'B'); assert.equal(s.mount.getAnswers().revealed,3);
-  const count = s.changes.length;s.mount.setAnswers({revealed:2,block2:{question1:'C'}});
-  assert.equal(s.changes.length,count);assert.equal(s.host.querySelectorAll('.ek-stage-section').length,2);
-  s.fire(s.host.querySelector(':scope > .ek-actions .ek-reset'),'click');
-  assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
+  s.click('Show next exercise');
+  const gap = s.host.querySelector('.ek-typed-gap');gap.value='My saved answer';s.fire(gap,'input');
+  const saved = s.mount.getAnswers();
+  assert.equal(saved.block2.question1,'B');assert.equal(saved.revealed,3);
+  assert.equal(s.button('Show next exercise'),undefined);
+  s.click('Hide last exercise');
+  assert.deepEqual(s.mount.getAnswers(),{...saved,revealed:2});
+  assert.equal(s.host.querySelectorAll('.ek-stage-section')[1],choiceSection);
+  assert.equal(input.checked,true);
+  s.click('Hide last exercise');
+  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
+  assert.equal(s.button('Hide last exercise'),undefined);
+  assert.deepEqual(s.mount.getAnswers(),{...saved,revealed:1});
+  s.click('Show next exercise');s.click('Show next exercise');
+  assert.equal(s.host.querySelector('.ek-typed-gap').value,'My saved answer');
+  assert.equal(s.host.querySelectorAll('input')[1].checked,true);
+  assert.deepEqual(s.mount.getAnswers(),saved);
+  const choiceReset = s.host.querySelectorAll('.ek-stage-section')[1].querySelector('.ek-reset');
+  s.fire(choiceReset,'click');
+  assert.deepEqual(s.mount.getAnswers(),{...saved,block2:{}});
+  assert.equal(s.host.querySelector('.ek-typed-gap').value,'My saved answer');
+});
+test('progressive stage restores remote visibility and hidden answers without echoing', () => {
+  const s = setup('progressive-stage-demo');
+  const remote = {revealed:3,block2:{question1:'C'},block3:{gap1:'Remote answer'}};
+  s.mount.setAnswers(remote);
+  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,3);
+  s.mount.setAnswers({...remote,revealed:1});
+  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
+  assert.equal(s.changes.length,0);
+  s.click('Show next exercise');s.click('Show next exercise');
+  assert.equal(s.host.querySelector('.ek-typed-gap').value,'Remote answer');
+  assert.equal(s.mount.getAnswers().block2.question1,'C');
+});
+test('read-only progressive navigation cannot change visibility or answers', () => {
+  const initial = {revealed:2,block2:{question1:'B'}};
+  const s = setup('progressive-stage-demo',{readOnly:true,answers:initial});
+  for (const label of ['Show next exercise','Hide last exercise']) {
+    assert.equal(s.button(label).disabled,true);s.click(label);
+  }
+  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,2);
+  assert.deepEqual(s.mount.getAnswers(),initial);assert.equal(s.changes.length,0);
 });
 test('read-only drag cannot mutate answers', () => {
   const s = setup('sort-demo',{readOnly:true});

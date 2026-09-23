@@ -69,7 +69,7 @@ Useful Language disclosures open initially. Possible Answers and audio transcrip
 - Order: click to append/return, drag before another item or to the end, Alt+Left/Right to reorder.
 - Image labels stay where placed, even when wrong. Only Check evaluates them.
 - Feedback appears only after Check; editing clears stale feedback and corrections. Reset clears answers and feedback.
-- Each nested exercise has its own Check/Reset. A stage additionally has Reset for the whole stack. Progressive reveal belongs to the stage, not to individual templates.
+- Each nested exercise has its own Check/Reset. A stage has no global Reset. Progressive stages offer Show next exercise / Hide last exercise; hiding changes only the revealed count and retains all block answers for reopening and synchronization. Progressive reveal belongs to the stage, not to individual templates.
 - `setAnswers` hydrates remote state without emitting another onChange. Read-only mounts block changes.
 - Global and per-item players stop other playing audio when starting.
 

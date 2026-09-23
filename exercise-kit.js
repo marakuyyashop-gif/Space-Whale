@@ -481,19 +481,41 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           const handle = mount(child, block.exercise, { readOnly: Boolean(config.readOnly), answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
-          if (def.progressive && index < def.exercises.length - 1) {
-            const next = button('↓', () => {
-              if (config.readOnly) return;
-              next.remove(); visibleCount += 1; answers.revealed = visibleCount; save();
-              reveal().scrollIntoView?.({behavior:'smooth', block:'start'});
-            }, 'ek-button ek-secondary ek-next-exercise');
-            next.setAttribute('aria-label', 'Show next exercise');
-            if (index === visibleCount - 1) section.append(next);
-          }
           return section;
+        };
+        const navigation = node('div', 'ek-stage-navigation');
+        const updateNavigation = focusDirection => {
+          navigation.replaceChildren();
+          const addControl = (direction, label, handler) => {
+            const control = button('', handler, `ek-button ek-stage-toggle ek-stage-${direction}`);
+            control.setAttribute('aria-label', label); control.title = label;
+            control.disabled = Boolean(config.readOnly);
+            const chevron = node('span', 'ek-stage-chevron'); chevron.setAttribute('aria-hidden', 'true');
+            control.append(chevron); navigation.append(control);
+            return control;
+          };
+          let down, up;
+          if (visibleCount < def.exercises.length) down = addControl('down', 'Show next exercise', () => {
+            if (config.readOnly) return;
+            visibleCount += 1; answers.revealed = visibleCount; save();
+            const section = reveal(); updateNavigation('down');
+            section.scrollIntoView?.({behavior:'smooth', block:'start'});
+          });
+          if (visibleCount > 1) up = addControl('up', 'Hide last exercise', () => {
+            if (config.readOnly) return;
+            const block = def.exercises[visibleCount - 1];
+            nestedMounts.pop().destroy(); nestedMountsByBlock.delete(block.id);
+            stack.lastElementChild.remove();
+            // Only visibility changes: keep the hidden block's answers for reopening/sync.
+            visibleCount -= 1; answers.revealed = visibleCount; save();
+            updateNavigation('up');
+            navigation.scrollIntoView?.({behavior:'smooth', block:'nearest'});
+          });
+          if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus();
         };
         while (nestedMounts.length < visibleCount) reveal();
         body.append(stack);
+        if (def.progressive) { body.append(navigation); updateNavigation(); }
       }
       if (def.kind === 'rule-page') {
         const page = node('div', 'ek-rule-page');
@@ -821,7 +843,7 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     }));
-    if (!['presentation', 'audio', 'rule-page'].includes(def.kind)) {
+    if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {
       const reset = button('↻', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
       reset.setAttribute('aria-label', 'Reset exercise'); reset.title = 'Reset exercise'; actions.append(reset);
     }

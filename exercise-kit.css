@@ -1,4 +1,4 @@
-@import url("exercise-theme.css?v=20260923-factory");
+@import url("exercise-theme.css?v=20260923-stage-collapse");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
@@ -590,9 +590,14 @@
 .exercise-kit .ek-correction p { margin: 8px 0 0; }
 .exercise-kit .ek-correction-line .ek-muted { font-size: 1em; }
 .exercise-kit .ek-correction-line strong { color: var(--ek-correct); }
-.exercise-kit .ek-stage-stack { display: grid; gap: 32px; }
+.exercise-kit .ek-stage-stack { display: grid; gap: var(--sw-stage-gap, 48px); }
 .exercise-kit .ek-stage-section { min-width: 0; scroll-margin-top: 24px; }
-.exercise-kit .ek-next-exercise { display: block; margin: 24px auto 0; border-radius: 50%; font-size: 1.2em; }
+.exercise-kit .ek-stage-section + .ek-stage-section { border-top: 1px solid var(--ek-line); padding-top: var(--sw-stage-gap, 48px); }
+.exercise-kit .ek-stage-navigation { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 28px; }
+.exercise-kit .ek-stage-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; flex-shrink: 0; }
+.exercise-kit .ek-stage-up { width: 36px; height: 36px; }
+.exercise-kit .ek-stage-chevron { width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.exercise-kit .ek-stage-up .ek-stage-chevron { transform: translateY(2px) rotate(225deg); }
 .exercise-kit .ek-audio-range { accent-color: var(--ek-accent); }
 .exercise-kit .ek-question { min-width: 0; }
 .exercise-kit .ek-token, .exercise-kit .ek-radio { overflow-wrap: anywhere; }
