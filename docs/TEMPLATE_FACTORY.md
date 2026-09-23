@@ -87,3 +87,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 - Grouped spacing: `--sw-component-gap`; independent exercise spacing: `--sw-stage-gap`.
 - The single `uiLabels.check` value in exercise-kit.js controls the validation button label for every shared exercise, including nested ones. Changing it to Done updates them on the next page load without changing validation behavior or lesson data. Exported as SpaceWhaleExerciseKit.uiLabels for configuration before mounting.
 - Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior remains in the separate Audio + script preview.
+
+## Approved monochrome direction
+
+Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px instructions and controls. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.

@@ -2,23 +2,34 @@
    Lessons contain content only. Every host imports these tokens through exercise-kit.css.
    Keep type-specific changes under their named tokens; never style one lesson ID. */
 :root {
-  --sw-exercise-font: Onest, Arial, sans-serif;
-  --sw-exercise-text-size: 17px;
-  --sw-exercise-title-size: 23px;
-  --sw-exercise-compact-text-size: 15px;
+  --sw-exercise-font: Onest, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sw-exercise-text-size: 16px;
+  --sw-exercise-title-size: 20px;
+  --sw-exercise-compact-text-size: 16px;
   --sw-exercise-compact-title-size: 18px;
   --sw-exercise-mobile-text-size: 16px;
-  --sw-exercise-mobile-title-size: 21px;
-  --sw-exercise-radius: 16px;
+  --sw-exercise-mobile-title-size: 20px;
+  --sw-exercise-radius: 14px;
+  --sw-exercise-ink: #292b2f;
+  --sw-exercise-muted: #686b70;
+  --sw-exercise-line: #dedfe2;
+  --sw-exercise-surface: #fff;
+  --sw-exercise-soft: #f1f1f2;
+  --sw-exercise-small-size: 14px;
+  --sw-exercise-caption-size: 13px;
+  --sw-exercise-line-height: 1.65;
+  --sw-exercise-button-radius: 12px;
+  --sw-exercise-button-padding: 13px;
+  --sw-exercise-control-height: 40px;
   --sw-stage-gap: 48px;
   --sw-component-gap: 24px;
   --sw-audio-idle: #c5c7ce;
-  --sw-audio-progress: #7970bb;
-  --sw-matching-min-height: 170px;
+  --sw-audio-progress: #292b2f;
+  --sw-matching-min-height: 148px;
   --sw-matching-ratio: auto;
   --sw-picture-word-ratio: 0.72 / 1;
-  --sw-picture-word-radius: 20px;
-  --sw-exercise-accent: #ed8a42;
+  --sw-picture-word-radius: 16px;
+  --sw-exercise-accent: #292b2f;
   --sw-exercise-correct: #25734b;
   --sw-exercise-incorrect: #b13b3b;
 }
