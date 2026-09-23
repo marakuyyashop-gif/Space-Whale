@@ -250,7 +250,11 @@
     let trigger;
     let closeInline;
     const dismissInline = () => { closeInline?.(); closeInline = null; };
-    const onOutside = event => { if (!event.target.closest?.('.ek-inline-choice')) dismissInline(); };
+    const onOutside = event => {
+      // A fresh press starts a new gesture; only the drag's own trailing click is suppressed.
+      suppressDragClick = false;
+      if (!event.target.closest?.('.ek-inline-choice')) dismissInline();
+    };
     const controls = new Map();
     let visibleCount = 0;
     let draggedId = null;
@@ -389,6 +393,7 @@
       if (!config.readOnly && target && dropTargets.has(target)) dropTargets.get(target)(drag.id);
     };
     const dragClick = event => {
+      if (event.detail === 0) { suppressDragClick = false; return; } // keyboard/programmatic activation
       if (!suppressDragClick) return;
       suppressDragClick = false; event.preventDefault(); event.stopImmediatePropagation();
     };

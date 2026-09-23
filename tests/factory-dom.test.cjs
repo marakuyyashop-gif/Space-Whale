@@ -27,7 +27,7 @@ function setup(id, config = {}) {
   const host = document.querySelector('main');
   const changes = [];
   const mount = kit.mount(host, fixture(id), {...config,onChange:value => changes.push(value)});
-  const fire = (el,type,extras = {}) => {assert.ok(el,`${type} target exists`);const event = new window.Event(type,{bubbles:true,cancelable:true});Object.assign(event,extras);el.dispatchEvent(event);};
+  const fire = (el,type,extras = {}) => {assert.ok(el,`${type} target exists`);const event = new window.Event(type,{bubbles:true,cancelable:true});Object.assign(event,extras);el.dispatchEvent(event);return event;};
   const button = label => [...host.querySelectorAll('button')].find(el => el.textContent === label || el.getAttribute('aria-label') === label);
   const click = label => fire(button(label),'click');
   const drag = (source,target) => {
@@ -166,4 +166,31 @@ test('pointer drag moves item through the actual gesture path and blocks acciden
   assert.deepEqual(s.mount.getAnswers(),{item1:'A'});
   assert.equal(s.host.querySelectorAll('.ek-token').length,2);
   assert.equal(s.changes.length,1);
+});
+
+function pointerDrop(s) {
+  const target = s.host.querySelector('.ek-sort-group');
+  s.document.elementFromPoint = () => target;
+  s.fire(s.button('[Item 1]'),'pointerdown',{pointerId:1,button:0,clientX:10,clientY:100});
+  s.fire(s.document,'pointermove',{pointerId:1,clientX:10,clientY:20});
+  s.fire(s.document,'pointerup',{pointerId:1,clientX:10,clientY:20});
+}
+test('first Check and Reset after dragging work when browser emits no trailing click', () => {
+  const s = setup('sort-demo'); pointerDrop(s);
+  s.fire(s.button('Check'),'pointerdown',{pointerId:2,button:0});
+  assert.equal(s.fire(s.button('Check'),'click',{detail:1}).defaultPrevented,false);
+  assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
+  pointerDrop(s);
+  s.fire(s.button('Reset exercise'),'pointerdown',{pointerId:3,button:0});
+  s.fire(s.button('Reset exercise'),'click',{detail:1});
+  assert.deepEqual(s.mount.getAnswers(),{});
+});
+test('drag trailing click is suppressed, but keyboard Check is never swallowed', () => {
+  const s = setup('sort-demo'); pointerDrop(s);
+  const trailing = s.fire(s.host,'click',{detail:1});
+  assert.equal(trailing.defaultPrevented,true);
+  assert.deepEqual(s.mount.getAnswers(),{item1:'A'});
+  pointerDrop(s);
+  assert.equal(s.fire(s.button('Check'),'click',{detail:0}).defaultPrevented,false);
+  assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
 });
