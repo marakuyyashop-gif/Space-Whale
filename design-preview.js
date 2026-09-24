@@ -1,10 +1,5 @@
 (() => {
   'use strict';
-  // A single illuminated specimen; the exercise study remains available unchanged.
-  if(new URLSearchParams(window.location.search).get('detail')==='lamp'){
-    document.body.classList.add('indicator-only');
-    document.getElementById('indicatorStudy').hidden=false;
-  }
   const kit=window.SpaceWhaleExerciseKit;
   const base=(id,kind,title,data)=>({version:1,id,kind,title,...data});
   const fixtures=[
@@ -50,8 +45,17 @@
     matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
       const result=results[wrap.dataset.item];wrap.dataset.result=result;
       const lamp=wrap.querySelector('.preview-result-lamp');
-      // Engraved Y/N remains discernible without relying on colour alone.
-      lamp.textContent=result==='correct'?'Y':result==='retry'?'N':'·';
+      lamp.replaceChildren();
+      if(result==='correct'||result==='retry'){
+        const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');
+        const shape=result==='correct'?'M5 12.5 9.5 17 19 7':'M7 7 17 17M17 7 7 17';
+        ['preview-mark-highlight','preview-mark-stroke'].forEach(className=>{
+          const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+          path.setAttribute('d',shape);path.setAttribute('class',className);svg.append(path);
+        });
+        lamp.append(svg);
+      }
       const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
       lamp.setAttribute('aria-label',label);lamp.setAttribute('title',label);
       const hint=wrap.parentElement.querySelector('.preview-answer-hint');

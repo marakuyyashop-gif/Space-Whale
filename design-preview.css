@@ -158,46 +158,22 @@
 @media(max-width:700px){.preview-clock-controls{gap:14px}.preview-clock-actions{margin-right:0}.preview-duration{gap:5px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.preview-themes::before{transition:none!important}}
 
-/* Directed indicator light: scoped to a single matching study. */
-.design-preview #matchHost{--lamp-green:69,139,119;--lamp-red:181,94,109;--answer-bed:#dcdfe3}
-.design-preview[data-theme=dark] #matchHost{--lamp-green:108,196,164;--lamp-red:221,128,145;--answer-bed:#1e2228}
+/* Minimal feedback study: neutral round symbols and a fine dotted answer outline. */
+.design-preview #matchHost{--feedback-right:#6b9b82;--feedback-wrong:#bd7e8e;--answer-bed:#dcdfe3;--feedback-highlight:#ffffffd9}
+.design-preview[data-theme=dark] #matchHost{--feedback-right:#91b5a0;--feedback-wrong:#c997a4;--answer-bed:#1e2228;--feedback-highlight:#ffffff35}
 .design-preview #matchHost .ek-results{display:none}
-/* Keep the shared live announcement available to assistive technology only. */
 .design-preview #matchHost .ek-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0;padding:0;white-space:nowrap}
 .design-preview #matchHost .ek-body [data-feedback]{outline:none}
-.design-preview #matchHost .ek-body [data-feedback]:focus-visible{outline:2px solid var(--p-ring);outline-offset:4px}
-.preview-answer-light{position:relative;isolation:isolate;display:flex;align-items:center;gap:12px;width:100%;margin-top:auto;--lamp-rgb:var(--lamp-green)}
-.design-preview #matchHost .preview-answer-light .ek-match-slot{position:relative;z-index:1;flex:1;min-width:0;width:auto;margin:0;background:var(--answer-bed);box-shadow:var(--p-inset);color:var(--p-ink);border-radius:15px}
-.design-preview #matchHost .preview-answer-light .ek-match-slot:hover{background:var(--p-soft)}
-.preview-result-lamp{position:relative;z-index:3;display:grid;place-items:center;flex:none;width:26px;height:30px;border-radius:11px;background:var(--p-material);box-shadow:var(--p-small);font:600 10px Onest,sans-serif;color:var(--p-muted);transition:color 240ms,box-shadow 300ms,transform 240ms}
-.preview-result-lamp::before{content:"";position:absolute;left:1px;top:8px;bottom:8px;width:2px;border-radius:3px;background:var(--p-line);transition:background 300ms,box-shadow 300ms}
-.preview-answer-light::before{content:"";position:absolute;z-index:2;pointer-events:none;right:24px;top:50%;width:calc(100% - 24px);height:68px;transform:translateY(-50%);background:linear-gradient(to left,rgba(var(--lamp-rgb),.28),rgba(var(--lamp-rgb),.1) 44%,rgba(var(--lamp-rgb),0) 94%);clip-path:polygon(100% 43%,0 0,0 100%,100% 57%);filter:blur(4px);mask-image:radial-gradient(ellipse at 100% 50%,#000 0%,#0009 42%,transparent 76%);opacity:0;transition:opacity 380ms ease-out}
-.preview-answer-light[data-result=retry]{--lamp-rgb:var(--lamp-red)}
-.preview-answer-light:is([data-result=correct],[data-result=retry])::before{opacity:1}
-.preview-answer-light:is([data-result=correct],[data-result=retry]) .preview-result-lamp{color:rgb(var(--lamp-rgb));transform:translateY(-1px);box-shadow:var(--p-small),-3px 0 7px rgba(var(--lamp-rgb),.13)}
-.preview-answer-light:is([data-result=correct],[data-result=retry]) .preview-result-lamp::before{background:rgb(var(--lamp-rgb));box-shadow:-2px 0 5px rgba(var(--lamp-rgb),.6),-7px 0 13px rgba(var(--lamp-rgb),.22)}
-.preview-answer-hint{margin:14px 38px 0 0;padding:9px 12px;border-radius:11px;background:var(--answer-bed);color:var(--p-ink);box-shadow:var(--p-inset);font-size:13px;line-height:1.5;animation:feedback-arrive 220ms ease-out}
+.preview-answer-light{display:flex;align-items:center;gap:12px;width:100%;margin-top:auto}
+.design-preview #matchHost .preview-answer-light .ek-match-slot{flex:1;min-width:0;width:auto;margin:0;border-radius:15px;color:var(--p-ink)}
+.design-preview #matchHost .preview-answer-light .ek-match-slot[data-feedback=correct]{outline:.75px dotted var(--feedback-right);outline-offset:2px}
+.design-preview #matchHost .preview-answer-light .ek-match-slot[data-feedback=retry]{outline:.75px dotted var(--feedback-wrong);outline-offset:2px}
+.design-preview #matchHost .preview-answer-light .ek-match-slot:focus-visible{outline:2px solid var(--p-ring);outline-offset:4px}
+.preview-result-lamp{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--p-material);box-shadow:var(--p-small);color:var(--p-muted);transition:box-shadow 180ms ease}
+.preview-answer-light:is([data-result=correct],[data-result=retry]) .preview-result-lamp{box-shadow:var(--p-glow)}
+.preview-result-lamp svg{width:19px;height:19px;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.preview-mark-highlight{stroke:var(--feedback-highlight);stroke-width:2;transform:translate(.4px,.8px)}
+.preview-mark-stroke{stroke:currentColor;stroke-width:1.8}
+.preview-answer-hint{margin:14px 46px 0 0;padding:9px 12px;border-radius:11px;background:var(--answer-bed);color:var(--p-ink);box-shadow:var(--p-inset);font-size:13px;line-height:1.5}
 @media(max-width:1100px){.design-preview #matchHost .ek-card{grid-template-columns:18px minmax(0,1fr) minmax(155px,1.2fr)}.preview-answer-light{margin:0}.preview-answer-hint{grid-column:3;margin-top:0}}
 @media(max-width:700px){.design-preview #matchHost .ek-card{grid-template-columns:14px minmax(0,1fr);gap:14px}.preview-answer-light{grid-column:2}.preview-answer-hint{grid-column:2}}
-@media(prefers-reduced-motion:reduce){.preview-answer-light::before,.preview-result-lamp::before{transition:none!important}}
-
-/* One specimen: sculpted keycap and a luminous recessed letter. */
-.design-preview.indicator-only .reference-app{grid-template-columns:minmax(0,1fr)}
-.indicator-only .preview-sidebar,.indicator-only .preview-column{display:none}
-.indicator-only .preview-scroll{display:grid;place-items:center;flex:1;padding:32px 24px 110px}
-.indicator-study{width:min(100%,350px)}
-.indicator-answer{--study-light:255,68,80;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:84px;padding:13px 15px 13px 25px;border-radius:28px;background:#e0e2e6;box-shadow:inset 4px 5px 11px #b4bbc59c,inset -4px -4px 10px #ffffffd9;color:var(--p-ink)}
-/* Hot reflected core sits beneath the key. Broad light fades along the answer bed. */
-.indicator-answer::before{content:"";position:absolute;z-index:0;inset:0;pointer-events:none;background:radial-gradient(ellipse 18px 23px at calc(100% - 56px) 54%,#fff6efcc 0%,rgba(var(--study-light),.65) 26%,rgba(var(--study-light),.2) 59%,transparent 100%),radial-gradient(ellipse 64px 32px at calc(100% - 61px) 53%,rgba(var(--study-light),.42),rgba(var(--study-light),.18) 35%,transparent 100%),radial-gradient(ellipse 140px 43px at calc(100% - 78px) 51%,rgba(var(--study-light),.18),rgba(var(--study-light),.06) 48%,transparent 100%);mask-image:linear-gradient(to right,#000 calc(100% - 51px),transparent calc(100% - 24px));filter:blur(4px)}
-.indicator-answer-text{position:relative;z-index:1;font-size:16px;font-weight:500;line-height:1.5;letter-spacing:-.015em}
-.indicator-round{position:relative;z-index:2;flex:none;display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:linear-gradient(150deg,#f3f4f5 4%,#e9ebee 47%,#d0d5dc 100%);box-shadow:3px 6px 8px #959da975,1px 3px 2px #a4abb55c,inset 0 5px 7px #ffffffb3,inset 0 -3px 5px #a8b0bc33}
-/* Backlight is revealed only on the left; there is no luminous perimeter stroke. */
-.indicator-round::before{content:"";position:absolute;z-index:-1;left:-9px;top:9px;width:23px;height:39px;border-radius:50%;background:radial-gradient(ellipse,#fff8edcf 0%,rgba(var(--study-light),.73) 28%,rgba(var(--study-light),.2) 57%,transparent 75%);filter:blur(5px);pointer-events:none}
-.indicator-letter{position:relative;width:19px;height:24px;overflow:visible;fill:none;stroke-linejoin:round;stroke-linecap:round}
-.letter-lower-edge{stroke:#ffffffd9;stroke-width:5;transform:translate(.3px,1px)}
-.letter-recess{stroke:#66717f;stroke-opacity:.47;stroke-width:4.6}
-.letter-light{stroke:#fff6ef;stroke-width:2.5;filter:drop-shadow(0 0 1px #ff3648) drop-shadow(0 0 3px #ff3648b3)}
-.design-preview[data-theme=dark] .indicator-answer{background:#20242b;box-shadow:inset 5px 5px 12px #121519bb,inset -4px -4px 10px #3b424b77}
-.design-preview[data-theme=dark] .indicator-round{background:linear-gradient(145deg,#424850,#333942 50%,#262c34);box-shadow:3px 6px 9px #0b0f16c9,1px 3px 2px #11151ba8,inset 0 4px 7px #ffffff0f,inset 0 -3px 5px #0e13192e}
-.design-preview[data-theme=dark] .letter-lower-edge{stroke:#ffffff38}
-.design-preview[data-theme=dark] .letter-recess{stroke:#11151e;stroke-opacity:.9}
