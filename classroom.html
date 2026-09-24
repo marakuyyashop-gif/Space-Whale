@@ -4,12 +4,12 @@
 <title>Space Whale — Learning Space</title>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
-<link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions">
-<link rel="stylesheet" href="learning-space.css?v=20260924-monochrome">
-<link rel="stylesheet" href="workspace.css?v=20260924-guest">
+<link rel="stylesheet" href="exercise-kit.css?v=20260924-core-neu">
+<link rel="stylesheet" href="learning-space.css?v=20260924-core-neu">
+<link rel="stylesheet" href="workspace.css?v=20260924-core-neu">
 </head><body class="learning-space unified-workspace">
 <div class="reference-app">
-<aside class="app-sidebar" aria-label="Библиотека и задания">
+<div class="workspace-sidebar-shell"><aside id="workspaceSidebar" class="app-sidebar" aria-label="Библиотека и задания">
 <div class="workspace-session-heading"><a href="schedule.html" title="Открыть расписание">Свободное занятие · ученик не выбран</a></div>
 <div class="workspace-course-bar"><label class="workspace-visually-hidden" for="workspaceCourse">Выберите уровень и Whale</label><select id="workspaceCourse"></select></div>
 <div id="workspaceTopics" class="workspace-tree" aria-label="Темы и упражнения"></div>
@@ -30,19 +30,19 @@
 <button id="startLesson" type="button" disabled title="Открыть выбранный урок во вкладке Class">Start lesson</button>
 </div>
 </div>
-</aside>
-<section class="class-area"><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
+</aside><button id="workspaceSidebarToggle" class="workspace-sidebar-toggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Свернуть меню"><span aria-hidden="true"></span></button></div>
+<section class="class-area"><div class="workspace-theme-switch" role="group" aria-label="Тема"><button data-workspace-theme="light" type="button" aria-pressed="true">Светлая</button><button data-workspace-theme="dark" type="button" aria-pressed="false">Тёмная</button></div><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
 </div>
 <noscript>Для открытия упражнений включите JavaScript.</noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js?v=20260920-backend-v1"></script>
 <script src="classroom-realtime.js?v=20260924-guest-collab"></script>
-<script src="exercise-kit.js?v=20260924-interactions"></script>
+<script src="exercise-kit.js?v=20260924-core-neu"></script>
 <script src="template-gallery.js?v=20260923-audio-wave"></script>
 <script src="lesson-draft-first-day-school.js?v=20260922"></script>
 <script src="lesson-draft-school-fair.js?v=20260922"></script>
 <script src="course-content.js?v=20260922-clothes-photo"></script>
 <script src="workspace-catalog.js?v=1"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script src="workspace.js?v=20260924-guest-collab"></script>
+<script src="workspace.js?v=20260924-core-neu"></script>
 </body></html>

@@ -48,23 +48,23 @@ test('matching reassigns used option, closes dialog, clears stale feedback, rese
   const s = setup('matching-demo');
   s.fire(s.host.querySelectorAll('.ek-match-slot')[0],'click'); s.click('[Sentence ending 2]');
   assert.equal(s.host.querySelectorAll('dialog').length,0);
-  s.click('Check'); assert.equal(s.host.querySelector('.ek-match-slot').getAttribute('data-feedback'),'retry');
+  s.click('OK'); assert.equal(s.host.querySelector('.ek-match-slot').getAttribute('data-feedback'),'retry');
   s.fire(s.host.querySelectorAll('.ek-match-slot')[1],'click');
   const used = [...s.host.querySelectorAll('dialog .ek-option')].find(el => el.textContent === '[Sentence ending 2]');
   assert.ok(used.classList.contains('ek-option-used'));
   s.fire(used,'click');
   assert.deepEqual(s.mount.getAnswers(),{item2:'option2'});
-  assert.equal(s.host.querySelector('.ek-match-slot').textContent,'+');
+  assert.equal(s.host.querySelector('.ek-match-slot').textContent,'');
   assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
   s.click('Reset exercise'); assert.deepEqual(s.mount.getAnswers(),{});
 });
 test('typed bank stays typed, reports transformed answer, remote hydration does not echo', () => {
   const s = setup('bank-demo'); const input = s.host.querySelector('input');
-  input.value = 'wrong'; s.fire(input,'input'); s.click('Check');
+  input.value = 'wrong'; s.fire(input,'input'); s.click('OK');
   assert.equal(input.getAttribute('data-feedback'),'retry');
   assert.ok(s.host.querySelector('.ek-correction').textContent.includes('[Form 1]'));
   input.value = '[Form 1]'; s.fire(input,'input');
-  assert.equal(s.host.querySelector('.ek-correction'),null); s.click('Check');
+  assert.equal(s.host.querySelector('.ek-correction'),null); s.click('OK');
   assert.equal(input.getAttribute('data-feedback'),'correct');
   const count = s.changes.length; s.mount.setAnswers({gap1:'remote'});
   assert.equal(s.changes.length,count); assert.equal(input.value,'remote');
@@ -76,7 +76,7 @@ test('inline dropdown closes after selection and updates only its gap', () => {
   s.fire(s.host.querySelectorAll('.ek-inline-option')[1],'click');
   assert.deepEqual(s.mount.getAnswers(),{gap1:'[Form 1]'});
   assert.equal(s.host.querySelector('.ek-inline-menu').hidden,true);
-  s.click('Check'); assert.equal(s.host.querySelector('.ek-choice-trigger').getAttribute('data-feedback'),'correct');
+  s.click('OK'); assert.equal(s.host.querySelector('.ek-choice-trigger').getAttribute('data-feedback'),'correct');
 });
 test('single and multiple choices use real radios / checkboxes and exact set grading', () => {
   for (const id of ['choice-demo','image-choice-demo','multiple-choice-demo','image-multiple-demo']) {
@@ -84,7 +84,7 @@ test('single and multiple choices use real radios / checkboxes and exact set gra
     assert.equal(inputs[0].type,multiple ? 'checkbox':'radio');
     for (const index of multiple ? [0,2] : [1]) {inputs[index].checked=true;s.fire(inputs[index],'change');}
     assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
-    s.click('Check');assert.equal(s.host.querySelector('fieldset').getAttribute('data-feedback'),'correct');
+    s.click('OK');assert.equal(s.host.querySelector('fieldset').getAttribute('data-feedback'),'correct');
     s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});
   }
 });
@@ -93,7 +93,7 @@ test('sort drag moves, reassigns and returns items without copies', () => {
   s.drag(s.button('[Item 1]'),s.host.querySelectorAll('.ek-sort-group')[0]);
   assert.deepEqual(s.mount.getAnswers(),{item1:'A'});assert.equal(s.host.querySelectorAll('.ek-bank .ek-token').length,1);
   s.drag(s.button('[Item 1]'),s.host.querySelectorAll('.ek-sort-group')[1]); assert.deepEqual(s.mount.getAnswers(),{item1:'B'});
-  s.click('Check');assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'retry');
+  s.click('OK');assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'retry');
   s.drag(s.button('[Item 1]'),s.host.querySelector('.ek-bank'));assert.deepEqual(s.mount.getAnswers(),{});
   assert.equal(s.host.querySelectorAll('.ek-token').length,2);
 });
@@ -117,7 +117,7 @@ test('image label stays in wrong target until Check and supports moving occupied
   const s = setup('image-label-demo');
   s.drag(s.button('[Label 1]'),s.host.querySelectorAll('.ek-image-label-target')[1]);
   assert.deepEqual(s.mount.getAnswers(),{target2:'label1'});assert.equal(s.host.querySelectorAll('.ek-image-label-bank .ek-token').length,1);
-  assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);s.click('Check');
+  assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);s.click('OK');
   assert.equal(s.host.querySelectorAll('.ek-image-label-target')[1].getAttribute('data-feedback'),'retry');
   s.drag(s.host.querySelectorAll('.ek-image-label-target')[1],s.host.querySelectorAll('.ek-image-label-target')[0]);
   assert.deepEqual(s.mount.getAnswers(),{target1:'label1'});
@@ -125,15 +125,15 @@ test('image label stays in wrong target until Check and supports moving occupied
 });
 test('open tasks have no Check; useful language open, possible answers and script closed', () => {
   for (const id of ['writing-demo','presentation-demo','speaking-language-demo','possible-answers-demo','audio-script-demo']) {
-    const s = setup(id);assert.equal(s.button('Check'),undefined);
+    const s = setup(id);assert.equal(s.button('OK'),undefined);
     const details = s.host.querySelector('details');
     if (details) assert.equal(Boolean(details.open),id === 'speaking-language-demo');
   }
 });
 test('progressive stage collapses and reopens without losing hidden or earlier answers', () => {
   const s = setup('progressive-stage-demo');
-  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
-  assert.equal(s.button('Hide last exercise'),undefined);
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,1);
+  assert.equal(s.button('Свернуть задание'),undefined);
   assert.equal(s.host.querySelector(':scope > .ek-actions .ek-reset'),null);
   s.click('Show next exercise');
   const choiceSection = s.host.querySelectorAll('.ek-stage-section')[1];
@@ -143,13 +143,13 @@ test('progressive stage collapses and reopens without losing hidden or earlier a
   const saved = s.mount.getAnswers();
   assert.equal(saved.block2.question1,'B');assert.equal(saved.revealed,3);
   assert.equal(s.button('Show next exercise'),undefined);
-  s.click('Hide last exercise');
+  s.click('Свернуть задание');
   assert.deepEqual(s.mount.getAnswers(),{...saved,revealed:2});
   assert.equal(s.host.querySelectorAll('.ek-stage-section')[1],choiceSection);
   assert.equal(input.checked,true);
-  s.click('Hide last exercise');
-  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
-  assert.equal(s.button('Hide last exercise'),undefined);
+  s.click('Свернуть задание');
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,1);
+  assert.equal(s.button('Свернуть задание'),undefined);
   assert.deepEqual(s.mount.getAnswers(),{...saved,revealed:1});
   s.click('Show next exercise');s.click('Show next exercise');
   assert.equal(s.host.querySelector('.ek-typed-gap').value,'My saved answer');
@@ -164,9 +164,9 @@ test('progressive stage restores remote visibility and hidden answers without ec
   const s = setup('progressive-stage-demo');
   const remote = {revealed:3,block2:{question1:'C'},block3:{gap1:'Remote answer'}};
   s.mount.setAnswers(remote);
-  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,3);
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,3);
   s.mount.setAnswers({...remote,revealed:1});
-  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,1);
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,1);
   assert.equal(s.changes.length,0);
   s.click('Show next exercise');s.click('Show next exercise');
   assert.equal(s.host.querySelector('.ek-typed-gap').value,'Remote answer');
@@ -175,10 +175,10 @@ test('progressive stage restores remote visibility and hidden answers without ec
 test('read-only progressive navigation cannot change visibility or answers', () => {
   const initial = {revealed:2,block2:{question1:'B'}};
   const s = setup('progressive-stage-demo',{readOnly:true,answers:initial});
-  for (const label of ['Show next exercise','Hide last exercise']) {
+  for (const label of ['Show next exercise','Свернуть задание']) {
     assert.equal(s.button(label).disabled,true);s.click(label);
   }
-  assert.equal(s.host.querySelectorAll('.ek-stage-section').length,2);
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
   assert.deepEqual(s.mount.getAnswers(),initial);assert.equal(s.changes.length,0);
 });
 test('read-only drag cannot mutate answers', () => {
@@ -216,8 +216,8 @@ function pointerDrop(s) {
 }
 test('first Check and Reset after dragging work when browser emits no trailing click', () => {
   const s = setup('sort-demo'); pointerDrop(s);
-  s.fire(s.button('Check'),'pointerdown',{pointerId:2,button:0});
-  assert.equal(s.fire(s.button('Check'),'click',{detail:1}).defaultPrevented,false);
+  s.fire(s.button('OK'),'pointerdown',{pointerId:2,button:0});
+  assert.equal(s.fire(s.button('OK'),'click',{detail:1}).defaultPrevented,false);
   assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
   pointerDrop(s);
   s.fire(s.button('Reset exercise'),'pointerdown',{pointerId:3,button:0});
@@ -230,7 +230,7 @@ test('drag trailing click is suppressed, but keyboard Check is never swallowed',
   assert.equal(trailing.defaultPrevented,true);
   assert.deepEqual(s.mount.getAnswers(),{item1:'A'});
   pointerDrop(s);
-  assert.equal(s.fire(s.button('Check'),'click',{detail:0}).defaultPrevented,false);
+  assert.equal(s.fire(s.button('OK'),'click',{detail:0}).defaultPrevented,false);
   assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
 });
 
@@ -279,7 +279,7 @@ test('grouped listening keeps independent components and answers; Check label is
     const s=setup('listening-choice-demo');
     assert.equal(s.host.classList.contains('ek-stage-grouped'),true);
     assert.equal(s.host.querySelectorAll('.ek-audio-player').length,1);
-    assert.ok(s.button('Done'));assert.equal(s.button('Check'),undefined);
+    assert.ok(s.button('Done'));assert.equal(s.button('OK'),undefined);
     const input=s.host.querySelectorAll('input[type=radio]')[1];input.checked=true;s.fire(input,'change');
     s.click('Done');assert.equal(s.mount.getAnswers().block2.question1,'B');
     assert.ok(s.host.querySelector('[data-feedback=correct]'));
@@ -291,7 +291,7 @@ test('grouped listening keeps independent components and answers; Check label is
 
 test('shared Check result restores remotely without echo; editing clears shared Check',()=>{
  const a=setup('choice-demo',{syncChecks:true});
- const input=a.host.querySelectorAll('input')[1];input.checked=true;a.fire(input,'change');a.click('Check');
+ const input=a.host.querySelectorAll('input')[1];input.checked=true;a.fire(input,'change');a.click('OK');
  assert.equal(a.mount.getAnswers().__sw_checked,true);
  const b=setup('choice-demo',{syncChecks:true});b.mount.setAnswers(a.mount.getAnswers());
  assert.ok(b.host.querySelector('[data-feedback=correct]'));assert.equal(b.changes.length,0);
@@ -309,4 +309,29 @@ test('matching selection treatment survives remote updates and Reset remains an 
   s.click('Reset exercise');
   assert.equal(s.host.querySelector('.ek-match-slot').dataset.selected,'false');
   assert.deepEqual(s.mount.getAnswers(),{});
+});
+
+test('shared feedback uses five bands, neutral empty state and no duplicate counters',()=>{
+  assert.equal(kit.uiLabels.check,'OK');
+  for(const [n,message] of [[0,'Try again.'],[1,'Take another look.'],[2,'Good start.'],[3,'So close.'],[4,'All correct.']]){
+    assert.equal(kit.feedbackMessage(Object.fromEntries(Array.from({length:4},(_,i)=>[i,i<n?'correct':'retry']))),message);
+  }
+  const s=setup('matching-demo');s.click('OK');assert.equal(s.host.querySelector('.ek-status').textContent,'Choose an answer.');
+  assert.equal(s.host.querySelectorAll('.ek-results>[data-feedback]').length,0);
+  assert.ok(s.host.querySelector('.ek-results').hidden);
+  assert.equal(s.host.querySelectorAll('.ek-card>.ek-result-lamp').length,3);
+});
+test('height motion keeps content until closing finishes and cancels stale closing on reversal',()=>{
+  const {document}=parseHTML('<html><body><div>Content</div></body></html>');const el=document.querySelector('div');
+  el.getBoundingClientRect=()=>({height:80});Object.defineProperty(el,'scrollHeight',{value:80});
+  const animations=[];el.animate=(frames)=>{const animation={frames,cancel(){this.cancelled=true;}};animations.push(animation);return animation;};
+  kit.motion.expand(el,false);assert.equal(el.hidden,false);assert.equal(el.inert,true);assert.equal(animations[0].frames[1].height,'0px');
+  kit.motion.expand(el,true);assert.equal(animations[0].cancelled,true);assert.equal(el.inert,false);animations[1].onfinish();assert.equal(el.hidden,false);
+  kit.motion.expand(el,false);animations[2].onfinish();assert.equal(el.hidden,true);
+});
+test('nested feedback remains visible when another stage opens and closes',()=>{
+  const s=setup('progressive-stage-demo',{syncChecks:true});s.click('Show next exercise');
+  const section=s.host.querySelectorAll('.ek-stage-section')[1];const input=section.querySelectorAll('input')[1];input.checked=true;s.fire(input,'change');s.fire(section.querySelector('.ek-check'),'click');
+  assert.equal(section.querySelector('.ek-result-lamp').dataset.result,'correct');s.click('Show next exercise');s.click('Свернуть задание');
+  assert.equal(section.querySelector('.ek-result-lamp').dataset.result,'correct');
 });

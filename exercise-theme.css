@@ -36,3 +36,27 @@
   --sw-exercise-correct: #25734b;
   --sw-exercise-incorrect: #b13b3b;
 }
+
+/* Approved material system. Shared by all exercise hosts and the workspace. */
+:root {
+  --sw-neu-bg:#e9eaec;--sw-neu-ink:#35383e;--sw-neu-muted:#646a73;
+  --sw-neu-surface:linear-gradient(135deg,#f0f1f2,#e9eaec 48%,#e3e5e8);
+  --sw-neu-raised:9px 9px 20px #b9bec68c,-8px -8px 20px #ffffffcf;
+  --sw-neu-small:4px 5px 11px #b9bec680,-4px -4px 11px #ffffffbd;
+  --sw-neu-inset:inset 3px 4px 12px #aeb5bf38,inset -3px -3px 12px #ffffff70;
+  --sw-neu-glow:5px 6px 14px #b9bec680,-5px -5px 16px #ffffffed;
+  --sw-neu-feedback:#e1e3e6;--sw-neu-checked:#daddE2;--sw-neu-hover:#edf0f2;
+  --sw-neu-success:linear-gradient(140deg,#a0ddb6,#7dca9a 45%,#60b981);
+  --sw-neu-error:linear-gradient(140deg,#f3bdc4,#e9a0aa 45%,#d9808e);
+  --sw-neu-option-limit:38rem;
+  --sw-motion-time:260ms;--sw-motion-easing:cubic-bezier(.22,.7,.25,1);
+}
+[data-theme=dark] {
+  --sw-neu-bg:#25282d;--sw-neu-ink:#eef0f3;--sw-neu-muted:#b2b8c2;
+  --sw-neu-surface:linear-gradient(135deg,#2d3137,#25282d 55%,#22252a);
+  --sw-neu-raised:9px 9px 20px #15171b99,-8px -8px 20px #353a4260;
+  --sw-neu-small:4px 5px 11px #15171b99,-4px -4px 11px #363c4460;
+  --sw-neu-inset:inset 3px 4px 12px #13171d45,inset -3px -3px 12px #59616e18;
+  --sw-neu-glow:5px 6px 14px #14161b99,-5px -5px 16px #3b414a80;
+  --sw-neu-feedback:#2e333a;--sw-neu-checked:#343b44;--sw-neu-hover:#363d46;
+}

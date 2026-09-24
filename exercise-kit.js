@@ -1,6 +1,6 @@
 (function (scope) {
   'use strict';
-  const uiLabels = { check: 'Check' }; // Shared button copy for every exercise.
+  const uiLabels = { check: 'OK' }; // Shared button copy for every exercise.
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const clone = value => JSON.parse(JSON.stringify(value));
@@ -242,6 +242,29 @@
     }
     return results;
   }
+  const feedbackMessages=['Try again.','Take another look.','Good start.','So close.','All correct.'];
+  function feedbackMessage(results,kind){
+    const values=Object.values(results),correct=values.filter(value=>value==='correct').length;
+    if(!values.length||values.every(value=>value==='empty'))return kind==='gaps'?'Write an answer.':'Choose an answer.';
+    if(values.includes('review'))return 'Ready to discuss.';
+    const band=correct===0?0:correct===values.length?4:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));
+    return feedbackMessages[band];
+  }
+  // One reversible height transition for exercise sections, disclosures and workspace panels.
+  const movements=new WeakMap();
+  function expand(element,open,done){
+    const previous=movements.get(element);
+    const from=element.hidden?0:element.getBoundingClientRect?.().height||element.scrollHeight||0;
+    if(previous){previous.onfinish=null;previous.cancel();movements.delete(element);}
+    element.hidden=false;element.inert=!open;
+    const finish=()=>{element.hidden=!open;element.inert=!open;element.style.removeProperty('height');element.style.removeProperty('overflow');movements.delete(element);done?.();};
+    if(!element.animate||element.ownerDocument.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches){finish();return;}
+    element.style.height='auto';const to=open?element.scrollHeight:0;
+    element.style.overflow='hidden';
+    const animation=element.animate([{height:from+'px',opacity:open?.45:1},{height:to+'px',opacity:open?1:0}],{duration:260,easing:'cubic-bezier(.22,.7,.25,1)',fill:'both'});
+    movements.set(element,animation);
+    animation.onfinish=()=>{if(movements.get(element)!==animation)return;animation.cancel();finish();};
+  }
   function mount(host, definition, config = {}) {
     validate(definition);
     const def = clone(definition);
@@ -249,6 +272,8 @@
     let answers = clone(config.answers || {});
     let feedback = {};
     const doc = host.ownerDocument;
+    const modern=!doc.body?.classList.contains('design-preview');
+    let syncStage=null;
     let dialog;
     let trigger;
     let closeInline;
@@ -374,11 +399,12 @@
       wrap.append(audio, play);
       return wrap;
     };
-    const announce = message => { status.textContent = message; };
+    const announce = message => { status.textContent = message;if(modern)status.hidden=!message; };
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
       resultsBox.replaceChildren(); announce('');
+      if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');});}
     };
     const save = () => { if (config.syncChecks) delete answers.__sw_checked; clearFeedback(); config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
@@ -429,9 +455,9 @@
       if (!suppressDragClick) return;
       suppressDragClick = false; event.preventDefault(); event.stopImmediatePropagation();
     };
-    const closeDialog = () => { if (dialog?.open) dialog.close(); };
-    const onKeydown = event => { if (event.key === 'Escape') { closeDialog(); dismissInline(); } };
-    host.classList.add('exercise-kit');
+    const closeDialog = () => { if (!dialog?.open)return;const target=dialog;if(modern)expand(target,false,()=>target.close());else target.close(); };
+    const onKeydown = event => { if (event.key === 'Escape') { if(dialog?.open)event.preventDefault();closeDialog(); dismissInline(); } };
+    host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
     host.replaceChildren();
@@ -448,14 +474,15 @@
       trigger = opener;
       dialog = node('dialog', 'ek-dialog');
       dialog.setAttribute('aria-label', def.title);
-      dialog.append(button('Close ×', () => dialog.close(), 'ek-close'), node('h3', 'ek-title', def.title));
+      const close=button(modern?'':'Close ×', () => closeDialog(), 'ek-close');close.setAttribute('aria-label','Close');
+      dialog.append(close, node('h3', 'ek-title', def.title));
       const prompt = node('div', 'ek-prompt', item.text);
       prompt.setAttribute('aria-label', 'Phrase to match');
       if (item.image) prompt.prepend(illustration(item));
       dialog.append(prompt);
       const choices = node('div', 'ek-options');
       available.forEach(option => {
-        const choice = button(option.text, () => { onPick(option.id); dialog.close(); }, 'ek-option');
+        const choice = button(option.text, () => { onPick(option.id); closeDialog(); }, 'ek-option');
         if (option.image) choice.prepend(illustration(option));
         choice.setAttribute('aria-pressed', String(selected === option.id));
         if (used.has(option.id) && selected !== option.id) {
@@ -465,7 +492,7 @@
         choices.append(choice);
       });
       dialog.append(choices);
-      if (selected) dialog.append(button('Clear selection', () => { onPick(''); dialog.close(); }));
+      if (selected) dialog.append(button('Clear selection', () => { onPick(''); closeDialog(); }));
       const currentDialog = dialog;
       const currentTrigger = trigger;
       dialog.addEventListener('close', () => {
@@ -473,7 +500,7 @@
         const replacement = [...body.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === currentTrigger.getAttribute('aria-label'));
         if (host.isConnected) (currentTrigger.isConnected ? currentTrigger : replacement)?.focus();
       }, { once: true });
-      host.append(dialog); dialog.showModal();
+      host.append(dialog); dialog.showModal();if(modern){dialog.hidden=true;expand(dialog,true);}
     }
     function richText(value, highlights = []) {
       const el = node('p', 'ek-copy');
@@ -532,20 +559,27 @@
           if (visibleCount < def.exercises.length) down = addControl('down', 'Show next exercise', () => {
             if (config.readOnly) return;
             visibleCount += 1; answers.revealed = visibleCount; save();
-            const section = reveal(); updateNavigation('down');
+            const section = syncStage(visibleCount); updateNavigation('down');
             section.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
           });
-          if (visibleCount > 1) up = addControl('up', 'Hide last exercise', () => {
+          if (visibleCount > 1) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly) return;
-            const block = def.exercises[visibleCount - 1];
-            nestedMounts.pop().destroy(); nestedMountsByBlock.delete(block.id);
-            stack.lastElementChild.remove();
-            // Only visibility changes: keep the hidden block's answers for reopening/sync.
             visibleCount -= 1; answers.revealed = visibleCount; save();
+            syncStage(visibleCount);
             updateNavigation('up');
             navigation.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest'});
           });
           if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus();
+        };
+        syncStage=count=>{
+          while(nestedMounts.length<count){const section=reveal();section.hidden=true;}
+          visibleCount=count;
+          [...stack.children].forEach((section,index)=>{
+            const open=index<count;
+            if(!open)section.querySelectorAll('audio,video').forEach(media=>media.pause());
+            if(section.hidden===open||Boolean(section.inert)===open)expand(section,open);
+          });
+          updateNavigation();return stack.children[count-1];
         };
         while (nestedMounts.length < visibleCount) reveal();
         body.append(stack);
@@ -640,11 +674,11 @@
             if (!control) return;
             const option = def.options.find(candidate => candidate.id === answers[matchItem.id]);
             const label = pictureWord ? `picture ${matchIndex + 1}` : matchItem.text;
-            control.textContent = option?.text || '+';
+            control.textContent = option?.text || (modern?'':'+');
             control.dataset.selected = String(Boolean(option));
             control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
           };
-          const plus = button(chosen()?.text || '+', () => {
+          const plus = button(chosen()?.text || (modern?'':'+'), () => {
             const takenBy = new Map(
               Object.entries(answers)
                 .filter(([id, value]) => id !== item.id && value)
@@ -701,10 +735,10 @@
                 opener.dataset.selected = String(Boolean(answers[segment.id]));
                 menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[segment.id])));
               };
-              const shut = () => { menu.hidden = true; opener.setAttribute('aria-expanded', 'false'); };
+              const shut = () => { if(modern)expand(menu,false);else menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
               const opener = button('', () => {
-                if (!menu.hidden) { dismissInline(); return; }
-                dismissInline(); menu.hidden = false; opener.setAttribute('aria-expanded', 'true');
+                if (opener.getAttribute('aria-expanded')==='true') { dismissInline(); return; }
+                dismissInline(); if(modern)expand(menu,true);else menu.hidden=false;opener.setAttribute('aria-expanded','true');
                 closeInline = shut;
                 menu.querySelector('button')?.focus();
               }, 'ek-gap ek-choice-trigger');
@@ -855,7 +889,48 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
+    const lamps=new Map();
+    function decorate(){
+      if(!modern)return;
+      lamps.clear();
+      controls.forEach((control,id)=>{
+        if(!['matching','gaps','choice'].includes(def.kind))return;
+        const lamp=node('span','ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
+        if(def.kind==='matching')control.closest('.ek-card').append(lamp);
+        else if(def.kind==='choice'){
+          if(control.tagName==='FIELDSET')control.append(lamp);else control.after(lamp);
+        }else if(def.kind==='gaps')control.after(lamp);
+        else control.after(lamp);
+        lamps.set(id,lamp);
+      });
+      host.querySelectorAll('details.ek-disclosure').forEach(detail=>{
+        if(detail.dataset.motionReady)return;detail.dataset.motionReady='true';
+        const summary=detail.querySelector('summary'),content=node('div','ek-disclosure-content');
+        [...detail.childNodes].filter(child=>child!==summary).forEach(child=>content.append(child));detail.append(content);content.hidden=!detail.open;
+        summary.setAttribute('aria-expanded',String(Boolean(detail.open)));
+        summary.addEventListener('click',event=>{event.preventDefault();const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));if(open)detail.open=true;expand(content,open,()=>{detail.open=open;});});
+      });
+    }
+    function showFeedback(){
+      feedback=grade(def,answers);resultsBox.replaceChildren();
+      controls.forEach((control,id)=>{
+        const value=feedback[id];if(value)control.setAttribute('data-feedback',value);
+        const lamp=lamps.get(id);if(lamp){lamp.dataset.result=value||'empty';lamp.setAttribute('aria-label',value==='correct'?'Correct':value==='retry'?'Try again':'Not answered');}
+      });
+      status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
+      const showAnswers=def.feedback?.showAnswers??(def.layout!=='image-grid'&&def.layout!=='picture-word'&&def.kind!=='image-label');
+      if(showAnswers&&Object.values(feedback).some(value=>value!=='empty')){
+        const correction=node('li','ek-correction'),list=node('ol','ek-answer-pairs');correction.append(list);
+        const pair=(prompt,answer)=>{if(!answer)return;const row=node('li');row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '),node('strong','',answer));list.append(row);};
+        if(def.kind==='gaps')def.items.forEach(item=>{const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.[0]||'…')));list.append(row);});
+        else if(def.kind==='order')pair('',def.correctOrder?.map(id=>def.tokens.find(token=>token.id===id).text).join(' '));
+        else def.items.forEach(item=>{const choices=item.options||def.options||def.groups||[];const ids=def.multiple?item.correctIds:[item.correctId];pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));});
+        if(list.children.length)resultsBox.append(correction);
+      }
+      resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
+    }
     const checkFeedback = () => {
+      if(modern){showFeedback();return;}
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -883,10 +958,10 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     };
-    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button(uiLabels.check, () => {
+    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
       checkFeedback();
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
-    }));
+    });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);}
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {
       const reset = button('', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
       const icon=doc.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -902,8 +977,8 @@
 
       if (def.kind === 'stage') {
         const count = def.progressive ? Math.max(1, Math.min(def.exercises.length, Number(answers.revealed) || 1)) : def.exercises.length;
-        if (count !== visibleCount) render();
-        else def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
+        if (count !== visibleCount) syncStage(count);
+        def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
         return;
       }
 
@@ -950,7 +1025,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { originalRender(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    render = () => { originalRender(); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);
@@ -963,7 +1038,7 @@
       destroy: () => { pointerDrag = null; doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
-  const api = { validate, grade, mount, kinds, uiLabels };
+  const api = { validate, grade, mount, kinds, uiLabels, feedbackMessage, motion:{expand} };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.SpaceWhaleExerciseKit = api;
 })(typeof window !== 'undefined' ? window : globalThis);

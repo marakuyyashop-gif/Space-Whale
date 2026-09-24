@@ -99,6 +99,11 @@ test('stale or malformed deep links recover without selecting another course les
 class Element {
   constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.listeners = {}; this.textContent = ''; }
   append(...children) { this.children.push(...children); }
+  getAttribute(name) { return this.attrs[name] ?? null; }
+  querySelectorAll(selector) {
+    const name=selector.split(':')[0].slice(1),found=[];
+    const visit=node=>{ for(const child of node.children||[]){if((child.className||'').split(' ').includes(name)&&(!selector.includes(':not([hidden])')||!child.hidden))found.push(child);visit(child);} };visit(this);return found;
+  }
   replaceChildren(...children) { this.children = children; }
   setAttribute(name, value) { this.attrs[name] = value; }
   addEventListener(name, callback) { this.listeners[name] = callback; }
@@ -116,6 +121,7 @@ function app(search = '', storage = new Map(), live = null) {
   const document = {
     getElementById(id) { if(!nodes.has(id)) nodes.set(id,new Element('div')); return nodes.get(id); },
     createElement(tag) {return new Element(tag);},
+    querySelectorAll() { return []; },
     querySelector(selector) { return selector === '.workspace-session-heading a' ? sessionHeading : null; }
   };
   const window = {

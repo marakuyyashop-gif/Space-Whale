@@ -2,6 +2,7 @@
   'use strict';
 
   const kit = window.SpaceWhaleExerciseKit;
+  const expand=(element,open,done)=>{if(kit.motion)kit.motion.expand(element,open,done);else{element.hidden=!open;done?.();}};
   const catalog = window.SpaceWhaleCatalog.createCatalog(window.SpaceWhaleContent || [], window.SpaceWhaleTemplates || []);
   const classroom = window.SpaceWhaleClassroom || null;
   const sessionId = new URLSearchParams(location.search).get('session');
@@ -16,6 +17,19 @@
   const guideToggle = document.getElementById('taskGuide');
   const start = document.getElementById('startLesson');
   const sessionHeading = document.querySelector('.workspace-session-heading a');
+
+  const sidebar=document.getElementById('workspaceSidebar');
+  const sidebarToggle=document.getElementById('workspaceSidebarToggle');
+  sidebarToggle?.addEventListener('click',()=>{
+    const closed=sidebarToggle.getAttribute('aria-expanded')==='true';
+    document.querySelector('.reference-app').classList.toggle('workspace-sidebar-closed',closed);
+    sidebar.inert=closed;sidebarToggle.setAttribute('aria-expanded',String(!closed));
+    sidebarToggle.setAttribute('aria-label',closed?'Открыть меню':'Свернуть меню');
+  });
+  document.querySelectorAll('[data-workspace-theme]').forEach(button=>button.addEventListener('click',()=>{
+    document.body.dataset.theme=button.dataset.workspaceTheme;
+    document.querySelectorAll('[data-workspace-theme]').forEach(control=>control.setAttribute('aria-pressed',String(control===button)));
+  }));
 
   const panels = ['class', 'library', 'self-study'];
   const sections = [['tasks', 'Tasks'], ['language', 'Language input'], ['self-study', 'Self study']];
@@ -166,6 +180,7 @@
 
   function renderSidebar() {
     const sidebarScroll = tree.scrollTop;
+    const previouslyOpen=new Set([...tree.querySelectorAll('.workspace-topic-body:not([hidden])')].map(body=>body.id));
     tree.replaceChildren();
     course.value = route.view === 'library' ? `${route.level}|${route.whale}` : route.view;
 
@@ -198,7 +213,7 @@
       const heading = node('div', '', 'workspace-topic-heading');
 
       const toggle = button(lesson.title, () => {
-        if (open) { expanded.delete(lesson.id); renderSidebar(); }
+        if (open) {toggle.disabled=true;expand(document.getElementById(`topic-${lesson.id}`),false,()=>{expanded.delete(lesson.id);renderSidebar();});}
         else { expanded.add(lesson.id); go({ ...route, ...lessonLocation(lesson), lesson: lesson.id, exercise: '', section: 'tasks' }); }
       }, 'workspace-topic-toggle');
       toggle.setAttribute('aria-expanded', String(open));
@@ -237,7 +252,7 @@
           const item = node('div', '', `workspace-stage${active ? ' is-active' : ''}`);
           const index = lesson.stages.indexOf(stage) + 1;
           item.append(link(isTemplate ? stage.menu : `Stage ${index}`, { ...route, ...lessonLocation(lesson), lesson: lesson.id, exercise: stage.exercise.id, section }, active, 'workspace-stage-link'));
-          if (active && guideVisible) item.append(guide(stage));
+          if (active) {const help=guide(stage);help.hidden=!guideVisible;item.append(help);}
           stages.append(item);
         });
         if (!available.length) stages.append(node('p', 'Материалы пока не добавлены.', 'workspace-muted'));
@@ -254,6 +269,7 @@
         card.append(arrow);
       }
       tree.append(card);
+      if(open&&!previouslyOpen.has(body.id)){body.hidden=true;expand(body,true);}
     });
 
     if (!topics.length) {
@@ -561,7 +577,7 @@
     go({ ...route, panel, section, exercise: selected ? visibleStages(selected, section)[0]?.exercise.id || '' : '' });
   }));
 
-  guideToggle.addEventListener('click', () => { guideVisible = !guideVisible; renderSidebar(); });
+  guideToggle.addEventListener('click', () => {guideVisible=!guideVisible;guideToggle.setAttribute('aria-pressed',String(guideVisible));tree.querySelectorAll('.workspace-guide').forEach(help=>expand(help,guideVisible));});
 
   start.addEventListener('click', () => {
     const selected = selectedLesson();

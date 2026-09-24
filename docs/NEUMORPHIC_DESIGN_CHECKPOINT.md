@@ -11,3 +11,14 @@ Timer: default 60 minutes, integer custom durations 1–1440. The preview rememb
 Future timer integration: teacher account default; optional per-student override; optional per-session override. Resolve in order session > student > teacher > 60. Teacher controls start/pause/reset. Share authoritative start timestamp and accumulated elapsed time through existing session synchronization; reconnect must recover timer. Separate scheduled duration from topic-block lengths. Completion should notify without closing lessons or clearing answers. Account controls are not implemented yet.
 
 Next stages: approve feedback states, move material tokens and controls to a shared theme, verify existing exercise mechanics in batches, then apply to the remaining site screens. Preserve role permissions, existing navigation, and realtime answer state during rollout.
+
+
+## Shared core — 2026-09-24
+
+Approved preview appearance now lives in `exercise-theme.css` (material/colour/motion tokens), `exercise-kit.css` (shared `.ek-modern` components), and `exercise-kit.js` (feedback and reversible disclosure motion). `classroom.html` uses it for templates and real lessons. The old design preview remains an isolated reference, not the source for future changes.
+
+- Neutral light/dark themes, rounded fields, circular OK, matching status indicator at the top right, right chevron in the answer field, icon-only Close, compact reset.
+- Choice options fit their content up to `--sw-neu-option-limit`, then wrap. Checked text is muted; inset shadows and surface differences are deliberately subtle.
+- Five feedback bands, identical on local checks and remote check restoration. `feedback.showAnswers` can override defaults; picture selection/picture-word/image-label default to message-only feedback.
+- Stage collapse keeps mounted responses and pauses hidden audio. Shared `kit.motion.expand` animates height for disclosures, popovers, sections and workspace topic/guide panels, cancels stale motion, and respects reduced motion. Sidebar and theme switch use CSS movement.
+- Existing grading, answer formats, transport and account permissions are unchanged. The timer remains a preview feature; account duration settings are still a separate task.
