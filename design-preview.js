@@ -11,6 +11,7 @@
   // A deliberately isolated feedback experiment for the first exercise only.
   const matchHost=document.getElementById('matchHost');
   let matchInstance;
+  let answerKey;
   function decorateMatching(){
     matchHost.querySelectorAll('.ek-card').forEach((card,index)=>{
       if(card.querySelector('.preview-answer-light'))return;
@@ -18,17 +19,28 @@
       const wrap=document.createElement('div');wrap.className='preview-answer-light';
       const lamp=document.createElement('span');lamp.className='preview-result-lamp';
       lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
-      const correction=document.createElement('p');correction.className='preview-answer-hint';correction.hidden=true;
-      card.insertBefore(wrap,field);wrap.append(field,lamp);card.append(correction);
+      card.insertBefore(wrap,field);wrap.append(field,lamp);
       wrap.dataset.item=fixtures[0][1].items[index].id;
     });
+    if(!answerKey){
+      answerKey=document.createElement('dl');answerKey.className='preview-answer-key';answerKey.hidden=true;
+      answerKey.setAttribute('aria-label','Correct answers');
+      fixtures[0][1].items.forEach(item=>{
+        const row=document.createElement('div');
+        const prompt=document.createElement('dt');prompt.textContent=item.text;
+        const answer=document.createElement('dd');
+        answer.textContent=fixtures[0][1].options.find(option=>option.id===item.correctId).text;
+        row.append(prompt,answer);answerKey.append(row);
+      });
+      matchHost.querySelector('.ek-actions').insertAdjacentElement('afterend',answerKey);
+    }
   }
   function clearMatchingLights(){
     matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
       delete wrap.dataset.result;
       const lamp=wrap.querySelector('.preview-result-lamp');lamp.textContent='';lamp.setAttribute('aria-label','Not checked');lamp.removeAttribute('title');
     });
-    matchHost.querySelectorAll('.preview-answer-hint').forEach(hint=>{hint.hidden=true;hint.textContent='';});
+    if(answerKey)answerKey.hidden=true;
   }
   fixtures.forEach(([id,data])=>{
     const instance=kit.mount(document.getElementById(id),data,id==='matchHost'?{onChange:clearMatchingLights}:{});
@@ -46,26 +58,10 @@
       const result=results[wrap.dataset.item];wrap.dataset.result=result;
       const lamp=wrap.querySelector('.preview-result-lamp');
       lamp.replaceChildren();
-      if(result==='correct'||result==='retry'){
-        const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');
-        const shape=result==='correct'?'M5 12.5 9.5 17 19 7':'M7 7 17 17M17 7 7 17';
-        ['preview-mark-highlight','preview-mark-stroke'].forEach(className=>{
-          const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-          path.setAttribute('d',shape);path.setAttribute('class',className);svg.append(path);
-        });
-        lamp.append(svg);
-      }
       const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
       lamp.setAttribute('aria-label',label);lamp.setAttribute('title',label);
-      const hint=wrap.parentElement.querySelector('.preview-answer-hint');
-      hint.hidden=result!=='retry';
-      if(result==='retry'){
-        const item=definition.items.find(item=>item.id===wrap.dataset.item);
-        const answer=definition.options.find(option=>option.id===item.correctId).text;
-        hint.textContent='→ '+answer;hint.setAttribute('aria-label','Correct answer: '+answer);
-      }
     });
+    answerKey.hidden=false;
   });
   const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible=1;
