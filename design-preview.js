@@ -35,4 +35,41 @@
     document.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
   }));
   sync();
+
+  // Local visual-study timer. Navigation and exercise answers are independent.
+  const duration=30*60*1000;
+  let elapsed=0, startedAt=null, ticker=null;
+  const clock=document.getElementById('lessonClock');
+  const toggle=document.getElementById('timerToggle');
+  const status=document.getElementById('timerStatus');
+  const total=()=>Math.min(duration,elapsed+(startedAt===null?0:Date.now()-startedAt));
+  function renderTimer(){
+    const spent=total();
+    const seconds=Math.ceil((duration-spent)/1000);
+    document.getElementById('clockTime').textContent=`${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
+    document.getElementById('clockProgress').style.strokeDashoffset=String(100-spent/duration*100);
+    clock.setAttribute('aria-valuenow',String(Math.floor(spent/60000)));
+    clock.setAttribute('aria-valuetext',`${Math.floor(seconds/60)} мин. ${seconds%60} сек. осталось`);
+    if(spent>=duration&&startedAt!==null){
+      elapsed=duration;startedAt=null;window.clearInterval(ticker);ticker=null;
+      toggle.textContent='Завершено';toggle.disabled=true;toggle.setAttribute('aria-pressed','false');
+      status.textContent='Время занятия истекло.';
+    }
+  }
+  toggle.addEventListener('click',()=>{
+    if(startedAt===null){
+      startedAt=Date.now();ticker=window.setInterval(renderTimer,250);
+      toggle.textContent='Пауза';toggle.setAttribute('aria-pressed','true');status.textContent='Таймер запущен.';
+    }else{
+      elapsed=total();startedAt=null;window.clearInterval(ticker);ticker=null;
+      toggle.textContent='Продолжить';toggle.setAttribute('aria-pressed','false');status.textContent='Таймер на паузе.';
+    }
+    renderTimer();
+  });
+  document.getElementById('timerReset').addEventListener('click',()=>{
+    window.clearInterval(ticker);ticker=null;elapsed=0;startedAt=null;
+    toggle.disabled=false;toggle.textContent='Начать урок';toggle.setAttribute('aria-pressed','false');
+    status.textContent='Таймер сброшен.';renderTimer();
+  });
+  renderTimer();
 })();

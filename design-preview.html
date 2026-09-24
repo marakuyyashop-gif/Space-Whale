@@ -2,18 +2,31 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Space Whale — Short Talk</title>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-interactions">
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-neumorphic">
 </head><body class="design-preview" data-theme="light">
 <div class="reference-app">
-<aside class="app-sidebar" aria-label="Задания">
-<div class="workspace-session-heading">Space Whale</div>
-<div class="workspace-course-bar"><p class="preview-course">A1.1 · Whale 1 · Short Talk</p></div>
-<div class="workspace-tree"><section class="workspace-topic"><div class="workspace-topic-heading"><span class="workspace-topic-toggle">Как я рад встрече!</span></div><div class="workspace-topic-tabs"><span class="workspace-section-tab" aria-pressed="true">Tasks</span></div><nav class="workspace-stages" aria-label="Примеры упражнений">
-<div class="workspace-stage"><a class="workspace-stage-link" href="#sample-1" data-jump="1" aria-current="step">01 · Сопоставление</a><div class="workspace-guide">Приветствия и ответы</div></div>
-<div class="workspace-stage"><a class="workspace-stage-link" href="#sample-2" data-jump="2">02 · Ввод ответа</a><div class="workspace-guide">Короткий диалог</div></div>
-<div class="workspace-stage"><a class="workspace-stage-link" href="#sample-3" data-jump="3">03 · Аудио</a><div class="workspace-guide">Плеер и выбор ответа</div></div>
-</nav></section></div>
-<div class="workspace-footer"><nav class="workspace-bottom-nav" aria-label="Возврат"><a class="preview-back" href="classroom.html">← Вернуться в Workspace</a></nav></div>
+<aside class="preview-sidebar" aria-label="Урок и навигация">
+<a class="preview-brand" href="index.html">space whale<span aria-hidden="true">°</span></a>
+<section class="preview-clock-panel" aria-label="Таймер занятия">
+<div class="preview-clock" role="progressbar" aria-label="Прошедшая часть занятия" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" id="lessonClock">
+<svg viewBox="0 0 160 160" aria-hidden="true"><circle class="clock-track" cx="80" cy="80" r="65"/><circle class="clock-progress" id="clockProgress" cx="80" cy="80" r="65" pathLength="100"/><path class="clock-tick" d="M80 8v6 M152 80h-6 M80 152v-6 M8 80h6"/></svg>
+<div class="preview-clock-face"><span id="clockTime">30:00</span><span class="preview-clock-caption">минут осталось</span></div>
+</div>
+<div class="preview-clock-actions"><button class="preview-timer-start" id="timerToggle" type="button" aria-pressed="false">Начать урок</button><button class="preview-icon preview-timer-reset" id="timerReset" type="button" aria-label="Сбросить таймер" data-tooltip="Сбросить таймер"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button></div>
+<span class="preview-sr-only" id="timerStatus" role="status"></span>
+</section>
+<div class="preview-lesson"><p>A1.1 · Whale 1</p><h2>Как я рад встрече!</h2></div>
+<nav class="preview-tasks" aria-label="Задания урока">
+<a href="#sample-1" data-jump="1" aria-current="step"><span>01</span><span>Match the greetings</span></a>
+<a href="#sample-2" data-jump="2"><span>02</span><span>Complete the conversation</span></a>
+<a href="#sample-3" data-jump="3"><span>03</span><span>Listen and choose</span></a>
+</nav>
+<nav class="preview-dock" aria-label="Основная навигация">
+<a class="preview-icon" href="index.html" aria-label="Главная" data-tooltip="Главная"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a>
+<a class="preview-icon" href="students.html" aria-label="Ученики" data-tooltip="Ученики"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a>
+<a class="preview-icon" href="library.html" aria-label="Библиотека" data-tooltip="Библиотека"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M3 5l2 1-2 1M3 11l2 1-2 1M3 17l2 1-2 1"/></svg></a>
+<a class="preview-icon" href="classroom.html" aria-label="Рабочее пространство" data-tooltip="Рабочее пространство"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></a>
+</nav>
 </aside>
 <section class="preview-workspace"><header class="preview-toolbar"><div class="preview-themes" role="group" aria-label="Тема рабочей области"><button type="button" data-theme-choice="light" aria-pressed="true">Светлая</button><button type="button" data-theme-choice="dark" aria-pressed="false">Тёмная</button></div></header>
 <main class="preview-scroll" id="previewScroll"><div class="preview-column">
@@ -23,5 +36,5 @@
 <div class="preview-navigation"><button type="button" id="showNext" class="preview-disclose" aria-label="Следующее задание" title="Следующее задание"><span class="preview-circle" aria-hidden="true"></span></button><button type="button" id="collapseLast" class="preview-disclose preview-up" aria-label="Свернуть последнее задание" title="Свернуть последнее задание" hidden><span class="preview-circle" aria-hidden="true"></span></button></div>
 
 </div></main></section></div>
-<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-interactions"></script>
+<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-neumorphic"></script>
 </body></html>
