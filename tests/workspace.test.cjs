@@ -97,7 +97,7 @@ test('stale or malformed deep links recover without selecting another course les
 
 // A minimal DOM adapter exercises controller navigation/state, not browser layout or engine rendering.
 class Element {
-  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.listeners = {}; this.textContent = ''; }
+  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.listeners = {}; this.textContent = ''; this.hidden=false; }
   append(...children) { this.children.push(...children); }
   getAttribute(name) { return this.attrs[name] ?? null; }
   querySelectorAll(selector) {
@@ -107,7 +107,7 @@ class Element {
   replaceChildren(...children) { this.children = children; }
   setAttribute(name, value) { this.attrs[name] = value; }
   addEventListener(name, callback) { this.listeners[name] = callback; }
-  click() { this.listeners.click?.({button:0,preventDefault(){}}); }
+  click() { if(this.disabled)return; this.listeners.click?.({button:0,preventDefault(){}}); }
   change(value) { this.value = value; this.listeners.change(); }
 }
 function app(search = '', storage = new Map(), live = null) {
@@ -139,6 +139,7 @@ function app(search = '', storage = new Map(), live = null) {
     }},
     SpaceWhaleCollaboration: live?.collaboration || null,
     SpaceWhaleClassroom: live?.classroom || null,
+    setInterval(){return 1;},clearInterval(){},
     addEventListener(name, cb) {events[name]=cb;}
   };
   vm.runInNewContext(fs.readFileSync(path.join(root,'workspace.js'),'utf8'), {
@@ -149,7 +150,7 @@ function app(search = '', storage = new Map(), live = null) {
   return {nodes,mounts,location,events,storage,sessionHeading};
 }
 function descendants(el) { return el.children.flatMap(child => [child, ...descendants(child)]); }
-function anchors(app) { return descendants(app.nodes.get('workspaceTopics')).filter(el => el.tagName === 'a'); }
+function anchors(app) { const visit=el=>el.hidden?[]:el.children.flatMap(child=>[...(child.tagName==='a'&&(child.className||'').includes('workspace-stage-link')?[child]:[]),...visit(child)]); return visit(app.nodes.get('workspaceTopics')); }
 
 function buttons(state) { return descendants(state.nodes.get('workspaceTopics')).filter(el => el.tagName === 'button'); }
 
@@ -164,10 +165,10 @@ test('sidebar accordions and guides do not remount an active exercise or lose an
   assert.equal(anchors(state).length, 0);
   assert.equal(state.mounts.length, 1);
   buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
-  anchors(state).find(el => el.textContent === 'Stage 2').click();
+  anchors(state).find(el => el.textContent === 'Words in context').click();
   assert.ok(first.destroyed);
   assert.equal(state.mounts.at(-1).host, first.host);
-  anchors(state).find(el => el.textContent === 'Stage 1').click();
+  anchors(state).find(el => el.textContent === 'Match the parts').click();
   assert.deepEqual(state.mounts.at(-1).config.answers, {m1:'o5'});
   const restored = app(state.location.search, state.storage);
   assert.equal(JSON.stringify(restored.mounts.at(-1).config.answers), '{"m1":"o5"}');
@@ -175,46 +176,60 @@ test('sidebar accordions and guides do not remount an active exercise or lose an
   assert.equal(JSON.stringify(app(restored.location.search, restored.storage).mounts.at(-1).config.answers), '{}');
 });
 
-test('combined dropdown uses actual catalog titles; outlines expand without fake exercises', () => {
-  const state = app();
-  assert.equal(state.nodes.get('libraryTab').attrs['aria-pressed'], 'true');
-  const groups = state.nodes.get('workspaceCourse').children;
-  assert.equal(groups[0].label, 'A1.1');
-  assert.equal(groups[0].children.length, 7);
-  assert.match(groups[0].children[0].textContent, /Short Talk/);
-  buttons(state).find(el => el.textContent === 'Как я рад встрече!').click();
-  assert.equal(state.mounts.length, 0);
-  assert.ok(buttons(state).find(el => el.textContent === 'Tasks'));
-  state.nodes.get('workspaceCourse').change('A2.2|8');
-  assert.ok(state.location.search.includes('whale=8'));
-  state.nodes.get('workspaceCourse').change('templates');
-  assert.equal(anchors(state).length, 31);
-  assert.equal(state.mounts.at(-1).exercise.id, 'matching-demo');
-  assert.equal(state.nodes.get('startLesson').disabled, true);
-  state.nodes.get('self-studyTab').click();
-  assert.equal(anchors(state).length, 0);
-  assert.ok(state.mounts.at(-1).destroyed);
+test('catalog expands levels and Whales; adding a whole Whale includes empty topics and survives reload', () => {
+  const state=app();
+  assert.equal(state.nodes.get('libraryTab').attrs['aria-pressed'],'true');
+  assert.ok(buttons(state).some(b=>b.textContent==='A1.1'));
+  assert.ok(buttons(state).some(b=>b.textContent==='Whale 1 · Short Talk'));
+  buttons(state).find(b=>b.textContent==='Как я рад встрече!').click();
+  assert.equal(state.mounts.length,0);
+  assert.ok(buttons(state).some(b=>b.textContent==='Tasks'));
+  buttons(state).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.1 · Whale 1 · Short Talk').click();
+  state.nodes.get('classTab').click();
+  const titles=buttons(state).map(b=>b.textContent);
+  assert.ok(titles.includes('Какая замечательная сегодня погода!'));
+  assert.ok(!titles.includes('Описываем одежду'));
+  assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
+  const restored=app(state.location.search,state.storage);
+  assert.ok(buttons(restored).some(b=>b.textContent==='Рад знакомству'));
+  buttons(restored).find(b=>b.attrs['aria-label']==='Убрать из класса: A1.1 · Whale 1 · Short Talk').click();
+  assert.ok(!buttons(restored).some(b=>b.textContent==='Рад знакомству'));
+  restored.nodes.get('libraryTab').click();
+  assert.ok(buttons(restored).some(b=>b.textContent==='Рад знакомству'));
 });
 
-test('Add to class and Start lesson keep local selection; empty Self Study is explicit', () => {
-  const state = app('?view=unassigned&lesson=school-fair');
-  buttons(state).find(el => el.textContent === 'Add to class').click();
-  assert.ok(buttons(state).find(el => el.textContent === 'Added ✓'));
+test('Class retains a standalone lesson and timer is independent of exercise and navigation', () => {
+  const state=app('?view=unassigned&lesson=school-fair');
+  buttons(state).find(b=>b.attrs['aria-label']==='Добавить в класс: Готовим школьную ярмарку').click();
   state.nodes.get('classTab').click();
-  assert.equal(state.nodes.get('classTab').attrs['aria-pressed'], 'true');
-  assert.ok(buttons(state).find(el => el.textContent === 'Готовим школьную ярмарку'));
-  assert.equal(state.mounts.at(-1).exercise.id, 'fair-reading');
-  state.nodes.get('self-studyTab').click();
-  assert.equal(anchors(state).length, 0);
-  assert.ok(state.mounts.at(-1).destroyed);
-  state.nodes.get('libraryTab').click();
+  assert.equal(state.mounts.at(-1).exercise.id,'fair-reading');
+  const mount=state.mounts.at(-1);
   state.nodes.get('startLesson').click();
-  assert.equal(state.nodes.get('classTab').attrs['aria-pressed'], 'true');
-  const restored = app(state.location.search, state.storage);
-  assert.ok(buttons(restored).find(el => el.textContent === 'Added ✓'));
-  buttons(restored).find(el => el.textContent === 'Added ✓').click();
-  assert.equal(anchors(restored).length, 0);
+  assert.equal(state.nodes.get('startLesson').attrs['aria-pressed'],'true');
+  state.nodes.get('libraryTab').click();
+  assert.equal(state.mounts.at(-1),mount);
+  const restored=app(state.location.search,state.storage);
+  assert.equal(restored.nodes.get('startLesson').attrs['aria-pressed'],'true');
+  restored.nodes.get('workspaceTimerReset').click();
+  assert.equal(restored.nodes.get('workspaceClockTime').textContent,'60:00');
+  assert.equal(restored.nodes.get('startLesson').attrs['aria-pressed'],'false');
+  restored.nodes.get('classTab').click();
+  buttons(restored).find(b=>b.textContent==='Убрать из класса').click();
+  assert.equal(anchors(restored).length,0);
   assert.ok(restored.mounts.at(-1).destroyed);
+});
+
+test('new sidebar tabs normalize one or several exercises without mutating lesson source',()=>{
+  const {lessons,templates}=content();
+  const original=lessons[0];
+  const multi={...original,id:'sequence-lesson',stages:[{id:'sequence-tab',menu:'Practice',exercises:original.stages.slice(0,2).map(s=>s.exercise)}]};
+  const catalog=createCatalog([multi],templates);
+  const sequence=catalog.lessons.find(l=>l.id==='sequence-lesson').stages[0].exercise;
+  kit.validate(sequence);
+  assert.equal(sequence.progressive,true);
+  assert.equal(sequence.exercises.length,2);
+  assert.equal(multi.stages[0].exercise,undefined);
+  assert.equal(catalog.normalize('?view=unassigned&lesson=sequence-lesson').exercise,'sequence-tab');
 });
 
 test('topic tabs and Back/Forward restore selection without moving learning content to another page', () => {
@@ -282,7 +297,7 @@ test('unified live Workspace streams drafts, applies remote answers and keeps te
   const student = app('?session=session-1&view=unassigned&lesson=school-fair&exercise=fair-typed-gaps&panel=library&section=tasks', new Map(), studentLive);
   await flush(); await flush();
   const studentMount = student.mounts.at(-1);
-  assert.equal(student.nodes.get('workspaceCourse').disabled, true);
+  assert.equal(student.nodes.get('startLesson').disabled, true);
   studentMount.config.onChange({a1:'i'});
   await flush();
   assert.deepEqual(studentLive.calls.find(call => call[0] === 'draft'), ['draft','fair-typed-gaps',{a1:'i'}]);
@@ -330,7 +345,7 @@ test('temporary guest Workspace limits the room to the two allowed lessons and k
   const teacherLive = makeGuest('teacher');
   const teacher = app(`?guest=${token}&view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-opening&panel=library&section=tasks`, new Map(), teacherLive);
   await flush(); await flush();
-  assert.equal(teacher.nodes.get('workspaceCourse').disabled, true);
+  assert.ok(!buttons(teacher).some(b=>b.className==='workspace-add'));
   const topicLabels = buttons(teacher).map(button => button.textContent);
   assert.ok(topicLabels.includes('Описываем одежду'));
   assert.ok(topicLabels.includes('Описываем внешний вид одежды'));
@@ -386,11 +401,17 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   await flush();await flush();
   assert.equal(teacher.mounts.length,0);
   assert.equal(student.mounts.length,0);
-  assert.equal(teacher.nodes.get('workspaceCourse').disabled,false);
-  assert.equal(student.nodes.get('workspaceCourse').disabled,true);
-  teacher.nodes.get('workspaceCourse').change('A1.2|4');
+  assert.equal(teacher.nodes.get('startLesson').disabled,false);
+  assert.equal(student.nodes.get('startLesson').disabled,true);
+  buttons(teacher).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.2 · Whale 4 · Описываем и объясняем выбор').click();
+  await flush();
+  student.nodes.get('classTab').click();
+  assert.ok(buttons(student).some(b=>b.textContent==='Описываем одежду'));
+  assert.ok(!buttons(student).some(b=>b.textContent==='Как я рад встрече!'));
+  student.nodes.get('libraryTab').click();
+  buttons(teacher).find(b=>b.textContent==='A1.2').click();
   buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
-  anchors(teacher).find(a=>a.textContent==='Stage 2').click();
+  anchors(teacher).find(a=>a.textContent==='Words').click();
   await flush();await flush();
   assert.equal(student.mounts.at(-1).exercise.id,teacher.mounts.at(-1).exercise.id);
   assert.equal(student.mounts.at(-1).config.readOnly,false);
@@ -401,7 +422,7 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   assert.equal(teacher.mounts.at(-1).answers.pw2,'dark');
   assert.equal(teacher.mounts.at(-1).answers.__sw_checked,true);
   const before=student.location.search;
-  student.nodes.get('workspaceCourse').change('A1.1|1');
+  buttons(student).find(b=>b.textContent==='Как я рад встрече!').click();
   assert.equal(student.location.search,before);
   const server=collaboration.create('server');
   server.merge(saved.get(teacher.mounts.at(-1).exercise.id));

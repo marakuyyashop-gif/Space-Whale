@@ -22,3 +22,14 @@ Approved preview appearance now lives in `exercise-theme.css` (material/colour/m
 - Five feedback bands, identical on local checks and remote check restoration. `feedback.showAnswers` can override defaults; picture selection/picture-word/image-label default to message-only feedback.
 - Stage collapse keeps mounted responses and pauses hidden audio. Shared `kit.motion.expand` animates height for disclosures, popovers, sections and workspace topic/guide panels, cancels stale motion, and respects reduced motion. Sidebar and theme switch use CSS movement.
 - Existing grading, answer formats, transport and account permissions are unchanged. The timer remains a preview feature; account duration settings are still a separate task.
+
+
+## Shared sidebar — 2026-09-24
+
+The only lesson workspace shell is `classroom.html`, styled by `workspace.css` and controlled by `workspace.js`. Home and Students retain their own pages. The dock has Home, Students, Library, Class; Class and Library switch the same sidebar without rebuilding the page.
+
+Library hierarchy: level → Whale → topic → named stage tabs. Add/remove operates on a whole Whale, including outline-only topics. Removal never deletes catalog data or saved answers. Unassigned lessons remain addable individually. Class selection is stored per local/session scope and included in teacher navigation URLs for the learner; guest allowlists remain enforced. Empty topics show only the material placeholder, with no invented exercise sets.
+
+A topic stage may retain `exercise` for a single unit or use `{ id, menu, title, exercises: [definition, ...] }` for a sequence. The catalog compiles sequences into the existing progressive stage component: one click selects the tab, arrows reveal/collapse units in the main area, answers use stable IDs. Existing authored lesson content is unchanged.
+
+The compact Class clock uses the approved dial, a charcoal power button (Start/Pause/Resume), and separate reset. Duration control is hidden; default remains 60 minutes. Timer state is local to the browser/session, restored on reload, and independent of task navigation; teacher-account defaults and shared timer transport are not implemented by this UI change.

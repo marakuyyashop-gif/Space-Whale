@@ -11,7 +11,6 @@
 
   const host = document.getElementById('workspaceExercise');
   const tree = document.getElementById('workspaceTopics');
-  const course = document.getElementById('workspaceCourse');
   const notice = document.getElementById('workspaceNotice');
   const scroll = document.getElementById('workspaceScroll');
   const guideToggle = document.getElementById('taskGuide');
@@ -31,7 +30,7 @@
     document.querySelectorAll('[data-workspace-theme]').forEach(control=>control.setAttribute('aria-pressed',String(control===button)));
   }));
 
-  const panels = ['class', 'library', 'self-study'];
+  const panels = ['class', 'library'];
   const sections = [['tasks', 'Tasks'], ['language', 'Language input'], ['self-study', 'Self study']];
   const attempts = new Map();
   const expanded = new Set();
@@ -54,8 +53,10 @@
   let liveSession = null;
   let guestAllowedLessons = null;
 
+  const classScope = sessionId || (guestToken ? `guest:${guestToken.slice(0,12)}` : 'standalone');
+  const topicsKey = liveMode ? `space-whale:class-topics:${classScope}` : 'space-whale:class-topics';
   let classIds;
-  try { classIds = new Set(JSON.parse(sessionStorage.getItem('space-whale:class-topics')) || []); }
+  try { classIds = new Set(JSON.parse(sessionStorage.getItem(topicsKey)) || []); }
   catch (_) { classIds = new Set(); }
 
   function readRoute(search) {
@@ -63,9 +64,9 @@
     const hasCourseRoute = ['view', 'level', 'whale', 'lesson', 'exercise'].some(key => params.has(key));
     const normalizedSearch = hasCourseRoute ? search : '?view=library&level=A1.1&whale=1';
     const route = catalog.normalize(normalizedSearch);
-    route.panel = panels.includes(params.get('panel')) ? params.get('panel') : 'library';
+    route.panel = panels.includes(params.get('panel')) ? params.get('panel') : params.get('panel') === 'self-study' ? 'class' : 'library';
     route.section = sections.some(([id]) => id === params.get('section')) ? params.get('section') : 'tasks';
-    if (route.panel === 'self-study') route.section = 'self-study';
+    if (params.get('panel') === 'self-study') route.section = 'self-study';
     return route;
   }
 
@@ -78,6 +79,8 @@
     params.set('section', next.section || 'tasks');
     if (sessionId) params.set('session', sessionId);
     if (guestToken) params.set('guest', guestToken);
+    params.set('class_whales',[...classWhales].join(','));
+    params.set('class_loose',[...classIds].filter(id=>catalog.lessons.some(l=>l.id===id&&l.level===null)).join(','));
     return `?${params}`;
   }
 
@@ -114,6 +117,7 @@
     if (liveMode && liveReady && liveRole === 'student' && !options.remote) return;
     route = readRoute(query(next));
     if (route.lesson) expanded.add(route.lesson);
+    openLevels.add(route.level);openWhales.add(whaleKey(route.level,route.whale));
     history[options.remote ? 'replaceState' : 'pushState'](null, '', `classroom.html${query(route)}`);
     render();
     if (!options.remote) syncTeacherNavigation();
@@ -157,14 +161,45 @@
   }
 
   function saveClass() {
-    try { sessionStorage.setItem('space-whale:class-topics', JSON.stringify([...classIds])); }
+    try { sessionStorage.setItem(topicsKey, JSON.stringify([...classIds])); }
     catch (_) { notice.textContent = 'Список Class сохранён только до обновления страницы.'; }
   }
 
+  const whaleKey = (level, whale) => `${level}|${whale}`;
+  let classWhales;
+  const classKey = `space-whale:class-whales:${classScope}`;
+  try { classWhales = new Set(JSON.parse(sessionStorage.getItem(classKey)) || []); } catch (_) { classWhales = new Set(); }
+  if (!liveMode) catalog.lessons.forEach(lesson => { if(classIds.has(lesson.id) && lesson.level) classWhales.add(whaleKey(lesson.level,lesson.whale)); });
+  function restoreClassSelection(search) {
+    const params=new URLSearchParams(search);
+    if(params.has('class_whales')) {
+      const valid=new Set(catalog.levels.flatMap(level=>level.whales.map(whale=>whaleKey(level.id,whale.id))));
+      classWhales=new Set(params.get('class_whales').split(',').filter(key=>valid.has(key)));
+      classIds=new Set(catalog.lessons.filter(lesson=>classWhales.has(whaleKey(lesson.level,lesson.whale))).map(lesson=>lesson.id));
+      (params.get('class_loose')||'').split(',').forEach(id=>{if(catalog.lessons.some(l=>l.id===id&&l.level===null))classIds.add(id);});
+      saveWhales();
+    }
+  }
+  restoreClassSelection(location.search);
+  const openLevels = new Set([route.level]);
+  const openWhales = new Set([whaleKey(route.level,route.whale)]);
+  const locked = () => Boolean(liveMode && liveReady && liveRole === 'student');
+  const permitted = lesson => !guestAllowedLessons || guestAllowedLessons.has(lesson.id);
+  function hasClassLesson(lesson) { return Boolean(lesson && (classIds.has(lesson.id) || classWhales.has(whaleKey(lesson.level,lesson.whale)))); }
+  function saveWhales() { try { sessionStorage.setItem(classKey,JSON.stringify([...classWhales])); } catch (_) {} saveClass(); }
+  function toggleWhale(level, whale) {
+    if (locked()) return;
+    const key=whaleKey(level,whale), remove=classWhales.has(key);
+    const topics=catalog.topics({view:'library',level,whale}).filter(permitted);
+    if(remove) {classWhales.delete(key);topics.forEach(lesson=>classIds.delete(lesson.id));}
+    else {classWhales.add(key);topics.forEach(lesson=>classIds.add(lesson.id));openWhales.add(key);}
+    saveWhales();history.replaceState(null,'',`classroom.html${query(route)}`);
+    if(remove&&route.panel==='class'&&route.level===level&&route.whale===whale){go({...route,lesson:'',exercise:''});}else {render();syncTeacherNavigation();}
+  }
   function toggleClass(lesson) {
-    if (liveMode && liveReady && liveRole === 'student') return;
+    if (locked()) return;
     if (classIds.has(lesson.id)) classIds.delete(lesson.id); else classIds.add(lesson.id);
-    saveClass(); render();
+    saveClass();history.replaceState(null,'',`classroom.html${query(route)}`);render();syncTeacherNavigation();
   }
 
   function guide(stage) {
@@ -178,107 +213,104 @@
     return box;
   }
 
+  function foldControl(label, content, open, change, className) {
+    const control=button(label,()=>{
+      const next=control.getAttribute('aria-expanded')!=='true';
+      control.setAttribute('aria-expanded',String(next));
+      change(next);expand(content,next);
+    },className);
+    control.setAttribute('aria-expanded',String(open));
+    control.setAttribute('aria-controls',content.id);content.hidden=!open;
+    return control;
+  }
+  function renderTopic(lesson,parent,studentLocked,previouslyOpen) {
+    const current=route.lesson===lesson.id, open=expanded.has(lesson.id), isTemplate=lesson.id==='templates';
+    const section=current?route.section:'tasks';
+    const card=node('section','','workspace-topic');
+    const heading=node('div','','workspace-topic-heading');
+    const body=node('div','','workspace-topic-body');body.id=`topic-${lesson.id}`;body.hidden=!open;
+    const toggle=button(lesson.title,()=>{
+      if(toggle.getAttribute('aria-expanded')==='true') {
+        expanded.delete(lesson.id);toggle.setAttribute('aria-expanded','false');expand(body,false);
+      } else {expanded.add(lesson.id);go({...route,...lessonLocation(lesson),lesson:lesson.id,exercise:'',section:'tasks'});}
+    },'workspace-topic-toggle');
+    toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-controls',body.id);toggle.disabled=studentLocked;
+    heading.append(toggle);card.append(heading);
+    if(lesson.level===null && !guestToken) {
+      const add=button(classIds.has(lesson.id)?'Убрать из класса':'Добавить в класс',()=>toggleClass(lesson),'workspace-add');add.setAttribute('aria-label',`${classIds.has(lesson.id)?'Убрать из класса':'Добавить в класс'}: ${lesson.title}`);add.disabled=studentLocked;heading.append(add);
+    }
+    if(open) {
+      if(!isTemplate) {
+        const tabs=node('div','','workspace-topic-tabs');tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Разделы темы');
+        sections.forEach(([id,label])=>{
+          const tab=button(label,()=>go({...route,...lessonLocation(lesson),lesson:lesson.id,section:id,exercise:visibleStages(lesson,id)[0]?.exercise.id||''}),'workspace-section-tab');
+          tab.disabled=studentLocked;tab.setAttribute('aria-pressed',String(section===id));tabs.append(tab);
+        });body.append(tabs);
+      }
+      const stages=node('nav','','workspace-stages');stages.setAttribute('aria-label',`Задания: ${lesson.title}`);
+      const available=isTemplate?lesson.stages:visibleStages(lesson,section);
+      available.forEach((stage,index)=>{
+        const active=current && route.exercise===stage.exercise.id && route.section===section;
+        const item=node('div','',`workspace-stage${active?' is-active':''}`);
+        const title=stage.menu || stage.title || stage.exercise.title || `Задание ${index+1}`;
+        item.append(link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section},active,'workspace-stage-link'));
+        if(active){const help=guide(stage);help.hidden=!guideVisible;item.append(help);}
+        stages.append(item);
+      });
+      if(!available.length) stages.append(node('p','Материалы пока не добавлены.','workspace-muted'));
+      body.append(stages);
+    }
+    card.append(body);parent.append(card);
+    if(open&&!previouslyOpen.has(body.id)){body.hidden=true;expand(body,true);}
+  }
   function renderSidebar() {
-    const sidebarScroll = tree.scrollTop;
+    const sidebarScroll=tree.scrollTop;
     const previouslyOpen=new Set([...tree.querySelectorAll('.workspace-topic-body:not([hidden])')].map(body=>body.id));
     tree.replaceChildren();
-    course.value = route.view === 'library' ? `${route.level}|${route.whale}` : route.view;
-
-    const studentLocked = Boolean(liveMode && liveReady && liveRole === 'student');
-    course.disabled = studentLocked || Boolean(guestAllowedLessons);
-    panels.forEach(panel => {
-      const tab = document.getElementById(`${panel}Tab`);
-      tab.setAttribute('aria-pressed', String(route.panel === panel));
-      tab.disabled = studentLocked;
-    });
-    guideToggle.setAttribute('aria-pressed', String(guideVisible));
-
-    const source = route.panel === 'class' ? catalog.lessons : catalog.topics(route);
-    const topics = source.filter(lesson => {
-      if (guestAllowedLessons && !guestAllowedLessons.has(lesson.id)) return false;
-      if (route.panel === 'class') {
-        if (liveMode && liveReady) return classIds.has(lesson.id) || lesson.id === route.lesson || Boolean(guestToken);
-        return classIds.has(lesson.id);
-      }
-      if (route.panel === 'self-study') return visibleStages(lesson, 'self-study').length;
-      return true;
-    });
-
-    topics.forEach(lesson => {
-      const current = route.lesson === lesson.id;
-      const isTemplate = lesson.id === 'templates';
-      const open = expanded.has(lesson.id);
-      const section = route.panel === 'self-study' ? 'self-study' : current ? route.section : 'tasks';
-      const card = node('section', '', 'workspace-topic');
-      const heading = node('div', '', 'workspace-topic-heading');
-
-      const toggle = button(lesson.title, () => {
-        if (open) {toggle.disabled=true;expand(document.getElementById(`topic-${lesson.id}`),false,()=>{expanded.delete(lesson.id);renderSidebar();});}
-        else { expanded.add(lesson.id); go({ ...route, ...lessonLocation(lesson), lesson: lesson.id, exercise: '', section: 'tasks' }); }
-      }, 'workspace-topic-toggle');
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-controls', `topic-${lesson.id}`);
-      heading.append(toggle);
-
-      if (open && !isTemplate && !guestToken) {
-        const add = button(classIds.has(lesson.id) ? 'Added ✓' : 'Add to class', () => toggleClass(lesson), 'workspace-add');
-        add.disabled = studentLocked || !lesson.stages.length;
-        add.setAttribute('aria-pressed', String(classIds.has(lesson.id)));
-        add.title = lesson.stages.length ? 'Добавить или убрать тему из Class' : 'В теме ещё нет упражнений';
-        heading.append(add);
-      }
-
-      card.append(heading);
-      const body = node('div', '', 'workspace-topic-body'); body.id = `topic-${lesson.id}`; body.hidden = !open;
-
-      if (open) {
-        if (!isTemplate) {
-          const tabs = node('div', '', 'workspace-topic-tabs'); tabs.setAttribute('role', 'group'); tabs.setAttribute('aria-label', 'Разделы темы');
-          sections.forEach(([id, label]) => {
-            const tab = button(label, () => {
-              const first = visibleStages(lesson, id)[0];
-              go({ ...route, ...lessonLocation(lesson), panel: route.panel === 'self-study' && id !== 'self-study' ? 'library' : route.panel, lesson: lesson.id, section: id, exercise: first?.exercise.id || '' });
-            }, 'workspace-section-tab');
-            tab.disabled = studentLocked;
-            tab.setAttribute('aria-pressed', String(section === id)); tabs.append(tab);
-          });
-          body.append(tabs);
+    const studentLocked=locked(), inClass=route.panel==='class';
+    panels.forEach(panel=>{const tab=document.getElementById(`${panel}Tab`);tab.setAttribute('aria-pressed',String(route.panel===panel));});
+    guideToggle.setAttribute('aria-pressed',String(guideVisible));
+    document.getElementById('workspacePanelTitle').textContent=inClass?'Класс':'Библиотека';
+    const clockPanel=document.getElementById('workspaceClockPanel');
+    if(Boolean(clockPanel.hidden)===inClass) expand(clockPanel,inClass);
+    start.disabled=studentLocked;
+    document.getElementById('workspaceTimerReset').disabled=studentLocked;
+    catalog.levels.forEach(level=>{
+      const whales=level.whales.filter(whale=>{
+        const topics=catalog.topics({view:'library',level:level.id,whale:whale.id});
+        if(guestAllowedLessons&&!topics.some(permitted))return false;
+        return !inClass||classWhales.has(whaleKey(level.id,whale.id))||topics.some(lesson=>hasClassLesson(lesson)||(liveMode&&liveReady&&(lesson.id===route.lesson||Boolean(guestAllowedLessons))));
+      });
+      if(!whales.length)return;
+      const group=node('section','','workspace-level');
+      const body=node('div','','workspace-level-body');body.id=`level-${level.id}`;
+      group.append(foldControl(level.id,body,openLevels.has(level.id),open=>open?openLevels.add(level.id):openLevels.delete(level.id),'workspace-level-toggle'));
+      whales.forEach(whale=>{
+        const key=whaleKey(level.id,whale.id), chosen=classWhales.has(key);
+        const block=node('section','','workspace-whale');
+        const heading=node('div','','workspace-whale-heading');
+        const topicsBox=node('div','','workspace-whale-body');topicsBox.id=`whale-${level.id}-${whale.id}`;
+        const label=foldControl(whale.title,topicsBox,openWhales.has(key),open=>open?openWhales.add(key):openWhales.delete(key),'workspace-whale-toggle');
+        heading.append(label);
+        if(!guestAllowedLessons) {
+          const add=button(chosen?'−':'+',()=>toggleWhale(level.id,whale.id),'workspace-add');
+          add.setAttribute('aria-label',`${chosen?'Убрать из класса':'Добавить в класс'}: ${level.id} · ${whale.title}`);
+          add.title=chosen?'Убрать Whale из класса':'Добавить весь Whale в класс';add.disabled=studentLocked;add.setAttribute('aria-pressed',String(chosen));heading.append(add);
         }
-
-        const stages = node('nav', '', 'workspace-stages'); stages.setAttribute('aria-label', `Задания: ${lesson.title}`);
-        const available = isTemplate ? lesson.stages : visibleStages(lesson, section);
-        available.forEach(stage => {
-          const active = current && route.exercise === stage.exercise.id && route.section === section;
-          const item = node('div', '', `workspace-stage${active ? ' is-active' : ''}`);
-          const index = lesson.stages.indexOf(stage) + 1;
-          item.append(link(isTemplate ? stage.menu : `Stage ${index}`, { ...route, ...lessonLocation(lesson), lesson: lesson.id, exercise: stage.exercise.id, section }, active, 'workspace-stage-link'));
-          if (active) {const help=guide(stage);help.hidden=!guideVisible;item.append(help);}
-          stages.append(item);
-        });
-        if (!available.length) stages.append(node('p', 'Материалы пока не добавлены.', 'workspace-muted'));
-        body.append(stages);
-      }
-
-      card.append(body);
-      if (!open) {
-        const arrow = button('⌄', () => { expanded.add(lesson.id); go({ ...route, ...lessonLocation(lesson), lesson: lesson.id, exercise: '', section: 'tasks' }); }, 'workspace-topic-arrow');
-        arrow.disabled = studentLocked;
-        arrow.setAttribute('aria-label', `Раскрыть тему: ${lesson.title}`);
-        arrow.setAttribute('aria-expanded', 'false');
-        arrow.setAttribute('aria-controls', body.id);
-        card.append(arrow);
-      }
-      tree.append(card);
-      if(open&&!previouslyOpen.has(body.id)){body.hidden=true;expand(body,true);}
+        const topics=catalog.topics({view:'library',level:level.id,whale:whale.id}).filter(permitted);
+        topics.forEach(lesson=>renderTopic(lesson,topicsBox,studentLocked,previouslyOpen));
+        if(!topics.length)topicsBox.append(node('p','Темы пока не добавлены.','workspace-muted'));
+        block.append(heading,topicsBox);body.append(block);
+      });group.append(body);tree.append(group);
     });
-
-    if (!topics.length) {
-      tree.append(node('p', route.panel === 'class' ? 'Добавьте тему через Add to class.' : route.panel === 'self-study' ? 'Самостоятельные задания пока не добавлены.' : 'Тем пока нет.', 'workspace-muted'));
+    const loose=catalog.lessons.filter(lesson=>lesson.level===null&&permitted(lesson)&&(!inClass||hasClassLesson(lesson)||(liveMode&&liveReady&&(lesson.id===route.lesson||Boolean(guestAllowedLessons)))));
+    if(loose.length){const group=node('section','','workspace-level');group.append(node('h3','Уроки без Whale','workspace-group-title'));loose.forEach(lesson=>renderTopic(lesson,group,studentLocked,previouslyOpen));tree.append(group);}
+    if(!inClass&&!guestAllowedLessons){
+      const templates=catalog.topics({view:'templates'})[0];renderTopic(templates,tree,studentLocked,previouslyOpen);
+      const manage=node('a','Управление материалами','workspace-manage');manage.href='library-manage.html';tree.append(manage);
     }
-
-    const selected = selectedLesson();
-    start.disabled = Boolean(guestAllowedLessons) || studentLocked || !selected?.stages.length || route.view === 'templates';
-    tree.scrollTop = sidebarScroll;
+    if(!tree.children.length)tree.append(node('p',inClass?'Добавьте Whale из библиотеки.':'Материалы пока не добавлены.','workspace-muted'));
+    tree.scrollTop=sidebarScroll;
   }
 
   function readAnswers(key, signature) {
@@ -367,7 +399,7 @@
     const selected = selectedLesson();
     const stage = selected?.stages.find(stage => stage.exercise.id === route.exercise && stageSection(stage) === route.section);
     const allowedSelected = !selected || !guestAllowedLessons || guestAllowedLessons.has(selected.id);
-    const visible = allowedSelected && (route.panel !== 'class' || Boolean(liveMode && liveReady) || classIds.has(selected?.id));
+    const visible = allowedSelected && (route.panel !== 'class' || Boolean(liveMode && liveReady) || hasClassLesson(selected));
     const liveIdentity = sessionId
       ? `${sessionId}:${liveRole || 'connecting'}`
       : guestToken
@@ -429,7 +461,7 @@
   function applyRemoteNavigation(payload) {
     if (!liveMode || liveRole !== 'student') return;
     let next = null;
-    if (payload?.current_page_id) next = readRoute(payload.current_page_id);
+    if (payload?.current_page_id) {restoreClassSelection(payload.current_page_id);next = readRoute(payload.current_page_id);}
     if ((!next || !next.exercise) && payload?.current_exercise_id) next = routeForExercise(payload.current_exercise_id);
     if (next) go(next, { remote: true });
   }
@@ -531,6 +563,7 @@
     if (shared?.current_page_id || shared?.current_exercise_id) {
       if (liveRole === 'student') applyRemoteNavigation(shared);
       else {
+        if(shared.current_page_id)restoreClassSelection(shared.current_page_id);
         const restored = shared.current_page_id
           ? readRoute(shared.current_page_id)
           : routeForExercise(shared.current_exercise_id);
@@ -549,49 +582,48 @@
     if (route.exercise) hydrateLiveExercise(route.exercise, mounted?.getAnswers?.() || {});
   }
 
-  catalog.levels.forEach(level => {
-    const group = node('optgroup'); group.label = level.id;
-    level.whales.forEach(whale => {
-      const option = node('option', `${level.id} · ${whale.title}`); option.value = `${level.id}|${whale.id}`; group.append(option);
-    });
-    course.append(group);
-  });
-
-  const other = node('optgroup'); other.label = 'Другие материалы';
-  [['unassigned', 'Уроки без Whale'], ['templates', 'Шаблоны упражнений']].forEach(([value, label]) => {
-    const option = node('option', label); option.value = value; other.append(option);
-  });
-  course.append(other);
-
-  course.addEventListener('change', () => {
-    const [level, whale] = course.value.split('|');
-    expanded.clear();
-    go(whale
-      ? { view: 'library', level, whale: Number(whale), panel: 'library', section: 'tasks' }
-      : { ...route, view: level, panel: 'library', section: 'tasks', lesson: '', exercise: '' });
-  });
-
   panels.forEach(panel => document.getElementById(`${panel}Tab`).addEventListener('click', () => {
-    const selected = selectedLesson();
-    const section = panel === 'self-study' ? 'self-study' : 'tasks';
-    go({ ...route, panel, section, exercise: selected ? visibleStages(selected, section)[0]?.exercise.id || '' : '' });
+    // Browsing the catalog never broadcasts navigation or changes the active task.
+    route={...route,panel};history.replaceState(null,'',`classroom.html${query(route)}`);render();
   }));
 
   guideToggle.addEventListener('click', () => {guideVisible=!guideVisible;guideToggle.setAttribute('aria-pressed',String(guideVisible));tree.querySelectorAll('.workspace-guide').forEach(help=>expand(help,guideVisible));});
 
-  start.addEventListener('click', () => {
-    const selected = selectedLesson();
-    if (!selected?.stages.length || guestAllowedLessons || (liveMode && liveReady && liveRole === 'student')) return;
-    classIds.add(selected.id); saveClass();
-    go({ ...route, panel: 'class', section: stageSection(selected.stages[0]), exercise: selected.stages[0].exercise.id });
+  // One local lesson clock survives exercise changes and page reloads. Account duration can be connected here later.
+  const timerKey=`space-whale:clock:${classScope}`, duration=60*60*1000;
+  let timer={elapsed:0,startedAt:null},ticker=null;
+  try {const saved=JSON.parse(sessionStorage.getItem(timerKey));if(saved&&Number.isFinite(saved.elapsed)&&saved.elapsed>=0&&(saved.startedAt===null||Number.isFinite(saved.startedAt)))timer=saved;}catch(_){}
+  function saveTimer(){try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}}
+  function elapsed(){return Math.min(duration,Math.max(0,timer.elapsed+(timer.startedAt===null?0:Date.now()-timer.startedAt)));}
+  function paintTimer(){
+    const spent=elapsed(),remaining=Math.ceil((duration-spent)/1000);
+    if(spent>=duration&&timer.startedAt!==null){timer={elapsed:duration,startedAt:null};saveTimer();document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';}
+    const running=timer.startedAt!==null;
+    document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+    document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/duration*100));
+    const clock=document.getElementById('workspaceClock');clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${Math.floor(remaining/60)} мин. ${remaining%60} сек. осталось`);
+    const label=running?'Pause Lesson':spent>0&&spent<duration?'Resume Lesson':'Start Lesson';
+    start.setAttribute('aria-pressed',String(running));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);
+    if(!running&&ticker!==null){window.clearInterval(ticker);ticker=null;}
+  }
+  function tick(){paintTimer();if(timer.startedAt!==null&&ticker===null)ticker=window.setInterval(paintTimer,1000);}
+  start.addEventListener('click',()=>{
+    if(locked())return;
+    if(timer.startedAt!==null)timer={elapsed:elapsed(),startedAt:null};
+    else timer={elapsed:elapsed()>=duration?0:elapsed(),startedAt:Date.now()};
+    saveTimer();tick();
+    route={...route,panel:'class'};history.replaceState(null,'',`classroom.html${query(route)}`);render();
   });
+  document.getElementById('workspaceTimerReset').addEventListener('click',()=>{if(locked())return;timer={elapsed:0,startedAt:null};saveTimer();paintTimer();document.getElementById('workspaceTimerStatus').textContent='Таймер сброшен.';});
+  tick();
 
   window.addEventListener('popstate', () => {
     if (liveMode && liveReady && liveRole === 'student') {
       history.replaceState(null, '', `classroom.html${query(route)}`);
       return;
     }
-    route = readRoute(location.search);
+    restoreClassSelection(location.search);route = readRoute(location.search);
+    openLevels.add(route.level);openWhales.add(whaleKey(route.level,route.whale));
     if (route.lesson) expanded.add(route.lesson);
     render();
     syncTeacherNavigation();

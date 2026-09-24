@@ -82,6 +82,17 @@
   ));
 
   function createCatalog(lessons, templates) {
+    // A sidebar tab accepts one exercise or a sequence; the shared engine owns the arrows.
+    // Existing exercise definitions and their answer IDs are left untouched.
+    lessons = lessons.map(lesson => ({...lesson, stages: lesson.stages.map(stage => {
+      if (!stage.exercises) return stage;
+      if (stage.exercise || !stage.id || !stage.exercises.length) throw new Error('A sequence needs a unique tab ID and exercises');
+      return {...stage, exercise: {
+        version:1, id:stage.id, kind:'stage', title:stage.title || stage.menu || 'Exercises',
+        instruction:stage.instruction || '', progressive:true,
+        exercises:stage.exercises.map(exercise => ({id:exercise.id, exercise}))
+      }};
+    })}));
     const ids = new Set();
     lessons.forEach(lesson => {
       if (!lesson.id || ids.has(lesson.id)) throw new Error('Duplicate or missing lesson ID');
