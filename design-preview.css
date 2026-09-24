@@ -180,3 +180,19 @@
 @media(max-width:1100px){.design-preview #matchHost .ek-card{grid-template-columns:18px minmax(0,1fr) minmax(155px,1.2fr)}.preview-answer-light{margin:0}.preview-answer-hint{grid-column:3;margin-top:0}}
 @media(max-width:700px){.design-preview #matchHost .ek-card{grid-template-columns:14px minmax(0,1fr);gap:14px}.preview-answer-light{grid-column:2}.preview-answer-hint{grid-column:2}}
 @media(prefers-reduced-motion:reduce){.preview-answer-light::before,.preview-result-lamp::before{transition:none!important}}
+
+/* One specimen: a recessed answer bed with a raised, backlit circular indicator. */
+.design-preview.indicator-only .reference-app{grid-template-columns:minmax(0,1fr)}
+.indicator-only .preview-sidebar,.indicator-only .preview-column{display:none}
+.indicator-only .preview-scroll{display:grid;place-items:center;flex:1;padding:32px 24px 110px}
+.indicator-study{width:min(100%,350px)}
+.indicator-answer{--study-light:192,99,119;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:78px;padding:13px 15px 13px 25px;border-radius:27px;background:#dfe1e5;box-shadow:inset 5px 5px 12px #b6bcc5b3,inset -5px -5px 11px #ffffffde;color:var(--p-ink)}
+/* Three overlapping ellipses model reflected light; no polygon or beam edge. */
+.indicator-answer::before{content:"";position:absolute;z-index:0;inset:0;pointer-events:none;background:radial-gradient(ellipse 34px 22px at calc(100% - 45px) 50%,rgba(var(--study-light),.49),rgba(var(--study-light),.19) 52%,transparent 100%),radial-gradient(ellipse 92px 29px at calc(100% - 54px) 50%,rgba(var(--study-light),.29),rgba(var(--study-light),.11) 44%,transparent 100%),radial-gradient(ellipse 175px 44px at calc(100% - 68px) 50%,rgba(var(--study-light),.14),rgba(var(--study-light),.055) 48%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 calc(100% - 47px),transparent calc(100% - 20px));filter:blur(3px)}
+.indicator-answer-text{position:relative;z-index:1;font-size:16px;font-weight:500;line-height:1.5;letter-spacing:-.015em}
+.indicator-round{position:relative;z-index:2;flex:none;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:linear-gradient(140deg,#f5f5f6 0%,#e9eaed 48%,#d4d7dc 100%);box-shadow:3px 4px 7px #a9afb99c,-2px -2px 6px #ffffffc9,inset 1px 1px 1px #ffffffed,inset -1px -1px 2px #a8aeb756}
+.indicator-round::before{content:"";position:absolute;z-index:-1;inset:5px;border-radius:50%;box-shadow:-9px 0 12px -6px rgba(var(--study-light),.62);pointer-events:none}
+.indicator-letter{font:700 23px/1 Onest,sans-serif;letter-spacing:-.045em;color:#a66375;text-shadow:0 1px 1px #ffffffec,0 -1px 1px #58333f70,0 0 6px rgba(var(--study-light),.27);transform:translateY(1px)}
+.design-preview[data-theme=dark] .indicator-answer{--study-light:211,112,136;background:#20242b;box-shadow:inset 5px 5px 12px #121519bb,inset -4px -4px 10px #3b424b77}
+.design-preview[data-theme=dark] .indicator-round{background:linear-gradient(140deg,#41464f,#30353e 50%,#262b32);box-shadow:3px 4px 7px #11141acc,-2px -2px 6px #484f5966,inset 1px 1px 1px #ffffff22,inset -1px -1px 2px #0b0e1455}
+.design-preview[data-theme=dark] .indicator-letter{color:#c67d90;text-shadow:0 1px 1px #ffffff35,0 -1px 1px #080c12dd,0 0 6px rgba(var(--study-light),.3)}

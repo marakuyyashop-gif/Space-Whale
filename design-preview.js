@@ -1,5 +1,10 @@
 (() => {
   'use strict';
+  // A single illuminated specimen; the exercise study remains available unchanged.
+  if(new URLSearchParams(window.location.search).get('detail')==='lamp'){
+    document.body.classList.add('indicator-only');
+    document.getElementById('indicatorStudy').hidden=false;
+  }
   const kit=window.SpaceWhaleExerciseKit;
   const base=(id,kind,title,data)=>({version:1,id,kind,title,...data});
   const fixtures=[

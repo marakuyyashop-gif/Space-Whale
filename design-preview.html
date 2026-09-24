@@ -2,7 +2,7 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Space Whale — Short Talk</title>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-directed-light">
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-inset-letter">
 </head><body class="design-preview" data-theme="light">
 <div class="reference-app">
 <aside class="preview-sidebar" aria-label="Урок и навигация">
@@ -30,12 +30,19 @@
 </nav>
 </aside>
 <section class="preview-workspace"><header class="preview-toolbar"><div class="preview-themes" role="group" aria-label="Тема рабочей области"><button type="button" data-theme-choice="light" aria-pressed="true">Светлая</button><button type="button" data-theme-choice="dark" aria-pressed="false">Тёмная</button></div></header>
-<main class="preview-scroll" id="previewScroll"><div class="preview-column">
+<main class="preview-scroll" id="previewScroll">
+<div id="indicatorStudy" class="indicator-study" hidden>
+<div class="indicator-answer" aria-label="Ответ Bye! — неверно">
+<span class="indicator-answer-text">Bye!</span>
+<span class="indicator-round" role="img" aria-label="Неверный ответ"><span class="indicator-letter" aria-hidden="true">N</span></span>
+</div>
+</div>
+<div class="preview-column">
 <section class="preview-section" id="sample-1"><div id="matchHost"></div></section>
 <section class="preview-section" id="sample-2" hidden><div id="gapHost"></div></section>
 <section class="preview-section" id="sample-3" hidden><div id="audioHost"></div><div id="choiceHost"></div></section>
 <div class="preview-navigation"><button type="button" id="showNext" class="preview-disclose" aria-label="Следующее задание" title="Следующее задание"><span class="preview-circle" aria-hidden="true"></span></button><button type="button" id="collapseLast" class="preview-disclose preview-up" aria-label="Свернуть последнее задание" title="Свернуть последнее задание" hidden><span class="preview-circle" aria-hidden="true"></span></button></div>
 
 </div></main></section></div>
-<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-directed-light"></script>
+<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-inset-letter"></script>
 </body></html>
