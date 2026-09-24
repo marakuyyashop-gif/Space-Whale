@@ -107,3 +107,6 @@ body.unified-workspace{background:var(--sw-neu-bg);color:var(--sw-neu-ink);--lea
 .workspace-brand-row{grid-column:1/-1}.workspace-session-heading{grid-column:1/-1}.workspace-panel-heading{grid-column:2;grid-row:2}.workspace-clock-panel{grid-column:1;grid-row:2/4;align-self:start;padding:4px 0 25px}.workspace-clock{width:110px;height:110px}.workspace-clock svg{width:100px;height:100px}.workspace-tree{grid-column:2;grid-row:3/5;min-height:0}.workspace-session-tools{grid-column:1;grid-row:3;align-self:end;max-height:80px;overflow:auto}.workspace-dock{grid-column:1;grid-row:4;display:grid;grid-template-columns:1fr 1fr;padding:0;gap:8px}.workspace-dock .workspace-icon{width:36px;height:36px}.workspace-session-tools{grid-column:1/-1;grid-row:5;max-height:48px}.workspace-sidebar-closed .app-sidebar{transform:translateY(-60dvh)!important}
 }
 @media(prefers-reduced-motion:reduce){.unified-workspace *,.unified-workspace *::before{transition:none!important;animation:none!important}}
+
+.unified-workspace .workspace-timer-reset[data-tooltip]::after{left:auto;right:0;transform:translateY(4px)}
+.unified-workspace .workspace-timer-reset[data-tooltip]:is(:hover,:focus-visible)::after{transform:translateY(0)}
