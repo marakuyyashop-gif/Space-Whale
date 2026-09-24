@@ -8,77 +8,97 @@
     ['audioHost',base('preview-audio','audio','Listen and choose',{instruction:'Listen to the short sound.',audio:'assets/factory/test-tone.wav'})],
     ['choiceHost',base('preview-choice','choice','What can you hear?',{items:[{id:'q1',prompt:'Choose one answer.',options:[{id:'voice',text:'A voice'},{id:'tones',text:'Electronic tones'}],correctId:'tones'}]})]
   ];
-  // A deliberately isolated feedback experiment for the first exercise only.
-  const matchHost=document.getElementById('matchHost');
-  const matchingFeedback={showAnswers:true};
-  // Five coarse bands; only an exact full score receives the all-correct message.
+  // Preview adapters share feedback presentation without changing lesson mechanics.
   const feedbackMessages=['Try again.','Take another look.','Good start.','So close.','All correct.'];
-  function feedbackMessage(results){
+  function feedbackMessage(results,kind){
     const values=Object.values(results);
     const correct=values.filter(result=>result==='correct').length;
-    if(!values.length||values.every(result=>result==='empty'))return 'Choose an answer.';
+    if(!values.length||values.every(result=>result==='empty'))return kind==='gaps'?'Write an answer.':'Choose an answer.';
     const band=correct===0?0:correct===values.length?4:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));
     return feedbackMessages[band];
   }
-  let matchInstance;
-  let answerKey;
-  function decorateMatching(){
-    matchHost.querySelectorAll('.ek-card').forEach((card,index)=>{
-      if(card.querySelector('.preview-answer-light'))return;
-      const field=card.querySelector('.ek-match-slot');
-      const wrap=document.createElement('div');wrap.className='preview-answer-light';
-      const lamp=document.createElement('span');lamp.className='preview-result-lamp';
-      lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
-      card.insertBefore(wrap,field);wrap.append(field,lamp);
-      wrap.dataset.item=fixtures[0][1].items[index].id;
-    });
-    if(!answerKey){
-      answerKey=document.createElement('section');answerKey.className='preview-answer-key';answerKey.hidden=true;
-      answerKey.setAttribute('aria-label','Feedback');
-      const message=document.createElement('p');message.className='preview-feedback-message';
-      message.setAttribute('role','status');
-      const pairs=document.createElement('ol');pairs.className='preview-answer-pairs';
-      pairs.setAttribute('aria-label','Correct answers');
-      fixtures[0][1].items.forEach(item=>{
-        const row=document.createElement('li');
-        const prompt=document.createElement('span');prompt.className='preview-answer-prompt';prompt.textContent=item.text;
-        const answer=document.createElement('strong');
-        answer.textContent=fixtures[0][1].options.find(option=>option.id===item.correctId).text;
-        row.append(prompt,document.createTextNode(' — '),answer);pairs.append(row);
-      });
-      answerKey.append(message,pairs);
-      matchHost.querySelector('.ek-actions').insertAdjacentElement('afterend',answerKey);
+  const adapters=new Map();
+  function lampFor(parent,id){
+    let lamp=parent.querySelector('.preview-result-lamp');
+    if(!lamp){
+      lamp=document.createElement('span');lamp.className='preview-result-lamp';
+      lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');parent.append(lamp);
     }
+    lamp.dataset.item=id;return lamp;
   }
-  function clearMatchingLights(){
-    matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
-      delete wrap.dataset.result;
-      const lamp=wrap.querySelector('.preview-result-lamp');lamp.textContent='';lamp.setAttribute('aria-label','Not checked');lamp.removeAttribute('title');
+  function decorate(adapter){
+    const {host,definition}=adapter;
+    const check=host.querySelector('.ek-actions .ek-button:not(.ek-reset)');
+    if(check){check.textContent='OK';check.classList.add('preview-ok');check.setAttribute('aria-label','Check answers');}
+    host.querySelectorAll('.ek-close').forEach(close=>{
+      close.textContent='';close.classList.add('preview-close');close.setAttribute('aria-label','Close');close.title='Close';
     });
-    if(answerKey){answerKey.hidden=true;answerKey.querySelector('.preview-feedback-message').textContent='';}
+    if(definition.kind==='matching')host.querySelectorAll('.ek-card').forEach((card,index)=>{
+      const field=card.querySelector('.ek-match-slot');
+      if(field.dataset.selected!=='true')field.textContent='';
+      lampFor(card,definition.items[index].id);
+    });
+    if(definition.kind==='gaps')host.querySelectorAll('.ek-sentence').forEach((row,index)=>{
+      const gaps=definition.items[index].segments.filter(segment=>typeof segment!=='string');
+      // This preview has one gap per sentence; the shared grader still owns all answers.
+      if(gaps.length===1)lampFor(row,gaps[0].id);
+    });
+    if(definition.kind==='choice')host.querySelectorAll('.ek-question').forEach((group,index)=>lampFor(group,definition.items[index].id));
   }
-  fixtures.forEach(([id,data])=>{
-    const instance=kit.mount(document.getElementById(id),data,id==='matchHost'?{onChange:clearMatchingLights}:{});
-    if(id==='matchHost')matchInstance=instance;
-  });
-  decorateMatching();
-  matchHost.addEventListener('click',event=>{
-    const action=event.target.closest('.ek-actions button');
-    if(!action)return;
-    decorateMatching();
-    if(action.classList.contains('ek-reset')){clearMatchingLights();return;}
-    const definition=fixtures[0][1];
-    const results=kit.grade(definition,matchInstance.getAnswers());
-    matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
-      const result=results[wrap.dataset.item];wrap.dataset.result=result;
-      const lamp=wrap.querySelector('.preview-result-lamp');
-      lamp.replaceChildren();
-      const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
-      lamp.setAttribute('aria-label',label);lamp.setAttribute('title',label);
+  function makePanel(adapter){
+    const {host,definition}=adapter;
+    const panel=document.createElement('section');panel.className='preview-answer-key';panel.hidden=true;panel.setAttribute('aria-label','Feedback');
+    const message=document.createElement('p');message.className='preview-feedback-message';message.setAttribute('role','status');
+    const pairs=document.createElement('ol');pairs.className='preview-answer-pairs';pairs.setAttribute('aria-label','Correct answers');
+    definition.items.forEach(item=>{
+      const row=document.createElement('li');
+      const fragment=(text,answer=false)=>{
+        const node=document.createElement(answer?'strong':'span');
+        if(!answer)node.className='preview-answer-prompt';node.textContent=text;row.append(node);
+      };
+      if(definition.kind==='gaps')item.segments.forEach(segment=>{
+        if(typeof segment==='string')fragment(segment);else fragment(segment.answers[0],true);
+      });
+      else{
+        fragment(item.text||item.prompt);row.append(document.createTextNode(' — '));
+        fragment((item.options||definition.options).find(option=>option.id===item.correctId).text,true);
+      }
+      pairs.append(row);
     });
-    answerKey.querySelector('.preview-answer-pairs').hidden=!matchingFeedback.showAnswers||Object.values(results).every(result=>result==='empty');
-    answerKey.hidden=false;
-    answerKey.querySelector('.preview-feedback-message').textContent=feedbackMessage(results);
+    panel.append(message,pairs);host.querySelector('.ek-actions').insertAdjacentElement('afterend',panel);
+    Object.assign(adapter,{panel,message,pairs});
+  }
+  function clearFeedback(adapter){
+    adapter.host.querySelectorAll('.preview-result-lamp').forEach(lamp=>{
+      delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');lamp.removeAttribute('title');
+    });
+    if(adapter.panel){adapter.panel.hidden=true;adapter.message.textContent='';}
+  }
+  fixtures.forEach(([id,definition])=>{
+    const host=document.getElementById(id);
+    if(definition.kind==='audio'){kit.mount(host,definition);return;}
+    const adapter={host,definition,showAnswers:true};adapters.set(id,adapter);
+    adapter.instance=kit.mount(host,definition,{onChange:()=>{
+      clearFeedback(adapter);
+      // Matching updates its text after onChange; decorate once that update is complete.
+      Promise.resolve().then(()=>decorate(adapter));
+    }});
+    decorate(adapter);makePanel(adapter);
+    // Replace the engine's duplicate count announcement with the short panel message.
+    host.querySelector('.ek-status').removeAttribute('role');host.querySelector('.ek-status').setAttribute('aria-hidden','true');
+    host.addEventListener('click',event=>{
+      decorate(adapter);
+      const action=event.target.closest('.ek-actions button');if(!action)return;
+      if(action.classList.contains('ek-reset')){clearFeedback(adapter);return;}
+      const results=kit.grade(definition,adapter.instance.getAnswers());
+      host.querySelectorAll('.preview-result-lamp').forEach(lamp=>{
+        const result=results[lamp.dataset.item];lamp.dataset.result=result;
+        const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
+        lamp.setAttribute('aria-label',label);lamp.title=label;
+      });
+      adapter.pairs.hidden=!adapter.showAnswers||Object.values(results).every(result=>result==='empty');
+      adapter.panel.hidden=false;adapter.message.textContent=feedbackMessage(results,definition.kind);
+    });
   });
   const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible=1;
@@ -106,6 +126,15 @@
     document.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
   }));
   sync();
+  const sidebar=document.getElementById('previewSidebar');
+  const sidebarToggle=document.getElementById('sidebarToggle');
+  sidebarToggle.addEventListener('click',()=>{
+    const collapsed=!sidebar.hidden;sidebar.hidden=collapsed;
+    document.querySelector('.reference-app').classList.toggle('preview-sidebar-collapsed',collapsed);
+    sidebarToggle.setAttribute('aria-expanded',String(!collapsed));
+    const label=collapsed?'Открыть меню':'Свернуть меню';
+    sidebarToggle.setAttribute('aria-label',label);sidebarToggle.title=label;
+  });
 
   // Local visual-study timer. Navigation and exercise answers are independent.
   const minutesInput=document.getElementById('lessonMinutes');
