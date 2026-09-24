@@ -393,11 +393,27 @@ test('picture order grades each position and clears its badge on edit',()=>{
 });
 test('guided discovery reveals rule explicitly and preserves checked exercise on collapse',()=>{
   const s=setup('rule-page-demo',{syncChecks:true});const rule=s.host.querySelector('.ek-rule-block');assert.equal(rule.hidden,true);
-  const input=s.host.querySelector('select');input.value='B';s.fire(input,'change');s.click('OK');s.click('Show rule');assert.equal(rule.hidden,false);assert.equal(input.dataset.feedback,'correct');
-  s.click('Hide rule');assert.equal(rule.hidden,true);assert.equal(input.value,'B');
-  const count=s.changes.length;s.mount.setAnswers({notice:{question1:'A'},__sw_rule_visible:true});assert.equal(s.changes.length,count);assert.equal(rule.hidden,false);assert.equal(s.host.querySelector('select').value,'A');
+  const input=s.host.querySelector('.ek-choice-trigger');s.fire(input,'click');s.click('[Option B]');s.click('OK');s.click('Show rule');assert.equal(rule.hidden,false);assert.equal(input.getAttribute('data-feedback'),'correct');
+  s.click('Hide rule');assert.equal(rule.hidden,true);assert.ok(input.textContent.includes('[Option B]'));
+  const count=s.changes.length;s.mount.setAnswers({notice:{question1:'A'},__sw_rule_visible:true});assert.equal(s.changes.length,count);assert.equal(rule.hidden,false);assert.ok(s.host.querySelector('.ek-choice-trigger').textContent.includes('[Option A]'));
 });
 test('writing uses one line; picture choices retain accessible names without visible option labels',()=>{
   const s=setup('writing-demo');const input=s.host.querySelector('input[type=text]');assert.ok(input);assert.equal(s.host.querySelector('textarea'),null);input.value='A short answer';s.fire(input,'input');assert.equal(s.mount.getAnswers().response,'A short answer');
   const pictures=setup('image-choice-demo');assert.equal(pictures.host.querySelectorAll('.ek-image-choice-option>span').length,0);assert.equal(pictures.host.querySelector('input').getAttribute('aria-label'),'[Option A]');
+});
+
+
+test('writing model answers start closed and never overwrite a learner response',()=>{
+  const s=setup('writing-demo');const input=s.host.querySelector('input');input.value='My own response';s.fire(input,'input');
+  const detail=s.host.querySelector('.ek-writing-answers');assert.equal(Boolean(detail.open),false);assert.equal(detail.querySelector('summary').textContent,'Possible answers');
+  s.fire(detail.querySelector('summary'),'click');assert.equal(detail.open,true);assert.ok(detail.textContent.includes('[Possible answer]'));assert.equal(s.mount.getAnswers().response,'My own response');
+});
+test('discovery uses the shared picker, grades IDs, closes on Escape and clears feedback on edit',()=>{
+  const s=setup('rule-page-demo');assert.equal(s.host.querySelector('select'),null);const opener=s.host.querySelector('.ek-choice-trigger');
+  s.fire(opener,'click');assert.equal(opener.getAttribute('aria-expanded'),'true');s.fire(opener,'keydown',{key:'Escape'});assert.equal(opener.getAttribute('aria-expanded'),'false');
+  s.fire(opener,'click');s.click('[Option B]');assert.equal(s.mount.getAnswers().notice.question1,'B');s.click('OK');assert.equal(opener.getAttribute('data-feedback'),'correct');
+  s.fire(opener,'click');s.click('[Option A]');assert.equal(opener.getAttribute('data-feedback'),null);assert.equal(s.mount.getAnswers().notice.question1,'A');
+});
+test('picture matching dialog shows just its image in the prompt',()=>{
+  const s=setup('picture-word-demo');s.fire(s.host.querySelector('.ek-match-slot'),'click');const prompt=s.host.querySelector('.ek-picture-prompt');assert.ok(prompt.querySelector('img'));assert.equal(prompt.textContent,'');
 });

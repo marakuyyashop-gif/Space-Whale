@@ -735,7 +735,7 @@
 /* Compact inline feedback and direct manipulation. */
 .exercise-kit.ek-modern .ek-dialog .ek-prompt{display:flex;align-items:center;justify-content:center;text-align:center;min-height:54px;box-sizing:border-box;width:100%;padding:14px 20px;margin:22px 0 18px;line-height:1.6;border:0;border-radius:24px;overflow-wrap:anywhere}
 .exercise-kit.ek-modern.ek-reading-width .ek-numbered-sentence{padding-left:0}
-.exercise-kit.ek-modern.ek-reading-width .ek-choice-trigger{height:auto;min-height:42px;padding:6px 12px 6px 8px;gap:10px;border:0;border-radius:22px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-inset);line-height:1.6;vertical-align:middle}
+.exercise-kit.ek-modern .ek-choice-trigger{height:auto;min-height:42px;padding:6px 12px 6px 8px;gap:10px;border:0;border-radius:22px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-inset);line-height:1.6;vertical-align:middle}
 .exercise-kit.ek-modern .ek-choice-trigger::after{content:'';width:7px;height:7px;margin:0 2px 3px 4px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg)}
 .exercise-kit.ek-modern .ek-inline-menu{padding:5px 0;border-radius:12px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-raised)}
 .exercise-kit.ek-modern .ek-inline-option{border:0;border-radius:0;background:transparent;box-shadow:none;padding:10px 14px;line-height:1.5;transform:none}
@@ -829,3 +829,16 @@
 
 /* Reserved image area while the author supplies lesson artwork. */
 .exercise-kit .ek-image-pending { aspect-ratio: 1 / 1; min-height: 180px; background: transparent; }
+/* Small follow-up refinements shared by all exercise hosts. */
+.exercise-kit.ek-modern .ek-order-target:not(.ek-order-images-target){min-height:76px;padding:14px;align-content:center}
+.exercise-kit.ek-modern .ek-dialog .ek-picture-prompt{display:block;padding:0;min-height:0;overflow:hidden;border-radius:24px}
+.exercise-kit.ek-modern .ek-dialog .ek-picture-prompt>.ek-image{display:block;width:100%;height:auto;max-height:none;aspect-ratio:4/3;object-fit:cover;margin:0;border-radius:inherit}
+.exercise-kit.ek-modern .ek-dialog .ek-picture-prompt>.ek-crop-image{height:auto;aspect-ratio:4/3}
+.exercise-kit.ek-modern .ek-discovery-choice .ek-inline-choice{vertical-align:middle}
+.exercise-kit.ek-modern .ek-discovery-choice .ek-choice-trigger{width:auto;min-width:130px;max-width:100%;white-space:normal}
+.exercise-kit.ek-modern :is(.ek-typed-gap,.ek-writing-input){font-family:var(--ek-font);font-size:var(--ek-text-size);font-weight:400;font-style:normal;caret-color:var(--ek-ink)}
+.exercise-kit.ek-modern.ek-reading-width .ek-typed-gap{height:30px;min-height:30px;line-height:normal;padding:3px 0}
+.exercise-kit.ek-modern .ek-sort-token{position:relative;overflow:visible}
+.exercise-kit.ek-modern .ek-sort-token:is([data-feedback=correct],[data-feedback=retry])::after{content:'';position:absolute;right:-4px;top:-4px;width:14px;height:14px;border:0;border-radius:50%;background:var(--sw-neu-success);box-shadow:var(--sw-neu-small);pointer-events:none}
+.exercise-kit.ek-modern .ek-sort-token[data-feedback=retry]::after{background:var(--sw-neu-error)}
+.exercise-kit.ek-modern .ek-writing-answers .ek-copy+.ek-copy{margin-top:10px}

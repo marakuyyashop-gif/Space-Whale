@@ -38,7 +38,7 @@
     choice('choice-demo'),
     order('order-demo'),
     sort('sort-demo'),
-    base('writing-demo','writing','Open Writing',{instruction:'[Writing instruction] Ответ оценивает преподаватель.',items:[{id:'response',prompt:'[Writing prompt]'}]}),
+    base('writing-demo','writing','Open Writing',{instruction:'[Writing instruction] Ответ оценивает преподаватель.',items:[{id:'response',prompt:'[Writing prompt]',possibleAnswers:['[Possible answer]']}]}),
     base('presentation-demo','presentation','Speaking / Presentation',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'}]}),
     base('image-label-demo','image-label','Image Label',{instruction:'Перетащите подписи в зоны. Подпись остаётся там до вашего следующего действия. Нажатие возвращает подпись в набор. С клавиатуры: Alt + ← / →.',...image(1),items:[{id:'target1',prompt:'[Target 1]',x:30,y:45,correctId:'label1'},{id:'target2',prompt:'[Target 2]',x:70,y:70,correctId:'label2'}],options:[option('label2','[Label 2]'),option('label1','[Label 1]')]}),
     order('picture-order-demo',true),

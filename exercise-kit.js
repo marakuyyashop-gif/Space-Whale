@@ -199,7 +199,7 @@
       const valid = options(def.groups);
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
     }
-    if (def.kind === 'writing') def.items.forEach(item => text(item.prompt, 'prompt'));
+    if (def.kind === 'writing') def.items.forEach(item => {text(item.prompt,'prompt');if(item.possibleAnswers!=null){if(!Array.isArray(item.possibleAnswers)||!item.possibleAnswers.length)fail('possibleAnswers must be a non-empty list');item.possibleAnswers.forEach(answer=>text(answer,'possible answer'));}});
     if (def.kind === 'gaps') {
       if (def.layout != null && !['sentences', 'paragraph'].includes(def.layout)) fail('Unsupported gaps layout');
       if (def.inputMode != null && !['text', 'select'].includes(def.inputMode)) fail('Unsupported gaps inputMode');
@@ -539,7 +539,8 @@
       dialog.setAttribute('aria-label', def.title);
       const close=button(modern?'':'Close ×', () => closeDialog(), 'ek-close');close.setAttribute('aria-label','Close');
       dialog.append(close, node('h3', 'ek-title', def.title));
-      const prompt = node('div', 'ek-prompt', item.text);
+      const pictureOnly=def.kind==='matching'&&def.layout==='picture-word'&&(item.image||item.imagePending);
+      const prompt = node('div', pictureOnly?'ek-prompt ek-picture-prompt':'ek-prompt', pictureOnly?'':item.text);
       prompt.setAttribute('aria-label', 'Phrase to match');
       if (item.image || item.imagePending) prompt.prepend(illustration(item));
       dialog.append(prompt);
@@ -576,6 +577,44 @@
         el.append(doc.createTextNode(rest.slice(0, at)), node('strong', '', match)); rest = rest.slice(at + match.length);
       }
       return el;
+    }
+    function inlinePicker(id,label,options,number){
+      const wrap = node('span', 'ek-inline-choice');
+      const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
+      menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
+      const badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);
+      const paint = () => {
+        opener.replaceChildren(badge, doc.createTextNode(options.find(option=>option.id===answers[id])?.text || '\u00a0'));
+        opener.setAttribute('aria-label', `${label}: ${options.find(option=>option.id===answers[id])?.text || 'choose an answer'}`);
+        opener.dataset.selected = String(Boolean(answers[id]));
+        menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[id])));
+      };
+      const shut = () => { menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
+      const opener = button('', () => {
+        if (opener.getAttribute('aria-expanded')==='true') { dismissInline(); return; }
+        dismissInline(); menu.hidden=false;opener.setAttribute('aria-expanded','true');
+        closeInline = shut;
+        menu.querySelector('button')?.focus();
+      }, 'ek-gap ek-choice-trigger');
+      opener.setAttribute('aria-expanded', 'false');
+      options.forEach((entry, optionIndex) => {
+        const value=entry.id;
+        const option = button('', () => { changed(id, value); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option');
+        option.dataset.optionValue = value;
+        if(!modern)option.append(node('span', 'ek-gap-number', String(optionIndex + 1)));option.append(doc.createTextNode(entry.text));
+        menu.append(option);
+      });
+      menu.append(button('Clear', () => { changed(id, ''); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option ek-inline-clear'));
+      wrap.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.stopPropagation(); dismissInline(); opener.focus(); }
+        if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+          event.preventDefault();
+          if (menu.hidden) opener.click();
+          else { const buttons = [...menu.querySelectorAll('button')]; const i = buttons.indexOf(doc.activeElement); buttons[(i + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length].focus(); }
+        }
+      });
+      wrap.addEventListener('focusout', event => { if (!wrap.contains(event.relatedTarget)) shut(); });
+      paint(); wrap.append(opener, menu); return {wrap,opener};
     }
     function render() {
       dismissInline();
@@ -801,41 +840,7 @@
             const label = `Sentence ${index + 1}, gap ${segment.id}`;
             const options = def.inputMode === 'text' ? null : segment.options || (def.inputMode === 'select' ? def.bank : null);
             if (options) {
-              const wrap = node('span', 'ek-inline-choice');
-              const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
-              menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
-              const badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);
-              const paint = () => {
-                opener.replaceChildren(badge, doc.createTextNode(answers[segment.id] || '\u00a0'));
-                opener.setAttribute('aria-label', `${label}: ${answers[segment.id] || 'choose an answer'}`);
-                opener.dataset.selected = String(Boolean(answers[segment.id]));
-                menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[segment.id])));
-              };
-              const shut = () => { menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
-              const opener = button('', () => {
-                if (opener.getAttribute('aria-expanded')==='true') { dismissInline(); return; }
-                dismissInline(); menu.hidden=false;opener.setAttribute('aria-expanded','true');
-                closeInline = shut;
-                menu.querySelector('button')?.focus();
-              }, 'ek-gap ek-choice-trigger');
-              opener.setAttribute('aria-expanded', 'false');
-              options.forEach((value, optionIndex) => {
-                const option = button('', () => { changed(segment.id, value); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option');
-                option.dataset.optionValue = value;
-                if(!modern)option.append(node('span', 'ek-gap-number', String(optionIndex + 1)));option.append(doc.createTextNode(value));
-                menu.append(option);
-              });
-              menu.append(button('Clear', () => { changed(segment.id, ''); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option ek-inline-clear'));
-              wrap.addEventListener('keydown', event => {
-                if (event.key === 'Escape') { event.stopPropagation(); dismissInline(); opener.focus(); }
-                if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
-                  event.preventDefault();
-                  if (menu.hidden) opener.click();
-                  else { const buttons = [...menu.querySelectorAll('button')]; const i = buttons.indexOf(doc.activeElement); buttons[(i + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length].focus(); }
-                }
-              });
-              wrap.addEventListener('focusout', event => { if (!wrap.contains(event.relatedTarget)) shut(); });
-              paint(); wrap.append(opener, menu); row.append(wrap); controls.set(segment.id, opener); return;
+              const {wrap,opener}=inlinePicker(segment.id,label,options.map(value=>({id:value,text:value})),number);row.append(wrap);controls.set(segment.id,opener);return;
             }
             const field = node('input', 'ek-gap ek-typed-gap');
             field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false;
@@ -851,15 +856,10 @@
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
         if (def.layout === 'dropdown') {
-          const row = node('label', 'ek-discovery-choice');
+          const row = node('div', 'ek-discovery-choice');
           row.append(doc.createTextNode(`${item.prompt} `));
-          const select = node('select', 'ek-gap ek-discovery-select');
-          select.setAttribute('aria-label', item.prompt);
-          const empty = node('option', '', '…'); empty.value = ''; select.append(empty);
-          item.options.forEach(option => { const el = node('option', '', option.text); el.value = option.id; select.append(el); });
-          select.value = answers[item.id] || '';
-          select.addEventListener('change', () => changed(item.id, select.value));
-          const field=node('span','ek-discovery-field');field.append(node('span','ek-gap-number',String(index+1)),select);row.append(field); body.append(row); controls.set(item.id, select); return;
+          const {wrap,opener}=inlinePicker(item.id,item.prompt,item.options,index+1);
+          row.append(wrap);body.append(row);controls.set(item.id,opener);return;
         }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
         item.options.forEach(option => {
@@ -953,7 +953,7 @@
         const itemButton = item => {
           const b = button(item.text, () => {if(answers[item.id]){delete answers[item.id];save();render();}}, 'ek-token');
           keyboardPlacement(b,def.groups,()=>def.groups.findIndex(group=>group.id===answers[item.id]),group=>{changed(item.id,group.id);render();});
-          b.setAttribute('aria-label', `Choose group for ${item.text}`); draggable(b, item.id); controls.set(item.id, b); return b;
+          b.setAttribute('aria-label', `Choose group for ${item.text}`); b.classList.add('ek-sort-token');draggable(b, item.id); controls.set(item.id, b); return b;
         };
         def.groups.forEach(group => {
           const box = node('section', 'ek-sort-group'); dropzone(box, id => { changed(id, group.id); render(); }); box.append(node('h3', '', group.text));
@@ -966,6 +966,7 @@
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
         const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
+        if(item.possibleAnswers?.length){const detail=node('details','ek-disclosure ek-writing-answers');detail.append(node('summary','',POSSIBLE_ANSWERS_TITLE));item.possibleAnswers.forEach(answer=>detail.append(node('p','ek-copy',answer)));body.append(detail);}
       });
     }
     const lamps=new Map();
