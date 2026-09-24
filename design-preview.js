@@ -37,7 +37,13 @@
   sync();
 
   // Local visual-study timer. Navigation and exercise answers are independent.
-  const duration=30*60*1000;
+  const minutesInput=document.getElementById('lessonMinutes');
+  const durationKey='sw.preview.lessonMinutes';
+  const validMinutes=value=>Number.isInteger(value)&&value>=1&&value<=1440;
+  let minutes=60;
+  try { const saved=Number(window.localStorage.getItem(durationKey));if(validMinutes(saved))minutes=saved; } catch (_) {}
+  let duration=minutes*60*1000;
+  minutesInput.value=String(minutes);
   let elapsed=0, startedAt=null, ticker=null;
   const clock=document.getElementById('lessonClock');
   const toggle=document.getElementById('timerToggle');
@@ -45,6 +51,8 @@
   const total=()=>Math.min(duration,elapsed+(startedAt===null?0:Date.now()-startedAt));
   function renderTimer(){
     const spent=total();
+    clock.setAttribute('aria-valuemax',String(duration/60000));
+    minutesInput.disabled=startedAt!==null||elapsed>0;
     const seconds=Math.ceil((duration-spent)/1000);
     document.getElementById('clockTime').textContent=`${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
     document.getElementById('clockProgress').style.strokeDashoffset=String(100-spent/duration*100);
@@ -70,6 +78,18 @@
     window.clearInterval(ticker);ticker=null;elapsed=0;startedAt=null;
     toggle.disabled=false;toggle.textContent='Начать урок';toggle.setAttribute('aria-pressed','false');
     status.textContent='Таймер сброшен.';renderTimer();
+  });
+  minutesInput.addEventListener('change',()=>{
+    if(startedAt!==null||elapsed>0){minutesInput.value=String(duration/60000);return;}
+    const value=Number(minutesInput.value);
+    if(!validMinutes(value)){
+      minutesInput.value=String(duration/60000);
+      status.textContent='Введите целое число минут от 1 до 1440.';
+      return;
+    }
+    duration=value*60*1000;
+    try {window.localStorage.setItem(durationKey,String(value));} catch (_) {}
+    renderTimer();
   });
   renderTimer();
 })();

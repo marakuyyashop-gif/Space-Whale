@@ -2,18 +2,19 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Space Whale — Short Talk</title>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-neumorphic">
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exercise-kit.css?v=20260924-interactions"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="design-preview.css?v=20260924-neumorphic-feedback">
 </head><body class="design-preview" data-theme="light">
 <div class="reference-app">
 <aside class="preview-sidebar" aria-label="Урок и навигация">
 <a class="preview-brand" href="index.html">space whale<span aria-hidden="true">°</span></a>
 <section class="preview-clock-panel" aria-label="Таймер занятия">
-<div class="preview-clock" role="progressbar" aria-label="Прошедшая часть занятия" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" id="lessonClock">
+<div class="preview-clock" role="progressbar" aria-label="Прошедшая часть занятия" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="lessonClock">
 <svg viewBox="0 0 160 160" aria-hidden="true"><circle class="clock-track" cx="80" cy="80" r="65"/><circle class="clock-progress" id="clockProgress" cx="80" cy="80" r="65" pathLength="100"/><path class="clock-tick" d="M80 8v6 M152 80h-6 M80 152v-6 M8 80h6"/></svg>
-<div class="preview-clock-face"><span id="clockTime">30:00</span><span class="preview-clock-caption">минут осталось</span></div>
+<div class="preview-clock-face"><span id="clockTime">60:00</span><span class="preview-clock-caption">минут осталось</span></div>
 </div>
+<div class="preview-clock-controls"><label class="preview-duration" for="lessonMinutes">Длительность <input id="lessonMinutes" type="number" min="1" max="1440" step="1" value="60" inputmode="numeric"> мин</label>
 <div class="preview-clock-actions"><button class="preview-timer-start" id="timerToggle" type="button" aria-pressed="false">Начать урок</button><button class="preview-icon preview-timer-reset" id="timerReset" type="button" aria-label="Сбросить таймер" data-tooltip="Сбросить таймер"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button></div>
-<span class="preview-sr-only" id="timerStatus" role="status"></span>
+</div><span class="preview-sr-only" id="timerStatus" role="status"></span>
 </section>
 <div class="preview-lesson"><p>A1.1 · Whale 1</p><h2>Как я рад встрече!</h2></div>
 <nav class="preview-tasks" aria-label="Задания урока">
@@ -36,5 +37,5 @@
 <div class="preview-navigation"><button type="button" id="showNext" class="preview-disclose" aria-label="Следующее задание" title="Следующее задание"><span class="preview-circle" aria-hidden="true"></span></button><button type="button" id="collapseLast" class="preview-disclose preview-up" aria-label="Свернуть последнее задание" title="Свернуть последнее задание" hidden><span class="preview-circle" aria-hidden="true"></span></button></div>
 
 </div></main></section></div>
-<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-neumorphic"></script>
+<script src="exercise-kit.js?v=20260924-interactions"></script><script src="design-preview.js?v=20260924-neumorphic-feedback"></script>
 </body></html>
