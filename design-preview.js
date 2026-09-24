@@ -10,6 +10,16 @@
   ];
   // A deliberately isolated feedback experiment for the first exercise only.
   const matchHost=document.getElementById('matchHost');
+  const matchingFeedback={showAnswers:true};
+  // Five coarse bands; only an exact full score receives the all-correct message.
+  const feedbackMessages=['Try again.','Take another look.','Good start.','So close.','All correct.'];
+  function feedbackMessage(results){
+    const values=Object.values(results);
+    const correct=values.filter(result=>result==='correct').length;
+    if(!values.length||values.every(result=>result==='empty'))return 'Choose an answer.';
+    const band=correct===0?0:correct===values.length?4:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));
+    return feedbackMessages[band];
+  }
   let matchInstance;
   let answerKey;
   function decorateMatching(){
@@ -23,15 +33,20 @@
       wrap.dataset.item=fixtures[0][1].items[index].id;
     });
     if(!answerKey){
-      answerKey=document.createElement('dl');answerKey.className='preview-answer-key';answerKey.hidden=true;
-      answerKey.setAttribute('aria-label','Correct answers');
+      answerKey=document.createElement('section');answerKey.className='preview-answer-key';answerKey.hidden=true;
+      answerKey.setAttribute('aria-label','Feedback');
+      const message=document.createElement('p');message.className='preview-feedback-message';
+      message.setAttribute('role','status');
+      const pairs=document.createElement('ol');pairs.className='preview-answer-pairs';
+      pairs.setAttribute('aria-label','Correct answers');
       fixtures[0][1].items.forEach(item=>{
-        const row=document.createElement('div');
-        const prompt=document.createElement('dt');prompt.textContent=item.text;
-        const answer=document.createElement('dd');
+        const row=document.createElement('li');
+        const prompt=document.createElement('span');prompt.className='preview-answer-prompt';prompt.textContent=item.text;
+        const answer=document.createElement('strong');
         answer.textContent=fixtures[0][1].options.find(option=>option.id===item.correctId).text;
-        row.append(prompt,answer);answerKey.append(row);
+        row.append(prompt,document.createTextNode(' — '),answer);pairs.append(row);
       });
+      answerKey.append(message,pairs);
       matchHost.querySelector('.ek-actions').insertAdjacentElement('afterend',answerKey);
     }
   }
@@ -40,7 +55,7 @@
       delete wrap.dataset.result;
       const lamp=wrap.querySelector('.preview-result-lamp');lamp.textContent='';lamp.setAttribute('aria-label','Not checked');lamp.removeAttribute('title');
     });
-    if(answerKey)answerKey.hidden=true;
+    if(answerKey){answerKey.hidden=true;answerKey.querySelector('.preview-feedback-message').textContent='';}
   }
   fixtures.forEach(([id,data])=>{
     const instance=kit.mount(document.getElementById(id),data,id==='matchHost'?{onChange:clearMatchingLights}:{});
@@ -61,7 +76,9 @@
       const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
       lamp.setAttribute('aria-label',label);lamp.setAttribute('title',label);
     });
+    answerKey.querySelector('.preview-answer-pairs').hidden=!matchingFeedback.showAnswers||Object.values(results).every(result=>result==='empty');
     answerKey.hidden=false;
+    answerKey.querySelector('.preview-feedback-message').textContent=feedbackMessage(results);
   });
   const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible=1;
