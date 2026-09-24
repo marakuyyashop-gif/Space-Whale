@@ -144,7 +144,7 @@
           },
           {
             type: 'disclosure',
-            title: 'Useful language',
+            title: 'Use phrases',
             text: '1. Welcome to...\n2. My name is... I am a...\n3. This is...\n4. Let me introduce...\n5. This is... / Pleased to meet...\n6. Welcome to...'
           }
         ]

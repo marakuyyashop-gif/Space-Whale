@@ -273,7 +273,7 @@
     let feedback = {};
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
-    let syncStage=null;
+    let syncStage=null, syncRules=null;
     let dialog;
     let trigger;
     let closeInline;
@@ -404,11 +404,21 @@
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
+      body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
       resultsBox.replaceChildren(); announce('');
       if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');});}
     };
     const save = () => { if (config.syncChecks) delete answers.__sw_checked; clearFeedback(); config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
+    const layoutSnapshot=()=>new Map([...body.querySelectorAll('[data-ek-drag-id]:not(.ek-drag-source-hidden)')].map(el=>[el.dataset.ekDragId,el.getBoundingClientRect()]));
+    const animateLayout=before=>{
+      if(doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+      body.querySelectorAll('[data-ek-drag-id]:not(.ek-drag-source-hidden)').forEach(el=>{const old=before.get(el.dataset.ekDragId);if(!old||!el.animate)return;const rect=el.getBoundingClientRect();const x=old.left-rect.left,y=old.top-rect.top;const base=doc.defaultView?.getComputedStyle?.(el).transform;const transform=base&&base!=='none'?base:'';if(Math.abs(x)+Math.abs(y)>1)el.animate([{transform:`translate(${x}px,${y}px) ${transform}`},{transform:transform||'translate(0,0)'}],{duration:190,easing:'cubic-bezier(.22,.7,.25,1)'});});
+    };
+    const keyboardPlacement=(el,places,current,place)=>{
+      el.title='Drag to place; Alt + arrow to change destination';
+      el.addEventListener('keydown',event=>{if(config.readOnly||!event.altKey||!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const at=current();place(places[(at+(event.key==='ArrowLeft'?-1:1)+places.length)%places.length]);});
+    };
     const draggable = (el, id) => {
       el.dataset.ekDragId=id;
       el.addEventListener('pointerdown', event => {
@@ -443,7 +453,7 @@
         drag.ghost.classList.add('ek-drag-ghost');drag.ghost.setAttribute('aria-hidden','true');drag.ghost.tabIndex=-1;
         Object.assign(drag.ghost.style,{position:'fixed',left:`${drag.rect.left}px`,top:`${drag.rect.top}px`,width:`${drag.rect.width}px`,height:`${drag.rect.height}px`,margin:'0',pointerEvents:'none',zIndex:'9999'});
         host.append(drag.ghost);dragFlights.add(drag.ghost);
-        drag.el.classList.add('ek-dragging');drag.moved=true;
+        const before=layoutSnapshot();drag.el.classList.add('ek-dragging','ek-drag-source-hidden');drag.moved=true;animateLayout(before);
       }
       drag.dx=event.clientX-drag.x;drag.dy=event.clientY-drag.y;
       drag.ghost.style.transform=`translate(${drag.dx}px,${drag.dy}px)`;
@@ -451,6 +461,18 @@
       body.querySelectorAll('.ek-drag-over').forEach(el => el.classList.remove('ek-drag-over'));
       const target = pointerTarget(event);
       if (target && dropTargets.has(target)) target.classList.add('ek-drag-over');
+      const ordered=target?.closest('.ek-order-target');
+      if(ordered){
+        const tokens=[...ordered.children].filter(el=>el.dataset.ekDragId&&el!==drag.el);
+        const before=tokens.find(el=>{const r=el.getBoundingClientRect();return event.clientY<r.top || (event.clientY<=r.bottom && event.clientX<r.left+r.width/2);})||null;
+        if(drag.previewParent!==ordered||drag.before!==before?.dataset.ekDragId){
+          const snapshot=layoutSnapshot();drag.placeholder?.remove();
+          const placeholder=node('span','ek-drag-placeholder');placeholder.setAttribute('aria-hidden','true');
+          Object.assign(placeholder.style,{width:`${drag.rect.width}px`,height:`${drag.rect.height}px`});
+          ordered.insertBefore(placeholder,before);drag.placeholder=placeholder;drag.previewParent=ordered;drag.before=before?.dataset.ekDragId;animateLayout(snapshot);
+        }
+      }else if(drag.placeholder){const snapshot=layoutSnapshot();drag.placeholder.remove();drag.placeholder=null;drag.previewParent=null;drag.before=null;animateLayout(snapshot);}
+
     };
     const pointerEnd = event => {
       if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
@@ -459,7 +481,11 @@
       if (!drag.moved) return;
       suppressDragClick = true;
       const target = event.type==='pointercancel'?null:pointerTarget(event);
-      if (!config.readOnly && target && dropTargets.has(target)) dropTargets.get(target)(drag.id);
+      const before=layoutSnapshot();drag.placeholder?.remove();
+      const ordered=target?.closest('.ek-order-target');
+      if (!config.readOnly && target && dropTargets.has(target)) dropTargets.get(ordered||target)(drag.id,ordered?drag.before:undefined);
+      drag.el.classList.remove('ek-drag-source-hidden');
+      animateLayout(before);
       const destination=[...body.querySelectorAll('[data-ek-drag-id]')].find(el=>el.dataset.ekDragId===drag.id)||drag.el;
       drag.el.classList.remove('ek-dragging');
       const finish=()=>{destination.classList.remove('ek-dragging');drag.ghost.remove();dragFlights.delete(drag.ghost);};
@@ -514,7 +540,7 @@
         choices.append(choice);
       });
       dialog.append(choices);
-      if (selected) dialog.append(button('Clear selection', () => { onPick(''); closeDialog(); }));
+      if (selected) { const reset=button('↺', () => { onPick(''); closeDialog(); }, 'ek-button ek-reset ek-selection-reset'); reset.setAttribute('aria-label','Clear selection'); reset.title='Clear selection'; dialog.append(reset); }
       const currentDialog = dialog;
       const currentTrigger = trigger;
       dialog.addEventListener('close', () => {
@@ -546,8 +572,8 @@
           if (block.type === 'image') body.append(illustration(block));
           else if (block.type === 'disclosure') {
             const detail = node('details', 'ek-disclosure');
-            const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : block.title;
-            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || normalize(block.title) === 'useful language');
+            const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : /useful language/i.test(block.title) ? 'Use phrases' : block.title;
+            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || ['useful language','use phrases'].includes(normalize(block.title)));
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
@@ -609,10 +635,11 @@
       }
       if (def.kind === 'rule-page') {
         const page = node('div', 'ek-rule-page');
+        const revealable=[]; let afterExercise=false;
         def.blocks.forEach((block, index) => {
           if (block.type === 'text') {
             const section = node('section', 'ek-rule-section ek-rule-text-section');
-            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
+            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title === 'Examples' ? '[Exercise instruction]' : block.title));
             section.append(richText(block.text, block.highlights));
             page.append(section);
           }
@@ -630,6 +657,7 @@
               block.examples.forEach(example => examples.append(node('p', 'ek-rule-example', example)));
               section.append(examples);
             }
+            if(afterExercise && !possibleAnswers) revealable.push(section);
             page.append(section);
           }
           if (block.type === 'image') {
@@ -639,6 +667,7 @@
             page.append(figure);
           }
           if (block.type === 'exercise') {
+            afterExercise=true;
             const section = node('section', 'ek-discovery-block');
             const child = node('div', 'ek-discovery-host');
             section.append(child);
@@ -658,6 +687,15 @@
           }
         });
         body.append(page);
+        syncRules=null;
+        if(revealable.length){
+          const navigation=node('div','ek-stage-navigation');
+          const toggle=button('',()=>{answers.__sw_rule_visible=!answers.__sw_rule_visible;save();syncRules(true);},'ek-button ek-stage-toggle ek-stage-down');
+          const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');toggle.append(arrow);
+          navigation.append(toggle);revealable[0].before(navigation);
+          syncRules=(animate=false)=>{const open=Boolean(answers.__sw_rule_visible);revealable.forEach(section=>{if(animate)expand(section,open);else section.hidden=!open;});toggle.classList.toggle('ek-stage-up',open);toggle.classList.toggle('ek-stage-down',!open);toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Hide rule':'Show rule');toggle.title=open?'Hide rule':'Show rule';};
+          syncRules();
+        }
       }
       if (def.kind === 'audio') {
         if (def.layout === 'listen-repeat') {
@@ -799,14 +837,14 @@
       if (def.kind === 'choice') def.items.forEach((item, index) => {
         if (def.layout === 'dropdown') {
           const row = node('label', 'ek-discovery-choice');
-          row.append(doc.createTextNode(`${index + 1}. ${item.prompt} `));
+          row.append(doc.createTextNode(`${item.prompt} `));
           const select = node('select', 'ek-gap ek-discovery-select');
           select.setAttribute('aria-label', item.prompt);
           const empty = node('option', '', '…'); empty.value = ''; select.append(empty);
           item.options.forEach(option => { const el = node('option', '', option.text); el.value = option.id; select.append(el); });
           select.value = answers[item.id] || '';
           select.addEventListener('change', () => changed(item.id, select.value));
-          row.append(select); body.append(row); controls.set(item.id, select); return;
+          const field=node('span','ek-discovery-field');field.append(node('span','ek-gap-number',String(index+1)),select);row.append(field); body.append(row); controls.set(item.id, select); return;
         }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
         item.options.forEach(option => {
@@ -817,7 +855,7 @@
             if (input.checked) selected.add(option.id); else selected.delete(option.id);
             changed(item.id, [...selected]);
           });
-          label.append(input, node('span', '', option.text)); if (option.image) label.append(illustration(option)); group.append(label);
+          label.classList.toggle('ek-multiple-option',Boolean(def.multiple)); input.setAttribute('aria-label',option.text);label.append(input);if(def.layout!=='image-grid'||!option.image)label.append(node('span','',option.text)); if (option.image) label.append(illustration(option)); group.append(label);
         }); body.append(group); controls.set(item.id, group);
       });
       if (def.kind === 'image-label') {
@@ -831,17 +869,18 @@
         };
         def.items.forEach((item, index) => {
           const selected = def.options.find(option => option.id === answers[item.id]);
-          const target = button(selected?.text || '+', () => popover({text:item.prompt || `Target ${index + 1}`}, def.options, answers[item.id], value => assign(item.id, value), target, new Set(Object.values(answers))), 'ek-image-label-target');
+          const target = button(selected?.text || '+', () => {if(selected)assign(item.id,'');}, 'ek-image-label-target');
           target.style.left = `${item.x}%`; target.style.top = `${item.y}%`;
           target.setAttribute('aria-label', item.prompt || `Target ${index + 1}`);
-          target.setAttribute('aria-haspopup', 'dialog');
-          if (selected) draggable(target, selected.id);
+          target.title='Click to return label; use Alt + arrow to move labels with the keyboard';
+          if (selected) {draggable(target, selected.id);keyboardPlacement(target,def.items,()=>index,destination=>assign(destination.id,selected.id));}
           dropzone(target, id => assign(item.id, id));
           controls.set(item.id, target); stage.append(target);
         });
         const bank = node('div', 'ek-image-label-bank'); bank.setAttribute('aria-label', 'Label bank');
         def.options.filter(option => !Object.values(answers).includes(option.id)).forEach(option => {
-          const label = button(option.text, () => popover({text:option.text}, def.items.map((item,index) => ({id:item.id,text:item.prompt || `Target ${index+1}`})), '', targetId => { if (targetId) assign(targetId, option.id); }, label), 'ek-token');
+          const label = button(option.text, () => {}, 'ek-token');
+          keyboardPlacement(label,def.items,()=>-1,target=>assign(target.id,option.id));
           draggable(label, option.id); bank.append(label);
         });
         dropzone(bank, id => { Object.keys(answers).forEach(key => { if (answers[key] === id) delete answers[key]; }); save(); render(); });
@@ -854,7 +893,7 @@
         const imageMode = def.layout === 'image-grid';
         const ordered = node('div', imageMode ? 'ek-order-target ek-order-images-target' : 'ek-order-target');
         ordered.setAttribute('aria-label', imageMode ? 'Your picture order' : 'Your sentence');
-        if (!picked.length) ordered.append(node('span', 'ek-muted', imageMode ? 'Choose the pictures below in order.' : 'Choose the words below in order.'));
+
         const tokenButton = (token, handler, index) => {
           if (!imageMode) return button(token.text, handler, 'ek-token');
           const card = button('', handler, 'ek-order-image-card');
@@ -886,7 +925,7 @@
           });
           ordered.append(control);
         });
-        ordered.tabIndex = 0; dropzone(ordered, id => move(id));
+        ordered.tabIndex = 0; dropzone(ordered, (id,before) => move(id,before));
         const bank = node('div', imageMode ? 'ek-bank ek-order-image-bank' : 'ek-bank');
         def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => {
           const control = tokenButton(token, () => move(token.id), index); draggable(control, token.id); bank.append(control);
@@ -897,7 +936,8 @@
       if (def.kind === 'sort') {
         const bank = node('div', 'ek-bank'); const groups = node('div', 'ek-group-grid');
         const itemButton = item => {
-          const b = button(item.text, () => popover(item, def.groups, answers[item.id], value => { changed(item.id, value); render(); }, b), 'ek-token');
+          const b = button(item.text, () => {if(answers[item.id]){delete answers[item.id];save();render();}}, 'ek-token');
+          keyboardPlacement(b,def.groups,()=>def.groups.findIndex(group=>group.id===answers[item.id]),group=>{changed(item.id,group.id);render();});
           b.setAttribute('aria-label', `Choose group for ${item.text}`); draggable(b, item.id); controls.set(item.id, b); return b;
         };
         def.groups.forEach(group => {
@@ -910,7 +950,7 @@
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
-        const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
+        const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
     const lamps=new Map();
@@ -920,11 +960,11 @@
       controls.forEach((control,id)=>{
         if(!['matching','gaps','choice'].includes(def.kind))return;
         if(def.kind==='choice'&&control.tagName==='FIELDSET')return;
-        const lamp=def.kind==='gaps'?(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number')):node('span','ek-result-lamp');
+        const lamp=def.kind==='matching'?control.closest('.ek-card').querySelector('.ek-number'):(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number'));
         if(!lamp)return;lamp.classList.add('ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
-        if(def.kind==='matching')control.closest('.ek-card').append(lamp);
+        if(def.kind==='matching'){ /* Reuse the number badge, without a second indicator. */ }
         else if(def.kind==='choice'){
-          if(control.tagName==='FIELDSET')control.append(lamp);else control.after(lamp);
+          /* Discovery badge is already inside its field. */
         }else if(def.kind==='gaps'){ /* Number badge is already inside the answer field. */ }
         else control.after(lamp);
         lamps.set(id,lamp);
@@ -942,6 +982,9 @@
       controls.forEach((control,id)=>{
         const value=feedback[id];if(value)control.setAttribute('data-feedback',value);
         const lamp=lamps.get(id);if(lamp){lamp.dataset.result=value||'empty';lamp.setAttribute('aria-label',value==='correct'?'Correct':value==='retry'?'Try again':'Not answered');}
+      });
+      if(def.kind==='order'&&def.layout==='image-grid')body.querySelectorAll('.ek-order-target [data-ek-drag-id]').forEach((card,index)=>{
+        const badge=card.querySelector('.ek-order-number');if(badge){badge.dataset.result=def.correctOrder?.[index]===card.dataset.ekDragId?'correct':'retry';badge.setAttribute('aria-label',badge.dataset.result==='correct'?'Correct':'Try again');}
       });
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
       const showAnswers=def.feedback?.showAnswers??(def.layout!=='image-grid'&&def.layout!=='picture-word'&&def.kind!=='image-label');
@@ -1009,6 +1052,7 @@
       }
 
       if (def.kind === 'rule-page') {
+        syncRules?.(true);
         def.blocks.forEach(block => {
           if (block.type !== 'exercise') return;
           nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {});
@@ -1051,7 +1095,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { originalRender(); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);

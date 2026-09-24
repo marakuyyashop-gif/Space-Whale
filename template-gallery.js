@@ -24,7 +24,7 @@
     tokens:[3,1,2].map(n => ({id:`token${n}`,text:`[${pictures ? 'Event' : 'Chunk'} ${n}]`,...(pictures ? image(n) : {})})),correctOrder:['token1','token2','token3']
   });
   const sort = id => base(id,'sort','Sort into Groups', {
-    instruction:'Перетащите 1 в A, 2 в B. Можно менять группу или возвращать элемент в набор. Нажатие открывает выбор группы.',
+    instruction:'Перетащите 1 в A, 2 в B. Можно менять группу или возвращать элемент в набор. Нажмите на размещённый элемент, чтобы вернуть его. С клавиатуры: Alt + ← / →.',
     groups:[option('A','[Category A]'),option('B','[Category B]')],items:[{id:'item1',text:'[Item 1]',correctId:'A'},{id:'item2',text:'[Item 2]',correctId:'B'}]
   });
   const audio = (id, script = false) => base(id,'audio','Global Audio', {audio:sound,instruction:'[Listening instruction]',...(script ? {transcript:'[Audio script: three test tones]'} : {})});
@@ -40,18 +40,18 @@
     sort('sort-demo'),
     base('writing-demo','writing','Open Writing',{instruction:'[Writing instruction] Ответ оценивает преподаватель.',items:[{id:'response',prompt:'[Writing prompt]'}]}),
     base('presentation-demo','presentation','Speaking / Presentation',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'}]}),
-    base('image-label-demo','image-label','Image Label',{instruction:'Перетащите подписи в зоны. Подпись остаётся там до вашего следующего действия. Нажатие — доступная альтернатива.',...image(1),items:[{id:'target1',prompt:'[Target 1]',x:30,y:45,correctId:'label1'},{id:'target2',prompt:'[Target 2]',x:70,y:70,correctId:'label2'}],options:[option('label2','[Label 2]'),option('label1','[Label 1]')]}),
+    base('image-label-demo','image-label','Image Label',{instruction:'Перетащите подписи в зоны. Подпись остаётся там до вашего следующего действия. Нажатие возвращает подпись в набор. С клавиатуры: Alt + ← / →.',...image(1),items:[{id:'target1',prompt:'[Target 1]',x:30,y:45,correctId:'label1'},{id:'target2',prompt:'[Target 2]',x:70,y:70,correctId:'label2'}],options:[option('label2','[Label 2]'),option('label1','[Label 1]')]}),
     order('picture-order-demo',true),
     audio('audio-demo'),
     base('listen-repeat-demo','audio','Listen & Repeat',{layout:'listen-repeat',instruction:'Технические звуковые сигналы. Запуск следующего останавливает предыдущий.',items:[1,2].map(n=>({id:`item${n}`,text:`[Phrase ${n}]`,audio:sound}))}),
     matching('picture-word-demo','picture-word'),
     matching('word-definition-demo','word-definition'),
-    base('rule-page-demo','rule-page','Guided Discovery',{blocks:[{type:'text',title:'Examples',text:'[Example 1 with target form]\n[Example 2 with target form]',highlights:['target form']},{type:'exercise',id:'notice',exercise:choice('discovery-choice')},{type:'rule',title:'Rule',text:'[Rule explanation]',formula:'[Form] + [Form]',examples:['[Example]']}]}),
+    base('rule-page-demo','rule-page','Guided Discovery',{blocks:[{type:'text',title:'[Exercise instruction]',text:'[Example 1 with target form]\n[Example 2 with target form]',highlights:['target form']},{type:'exercise',id:'notice',exercise:choice('discovery-choice')},{type:'rule',title:'Rule',text:'[Rule explanation]',formula:'[Form] + [Form]',examples:['[Example]']}]}),
     {...gaps('error-correction-demo'),title:'Error Correction',instruction:'Исправьте только выделенный фрагмент. Технический ответ: [Correct form].',items:[{id:'correction1',segments:['[Unchanged context] ([Incorrect form]) → ',{id:'corrected',answers:['[Correct form]']},' [Unchanged ending].']}]},
     choice('image-choice-demo',false,true),
     choice('multiple-choice-demo',true),
     choice('image-multiple-demo',true,true),
-    base('speaking-language-demo','presentation','Speaking with Useful Language',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'},{type:'disclosure',title:'Useful Language',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),
+    base('speaking-language-demo','presentation','Speaking with Use phrases',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'},{type:'disclosure',title:'Use phrases',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),
     base('possible-answers-demo','presentation','Possible Answers',{blocks:[{type:'text',text:'[Open task prompt]'},{type:'disclosure',title:'Possible Answers',role:'possible-answers',text:'[Model response]'}]}),
     audio('audio-script-demo',true),
     base('reference-demo','rule-page','Rule / Language Reference',{blocks:[{type:'rule',title:'[Rule title]',text:'[Language reference]',formula:'[Form] + [Form]',examples:['[Example 1]','[Example 2]']}]}),

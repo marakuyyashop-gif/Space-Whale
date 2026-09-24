@@ -174,8 +174,8 @@
       }
     },
     {
-      menu: 'Useful language',
-      title: 'Useful language',
+      menu: 'Use phrases',
+      title: 'Use phrases',
       exercise: {
         version: 1,
         id: 'fair-translation',

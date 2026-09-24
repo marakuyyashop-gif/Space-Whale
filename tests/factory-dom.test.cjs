@@ -365,3 +365,39 @@ test('pointer pickup follows cursor; cancel restores source without changing ans
   assert.equal(source.classList.contains('ek-dragging'),false);
   assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
 });
+
+test('sort and label click returns assigned pieces without opening a dialog; bank click is inert',()=>{
+  for(const [id,bank,target] of [['sort-demo','.ek-bank','.ek-sort-group'],['image-label-demo','.ek-image-label-bank','.ek-image-label-target']]){
+    const s=setup(id);const piece=s.host.querySelector(`${bank} .ek-token`);s.fire(piece,'click');assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.host.querySelector('dialog'),null);
+    s.drag(piece,s.host.querySelector(target));const placed=id==='sort-demo'?s.host.querySelector(`${target} .ek-token`):s.host.querySelector(target);
+    s.fire(placed,'click');assert.equal(Object.values(s.mount.getAnswers()).filter(Boolean).length,0);assert.equal(s.host.querySelector('dialog'),null);assert.equal(s.host.querySelectorAll(`${bank} .ek-token`).length,2);
+  }
+});
+test('pointer order previews insertion, closes source space, commits exact slot and cancels cleanly',()=>{
+  const s=setup('order-demo');s.mount.setAnswers({order:['token3','token1','token2']});
+  const zone=s.host.querySelector('.ek-order-target');const tokens=[...zone.querySelectorAll('.ek-token')];
+  tokens.forEach((el,i)=>el.getBoundingClientRect=()=>({left:20+i*100,right:110+i*100,top:20,bottom:60,width:90,height:40}));
+  const source=tokens[2];s.document.elementFromPoint=()=>tokens[0];
+  s.fire(source,'pointerdown',{pointerId:5,button:0,clientX:240,clientY:40});
+  s.fire(s.document,'pointermove',{pointerId:5,clientX:25,clientY:40});
+  assert.ok(source.classList.contains('ek-drag-source-hidden'));assert.equal(zone.firstElementChild.className,'ek-drag-placeholder');assert.deepEqual(s.mount.getAnswers().order,['token3','token1','token2']);
+  s.fire(s.document,'pointerup',{pointerId:5,clientX:25,clientY:40});assert.deepEqual(s.mount.getAnswers().order,['token2','token3','token1']);assert.equal(s.host.querySelector('.ek-drag-placeholder'),null);
+  const next=s.host.querySelector('.ek-order-target .ek-token');s.document.elementFromPoint=()=>s.host.querySelector('.ek-order-target');
+  s.fire(next,'pointerdown',{pointerId:6,button:0,clientX:25,clientY:40});s.fire(s.document,'pointermove',{pointerId:6,clientX:500,clientY:40});s.fire(s.document,'pointercancel',{pointerId:6,clientX:500,clientY:40});
+  assert.deepEqual(s.mount.getAnswers().order,['token2','token3','token1']);assert.equal(s.host.querySelector('.ek-drag-source-hidden'),null);assert.equal(s.host.querySelector('.ek-drag-placeholder'),null);
+});
+test('picture order grades each position and clears its badge on edit',()=>{
+  const s=setup('picture-order-demo');s.mount.setAnswers({order:['token1','token3','token2']});s.click('OK');
+  assert.deepEqual([...s.host.querySelectorAll('.ek-order-target .ek-order-number')].map(el=>el.dataset.result),['correct','retry','retry']);
+  s.fire(s.host.querySelector('.ek-order-target .ek-order-image-card'),'click');assert.equal(s.host.querySelectorAll('.ek-order-number[data-result]').length,0);
+});
+test('guided discovery reveals rule explicitly and preserves checked exercise on collapse',()=>{
+  const s=setup('rule-page-demo',{syncChecks:true});const rule=s.host.querySelector('.ek-rule-block');assert.equal(rule.hidden,true);
+  const input=s.host.querySelector('select');input.value='B';s.fire(input,'change');s.click('OK');s.click('Show rule');assert.equal(rule.hidden,false);assert.equal(input.dataset.feedback,'correct');
+  s.click('Hide rule');assert.equal(rule.hidden,true);assert.equal(input.value,'B');
+  const count=s.changes.length;s.mount.setAnswers({notice:{question1:'A'},__sw_rule_visible:true});assert.equal(s.changes.length,count);assert.equal(rule.hidden,false);assert.equal(s.host.querySelector('select').value,'A');
+});
+test('writing uses one line; picture choices retain accessible names without visible option labels',()=>{
+  const s=setup('writing-demo');const input=s.host.querySelector('input[type=text]');assert.ok(input);assert.equal(s.host.querySelector('textarea'),null);input.value='A short answer';s.fire(input,'input');assert.equal(s.mount.getAnswers().response,'A short answer');
+  const pictures=setup('image-choice-demo');assert.equal(pictures.host.querySelectorAll('.ek-image-choice-option>span').length,0);assert.equal(pictures.host.querySelector('input').getAttribute('aria-label'),'[Option A]');
+});

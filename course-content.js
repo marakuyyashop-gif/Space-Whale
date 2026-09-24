@@ -396,7 +396,7 @@
             },
             {
               type: 'disclosure',
-              title: 'Useful language',
+              title: 'Use phrases',
               text: 'It’s very ...\nIt’s really ...\nIt’s a little ...\nIt’s a bit ...\nIt’s too ... for me.'
             }
           ]
