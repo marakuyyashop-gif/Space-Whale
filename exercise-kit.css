@@ -826,3 +826,6 @@
 .exercise-kit.ek-modern .ek-discovery-field>.ek-result-lamp[data-result=correct]{background:var(--sw-neu-success);color:transparent}
 .exercise-kit.ek-modern .ek-card>.ek-number.ek-result-lamp[data-result=retry],
 .exercise-kit.ek-modern .ek-discovery-field>.ek-result-lamp[data-result=retry]{background:var(--sw-neu-error);color:transparent}
+
+/* Reserved image area while the author supplies lesson artwork. */
+.exercise-kit .ek-image-pending { aspect-ratio: 1 / 1; min-height: 180px; background: transparent; }

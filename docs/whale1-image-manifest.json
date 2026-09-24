@@ -1,0 +1,68 @@
+[
+  {
+    "id": "weather-sunny",
+    "target": "sunny",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-sunny.png"
+  },
+  {
+    "id": "weather-cloudy",
+    "target": "cloudy",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-cloudy.png"
+  },
+  {
+    "id": "weather-windy",
+    "target": "windy",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-windy.png"
+  },
+  {
+    "id": "weather-rainy",
+    "target": "rainy",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-rainy.png"
+  },
+  {
+    "id": "weather-cold",
+    "target": "cold",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-cold.png"
+  },
+  {
+    "id": "weather-warm",
+    "target": "warm",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-warm.png"
+  },
+  {
+    "id": "weather-hot",
+    "target": "hot",
+    "usage": "Урок 6 · упражнение 2",
+    "path": "assets/whale1/weather-hot.png"
+  },
+  {
+    "id": "weather-speaking-1",
+    "target": "sunny + warm",
+    "usage": "Урок 6 · упражнение 8",
+    "path": "assets/whale1/weather-speaking-1.png"
+  },
+  {
+    "id": "weather-speaking-2",
+    "target": "cloudy + cold",
+    "usage": "Урок 6 · упражнение 8",
+    "path": "assets/whale1/weather-speaking-2.png"
+  },
+  {
+    "id": "weather-speaking-3",
+    "target": "rainy + windy",
+    "usage": "Урок 6 · упражнение 8",
+    "path": "assets/whale1/weather-speaking-3.png"
+  },
+  {
+    "id": "weather-speaking-4",
+    "target": "sunny + hot",
+    "usage": "Урок 6 · упражнение 8",
+    "path": "assets/whale1/weather-speaking-4.png"
+  }
+]

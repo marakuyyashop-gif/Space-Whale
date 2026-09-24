@@ -32,6 +32,7 @@
       return used;
     };
     const media = item => {
+      if (item.imagePending != null && typeof item.imagePending !== 'boolean') fail('imagePending must be boolean');
       if (item.image != null) {
         text(item.image, 'image'); text(item.alt, 'image alt');
         const url = new URL(item.image, 'https://preview.invalid/');
@@ -70,7 +71,7 @@
       array(def.blocks, 'blocks');
       def.blocks.forEach(block => {
         if (!['text', 'image', 'disclosure'].includes(block.type)) fail('Unsupported presentation block');
-        if (block.type === 'image') { text(block.image, 'image'); media(block); }
+        if (block.type === 'image') { if (!block.imagePending) text(block.image, 'image'); media(block); }
         else { text(block.text, 'block text'); if (block.type === 'disclosure') text(block.title, 'disclosure title'); }
       });
       return def;
@@ -113,7 +114,7 @@
           if (block.examples != null) { array(block.examples, 'rule examples'); block.examples.forEach(example => text(example, 'rule example')); }
         }
         if (block.type === 'image') {
-          text(block.image, 'image');
+          if (!block.imagePending) text(block.image, 'image');
           text(block.alt, 'image alt');
           media(block);
           if (block.caption != null && typeof block.caption !== 'string') fail('image caption must be text');
@@ -134,6 +135,12 @@
       const valid = options(def.tokens);
       def.tokens.forEach(token => media(token));
       if (def.correctOrder != null && (!Array.isArray(def.correctOrder) || def.correctOrder.length !== valid.size || new Set(def.correctOrder).size !== valid.size || def.correctOrder.some(id => !valid.has(id)))) fail('correctOrder must contain every token ID exactly once');
+      if (def.acceptedOrders != null) {
+        array(def.acceptedOrders, 'acceptedOrders');
+        def.acceptedOrders.forEach(order => {
+          if (!Array.isArray(order) || order.length !== valid.size || new Set(order).size !== valid.size || order.some(id => !valid.has(id))) fail('acceptedOrders must contain complete token permutations');
+        });
+      }
       return def;
     }
     if (def.kind === 'image-label') {
@@ -164,7 +171,7 @@
       def.items.forEach(item => {
         text(item.text, 'card text');
         media(item);
-        if (def.layout === 'picture-word' && !item.image) fail('Picture-word items need images');
+        if (def.layout === 'picture-word' && !item.image && !item.imagePending) fail('Picture-word items need images');
         key(item, valid);
         if (item.correctId != null) {
           if (assigned.has(item.correctId)) fail('Matching answer IDs must be unique');
@@ -222,12 +229,14 @@
     if (def.kind === 'presentation' || def.kind === 'audio' || def.kind === 'rule-page' || def.kind === 'stage') return results;
     if (def.kind === 'order') {
       const order = Array.isArray(answers.order) ? answers.order : [];
-      mark('order', order.length === def.tokens.length, def.correctOrder ? JSON.stringify(order) === JSON.stringify(def.correctOrder) : null);
+      const accepted = [...(def.correctOrder ? [def.correctOrder] : []), ...(def.acceptedOrders || [])];
+      mark('order', order.length === def.tokens.length, accepted.length ? accepted.some(candidate => JSON.stringify(order) === JSON.stringify(candidate)) : null);
     } else if (def.kind === 'gaps') {
       def.items.forEach(item => item.segments.forEach(segment => {
         if (typeof segment === 'string') return;
-        const value = normalize(answers[segment.id]);
-        mark(segment.id, !!value, segment.answers ? segment.answers.some(answer => normalize(answer) === value) : null);
+        const normalized = value => segment.normalization === 'phone' ? normalize(value).replace(/[\s()–—-]/g, '') : normalize(value);
+        const value = normalized(answers[segment.id]);
+        mark(segment.id, !!value, segment.answers ? segment.answers.some(answer => normalized(answer) === value) : null);
       }));
     } else {
       def.items.forEach(item => {
@@ -301,6 +310,12 @@
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
     };
     const illustration = item => {
+      if (item.imagePending && !item.image) {
+        const blank = node('div', 'ek-image ek-image-pending');
+        blank.setAttribute('aria-label', 'Изображение');
+        blank.setAttribute('role', 'img');
+        return blank;
+      }
       if (item.crop) {
         const crop = node('div', 'ek-image ek-crop-image');
         crop.setAttribute('role', 'img');
@@ -526,7 +541,7 @@
       dialog.append(close, node('h3', 'ek-title', def.title));
       const prompt = node('div', 'ek-prompt', item.text);
       prompt.setAttribute('aria-label', 'Phrase to match');
-      if (item.image) prompt.prepend(illustration(item));
+      if (item.image || item.imagePending) prompt.prepend(illustration(item));
       dialog.append(prompt);
       const choices = node('div', 'ek-options');
       available.forEach(option => {
@@ -726,7 +741,7 @@
           const card = node('article', pictureWord ? 'ek-card ek-picture-word-card' : 'ek-card');
           const number = node('span', pictureWord ? 'ek-number ek-picture-number' : 'ek-number', String(index + 1));
           card.append(number);
-          if (item.image) card.append(illustration(item));
+          if (item.image || item.imagePending) card.append(illustration(item));
           if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
           const promptText = pictureWord ? `Picture ${index + 1}` : item.text;

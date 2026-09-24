@@ -91,3 +91,12 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 ## Approved monochrome direction
 
 Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px instructions and controls. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.
+
+## Whale 1 content (2026-09-24)
+
+- `whale1-content.js` registers seven existing A1.1 / Whale 1 catalog IDs (57 stages). It contains data only and uses the existing shared templates.
+- `order.acceptedOrders` optionally lists additional complete permutations of token IDs. `correctOrder` remains supported. This does not change the one-answer contract of other closed kinds.
+- Presentation/rule-page image blocks and picture-word items may use `imagePending:true` with a stable `assetId` while the owner supplies artwork. They reserve an empty area, make no missing-file request and show no description in that area. Attach the real `image` URL and meaningful `alt` later; remove `imagePending`.
+- Whale 1 artwork mapping: `docs/whale1-image-manifest.json`; generation briefs: `docs/Whale_1_Image_Scenarios.md`. Weather conditions and temperature are separate matching sets.
+- `gap.normalization:'phone'` ignores spacing, parentheses and hyphens for phone input only. Email and symbol gaps retain their significant characters.
+- Audio remains script-only for this module. Teacher scripts live in stage guide data. They are not displayed in student live sessions. Listen & Repeat uses existing pending-audio support; do not attach template test tones.

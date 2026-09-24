@@ -204,7 +204,7 @@
 
   function guide(stage) {
     const data = stage.guide || {};
-    const entries = [['Aim', data.aim], ['TL', data.tl], ['Say', data.say || stage.exercise.instruction], ['Time', data.time]];
+    const entries = [['Aim', data.aim], ['TL', data.tl], ['Say', data.say || stage.exercise.instruction], ['Time', data.time], ['Notes', data.notes], ['Audio', data.audioScript]];
     const box = node('div', '', 'workspace-guide');
     entries.forEach(([label, value]) => {
       if (!value) return;
@@ -254,7 +254,7 @@
         const item=node('div','',`workspace-stage${active?' is-active':''}`);
         const title=stage.menu || stage.title || stage.exercise.title || `Задание ${index+1}`;
         item.append(link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section},active,'workspace-stage-link'));
-        if(active){const help=guide(stage);help.hidden=!guideVisible;item.append(help);}
+        if(active && (!liveMode || liveRole === 'teacher')){const help=guide(stage);help.hidden=!guideVisible;item.append(help);}
         stages.append(item);
       });
       if(!available.length) stages.append(node('p','Материалы пока не добавлены.','workspace-muted'));
@@ -270,6 +270,7 @@
     const studentLocked=locked(), inClass=route.panel==='class';
     panels.forEach(panel=>{const tab=document.getElementById(`${panel}Tab`);tab.setAttribute('aria-pressed',String(route.panel===panel));});
     guideToggle.setAttribute('aria-pressed',String(guideVisible));
+    guideToggle.hidden = liveMode && liveRole !== 'teacher';
     document.getElementById('workspacePanelTitle').textContent=inClass?'Класс':'Библиотека';
     const clockPanel=document.getElementById('workspaceClockPanel');
     if(Boolean(clockPanel.hidden)===inClass) expand(clockPanel,inClass);
