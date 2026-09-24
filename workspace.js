@@ -25,6 +25,13 @@
   const liveVersions = new Map();
   const liveSeenAt = new Map();
   const liveHydrated = new Set();
+  const replicas = new Map();
+  const replica = id => {
+    if (!replicas.has(id)) replicas.set(id, window.SpaceWhaleCollaboration.create(classroom.state.clientId));
+    return replicas.get(id);
+  };
+  const collaborative = () => Boolean(guestToken && window.SpaceWhaleCollaboration);
+  let mountedStorage = null;
 
   let mounted, mountedKey = '';
   let guideVisible = true;
@@ -163,7 +170,7 @@
     course.value = route.view === 'library' ? `${route.level}|${route.whale}` : route.view;
 
     const studentLocked = Boolean(liveMode && liveReady && liveRole === 'student');
-    course.disabled = studentLocked || Boolean(guestToken && liveReady);
+    course.disabled = studentLocked || Boolean(guestAllowedLessons);
     panels.forEach(panel => {
       const tab = document.getElementById(`${panel}Tab`);
       tab.setAttribute('aria-pressed', String(route.panel === panel));
@@ -254,7 +261,7 @@
     }
 
     const selected = selectedLesson();
-    start.disabled = Boolean(guestToken) || studentLocked || !selected?.stages.length || route.view === 'templates';
+    start.disabled = Boolean(guestAllowedLessons) || studentLocked || !selected?.stages.length || route.view === 'templates';
     tree.scrollTop = sidebarScroll;
   }
 
@@ -278,10 +285,10 @@
   }
 
   function acceptLivePayload(payload, options = {}) {
-    if (!payload?.exercise_id || !payload.response || liveRole !== 'teacher') return false;
+    if (!payload?.exercise_id || !payload.response || (liveRole !== 'teacher' && !collaborative())) return false;
     const exerciseId = payload.exercise_id;
 
-    if (options.database && (Date.now() - (liveSeenAt.get(exerciseId) || 0)) < 2000) return false;
+    if (!collaborative() && options.database && (Date.now() - (liveSeenAt.get(exerciseId) || 0)) < 2000) return false;
 
     if (payload.source_id && Number.isFinite(payload.seq)) {
       const versionKey = `${payload.source_id}:${exerciseId}`;
@@ -291,10 +298,19 @@
     }
 
     if (!options.database) liveSeenAt.set(exerciseId, Date.now());
-    liveAnswers.set(exerciseId, payload.response);
+    let response = payload.response;
+    if (collaborative()) {
+      const r = replica(exerciseId);
+      if (response.__sw_collab === 1) r.merge(response);
+      else if (!Object.keys(r.snapshot().entries).length) r.update(response);
+      response = r.answers();
+      if (!options.database) classroom.queueGuestSnapshot?.(exerciseId, r.snapshot());
+    }
+    liveAnswers.set(exerciseId, response);
 
     if (route.exercise === exerciseId && mounted?.setAnswers) {
-      mounted.setAnswers(payload.response);
+      mounted.setAnswers(response);
+      if (mountedStorage) storeAnswers(mountedStorage.key, mountedStorage.signature, collaborative() ? replica(exerciseId).snapshot() : response);
     }
     return true;
   }
@@ -303,7 +319,7 @@
     if (!liveMode || !liveReady || !exerciseId || liveHydrated.has(exerciseId)) return;
     liveHydrated.add(exerciseId);
 
-    if (liveRole === 'teacher') {
+    if (liveRole === 'teacher' || collaborative()) {
       try {
         const saved = await classroom.loadExerciseResponse(exerciseId);
         if (saved?.response) {
@@ -317,11 +333,15 @@
       } catch (error) {
         console.error('[Space Whale] Could not restore live exercise response', error);
       }
+      if (collaborative()) {
+        classroom.queueGuestSnapshot?.(exerciseId,replica(exerciseId).snapshot());
+        await classroom.sendExerciseSnapshot(exerciseId,replica(exerciseId).snapshot());
+      }
       try { await classroom.requestExerciseState(exerciseId); }
       catch (error) { console.error('[Space Whale] Could not request peer state', error); }
     }
 
-    if (liveRole === 'student' && hasAnswers(localAnswers)) {
+    if (liveRole === 'student' && !collaborative() && hasAnswers(localAnswers)) {
       try { await classroom.sendExerciseSnapshot(exerciseId, localAnswers); }
       catch (error) { console.error('[Space Whale] Could not restore pending student state', error); }
     }
@@ -345,8 +365,8 @@
 
     if (!stage || !visible) {
       const empty = node('section', '', 'workspace-empty');
-      empty.append(node('h1', selected?.title || 'Выберите тему'));
-      empty.append(node('p', selected ? 'В этом разделе пока нет заданий.' : 'Откройте тему в библиотеке слева.'));
+      empty.append(node('h1', selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Выберите тему')));
+      empty.append(node('p', selected ? 'В этом разделе пока нет заданий.' : (liveRole === 'student' ? 'Задание появится, когда преподаватель откроет его.' : 'Откройте тему в библиотеке слева.')));
       host.append(empty); document.title = 'Space Whale — Learning Space'; return;
     }
 
@@ -359,18 +379,28 @@
         : `space-whale:workspace:v1:${selected.id}:${exercise.id}`;
     const signature = JSON.stringify(exercise);
     const localAnswers = readAnswers(storageKey, signature);
-    const initialAnswers = liveMode && liveRole === 'teacher'
+    mountedStorage = {key:storageKey, signature};
+    if (collaborative()) {
+      const r=replica(exercise.id);
+      if (localAnswers.__sw_collab === 1) r.merge(localAnswers);
+      liveAnswers.set(exercise.id,r.answers());
+    }
+    const initialAnswers = liveMode && (liveRole === 'teacher' || collaborative())
       ? (liveAnswers.get(exercise.id) || {})
       : localAnswers;
 
     mounted = kit.mount(host, exercise, {
       answers: initialAnswers,
+      syncChecks: collaborative(),
       readOnly: false,
       onChange: answers => {
-        storeAnswers(storageKey, signature, answers);
-        if (liveMode && liveReady && liveRole === 'student') {
-          classroom.sendExerciseDraft(exercise.id, answers)
-            .catch(error => console.error('[Space Whale] Live answer sync failed', error));
+        const response = collaborative() ? replica(exercise.id).update(answers) : answers;
+        liveAnswers.set(exercise.id, answers);
+        liveSeenAt.set(exercise.id, Date.now());
+        storeAnswers(storageKey, signature, response);
+        if (liveMode && liveReady && (liveRole === 'student' || collaborative())) {
+          classroom.sendExerciseDraft(exercise.id, response)
+            .catch(error => { console.error('[Space Whale] Live answer sync failed', error); notice.textContent='Связь прервана. Ответы сохранены на этом устройстве; дождитесь подключения.'; });
         }
       }
     });
@@ -414,13 +444,22 @@
     }
 
     const handlers = {
+      onReconnect: async () => {
+        liveHydrated.clear();
+        const shared=await classroom.loadSharedState(sessionId);
+        if (liveRole==='student' && shared) applyRemoteNavigation(shared);
+        if (route.exercise) {
+          await hydrateLiveExercise(route.exercise, {});
+          if (collaborative()) await classroom.sendExerciseDraft(route.exercise, replica(route.exercise).snapshot());
+        }
+      },
       onNavigate: applyRemoteNavigation,
       onExerciseDraft: payload => acceptLivePayload(payload),
       onExerciseResponse: payload => acceptLivePayload(payload),
       onStateSnapshot: payload => acceptLivePayload(payload),
       onStateRequest: payload => {
-        if (liveRole !== 'student' || payload?.exercise_id !== route.exercise || !mounted?.getAnswers) return;
-        classroom.sendExerciseSnapshot(payload.exercise_id, mounted.getAnswers())
+        if ((!collaborative() && liveRole !== 'student') || payload?.exercise_id !== route.exercise || !mounted?.getAnswers) return;
+        classroom.sendExerciseSnapshot(payload.exercise_id, collaborative() ? replica(payload.exercise_id).snapshot() : mounted.getAnswers())
           .catch(error => console.error('[Space Whale] State snapshot failed', error));
       },
       onExerciseDatabaseChange: row => {
@@ -444,7 +483,9 @@
     liveReady = true;
     liveRole = result.role;
     liveSession = result.session;
-    guestAllowedLessons = guestToken ? new Set(result.session.allowed_lesson_ids || []) : null;
+    const inviteButton=document.getElementById('inviteStudent');
+    if (inviteButton) { inviteButton.hidden=liveRole!=='teacher';inviteButton.textContent='Ссылка для ученицы'; }
+    guestAllowedLessons = guestToken && !result.session.allowed_lesson_ids?.includes('*') ? new Set(result.session.allowed_lesson_ids || []) : null;
 
     if (!liveRole) throw new Error('This account is not a participant in the lesson session.');
 
@@ -524,7 +565,7 @@
 
   start.addEventListener('click', () => {
     const selected = selectedLesson();
-    if (!selected?.stages.length || guestToken || (liveMode && liveReady && liveRole === 'student')) return;
+    if (!selected?.stages.length || guestAllowedLessons || (liveMode && liveReady && liveRole === 'student')) return;
     classIds.add(selected.id); saveClass();
     go({ ...route, panel: 'class', section: stageSection(selected.stages[0]), exercise: selected.stages[0].exercise.id });
   });
@@ -540,6 +581,27 @@
     syncTeacherNavigation();
   });
 
+  const invite = document.getElementById('inviteStudent');
+  if (invite) {
+    invite.hidden = Boolean(sessionId);
+    invite.addEventListener('click', async () => {
+      invite.disabled=true;
+      try {
+        if (!guestToken) {
+          if (!await classroom.getCurrentUser()) { location.href='login.html?next='+encodeURIComponent('classroom.html'); return; }
+          const result=await window.spaceWhaleSupabase.rpc('create_guest_workspace');
+          if (result.error) throw result.error;
+          location.href='classroom.html?guest='+encodeURIComponent(result.data.token);
+          return;
+        }
+        const url=new URL('classroom.html',location.href);url.searchParams.set('guest',guestToken);
+        const field=document.getElementById('guestInviteLink');field.value=url.href;field.hidden=false;
+        try { await navigator.clipboard.writeText(url.href); notice.textContent='Ссылка скопирована. Отправь её ученице — регистрация ей не нужна.'; }
+        catch { field.focus();field.select();notice.textContent='Скопируй ссылку из поля и отправь ученице.'; }
+      } catch(error) {notice.textContent=error.message || 'Не удалось создать занятие.';}
+      finally {invite.disabled=false;}
+    });
+  }
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();
 

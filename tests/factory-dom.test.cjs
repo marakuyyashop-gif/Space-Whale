@@ -286,3 +286,13 @@ test('grouped listening keeps independent components and answers; Check label is
   } finally { kit.uiLabels.check=old; }
   assert.equal(setup('progressive-stage-demo').host.classList.contains('ek-stage-grouped'),false);
 });
+
+test('shared Check result restores remotely without echo; editing clears shared Check',()=>{
+ const a=setup('choice-demo',{syncChecks:true});
+ const input=a.host.querySelectorAll('input')[1];input.checked=true;a.fire(input,'change');a.click('Check');
+ assert.equal(a.mount.getAnswers().__sw_checked,true);
+ const b=setup('choice-demo',{syncChecks:true});b.mount.setAnswers(a.mount.getAnswers());
+ assert.ok(b.host.querySelector('[data-feedback=correct]'));assert.equal(b.changes.length,0);
+ const other=b.host.querySelectorAll('input')[0];other.checked=true;b.fire(other,'change');
+ assert.equal(b.mount.getAnswers().__sw_checked,undefined);assert.equal(b.host.querySelectorAll('[data-feedback]').length,0);
+});

@@ -372,7 +372,7 @@
       controls.forEach(control => control.removeAttribute('data-feedback'));
       resultsBox.replaceChildren(); announce('');
     };
-    const save = () => { clearFeedback(); config.onChange?.(clone(answers)); };
+    const save = () => { if (config.syncChecks) delete answers.__sw_checked; clearFeedback(); config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
     const draggable = (el, id) => {
       el.addEventListener('pointerdown', event => {
@@ -504,7 +504,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { readOnly: Boolean(config.readOnly), answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
+          const handle = mount(child, block.exercise, { syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -580,6 +580,7 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
+              syncChecks: Boolean(config.syncChecks),
               readOnly: Boolean(config.readOnly),
               answers: answers[block.id] || {},
               onChange: value => {
@@ -840,7 +841,7 @@
         const input = node('textarea'); input.rows = 3; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
       });
     }
-    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button(uiLabels.check, () => {
+    const checkFeedback = () => {
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -867,13 +868,17 @@
       }
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
+    };
+    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) actions.append(button(uiLabels.check, () => {
+      checkFeedback();
+      if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
     }));
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {
       const reset = button('↻', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
       reset.setAttribute('aria-label', 'Reset exercise'); reset.title = 'Reset exercise'; actions.append(reset);
     }
 
-    const setAnswers = next => {
+    const setAnswersCore = next => {
       answers = clone(next || {});
       clearFeedback();
 
@@ -916,6 +921,8 @@
 
       render();
     };
+    const setAnswers = next => { setAnswersCore(next); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+
     const renderReadOnly = () => {
       if (!config.readOnly) return;
       body.querySelectorAll('button,input,textarea,select').forEach(control => {
@@ -925,7 +932,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { originalRender(); renderReadOnly(); };
+    render = () => { originalRender(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);

@@ -131,6 +131,7 @@ function app(search = '', storage = new Map(), live = null) {
       };
       mounts.push(record); return record;
     }},
+    SpaceWhaleCollaboration: live?.collaboration || null,
     SpaceWhaleClassroom: live?.classroom || null,
     addEventListener(name, cb) {events[name]=cb;}
   };
@@ -344,4 +345,65 @@ test('temporary guest Workspace limits the room to the two allowed lessons and k
   });
   assert.ok(student.location.search.includes('lesson=a1-2-w4-l2'));
   assert.equal(student.mounts.at(-1).exercise.id, 'a12w4l2-opening');
+});
+
+
+test('empty guest room supports both editors, teacher navigation and restored shared state', async () => {
+  const flush = () => new Promise(resolve => setImmediate(resolve));
+  const collaboration = require('../collaboration-state.js');
+  const peers = [];
+  const saved = new Map();
+  let shared = {current_page_id:null,current_exercise_id:null};
+  function participant(role) {
+    const handlers = {};
+    const peer = {role, handlers}; peers.push(peer);
+    const send = (exercise_id, response) => {
+      peers.filter(p => p !== peer).forEach(p => p.handlers.onExerciseDraft?.({exercise_id,response}));
+    };
+    return {collaboration, handlers, classroom:{
+      state:{clientId:role,channel:{presenceState:()=>({})}},
+      async connectGuest(token, incoming) { Object.assign(handlers,incoming);return {role,session:{id:'guest:test',guest:true,allowed_lesson_ids:['*']}}; },
+      async loadSharedState(){return shared;},
+      async loadExerciseResponse(id){return saved.has(id) ? {response:saved.get(id)} : null;},
+      queueGuestSnapshot(id,response){saved.set(id,response);},
+      async requestExerciseState(exercise_id){peers.filter(p=>p!==peer).forEach(p=>p.handlers.onStateRequest?.({exercise_id}));},
+      async sendExerciseDraft(id,response){send(id,response);},
+      async sendExerciseSnapshot(id,response){send(id,response);},
+      async navigate(id,page){assert.equal(role,'teacher');shared={current_page_id:page,current_exercise_id:id};peers.filter(p=>p!==peer).forEach(p=>p.handlers.onNavigate?.(shared));}
+    }};
+  }
+  const teacherLive=participant('teacher');
+  const teacher=app('?guest=test',new Map(),teacherLive);
+  await flush();await flush();
+  const studentLive=participant('student');
+  const student=app('?guest=test',new Map(),studentLive);
+  await flush();await flush();
+  assert.equal(teacher.mounts.length,0);
+  assert.equal(student.mounts.length,0);
+  assert.equal(teacher.nodes.get('workspaceCourse').disabled,false);
+  assert.equal(student.nodes.get('workspaceCourse').disabled,true);
+  teacher.nodes.get('workspaceCourse').change('A1.2|4');
+  buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
+  anchors(teacher).find(a=>a.textContent==='Stage 2').click();
+  await flush();await flush();
+  assert.equal(student.mounts.at(-1).exercise.id,teacher.mounts.at(-1).exercise.id);
+  assert.equal(student.mounts.at(-1).config.readOnly,false);
+  assert.equal(teacher.mounts.at(-1).config.syncChecks,true);
+  teacher.mounts.at(-1).config.onChange({pw1:'bright'});
+  assert.equal(student.mounts.at(-1).answers.pw1,'bright');
+  student.mounts.at(-1).config.onChange({pw1:'bright',pw2:'dark',__sw_checked:true});
+  assert.equal(teacher.mounts.at(-1).answers.pw2,'dark');
+  assert.equal(teacher.mounts.at(-1).answers.__sw_checked,true);
+  const before=student.location.search;
+  student.nodes.get('workspaceCourse').change('A1.1|1');
+  assert.equal(student.location.search,before);
+  const server=collaboration.create('server');
+  server.merge(saved.get(teacher.mounts.at(-1).exercise.id));
+  server.update({...server.answers(),pw3:'warm'});
+  saved.set(teacher.mounts.at(-1).exercise.id,server.snapshot());
+  await teacherLive.handlers.onReconnect();
+  assert.equal(teacher.mounts.at(-1).answers.pw3,'warm');
+  assert.equal(student.mounts.at(-1).answers.pw3,'warm');
+  teacher.mounts.at(-1).config.onChange({});
+  assert.equal(JSON.stringify(student.mounts.at(-1).answers),'{}');
 });

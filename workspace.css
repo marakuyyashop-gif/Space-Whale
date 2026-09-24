@@ -55,3 +55,7 @@
   .unified-workspace .class-content { inset: 0; }
   .unified-workspace .lesson-scroll { padding: 28px 18px 60px !important; }
 }
+
+.workspace-invite { margin: 10px 12px; padding: 9px 12px; border: 0; border-radius: 12px; background: #292b2f; color: white; font: 500 13px Onest, sans-serif; cursor: pointer; }
+.workspace-invite-link { box-sizing: border-box; width: calc(100% - 24px); margin: 0 12px 8px; padding: 8px; border: 1px solid #dedfe2; border-radius: 8px; font-size: 12px; }
+.workspace-invite[hidden], .workspace-invite-link[hidden] { display: none; }

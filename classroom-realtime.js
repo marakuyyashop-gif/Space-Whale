@@ -171,7 +171,10 @@
     });
 
     channel
-      .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
+      .on("broadcast", { event: "navigate" }, async () => {
+        try { const saved=await loadSharedState(); if(saved) handlers.onNavigate?.(saved); }
+        catch(error) { console.error("Navigation restore failed",error); }
+      })
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
       .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
@@ -182,6 +185,7 @@
       .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
       .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
 
+    let subscribedOnce = false;
     await new Promise((resolve, reject) => {
       channel.subscribe(async (status, error) => {
         if (error) reject(error);
@@ -192,7 +196,9 @@
             guest: true,
             online_at: new Date().toISOString()
           });
+          const reconnect = subscribedOnce; subscribedOnce = true;
           resolve();
+          if (reconnect) Promise.resolve(handlers.onReconnect?.()).catch(console.error);
         }
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           reject(error || new Error(status));
@@ -206,11 +212,13 @@
 
   async function broadcast(event, payload) {
     if (!state.channel) throw new Error("Lesson realtime channel is not connected.");
-    return state.channel.send({
+    const result = await state.channel.send({
       type: "broadcast",
       event,
       payload
     });
+    if (result !== "ok") throw new Error("Realtime message was not delivered.");
+    return result;
   }
 
   async function startLesson() {
@@ -322,7 +330,7 @@
 
   async function persistDraftSnapshot(exerciseId, response) {
     if (state.guestToken) {
-      const { data, error } = await client.rpc("save_guest_lesson_response", {
+      const { data, error } = await client.rpc(response?.__sw_collab === 1 ? "merge_guest_lesson_response" : "save_guest_lesson_response", {
         p_token: state.guestToken,
         p_exercise_id: exerciseId,
         p_response: response
@@ -349,8 +357,18 @@
     if (error) throw error;
   }
 
+  function queueGuestSnapshot(exerciseId, response) {
+    clearTimeout(draftTimers.get(exerciseId));
+    draftTimers.set(exerciseId, setTimeout(() => {
+      draftTimers.delete(exerciseId);
+      persistDraftSnapshot(exerciseId, response).catch(error => {
+        console.error('[Space Whale] Snapshot failed', error);
+      });
+    }, 750));
+  }
+
   async function sendExerciseDraft(exerciseId, response) {
-    if (state.role !== "student") {
+    if (state.role !== "student" && !(state.guestToken && state.role === "teacher")) {
       throw new Error("Exercise drafts are sent by the student.");
     }
 
@@ -366,12 +384,7 @@
 
     const sendPromise = broadcast("exercise_draft", payload);
 
-    clearTimeout(draftTimers.get(exerciseId));
-    draftTimers.set(exerciseId, setTimeout(() => {
-      persistDraftSnapshot(exerciseId, response).catch((error) => {
-        console.error("[Space Whale] Draft snapshot failed", error);
-      });
-    }, 750));
+    queueGuestSnapshot(exerciseId, response);
 
     return sendPromise;
   }
@@ -440,7 +453,7 @@
   }
 
   async function sendExerciseSnapshot(exerciseId, response) {
-    if (state.role !== "student" || !state.channel || !exerciseId) return;
+    if ((state.role !== "student" && !(state.guestToken && state.role === "teacher")) || !state.channel || !exerciseId) return;
     return broadcast("state_snapshot", {
       exercise_id: exerciseId,
       response,
@@ -453,6 +466,8 @@
   }
 
   async function disconnect() {
+    draftTimers.forEach(timer => clearTimeout(timer));
+    draftTimers.clear();
     if (!client || !state.channel) return;
     await client.removeChannel(state.channel);
     state.channel = null;
@@ -474,6 +489,7 @@
     startLesson,
     syncAudio,
     sendExerciseDraft,
+    queueGuestSnapshot,
     saveExerciseResponse,
     requestExerciseState,
     sendExerciseSnapshot,

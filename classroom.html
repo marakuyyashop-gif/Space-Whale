@@ -6,13 +6,15 @@
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
 <link rel="stylesheet" href="exercise-kit.css?v=20260924-monochrome">
 <link rel="stylesheet" href="learning-space.css?v=20260924-monochrome">
-<link rel="stylesheet" href="workspace.css?v=2">
+<link rel="stylesheet" href="workspace.css?v=20260924-guest">
 </head><body class="learning-space unified-workspace">
 <div class="reference-app">
 <aside class="app-sidebar" aria-label="Библиотека и задания">
 <div class="workspace-session-heading"><a href="schedule.html" title="Открыть расписание">Свободное занятие · ученик не выбран</a></div>
 <div class="workspace-course-bar"><label class="workspace-visually-hidden" for="workspaceCourse">Выберите уровень и Whale</label><select id="workspaceCourse"></select></div>
 <div id="workspaceTopics" class="workspace-tree" aria-label="Темы и упражнения"></div>
+<button id="inviteStudent" type="button" class="workspace-invite">Пригласить ученицу</button>
+<input id="guestInviteLink" class="workspace-invite-link" aria-label="Ссылка для ученицы" readonly hidden>
 <p id="workspaceNotice" class="workspace-notice" role="status"></p>
 <div class="workspace-footer">
 <nav class="workspace-bottom-nav" aria-label="Разделы рабочей среды">
@@ -34,12 +36,13 @@
 <noscript>Для открытия упражнений включите JavaScript.</noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js?v=20260920-backend-v1"></script>
-<script src="classroom-realtime.js?v=20260922-guest-live"></script>
-<script src="exercise-kit.js?v=20260923-audio-wave"></script>
+<script src="classroom-realtime.js?v=20260924-guest-collab"></script>
+<script src="exercise-kit.js?v=20260924-shared-check"></script>
 <script src="template-gallery.js?v=20260923-audio-wave"></script>
 <script src="lesson-draft-first-day-school.js?v=20260922"></script>
 <script src="lesson-draft-school-fair.js?v=20260922"></script>
 <script src="course-content.js?v=20260922-clothes-photo"></script>
 <script src="workspace-catalog.js?v=1"></script>
-<script src="workspace.js?v=20260922-guest-live"></script>
+<script src="collaboration-state.js?v=20260924-guest"></script>
+<script src="workspace.js?v=20260924-guest-collab"></script>
 </body></html>
