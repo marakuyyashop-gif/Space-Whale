@@ -6,7 +6,7 @@
   const option = (id, text) => ({id,text});
   const sound = 'assets/factory/test-tone.wav';
   const matching = (id, layout = 'cards') => base(id,'matching',layout === 'word-definition' ? 'Word–Definition' : layout === 'picture-word' ? 'Picture–Word' : 'Match the Halves', {
-    layout, instruction:'Нажмите + и выберите ответ. Уже использованный ответ можно перенести в другую карточку.',
+    layout, instruction:'Выберите подходящую пару.',
     items:[1,2,3].map(n => ({id:`item${n}`,text:layout === 'word-definition' ? `[Word ${n}]` : `[Sentence beginning ${n}]`,correctId:`option${n}`,...(layout === 'picture-word' ? image(n) : {})})),
     options:[2,3,1].map(n => option(`option${n}`,layout === 'word-definition' ? `[Definition ${n}]` : layout === 'picture-word' ? `[Word ${n}]` : `[Sentence ending ${n}]`))
   });
@@ -16,7 +16,7 @@
     items:[{id:'sentence1',segments:['[Sentence beginning] ',{id:'gap1',answers:['[Form 1]'],...(select ? {options:['[Form 2]','[Form 1]']} : {})},' [Sentence ending].']}]
   });
   const choice = (id, multiple = false, pictures = false) => base(id,'choice',`${pictures ? 'Image' : 'Text'} ${multiple ? 'Multiple Select' : 'Single Choice'}`, {
-    multiple,layout:pictures ? 'image-grid' : 'list',instruction:multiple ? 'Выберите A и C. Проверка появится только после Check.' : 'Выберите B. До Check можно изменить ответ.',
+    multiple,layout:pictures ? 'image-grid' : 'list',instruction:multiple ? 'Выберите A и C. Проверка появится только после OK.' : 'Выберите B. До OK можно изменить ответ.',
     items:[{id:'question1',prompt:'[Question]',options:['A','B','C'].map((text,i) => ({id:text,text:`[Option ${text}]`,...(pictures ? image(i+1) : {})})),...(multiple ? {correctIds:['A','C']} : {correctId:'B'})}]
   });
   const order = (id, pictures = false) => base(id,'order',pictures ? 'Picture / Event Order' : 'Sentence / Chunk Order', {
