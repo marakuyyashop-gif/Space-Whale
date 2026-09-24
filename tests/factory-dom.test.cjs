@@ -332,6 +332,36 @@ test('height motion keeps content until closing finishes and cancels stale closi
 test('nested feedback remains visible when another stage opens and closes',()=>{
   const s=setup('progressive-stage-demo',{syncChecks:true});s.click('Show next exercise');
   const section=s.host.querySelectorAll('.ek-stage-section')[1];const input=section.querySelectorAll('input')[1];input.checked=true;s.fire(input,'change');s.fire(section.querySelector('.ek-check'),'click');
-  assert.equal(section.querySelector('.ek-result-lamp').dataset.result,'correct');s.click('Show next exercise');s.click('Свернуть задание');
-  assert.equal(section.querySelector('.ek-result-lamp').dataset.result,'correct');
+  assert.equal(section.querySelector('.ek-question').dataset.feedback,'correct');s.click('Show next exercise');s.click('Свернуть задание');
+  assert.equal(section.querySelector('.ek-question').dataset.feedback,'correct');
+});
+
+test('inline and typed gap feedback belongs to the number inside the field',()=>{
+  for(const id of ['inline-demo','typed-demo']){
+    const s=setup(id);const field=s.host.querySelector('.ek-gap');
+    const badge=s.host.querySelector('.ek-gap-number');
+    assert.ok(field.contains(badge)||field.parentElement.contains(badge));
+    assert.equal(s.host.querySelectorAll('.ek-sentence-number').length,0);
+    s.click('OK');assert.equal(badge.dataset.result,'empty');
+    if(id==='inline-demo'){
+      s.fire(field,'click');s.fire(s.host.querySelector('.ek-inline-option'),'click');
+      assert.equal(s.host.querySelector('.ek-gap-number'),badge);
+      assert.equal(s.host.querySelector('.ek-inline-menu').hidden,true);
+      assert.equal(s.host.querySelectorAll('.ek-inline-option .ek-gap-number').length,0);
+    }else{field.value='wrong';s.fire(field,'input');}
+    s.click('OK');assert.ok(['correct','retry'].includes(badge.dataset.result));
+    s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-gap-number').dataset.result,undefined);
+  }
+});
+test('pointer pickup follows cursor; cancel restores source without changing answers',()=>{
+  const s=setup('order-demo'),source=s.host.querySelector('.ek-token');
+  s.fire(source,'pointerdown',{pointerId:9,button:0,clientX:10,clientY:100});
+  s.fire(s.document,'pointermove',{pointerId:9,clientX:70,clientY:20});
+  const ghost=s.host.querySelector('.ek-drag-ghost');assert.ok(ghost);
+  assert.equal(ghost.style.transform,'translate(60px,-80px)');
+  assert.equal(source.classList.contains('ek-dragging'),true);
+  s.fire(s.document,'pointercancel',{pointerId:9,clientX:70,clientY:20});
+  assert.equal(s.host.querySelector('.ek-drag-ghost'),null);
+  assert.equal(source.classList.contains('ek-dragging'),false);
+  assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
 });

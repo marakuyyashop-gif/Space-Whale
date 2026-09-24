@@ -287,6 +287,7 @@
     let visibleCount = 0;
     let draggedId = null;
     let pointerDrag = null, suppressDragClick = false;
+    const dragFlights = new Set();
     const dropTargets = new WeakMap();
     let nestedMounts = [];
     const nestedMountsByBlock = new Map();
@@ -409,6 +410,7 @@
     const save = () => { if (config.syncChecks) delete answers.__sw_checked; clearFeedback(); config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
     const draggable = (el, id) => {
+      el.dataset.ekDragId=id;
       el.addEventListener('pointerdown', event => {
         suppressDragClick = false;
         if (config.readOnly || (event.button != null && event.button !== 0)) return;
@@ -433,8 +435,18 @@
     const pointerTarget = event => doc.elementFromPoint?.(event.clientX,event.clientY)?.closest('.ek-dropzone');
     const pointerMove = event => {
       if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
-      if (!pointerDrag.moved && Math.hypot(event.clientX-pointerDrag.x,event.clientY-pointerDrag.y) < 6) return;
-      pointerDrag.moved = true; pointerDrag.el.classList.add('ek-dragging');
+      const drag=pointerDrag;
+      if (!drag.moved && Math.hypot(event.clientX-drag.x,event.clientY-drag.y) < 6) return;
+      if(!drag.moved){
+        drag.rect=drag.el.getBoundingClientRect();
+        drag.ghost=drag.el.cloneNode(true);drag.ghost.removeAttribute('id');drag.ghost.removeAttribute('data-ek-drag-id');
+        drag.ghost.classList.add('ek-drag-ghost');drag.ghost.setAttribute('aria-hidden','true');drag.ghost.tabIndex=-1;
+        Object.assign(drag.ghost.style,{position:'fixed',left:`${drag.rect.left}px`,top:`${drag.rect.top}px`,width:`${drag.rect.width}px`,height:`${drag.rect.height}px`,margin:'0',pointerEvents:'none',zIndex:'9999'});
+        host.append(drag.ghost);dragFlights.add(drag.ghost);
+        drag.el.classList.add('ek-dragging');drag.moved=true;
+      }
+      drag.dx=event.clientX-drag.x;drag.dy=event.clientY-drag.y;
+      drag.ghost.style.transform=`translate(${drag.dx}px,${drag.dy}px)`;
       if (event.cancelable) event.preventDefault();
       body.querySelectorAll('.ek-drag-over').forEach(el => el.classList.remove('ek-drag-over'));
       const target = pointerTarget(event);
@@ -443,19 +455,29 @@
     const pointerEnd = event => {
       if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
       const drag = pointerDrag; pointerDrag = null;
-      drag.el.classList.remove('ek-dragging');
       body.querySelectorAll('.ek-drag-over').forEach(el => el.classList.remove('ek-drag-over'));
-      if (!drag.moved || event.type === 'pointercancel') return;
+      if (!drag.moved) return;
       suppressDragClick = true;
-      const target = pointerTarget(event);
+      const target = event.type==='pointercancel'?null:pointerTarget(event);
       if (!config.readOnly && target && dropTargets.has(target)) dropTargets.get(target)(drag.id);
+      const destination=[...body.querySelectorAll('[data-ek-drag-id]')].find(el=>el.dataset.ekDragId===drag.id)||drag.el;
+      drag.el.classList.remove('ek-dragging');
+      const finish=()=>{destination.classList.remove('ek-dragging');drag.ghost.remove();dragFlights.delete(drag.ghost);};
+      const rect=destination.getBoundingClientRect();
+      if(!drag.ghost.animate||doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches){finish();return;}
+      destination.classList.add('ek-dragging');
+      const animation=drag.ghost.animate([
+        {transform:`translate(${drag.dx}px,${drag.dy}px)`},
+        {transform:`translate(${rect.left-drag.rect.left}px,${rect.top-drag.rect.top}px)`}
+      ],{duration:190,easing:'cubic-bezier(.22,.7,.25,1)',fill:'forwards'});
+      animation.onfinish=finish;animation.oncancel=finish;
     };
     const dragClick = event => {
       if (event.detail === 0) { suppressDragClick = false; return; } // keyboard/programmatic activation
       if (!suppressDragClick) return;
       suppressDragClick = false; event.preventDefault(); event.stopImmediatePropagation();
     };
-    const closeDialog = () => { if (!dialog?.open)return;const target=dialog;if(modern)expand(target,false,()=>target.close());else target.close(); };
+    const closeDialog = () => { if(dialog?.open)dialog.close(); };
     const onKeydown = event => { if (event.key === 'Escape') { if(dialog?.open)event.preventDefault();closeDialog(); dismissInline(); } };
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
@@ -500,7 +522,7 @@
         const replacement = [...body.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === currentTrigger.getAttribute('aria-label'));
         if (host.isConnected) (currentTrigger.isConnected ? currentTrigger : replacement)?.focus();
       }, { once: true });
-      host.append(dialog); dialog.showModal();if(modern){dialog.hidden=true;expand(dialog,true);}
+      host.append(dialog); dialog.showModal();
     }
     function richText(value, highlights = []) {
       const el = node('p', 'ek-copy');
@@ -718,7 +740,7 @@
         let gapNumber = 0;
         def.items.forEach((item, index) => {
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
-          if (def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
+          if (!modern && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
             if (typeof segment === 'string') { row.append(doc.createTextNode(segment)); return; }
             gapNumber += 1;
@@ -729,16 +751,17 @@
               const wrap = node('span', 'ek-inline-choice');
               const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
               menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
+              const badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);
               const paint = () => {
-                opener.replaceChildren(node('span', 'ek-gap-number', String(number)), doc.createTextNode(answers[segment.id] || '\u00a0'));
+                opener.replaceChildren(badge, doc.createTextNode(answers[segment.id] || '\u00a0'));
                 opener.setAttribute('aria-label', `${label}: ${answers[segment.id] || 'choose an answer'}`);
                 opener.dataset.selected = String(Boolean(answers[segment.id]));
                 menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[segment.id])));
               };
-              const shut = () => { if(modern)expand(menu,false);else menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
+              const shut = () => { menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
               const opener = button('', () => {
                 if (opener.getAttribute('aria-expanded')==='true') { dismissInline(); return; }
-                dismissInline(); if(modern)expand(menu,true);else menu.hidden=false;opener.setAttribute('aria-expanded','true');
+                dismissInline(); menu.hidden=false;opener.setAttribute('aria-expanded','true');
                 closeInline = shut;
                 menu.querySelector('button')?.focus();
               }, 'ek-gap ek-choice-trigger');
@@ -746,7 +769,7 @@
               options.forEach((value, optionIndex) => {
                 const option = button('', () => { changed(segment.id, value); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option');
                 option.dataset.optionValue = value;
-                option.append(node('span', 'ek-gap-number', String(optionIndex + 1)), doc.createTextNode(value));
+                if(!modern)option.append(node('span', 'ek-gap-number', String(optionIndex + 1)));option.append(doc.createTextNode(value));
                 menu.append(option);
               });
               menu.append(button('Clear', () => { changed(segment.id, ''); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option ek-inline-clear'));
@@ -768,7 +791,8 @@
             const resize = () => { field.style.width = `${Math.max(5, Math.min(28, field.value.length + 2))}ch`; };
             resize();
             field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
-            controls.set(segment.id, field); row.append(field);
+            controls.set(segment.id, field);
+            if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);wrap.append(badge,field);row.append(wrap);}else row.append(field);
           }); body.append(row);
         });
       }
@@ -895,11 +919,13 @@
       lamps.clear();
       controls.forEach((control,id)=>{
         if(!['matching','gaps','choice'].includes(def.kind))return;
-        const lamp=node('span','ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
+        if(def.kind==='choice'&&control.tagName==='FIELDSET')return;
+        const lamp=def.kind==='gaps'?(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number')):node('span','ek-result-lamp');
+        if(!lamp)return;lamp.classList.add('ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
         if(def.kind==='matching')control.closest('.ek-card').append(lamp);
         else if(def.kind==='choice'){
           if(control.tagName==='FIELDSET')control.append(lamp);else control.after(lamp);
-        }else if(def.kind==='gaps')control.after(lamp);
+        }else if(def.kind==='gaps'){ /* Number badge is already inside the answer field. */ }
         else control.after(lamp);
         lamps.set(id,lamp);
       });
@@ -1035,7 +1061,7 @@
     return {
       getAnswers: () => clone(answers),
       setAnswers,
-      destroy: () => { pointerDrag = null; doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, kinds, uiLabels, feedbackMessage, motion:{expand} };

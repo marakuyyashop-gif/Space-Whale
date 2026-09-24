@@ -110,3 +110,5 @@ body.unified-workspace{background:var(--sw-neu-bg);color:var(--sw-neu-ink);--lea
 
 .unified-workspace .workspace-timer-reset[data-tooltip]::after{left:auto;right:0;transform:translateY(4px)}
 .unified-workspace .workspace-timer-reset[data-tooltip]:is(:hover,:focus-visible)::after{transform:translateY(0)}
+
+.workspace-sidebar-toggle:hover{transform:translateY(calc(-50% - 2px))}
