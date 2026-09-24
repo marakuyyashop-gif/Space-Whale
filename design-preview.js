@@ -9,19 +9,13 @@
     ['choiceHost',base('preview-choice','choice','What can you hear?',{items:[{id:'q1',prompt:'Choose one answer.',options:[{id:'voice',text:'A voice'},{id:'tones',text:'Electronic tones'}],correctId:'tones'}]})]
   ];
   fixtures.forEach(([id,data])=>kit.mount(document.getElementById(id),data,{}));
-  // Icon-only Reset retains the engine's accessible name and behavior.
-  document.querySelectorAll('.ek-reset').forEach(button=>{
-    button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>';
-    button.title='Сбросить ответы в этом задании';
-    button.setAttribute('aria-label','Сбросить ответы в этом задании');
-  });
   const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible=1;
   const sections=[...document.querySelectorAll('.preview-section')];
   function sync(){
     sections.forEach((section,i)=>section.hidden=i>=visible);
-    document.querySelectorAll('[data-reveal]').forEach(button=>{button.hidden=Number(button.dataset.reveal)<=visible;button.parentElement.hidden=button.hidden;});
-    document.querySelector('.preview-collapse').hidden=visible===1;
+    document.getElementById('showNext').hidden=visible===sections.length;
+    document.getElementById('collapseLast').hidden=visible===1;
   }
   function reveal(n){
     visible=Math.max(visible,n);sync();
@@ -29,13 +23,12 @@
     section.scrollIntoView({behavior:reduced()?'instant':'smooth',block:'start'});
     document.querySelectorAll('[data-jump]').forEach(a=>{if(Number(a.dataset.jump)===n)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');});
   }
-  document.querySelectorAll('[data-reveal]').forEach(button=>{button.setAttribute('aria-controls','sample-'+button.dataset.reveal);button.addEventListener('click',()=>reveal(Number(button.dataset.reveal)));});
+  document.getElementById('showNext').addEventListener('click',()=>{if(visible<sections.length)reveal(visible+1);});
   document.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',event=>{event.preventDefault();reveal(Number(a.dataset.jump));}));
   document.getElementById('collapseLast').addEventListener('click',()=>{
     if(visible===1)return;
     sections[visible-1].querySelectorAll('audio').forEach(a=>a.pause());visible--;sync();reveal(visible);
-    sections[visible-1].querySelector('[data-reveal]')?.focus({preventScroll:true});
-    document.getElementById('previewStatus').textContent='Задание свёрнуто. Ответы сохранены до закрытия этой страницы.';
+    document.getElementById('showNext').focus({preventScroll:true});
   });
   document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{
     document.body.dataset.theme=button.dataset.themeChoice;

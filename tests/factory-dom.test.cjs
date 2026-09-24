@@ -241,6 +241,8 @@ test('audio waveform tracks time, greys on pause, retains seek and fills at the 
   const track = s.host.querySelector('.ek-audio-track');
   const range = s.host.querySelector('.ek-audio-range');
   assert.equal(player.dataset.state,'paused');assert.equal(range.disabled,true);
+  assert.equal(track.querySelectorAll('svg path').length,2);
+  assert.equal(track.querySelector('.ek-audio-wave-base path').getAttribute('d'),track.querySelector('.ek-audio-wave-fill path').getAttribute('d'));
   audio.duration = 10;s.fire(audio,'loadedmetadata');assert.equal(range.disabled,false);
   s.click('Play audio');await Promise.resolve();
   assert.equal(player.dataset.state,'playing');assert.ok(s.button('Pause audio'));
@@ -295,4 +297,16 @@ test('shared Check result restores remotely without echo; editing clears shared 
  assert.ok(b.host.querySelector('[data-feedback=correct]'));assert.equal(b.changes.length,0);
  const other=b.host.querySelectorAll('input')[0];other.checked=true;b.fire(other,'change');
  assert.equal(b.mount.getAnswers().__sw_checked,undefined);assert.equal(b.host.querySelectorAll('[data-feedback]').length,0);
+});
+
+
+test('matching selection treatment survives remote updates and Reset remains an accessible icon', () => {
+  const s=setup('matching-demo');
+  assert.equal(s.host.querySelector('.ek-match-slot').dataset.selected,'false');
+  s.mount.setAnswers({item1:'option2'});
+  assert.equal(s.host.querySelector('.ek-match-slot').dataset.selected,'true');
+  assert.ok(s.button('Reset exercise').querySelector('svg[aria-hidden="true"]'));
+  s.click('Reset exercise');
+  assert.equal(s.host.querySelector('.ek-match-slot').dataset.selected,'false');
+  assert.deepEqual(s.mount.getAnswers(),{});
 });

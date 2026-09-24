@@ -29,6 +29,9 @@
   --sw-matching-ratio: auto;
   --sw-picture-word-ratio: 0.72 / 1;
   --sw-picture-word-radius: 16px;
+  --sw-interaction-hover: #eeeeef;
+  --sw-interaction-selected: #e7e7e9;
+  --sw-control-ring: #777b80;
   --sw-exercise-accent: #292b2f;
   --sw-exercise-correct: #25734b;
   --sw-exercise-incorrect: #b13b3b;

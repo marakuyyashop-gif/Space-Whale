@@ -305,13 +305,21 @@
       }, 'ek-audio-play');
       play.setAttribute('aria-label', 'Play audio');
       const track = node('div', 'ek-audio-track');
-      // Decorative waveform: progress follows real media time; bars do not claim signal amplitude.
+      // Decorative line, not a measured waveform. Fill follows actual media time.
+      const points = Array.from({length:601}, (_,x) => {
+        const t=x/600;
+        const envelope=Math.sin(Math.PI*t)**1.4;
+        const amplitude=5+9*(.5+.5*Math.sin(t*31));
+        const y=20+envelope*amplitude*Math.sin(t*185+1.2*Math.sin(t*23));
+        return `${x ? 'L' : 'M'}${x},${y.toFixed(2)}`;
+      }).join(' ');
       for (const layer of ['base', 'fill']) {
         const wave = node('div', `ek-audio-wave ek-audio-wave-${layer}`); wave.setAttribute('aria-hidden', 'true');
-        for (let i = 0; i < 64; i++) {
-          const bar = node('span'); bar.style.height = `${18 + ((i * 17 + i * i * 7) % 77)}%`; wave.append(bar);
-        }
-        track.append(wave);
+        const svg=doc.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('viewBox','0 0 600 40');svg.setAttribute('preserveAspectRatio','none');
+        const path=doc.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',points);path.setAttribute('vector-effect','non-scaling-stroke');
+        svg.append(path);wave.append(svg);track.append(wave);
       }
       const range = node('input', 'ek-audio-range'); range.type = 'range'; range.min = '0'; range.max = '100'; range.step = '0.1'; range.value = '0'; range.disabled = true; range.setAttribute('aria-label', 'Audio position');
       const time = node('span', 'ek-audio-time', '0:00 / 0:00');
@@ -442,6 +450,7 @@
       dialog.setAttribute('aria-label', def.title);
       dialog.append(button('Close ×', () => dialog.close(), 'ek-close'), node('h3', 'ek-title', def.title));
       const prompt = node('div', 'ek-prompt', item.text);
+      prompt.setAttribute('aria-label', 'Phrase to match');
       if (item.image) prompt.prepend(illustration(item));
       dialog.append(prompt);
       const choices = node('div', 'ek-options');
@@ -524,7 +533,7 @@
             if (config.readOnly) return;
             visibleCount += 1; answers.revealed = visibleCount; save();
             const section = reveal(); updateNavigation('down');
-            section.scrollIntoView?.({behavior:'smooth', block:'start'});
+            section.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
           });
           if (visibleCount > 1) up = addControl('up', 'Hide last exercise', () => {
             if (config.readOnly) return;
@@ -534,7 +543,7 @@
             // Only visibility changes: keep the hidden block's answers for reopening/sync.
             visibleCount -= 1; answers.revealed = visibleCount; save();
             updateNavigation('up');
-            navigation.scrollIntoView?.({behavior:'smooth', block:'nearest'});
+            navigation.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest'});
           });
           if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus();
         };
@@ -632,6 +641,7 @@
             const option = def.options.find(candidate => candidate.id === answers[matchItem.id]);
             const label = pictureWord ? `picture ${matchIndex + 1}` : matchItem.text;
             control.textContent = option?.text || '+';
+            control.dataset.selected = String(Boolean(option));
             control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
           };
           const plus = button(chosen()?.text || '+', () => {
@@ -660,6 +670,7 @@
               new Set(takenBy.keys())
             );
           }, pictureWord ? 'ek-match-slot ek-picture-word-slot' : 'ek-match-slot');
+          plus.dataset.selected = String(Boolean(chosen()));
           plus.setAttribute('aria-label', `Choose a match for ${promptText.toLowerCase()}`); plus.setAttribute('aria-haspopup', 'dialog');
           controls.set(item.id, plus); card.append(plus); grid.append(card);
         });
@@ -687,6 +698,8 @@
               const paint = () => {
                 opener.replaceChildren(node('span', 'ek-gap-number', String(number)), doc.createTextNode(answers[segment.id] || '\u00a0'));
                 opener.setAttribute('aria-label', `${label}: ${answers[segment.id] || 'choose an answer'}`);
+                opener.dataset.selected = String(Boolean(answers[segment.id]));
+                menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[segment.id])));
               };
               const shut = () => { menu.hidden = true; opener.setAttribute('aria-expanded', 'false'); };
               const opener = button('', () => {
@@ -698,6 +711,7 @@
               opener.setAttribute('aria-expanded', 'false');
               options.forEach((value, optionIndex) => {
                 const option = button('', () => { changed(segment.id, value); paint(); dismissInline(); opener.focus(); }, 'ek-inline-option');
+                option.dataset.optionValue = value;
                 option.append(node('span', 'ek-gap-number', String(optionIndex + 1)), doc.createTextNode(value));
                 menu.append(option);
               });
@@ -874,7 +888,11 @@
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
     }));
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {
-      const reset = button('↻', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
+      const reset = button('', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
+      const icon=doc.createElementNS('http://www.w3.org/2000/svg','svg');
+      icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');
+      const line=doc.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d','M4 10a8 8 0 1 1 1 7M4 4v6h6');icon.append(line);reset.append(icon);
       reset.setAttribute('aria-label', 'Reset exercise'); reset.title = 'Reset exercise'; actions.append(reset);
     }
 
