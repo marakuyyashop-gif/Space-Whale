@@ -835,7 +835,7 @@
 .exercise-kit.ek-modern .ek-dialog .ek-picture-prompt>.ek-image{display:block;width:100%;height:auto;max-height:none;aspect-ratio:4/3;object-fit:cover;margin:0;border-radius:inherit}
 .exercise-kit.ek-modern .ek-dialog .ek-picture-prompt>.ek-crop-image{height:auto;aspect-ratio:4/3}
 .exercise-kit.ek-modern .ek-discovery-choice .ek-inline-choice{vertical-align:middle}
-.exercise-kit.ek-modern .ek-discovery-choice .ek-choice-trigger{width:auto;min-width:130px;max-width:100%;white-space:normal}
+.exercise-kit.ek-modern .ek-discovery-choice .ek-choice-trigger{display:inline-flex;align-items:center;width:auto;min-width:130px;max-width:100%;white-space:normal}
 .exercise-kit.ek-modern :is(.ek-typed-gap,.ek-writing-input){font-family:var(--ek-font);font-size:var(--ek-text-size);font-weight:400;font-style:normal;caret-color:var(--ek-ink)}
 .exercise-kit.ek-modern.ek-reading-width .ek-typed-gap{height:30px;min-height:30px;line-height:normal;padding:3px 0}
 .exercise-kit.ek-modern .ek-sort-token{position:relative;overflow:visible}
