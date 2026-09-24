@@ -8,7 +8,56 @@
     ['audioHost',base('preview-audio','audio','Listen and choose',{instruction:'Listen to the short sound.',audio:'assets/factory/test-tone.wav'})],
     ['choiceHost',base('preview-choice','choice','What can you hear?',{items:[{id:'q1',prompt:'Choose one answer.',options:[{id:'voice',text:'A voice'},{id:'tones',text:'Electronic tones'}],correctId:'tones'}]})]
   ];
-  fixtures.forEach(([id,data])=>kit.mount(document.getElementById(id),data,{}));
+  // A deliberately isolated feedback experiment for the first exercise only.
+  const matchHost=document.getElementById('matchHost');
+  let matchInstance;
+  function decorateMatching(){
+    matchHost.querySelectorAll('.ek-card').forEach((card,index)=>{
+      if(card.querySelector('.preview-answer-light'))return;
+      const field=card.querySelector('.ek-match-slot');
+      const wrap=document.createElement('div');wrap.className='preview-answer-light';
+      const lamp=document.createElement('span');lamp.className='preview-result-lamp';
+      lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
+      const correction=document.createElement('p');correction.className='preview-answer-hint';correction.hidden=true;
+      card.insertBefore(wrap,field);wrap.append(field,lamp);card.append(correction);
+      wrap.dataset.item=fixtures[0][1].items[index].id;
+    });
+  }
+  function clearMatchingLights(){
+    matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
+      delete wrap.dataset.result;
+      const lamp=wrap.querySelector('.preview-result-lamp');lamp.textContent='';lamp.setAttribute('aria-label','Not checked');lamp.removeAttribute('title');
+    });
+    matchHost.querySelectorAll('.preview-answer-hint').forEach(hint=>{hint.hidden=true;hint.textContent='';});
+  }
+  fixtures.forEach(([id,data])=>{
+    const instance=kit.mount(document.getElementById(id),data,id==='matchHost'?{onChange:clearMatchingLights}:{});
+    if(id==='matchHost')matchInstance=instance;
+  });
+  decorateMatching();
+  matchHost.addEventListener('click',event=>{
+    const action=event.target.closest('.ek-actions button');
+    if(!action)return;
+    decorateMatching();
+    if(action.classList.contains('ek-reset')){clearMatchingLights();return;}
+    const definition=fixtures[0][1];
+    const results=kit.grade(definition,matchInstance.getAnswers());
+    matchHost.querySelectorAll('.preview-answer-light').forEach(wrap=>{
+      const result=results[wrap.dataset.item];wrap.dataset.result=result;
+      const lamp=wrap.querySelector('.preview-result-lamp');
+      // Engraved Y/N remains discernible without relying on colour alone.
+      lamp.textContent=result==='correct'?'Y':result==='retry'?'N':'·';
+      const label=result==='correct'?'Correct':result==='retry'?'Try again':'Choose an answer';
+      lamp.setAttribute('aria-label',label);lamp.setAttribute('title',label);
+      const hint=wrap.parentElement.querySelector('.preview-answer-hint');
+      hint.hidden=result!=='retry';
+      if(result==='retry'){
+        const item=definition.items.find(item=>item.id===wrap.dataset.item);
+        const answer=definition.options.find(option=>option.id===item.correctId).text;
+        hint.textContent='→ '+answer;hint.setAttribute('aria-label','Correct answer: '+answer);
+      }
+    });
+  });
   const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible=1;
   const sections=[...document.querySelectorAll('.preview-section')];

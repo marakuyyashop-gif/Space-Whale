@@ -157,3 +157,26 @@
 @keyframes feedback-arrive{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(max-width:700px){.preview-clock-controls{gap:14px}.preview-clock-actions{margin-right:0}.preview-duration{gap:5px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.preview-themes::before{transition:none!important}}
+
+/* Directed indicator light: scoped to a single matching study. */
+.design-preview #matchHost{--lamp-green:69,139,119;--lamp-red:181,94,109;--answer-bed:#dcdfe3}
+.design-preview[data-theme=dark] #matchHost{--lamp-green:108,196,164;--lamp-red:221,128,145;--answer-bed:#1e2228}
+.design-preview #matchHost .ek-results{display:none}
+/* Keep the shared live announcement available to assistive technology only. */
+.design-preview #matchHost .ek-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0;padding:0;white-space:nowrap}
+.design-preview #matchHost .ek-body [data-feedback]{outline:none}
+.design-preview #matchHost .ek-body [data-feedback]:focus-visible{outline:2px solid var(--p-ring);outline-offset:4px}
+.preview-answer-light{position:relative;isolation:isolate;display:flex;align-items:center;gap:12px;width:100%;margin-top:auto;--lamp-rgb:var(--lamp-green)}
+.design-preview #matchHost .preview-answer-light .ek-match-slot{position:relative;z-index:1;flex:1;min-width:0;width:auto;margin:0;background:var(--answer-bed);box-shadow:var(--p-inset);color:var(--p-ink);border-radius:15px}
+.design-preview #matchHost .preview-answer-light .ek-match-slot:hover{background:var(--p-soft)}
+.preview-result-lamp{position:relative;z-index:3;display:grid;place-items:center;flex:none;width:26px;height:30px;border-radius:11px;background:var(--p-material);box-shadow:var(--p-small);font:600 10px Onest,sans-serif;color:var(--p-muted);transition:color 240ms,box-shadow 300ms,transform 240ms}
+.preview-result-lamp::before{content:"";position:absolute;left:1px;top:8px;bottom:8px;width:2px;border-radius:3px;background:var(--p-line);transition:background 300ms,box-shadow 300ms}
+.preview-answer-light::before{content:"";position:absolute;z-index:2;pointer-events:none;right:24px;top:50%;width:calc(100% - 24px);height:68px;transform:translateY(-50%);background:linear-gradient(to left,rgba(var(--lamp-rgb),.28),rgba(var(--lamp-rgb),.1) 44%,rgba(var(--lamp-rgb),0) 94%);clip-path:polygon(100% 43%,0 0,0 100%,100% 57%);filter:blur(4px);mask-image:radial-gradient(ellipse at 100% 50%,#000 0%,#0009 42%,transparent 76%);opacity:0;transition:opacity 380ms ease-out}
+.preview-answer-light[data-result=retry]{--lamp-rgb:var(--lamp-red)}
+.preview-answer-light:is([data-result=correct],[data-result=retry])::before{opacity:1}
+.preview-answer-light:is([data-result=correct],[data-result=retry]) .preview-result-lamp{color:rgb(var(--lamp-rgb));transform:translateY(-1px);box-shadow:var(--p-small),-3px 0 7px rgba(var(--lamp-rgb),.13)}
+.preview-answer-light:is([data-result=correct],[data-result=retry]) .preview-result-lamp::before{background:rgb(var(--lamp-rgb));box-shadow:-2px 0 5px rgba(var(--lamp-rgb),.6),-7px 0 13px rgba(var(--lamp-rgb),.22)}
+.preview-answer-hint{margin:14px 38px 0 0;padding:9px 12px;border-radius:11px;background:var(--answer-bed);color:var(--p-ink);box-shadow:var(--p-inset);font-size:13px;line-height:1.5;animation:feedback-arrive 220ms ease-out}
+@media(max-width:1100px){.design-preview #matchHost .ek-card{grid-template-columns:18px minmax(0,1fr) minmax(155px,1.2fr)}.preview-answer-light{margin:0}.preview-answer-hint{grid-column:3;margin-top:0}}
+@media(max-width:700px){.design-preview #matchHost .ek-card{grid-template-columns:14px minmax(0,1fr);gap:14px}.preview-answer-light{grid-column:2}.preview-answer-hint{grid-column:2}}
+@media(prefers-reduced-motion:reduce){.preview-answer-light::before,.preview-result-lamp::before{transition:none!important}}
