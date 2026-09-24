@@ -540,7 +540,7 @@
         choices.append(choice);
       });
       dialog.append(choices);
-      if (selected) { const reset=button('↺', () => { onPick(''); closeDialog(); }, 'ek-button ek-reset ek-selection-reset'); reset.setAttribute('aria-label','Clear selection'); reset.title='Clear selection'; dialog.append(reset); }
+      if (selected) { const reset=button('', () => { onPick(''); closeDialog(); }, 'ek-button ek-reset ek-selection-reset'); const icon=actions.querySelector('.ek-reset svg');if(icon)reset.append(icon.cloneNode(true));reset.setAttribute('aria-label','Clear selection'); reset.title='Clear selection'; dialog.append(reset); }
       const currentDialog = dialog;
       const currentTrigger = trigger;
       dialog.addEventListener('close', () => {

@@ -820,3 +820,9 @@
 .exercise-kit.ek-modern .ek-disclosure-content{padding:0 24px 20px}
 .exercise-kit.ek-modern .ek-disclosure-content>.ek-copy{margin:0}
 @media(max-width:600px){.exercise-kit.ek-modern .ek-picture-word-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}.exercise-kit.ek-modern .ek-image-label-target{min-width:80px;padding:5px 10px;font-size:14px}.exercise-kit.ek-modern .ek-order-target{padding:16px}}
+.exercise-kit.ek-modern .ek-image-label-target:is([data-feedback=correct],[data-feedback=retry])::after{content:'';position:absolute;right:-4px;top:-4px;width:14px;height:14px;border:0;border-radius:50%;background:var(--sw-neu-success);box-shadow:var(--sw-neu-small);pointer-events:none}
+.exercise-kit.ek-modern .ek-image-label-target[data-feedback=retry]::after{background:var(--sw-neu-error)}
+.exercise-kit.ek-modern .ek-card>.ek-number.ek-result-lamp[data-result=correct],
+.exercise-kit.ek-modern .ek-discovery-field>.ek-result-lamp[data-result=correct]{background:var(--sw-neu-success);color:transparent}
+.exercise-kit.ek-modern .ek-card>.ek-number.ek-result-lamp[data-result=retry],
+.exercise-kit.ek-modern .ek-discovery-field>.ek-result-lamp[data-result=retry]{background:var(--sw-neu-error);color:transparent}

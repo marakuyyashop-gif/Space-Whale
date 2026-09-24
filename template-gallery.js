@@ -51,7 +51,7 @@
     choice('image-choice-demo',false,true),
     choice('multiple-choice-demo',true),
     choice('image-multiple-demo',true,true),
-    base('speaking-language-demo','presentation','Speaking with Use phrases',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'},{type:'disclosure',title:'Use phrases',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),
+    base('speaking-language-demo','presentation','Speaking · Use phrases',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'},{type:'disclosure',title:'Use phrases',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),
     base('possible-answers-demo','presentation','Possible Answers',{blocks:[{type:'text',text:'[Open task prompt]'},{type:'disclosure',title:'Possible Answers',role:'possible-answers',text:'[Model response]'}]}),
     audio('audio-script-demo',true),
     base('reference-demo','rule-page','Rule / Language Reference',{blocks:[{type:'rule',title:'[Rule title]',text:'[Language reference]',formula:'[Form] + [Form]',examples:['[Example 1]','[Example 2]']}]}),
