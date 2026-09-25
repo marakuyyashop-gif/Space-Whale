@@ -576,46 +576,7 @@
         if (restored) {
           route = restored;
           if (route.lesson) expanded.add(route.lesson);
-          function setupSidebarOverlays(){
-    if(!document.body?.append || !document.addEventListener)return;
-    const tooltip=node('div','','workspace-floating workspace-control-tooltip');tooltip.id='workspaceControlTooltip';tooltip.setAttribute('role','tooltip');
-    const popover=node('section','','workspace-floating workspace-lesson-popover');popover.id='workspaceLessonInfo';popover.setAttribute('role','dialog');popover.setAttribute('aria-labelledby','workspaceLessonInfoTitle');
-    [tooltip,popover].forEach(el=>{el.setAttribute('popover','manual');el.hidden=true;document.body.append(el);});
-    let tooltipOwner=null,infoOwner=null;
-    const hide=el=>{if(el.matches?.(':popover-open'))el.hidePopover();el.hidden=true;};
-    const place=(el,owner)=>{
-      const rect=owner.getBoundingClientRect(),box=el.getBoundingClientRect(),margin=12;
-      const width=window.innerWidth,height=window.innerHeight;
-      const beside=el===popover&&rect.right+box.width+margin*2<width;
-      const left=beside?rect.right+10:Math.min(width-box.width-margin,Math.max(margin,rect.left));
-      let top=beside?rect.top:rect.bottom+10;
-      if(top+box.height>height-margin)top=rect.top-box.height-10;
-      el.style.left=`${Math.max(margin,left)}px`;el.style.top=`${Math.max(margin,Math.min(top,height-box.height-margin))}px`;
-    };
-    const show=(el,owner)=>{el.hidden=false;if(el.showPopover&&!el.matches(':popover-open'))el.showPopover();place(el,owner);};
-    const closeTooltip=()=>{if(tooltipOwner)tooltipOwner.removeAttribute('aria-describedby');tooltipOwner=null;hide(tooltip);};
-    const closeInfo=(restore=false)=>{const owner=infoOwner;if(owner)owner.setAttribute('aria-expanded','false');infoOwner=null;hide(popover);if(restore&&owner?.isConnected)owner.focus();};
-    dismissSidebarOverlays=()=>{closeTooltip();closeInfo();};
-    openLessonPopover=(owner,lesson)=>{
-      if(infoOwner===owner){closeInfo();return;}closeInfo();closeTooltip();infoOwner=owner;
-      const header=node('div','','workspace-popover-heading');const title=node('h3',lesson.title);title.id='workspaceLessonInfoTitle';
-      const close=button('×',()=>closeInfo(true),'workspace-popover-close');close.setAttribute('aria-label','Закрыть информацию об уроке');header.append(title,close);popover.replaceChildren(header);
-      const meta=[lesson.level,lesson.whale?`Whale ${lesson.whale}`:'',lesson.stages.length?`${lesson.stages.length} этапов`:''].filter(Boolean).join(' · ');if(meta)popover.append(node('p',meta,'workspace-popover-meta'));
-      lessonInfo(lesson).forEach(([label,text])=>{const row=node('p','','workspace-popover-row');row.append(node('strong',label),node('span',text));popover.append(row);});
-      owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();
-    };
-    const tooltipFor=target=>target?.closest?.('[data-tooltip]');
-    const enter=event=>{const owner=tooltipFor(event.target);if(!owner||owner.disabled||infoOwner)return;if(tooltipOwner===owner)return;closeTooltip();tooltipOwner=owner;tooltip.textContent=owner.getAttribute('data-tooltip');owner.setAttribute('aria-describedby',tooltip.id);show(tooltip,owner);};
-    const leave=event=>{if(tooltipOwner&&!tooltipOwner.contains(event.relatedTarget))closeTooltip();};
-    document.addEventListener('pointerover',enter);document.addEventListener('focusin',enter);
-    document.addEventListener('pointerout',leave);document.addEventListener('focusout',leave);
-    document.addEventListener('pointerdown',event=>{closeTooltip();if(infoOwner&&!popover.contains(event.target)&&!infoOwner.contains(event.target))closeInfo();});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeTooltip();closeInfo(true);}});
-    document.addEventListener('scroll',event=>{if(!popover.contains(event.target))dismissSidebarOverlays();},true);
-    window.addEventListener('resize',dismissSidebarOverlays);
-  }
-  setupSidebarOverlays();
-  history.replaceState(null, '', `classroom.html${query(route)}`);
+          history.replaceState(null, '', `classroom.html${query(route)}`);
           mountedKey = '';
           render();
         }
@@ -694,6 +655,45 @@
       finally {invite.disabled=false;}
     });
   }
+  function setupSidebarOverlays(){
+    if(!document.body?.append || !document.addEventListener)return;
+    const tooltip=node('div','','workspace-floating workspace-control-tooltip');tooltip.id='workspaceControlTooltip';tooltip.setAttribute('role','tooltip');
+    const popover=node('section','','workspace-floating workspace-lesson-popover');popover.id='workspaceLessonInfo';popover.setAttribute('role','dialog');popover.setAttribute('aria-labelledby','workspaceLessonInfoTitle');
+    [tooltip,popover].forEach(el=>{el.setAttribute('popover','manual');el.hidden=true;document.body.append(el);});
+    let tooltipOwner=null,infoOwner=null;
+    const hide=el=>{if(el.matches?.(':popover-open'))el.hidePopover();el.hidden=true;};
+    const place=(el,owner)=>{
+      const rect=owner.getBoundingClientRect(),box=el.getBoundingClientRect(),margin=12;
+      const width=window.innerWidth,height=window.innerHeight;
+      const beside=el===popover&&rect.right+box.width+margin*2<width;
+      const left=beside?rect.right+10:Math.min(width-box.width-margin,Math.max(margin,rect.left));
+      let top=beside?rect.top:rect.bottom+10;
+      if(top+box.height>height-margin)top=rect.top-box.height-10;
+      el.style.left=`${Math.max(margin,left)}px`;el.style.top=`${Math.max(margin,Math.min(top,height-box.height-margin))}px`;
+    };
+    const show=(el,owner)=>{el.hidden=false;if(el.showPopover&&!el.matches(':popover-open'))el.showPopover();place(el,owner);};
+    const closeTooltip=()=>{if(tooltipOwner)tooltipOwner.removeAttribute('aria-describedby');tooltipOwner=null;hide(tooltip);};
+    const closeInfo=(restore=false)=>{const owner=infoOwner;if(owner)owner.setAttribute('aria-expanded','false');infoOwner=null;hide(popover);if(restore&&owner?.isConnected)owner.focus();};
+    dismissSidebarOverlays=()=>{closeTooltip();closeInfo();};
+    openLessonPopover=(owner,lesson)=>{
+      if(infoOwner===owner){closeInfo();return;}closeInfo();closeTooltip();infoOwner=owner;
+      const header=node('div','','workspace-popover-heading');const title=node('h3',lesson.title);title.id='workspaceLessonInfoTitle';
+      const close=button('×',()=>closeInfo(true),'workspace-popover-close');close.setAttribute('aria-label','Закрыть информацию об уроке');header.append(title,close);popover.replaceChildren(header);
+      const meta=[lesson.level,lesson.whale?`Whale ${lesson.whale}`:'',lesson.stages.length?`${lesson.stages.length} этапов`:''].filter(Boolean).join(' · ');if(meta)popover.append(node('p',meta,'workspace-popover-meta'));
+      lessonInfo(lesson).forEach(([label,text])=>{const row=node('p','','workspace-popover-row');row.append(node('strong',label),node('span',text));popover.append(row);});
+      owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();
+    };
+    const tooltipFor=target=>target?.closest?.('[data-tooltip]');
+    const enter=event=>{const owner=tooltipFor(event.target);if(!owner||owner.disabled||infoOwner)return;if(tooltipOwner===owner)return;closeTooltip();tooltipOwner=owner;tooltip.textContent=owner.getAttribute('data-tooltip');owner.setAttribute('aria-describedby',tooltip.id);show(tooltip,owner);};
+    const leave=event=>{if(tooltipOwner&&!tooltipOwner.contains(event.relatedTarget))closeTooltip();};
+    document.addEventListener('pointerover',enter);document.addEventListener('focusin',enter);
+    document.addEventListener('pointerout',leave);document.addEventListener('focusout',leave);
+    document.addEventListener('pointerdown',event=>{closeTooltip();if(infoOwner&&!popover.contains(event.target)&&!infoOwner.contains(event.target))closeInfo();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeTooltip();closeInfo(true);}});
+    document.addEventListener('scroll',event=>{if(!popover.contains(event.target))dismissSidebarOverlays();},true);
+    window.addEventListener('resize',dismissSidebarOverlays);
+  }
+  setupSidebarOverlays();
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();
 
