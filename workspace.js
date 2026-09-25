@@ -281,29 +281,37 @@
     if(milestoneRail.hidden)return;
     milestoneRail.append(node('span','Milestones','workspace-rail-caption'));
     const track=node('div','','workspace-milestone-track');milestoneRail.append(track);
-    let filled=0;for(const item of lesson.stages){if(completedStages.has(lesson.id)||completedMilestones.has(item.exercise.id))filled++;else break;}
+    let filled=0;for(const item of lesson.stages){if(completedMilestones.has(item.exercise.id))filled++;else break;}
     track.style.setProperty('--milestone-fill',`${lesson.stages.length>1?Math.min(100,filled/(lesson.stages.length-1)*100):0}%`);
     lesson.stages.forEach((stage,index)=>{
       const title=(stage.menu||stage.title||stage.exercise.title||`Milestone ${index+1}`).replace(/^\s*\d+\s*[.·]\s*/,'');
       const active=route.exercise===stage.exercise.id;
-      const control=link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)},active,`workspace-stage-link workspace-milestone-dot${completedStages.has(lesson.id)||completedMilestones.has(stage.exercise.id)?' is-complete':''}`);
+      const control=link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)},active,`workspace-stage-link workspace-milestone-dot${completedMilestones.has(stage.exercise.id)?' is-complete':''}`);
       control.setAttribute('aria-label',`Milestone ${index+1}: ${title}`);control.setAttribute('data-tooltip',`${String(index+1).padStart(2,'0')} · ${title}`);control.setAttribute('data-step',String(index+1));
       track.append(control);
     });
   }
+  function answerProgress(def,value={}){
+    const filled=value=>Array.isArray(value)?value.length>0:typeof value==='string'?value.trim().length>0:typeof value==='number';
+    if(def.kind==='stage'||def.kind==='rule-page'){
+      const children=def.kind==='stage'?(def.exercises||[]):(def.blocks||[]).filter(block=>block.type==='exercise');
+      const ratios=children.map(block=>answerProgress(block.exercise,value?.[block.id]||{})).filter(ratio=>ratio!==null);
+      return ratios.length?ratios.reduce((a,b)=>a+b,0)/ratios.length:null;
+    }
+    if(def.kind==='order')return def.tokens?.length?Math.min(1,new Set((value.order||[]).filter(id=>def.tokens.some(token=>token.id===id))).size/def.tokens.length):0;
+    const items=def.kind==='gaps'?(def.items||[]).flatMap(item=>item.segments.filter(part=>typeof part==='object')):def.items;
+    if(!['gaps','matching','choice','sort','writing','image-label'].includes(def.kind)||!items?.length)return null;
+    return items.filter(item=>filled(value?.[item.id])).length/items.length;
+  }
+  function milestoneAnswers(lesson,exercise){
+    if(liveAnswers.has(exercise.id))return liveAnswers.get(exercise.id);
+    const key=sessionId?`space-whale:workspace:live:v1:${sessionId}:${lesson.id}:${exercise.id}`:guestToken?`space-whale:workspace:guest:v1:${guestToken.slice(0,12)}:${lesson.id}:${exercise.id}`:`space-whale:workspace:v1:${lesson.id}:${exercise.id}`;
+    const saved=readAnswers(key,JSON.stringify(exercise));
+    return saved.__sw_collab===1?replica(exercise.id).answers():saved;
+  }
   function updateMilestoneProgress(exercise,answers){
-    const checked=(def,value)=>{
-      if(def.kind==='stage'){
-        const blocks=def.exercises.filter(block=>!['text','rule','speaking','listen_repeat'].includes(block.exercise.kind));
-        return blocks.length>0&&blocks.every(block=>checked(block.exercise,value?.[block.id]));
-      }
-      if(['guided_discovery','discovery'].includes(def.kind)){
-        const blocks=(def.blocks||[]).filter(block=>block.type==='exercise');
-        return blocks.length>0&&blocks.every(block=>checked(block.exercise,value?.[block.id]));
-      }
-      return value?.__sw_checked===true;
-    };
-    if(checked(exercise,answers))completedMilestones.add(exercise.id);else completedMilestones.delete(exercise.id);
+    liveAnswers.set(exercise.id,answers);
+    if(answerProgress(exercise,answers)===1)completedMilestones.add(exercise.id);else completedMilestones.delete(exercise.id);
     try{sessionStorage.setItem(milestonesKey,JSON.stringify([...completedMilestones]));}catch(_){}
     renderMilestones();
   }
@@ -322,13 +330,14 @@
   function renderLessonGauge(){
     const gauge=document.getElementById('workspaceLessonGauge');
     if(!gauge)return;
-    const lesson=selectedLesson(),total=lesson?.stages.length||0;
-    const count=lesson?lesson.stages.filter(item=>completedStages.has(lesson.id)||completedMilestones.has(item.exercise.id)).length:0;
+    const lesson=selectedLesson();
+    const ratios=(lesson?.stages||[]).map(item=>{const ratio=answerProgress(item.exercise,milestoneAnswers(lesson,item.exercise));if(ratio===1)completedMilestones.add(item.exercise.id);else completedMilestones.delete(item.exercise.id);return ratio;}).filter(ratio=>ratio!==null);
+    const total=ratios.length,count=ratios.reduce((sum,value)=>sum+value,0);
     const percent=total?Math.round(count/total*100):0;
     gauge.setAttribute('aria-valuenow',String(percent));
-    gauge.setAttribute('aria-valuetext',`${count} из ${total} Milestones`);
+    gauge.setAttribute('aria-valuetext',`${percent}% заданий заполнено`);
     gauge.querySelector('.workspace-gauge-percent').textContent=`${percent}%`;
-    gauge.querySelector('.workspace-gauge-count').textContent=`${count} / ${total} milestones`;
+    gauge.querySelector('.workspace-gauge-count').textContent=`${ratios.filter(value=>value===1).length} / ${total} milestones`;
     gauge.querySelectorAll('.workspace-gauge-tick').forEach((tick,index)=>tick.classList.toggle('is-filled',index<Math.round(count/(total||1)*48)));
   }
   function renderSidebar() {
@@ -353,7 +362,7 @@
         rows.forEach(other=>{other.menu.hidden=true;other.toggle.setAttribute('aria-expanded','false');});
         menu.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
       },'workspace-selector-toggle');
-      toggle.append(node('span',`${name} ${value}`),node('i','','workspace-selector-chevron'));
+      row.append(node('span',`${name} ${value}`,'workspace-selector-label'));toggle.append(node('i','','workspace-selector-chevron'));toggle.setAttribute('aria-label',`Выбрать ${name}`);
       toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls',menu.id);toggle.disabled=studentLocked;
       options.forEach((option,i)=>{
         const item=option.href?node('a',option.label,'workspace-inline-option'):button(option.label,()=>{menu.hidden=true;toggle.setAttribute('aria-expanded','false');option.action();},'workspace-inline-option');
@@ -372,8 +381,8 @@
     const whaleToggle=addRow('Whale',view==='library'?(whale?.id||'—'):'—',whales.map(item=>({label:item.title,selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})})),1);
     addRow('Stage',stageIndex>=0?String(stageIndex+1).padStart(2,'0'):'—',topics.map((item,i)=>({label:`${String(i+1).padStart(2,'0')} · ${item.title}`,selected:item.id===lesson?.id,action:()=>go({...route,...lessonLocation(item),lesson:item.id,exercise:'',section:'tasks'})})),2);
     addRow('Milestone',milestoneIndex>=0?String(milestoneIndex+1).padStart(2,'0'):'—',(lesson?.stages||[]).map((item,i)=>({label:`${String(i+1).padStart(2,'0')} · ${(item.menu||item.title||item.exercise.title).replace(/^\s*\d+\s*[.·]\s*/,'')}`,selected:item.exercise.id===route.exercise,action:()=>go({...route,...lessonLocation(lesson),lesson:lesson.id,exercise:item.exercise.id,section:stageSection(item)})})),3);
-    const upper=button(view==='library'?level?.id||'A1.1':'Level',()=>levelToggle.click(),'workspace-half-key');
-    const lower=button(whale&&view==='library'?`W ${whale.id}`:'W',()=>whaleToggle.click(),'workspace-half-key');
+    const upper=button(view==='library'?level?.id||'A1.1':'Level',()=>{rows.forEach(row=>{row.menu.hidden=true;row.toggle.setAttribute('aria-expanded','false');});openSidebarPicker?.(upper,'Level',levelOptions.filter(option=>levels.some(item=>item.id===option.label)));},'workspace-half-key');
+    const lower=button(whale&&view==='library'?`W ${whale.id}`:'W',()=>{rows.forEach(row=>{row.menu.hidden=true;row.toggle.setAttribute('aria-expanded','false');});openSidebarPicker?.(lower,'Whale',whales.map(item=>({label:String(item.id),selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})})));},'workspace-half-key');
     upper.setAttribute('aria-label','Выбрать уровень');lower.setAttribute('aria-label','Выбрать Whale');upper.disabled=lower.disabled=studentLocked;controls.append(upper,lower);
   }
 
@@ -752,12 +761,13 @@
       if(infoOwner===owner){closeInfo();return;}closeInfo();closeTooltip();infoOwner=owner;
       const header=node('div','','workspace-popover-heading');const heading=node('h3',title);heading.id='workspaceLessonInfoTitle';
       const close=button('×',()=>closeInfo(true),'workspace-popover-close');close.setAttribute('aria-label','Закрыть выбор');header.append(heading,close);popover.replaceChildren(header);
-      const list=node('div','','workspace-picker-options');
+      const list=node('div','','workspace-picker-options workspace-number-picker');
       options.forEach(option=>{
         const control=option.href?node('a',option.label,'workspace-picker-option'):button(option.label,()=>{closeInfo();option.action();},'workspace-picker-option');
         if(option.href)control.href=option.href;else control.setAttribute('aria-pressed',String(Boolean(option.selected)));
         list.append(control);
       });
+      if(!options.length)list.append(node('p','Материалы пока не добавлены.','workspace-muted'));
       popover.append(list);owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();
     };
     const tooltipFor=target=>target?.closest?.('[data-tooltip]');

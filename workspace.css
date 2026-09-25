@@ -344,3 +344,23 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 @media(max-height:760px) and (min-width:769px){.unified-workspace .app-sidebar{gap:12px}.workspace-selector-toggle{height:49px}.workspace-instruments .workspace-clock{height:105px;width:105px}.workspace-instruments .workspace-clock svg{height:97px;width:97px}.workspace-lesson-gauge{min-height:95px}.workspace-gauge-percent{font-size:24px}}
 @media(max-width:768px){.unified-workspace .app-sidebar{overflow-y:auto;grid-template-columns:140px minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:14px}.workspace-instruments{grid-column:1;grid-row:2;grid-template-columns:1fr;padding:0}.workspace-instruments .workspace-course-controls{grid-row:2;grid-column:1}.unified-workspace .workspace-tree{grid-column:2;grid-row:2;margin:0 -18px 0 0;align-self:start}.workspace-selector-toggle{height:51px;padding:0 16px;font-size:17px}.workspace-lesson-gauge{grid-column:1/-1;grid-row:3;height:170px;min-height:170px;max-width:260px;justify-self:center}.workspace-mini-dock{grid-row:4}.workspace-inline-option{padding:11px 16px}}
 @media(prefers-reduced-motion:reduce){.workspace-gauge-tick{transition:none}}
+/* True half-discs, separate button pickers, circular live progress. */
+.unified-workspace .workspace-half-key{width:80px;height:40px;min-height:40px;border-radius:40px 40px 0 0;flex:none}
+.unified-workspace .workspace-half-key:last-child{border-radius:0 0 40px 40px}
+.workspace-instruments .workspace-course-controls{gap:8px}
+.workspace-number-picker{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.workspace-number-picker .workspace-picker-option{display:grid;place-items:center;padding:12px 8px;min-height:44px;border-radius:13px;text-align:center;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small)}
+.workspace-number-picker .workspace-picker-option[aria-pressed=true]{box-shadow:var(--sw-neu-inset);color:var(--sidebar-accent)}
+.workspace-number-picker .workspace-picker-option::after{display:none}
+.workspace-lesson-gauge{background:transparent!important;border:0;box-shadow:none;min-height:110px;max-height:260px}
+.workspace-lesson-gauge svg{width:min(100%,240px);height:100%;max-height:240px;aspect-ratio:1;flex:none}
+.workspace-gauge-tick,.workspace-gauge-tick.is-filled{transform:none;stroke:none;transition:none}
+.workspace-gauge-rest{stroke:color-mix(in srgb,var(--sw-neu-muted) 45%,transparent);stroke-width:3;stroke-linecap:round}
+.workspace-gauge-fill{stroke:var(--sidebar-accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:25;stroke-dashoffset:25;opacity:0;transition:stroke-dashoffset 550ms cubic-bezier(.2,.7,.2,1),opacity 250ms;transition-delay:var(--tick-delay)}
+.workspace-gauge-tick.is-filled .workspace-gauge-fill{stroke-dashoffset:0;opacity:1}
+@media(prefers-reduced-motion:reduce){.workspace-gauge-fill{transition:none}}
+.workspace-selector-row{height:59px}
+.workspace-selector-label{display:flex;align-items:center;height:100%;padding:0 58px 0 25px;font:600 20px/1.2 Onest,sans-serif;letter-spacing:-.035em}
+.workspace-selector-toggle{position:absolute;right:0;top:0;width:53px;height:100%;padding:0;justify-content:center}
+@media(max-height:760px) and (min-width:769px){.workspace-selector-row{height:49px}.workspace-selector-toggle{height:100%}}
+@media(max-width:768px){.workspace-selector-row{height:51px}.workspace-selector-label{padding-left:16px;font-size:17px}.workspace-selector-toggle{height:100%}}
