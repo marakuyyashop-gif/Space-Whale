@@ -522,3 +522,16 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-lesson-status[role=button]{cursor:pointer}
 .workspace-lesson-status.is-empty{background:transparent;color:var(--sw-neu-muted);box-shadow:var(--sw-neu-inset);opacity:.65}
 .workspace-collection-mark{width:24px;height:24px;min-width:24px;font-size:12px;border-radius:8px}
+
+/* The learner uses the same exercises, without teacher navigation. */
+.unified-workspace:is([data-workspace-role=student],[data-workspace-role=connecting],[data-workspace-role=connection-error]) .reference-app{grid-template-columns:minmax(0,1fr)}
+.unified-workspace:is([data-workspace-role=student],[data-workspace-role=connecting],[data-workspace-role=connection-error]) .workspace-sidebar-shell{display:none!important}
+.unified-workspace:is([data-workspace-role=connecting],[data-workspace-role=connection-error]) .reference-app{visibility:hidden;pointer-events:none}
+.unified-workspace:is([data-workspace-role=connecting],[data-workspace-role=connection-error]) .workspace-connection-state{display:block!important;position:fixed;inset:40% 24px auto;text-align:center;font:400 15px/1.6 Onest,sans-serif;color:var(--sw-neu-muted)}
+.unified-workspace[data-workspace-role=student] .class-area{height:100dvh;min-height:0}
+@media(max-width:768px){
+.unified-workspace[data-workspace-role=student] .reference-app{height:100dvh}
+.unified-workspace[data-workspace-role=student] .lesson-scroll{padding:72px 16px max(32px,env(safe-area-inset-bottom))!important;scroll-padding-bottom:32px}
+.unified-workspace[data-workspace-role=student] .workspace-theme-switch{right:16px;top:max(14px,env(safe-area-inset-top))}
+.unified-workspace[data-workspace-role=student] #workspaceExercise{min-width:0;max-width:100%}
+}

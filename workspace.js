@@ -715,8 +715,11 @@
       ? await classroom.connectGuest(guestToken, handlers)
       : await classroom.connect(sessionId, handlers);
 
+    if(!['teacher','student'].includes(result.role))throw new Error('Нет доступа к этому занятию.');
     liveReady = true;
     liveRole = result.role;
+    document.body.dataset.workspaceRole=liveRole;
+    sidebar.inert=liveRole==='student';
     liveSession = result.session;
     tick();
     const inviteButton=document.getElementById('inviteStudent');
@@ -927,9 +930,12 @@
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();
 
+  if(timer.ended&&liveMode){document.body.dataset.workspaceRole='connection-error';document.getElementById('workspaceConnectionState').textContent='Занятие завершено.';}
   if(!timer.ended)initLiveSession().catch(error => {
     console.error('[Space Whale] Live Workspace connection failed', error);
     notice.textContent = error.message;
+    document.body.dataset.workspaceRole='connection-error';
+    document.getElementById('workspaceConnectionState').textContent='Не удалось подключиться к занятию. Проверьте ссылку и соединение, затем обновите страницу.';
     if (sessionHeading) sessionHeading.textContent = guestToken ? 'Guest lesson · ссылка недействительна' : 'Live lesson · ошибка подключения';
   });
 })();
