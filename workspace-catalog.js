@@ -129,7 +129,7 @@
       const whale = level.whales.find(whale => whale.id === Number(params.get('whale'))) || level.whales[0];
       let view = params.get('view');
       if (!['library', 'unassigned', 'templates'].includes(view)) view = params.has('level') || params.has('whale') ? 'library' : 'unassigned';
-      const route = { view, level: level.id, whale: whale.id, lesson: '', exercise: '' };
+      const route = { view, level: level.id, whale: whale?.id || 0, lesson: '', exercise: '' };
       const lesson = topics(route).find(lesson => lesson.id === params.get('lesson')) || (view === 'templates' ? templateLesson : null);
       if (lesson) {
         route.lesson = lesson.id;
