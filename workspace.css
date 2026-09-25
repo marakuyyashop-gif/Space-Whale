@@ -433,3 +433,19 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-path-point.is-row-end::after{display:none}
 .workspace-path-point:hover .workspace-path-dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--sidebar-accent) 18%,transparent)}
 @media(prefers-reduced-motion:reduce){.workspace-lesson-selector{transition:none}}
+/* Explicit completion controls, independent of exercise answers. */
+.workspace-path-point{padding:0;border:0;background:none;cursor:pointer;font-family:Onest,sans-serif}
+.workspace-path-done{justify-self:center;align-self:center;width:28px;height:28px;border:1px solid color-mix(in srgb,var(--sidebar-accent) 55%,transparent);border-radius:10px;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small);font-size:17px;color:var(--sw-neu-muted)}
+.workspace-path-done[aria-pressed=true]{background:var(--sidebar-accent);color:var(--sw-neu-bg)}
+.workspace-current-overview{position:relative}
+.workspace-current-overview>.workspace-info-eyebrow{padding-right:70px}
+.workspace-milestone-actions{position:absolute;right:17px;top:16px;display:flex;align-items:center;gap:9px}
+.workspace-milestone-actions button{border:0;background:none;color:var(--sw-neu-muted);cursor:pointer;padding:4px;border-radius:8px}
+.workspace-progress-skip{font:400 11px/1.4 Onest,sans-serif}.workspace-progress-reset{font:400 22px/1 Onest,sans-serif}
+.workspace-milestone-actions button:hover{color:var(--sw-neu-ink);background:color-mix(in srgb,var(--sidebar-accent) 12%,transparent)}
+.workspace-lesson-status{font:500 11px/1.4 Onest,sans-serif;color:var(--sidebar-accent)}
+.workspace-card-picker .workspace-lesson-status{grid-column:2}
+.workspace-card-picker:has(.workspace-picker-number:first-child) .workspace-picker-number{overflow-wrap:normal}
+#workspaceLessonGauge[hidden]{display:none!important}
+.workspace-card-picker .workspace-picker-option{grid-template-columns:36px minmax(0,1fr)}
+.workspace-card-picker .workspace-picker-number{font-size:10px}
