@@ -110,8 +110,8 @@ class Element {
   click() { if(this.disabled)return; this.listeners.click?.({button:0,preventDefault(){}}); }
   change(value) { this.value = value; this.listeners.change(); }
 }
-function app(search = '', storage = new Map(), live = null) {
-  const data = content();
+function app(search = '', storage = new Map(), live = null, configure = () => {}) {
+  const data = content();configure(data);
   const nodes = new Map();
   const mounts = [];
   const location = {search};
@@ -154,13 +154,12 @@ function anchors(app) { const visit=el=>el.hidden?[]:el.children.flatMap(child=>
 
 function buttons(state) { return descendants(state.nodes.get('workspaceTopics')).filter(el => el.tagName === 'button'); }
 
-test('sidebar accordions and guides do not remount an active exercise or lose answers', () => {
+test('sidebar accordions preserve active exercise and answers without inline guides', () => {
   const state = app('?view=unassigned&lesson=first-day-school');
   const first = state.mounts.at(-1);
   first.config.onChange({m1:'o5'});
-  state.nodes.get('taskGuide').click();
-  assert.equal(state.mounts.length, 1);
-  assert.equal(state.nodes.get('taskGuide').attrs['aria-pressed'], 'false');
+  assert.equal(state.nodes.has('taskGuide'),false);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-guide').length,0);
   buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
   assert.equal(anchors(state).length, 0);
   assert.equal(state.mounts.length, 1);
@@ -183,7 +182,7 @@ test('catalog expands levels and Whales; adding a whole Whale includes empty top
   assert.ok(buttons(state).some(b=>b.textContent==='Whale 1 · Short Talk'));
   buttons(state).find(b=>b.textContent==='Как я рад встрече!').click();
   assert.equal(state.mounts.length,0);
-  assert.ok(buttons(state).some(b=>b.textContent==='Tasks'));
+  assert.ok(!buttons(state).some(b=>b.textContent==='Tasks'));
   buttons(state).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.1 · Whale 1 · Short Talk').click();
   state.nodes.get('classTab').click();
   const titles=buttons(state).map(b=>b.textContent);
@@ -232,12 +231,12 @@ test('new sidebar tabs normalize one or several exercises without mutating lesso
   assert.equal(catalog.normalize('?view=unassigned&lesson=sequence-lesson').exercise,'sequence-tab');
 });
 
-test('topic tabs and Back/Forward restore selection without moving learning content to another page', () => {
+test('compact stage links and Back/Forward restore selection in the same workspace', () => {
   const state = app('?view=unassigned&lesson=school-fair');
   const before = state.location.search;
-  buttons(state).find(el => el.textContent === 'Language input').click();
-  assert.ok(state.location.search.includes('section=language'));
-  assert.equal(anchors(state).length, 0);
+  anchors(state)[1].click();
+  assert.notEqual(state.location.search,before);
+  assert.notEqual(state.mounts.at(-1).exercise.id,'fair-reading');
   state.location.search = before; state.events.popstate();
   assert.equal(state.mounts.at(-1).exercise.id, 'fair-reading');
   assert.ok(anchors(state).every(el => el.href.startsWith('classroom.html?')));
@@ -433,4 +432,19 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   assert.equal(student.mounts.at(-1).answers.pw3,'warm');
   teacher.mounts.at(-1).config.onChange({});
   assert.equal(JSON.stringify(student.mounts.at(-1).answers),'{}');
+});
+
+
+test('one compact lesson list retains materials from every former section',()=>{
+  const state=app('?view=unassigned&lesson=first-day-school',new Map(),null,data=>{
+    const lesson=data.lessons.find(item=>item.id==='first-day-school');lesson.stages[0].section='language';lesson.stages[1].section='self-study';
+  });
+  assert.ok(state.location.search.includes('section=language'));
+  const links=anchors(state);assert.ok(links.some(link=>link.href.includes('section=self-study')));
+  links.find(link=>link.href.includes('section=self-study')).click();
+  assert.ok(state.location.search.includes('section=self-study'));assert.ok(state.mounts.at(-1).exercise);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-tabs').length,0);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-guide').length,0);
+  assert.equal(anchors(state).filter(link=>link.getAttribute('aria-current')==='page').length,1);
+  assert.ok(buttons(state).some(button=>button.getAttribute('aria-label')==='Об уроке: Первый день в новой школе'));
 });
