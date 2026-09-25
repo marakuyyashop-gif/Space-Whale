@@ -6,14 +6,15 @@
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
 <link rel="stylesheet" href="exercise-kit.css?v=20260926-template-details2">
 <link rel="stylesheet" href="learning-space.css?v=20260924-core-neu">
-<link rel="stylesheet" href="workspace.css?v=20260925-sidebar-hierarchy">
+<link rel="stylesheet" href="workspace.css?v=20260925-sidebar-bands">
 </head><body class="learning-space unified-workspace">
 <div class="reference-app">
 <div class="workspace-sidebar-shell"><aside id="workspaceSidebar" class="app-sidebar" aria-label="Библиотека и задания">
 <header class="workspace-brand-row"><a class="workspace-brand" href="index.html">space whale<span aria-hidden="true">°</span></a><div class="workspace-top-controls"><button id="inviteStudent" type="button" class="workspace-icon workspace-invite-top" aria-label="Пригласить ученика" data-tooltip="Пригласить ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M19 8v6M16 11h6"/></svg></button><button id="startLesson" class="workspace-power workspace-icon" type="button" aria-label="Start Lesson" aria-pressed="false" data-tooltip="Start Lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 5.8a8 8 0 1 0 11.4 0"/></svg></button></div></header>
 <div class="workspace-session-tools"><input id="guestInviteLink" class="workspace-invite-link" aria-label="Ссылка для ученика" readonly hidden><p id="workspaceNotice" class="workspace-notice" role="status"></p></div>
-<div class="workspace-session-heading"><a href="schedule.html"></a></div>
-<section id="workspaceClockPanel" class="workspace-clock-panel" aria-label="Таймер занятия" hidden>
+<div id="workspaceCourseControls" class="workspace-course-controls" aria-label="Выбор уровня и Whale"></div>
+<div class="workspace-session-heading workspace-visually-hidden"><a href="schedule.html" role="status"></a></div>
+<section id="workspaceClockPanel" class="workspace-clock-panel" aria-label="Таймер занятия">
 <div id="workspaceClock" class="workspace-clock" role="progressbar" aria-label="Ход занятия" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0"><svg viewBox="0 0 160 160" aria-hidden="true"><circle class="workspace-clock-track" cx="80" cy="80" r="65"/><circle id="workspaceClockProgress" class="workspace-clock-progress" cx="80" cy="80" r="65" pathLength="100"/><path class="workspace-clock-ticks" d="M80 8v6 M152 80h-6 M80 152v-6 M8 80h6"/></svg><div class="workspace-clock-face"><span id="workspaceClockTime">60:00</span></div></div>
 <button id="workspaceTimerReset" class="workspace-icon workspace-timer-reset" type="button" aria-label="Сбросить таймер" data-tooltip="Сбросить таймер"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button>
 <span id="workspaceTimerStatus" class="workspace-visually-hidden" role="status"></span>
@@ -40,5 +41,5 @@
 <script src="whale1-content.js?v=20260927-whale1"></script>
 <script src="workspace-catalog.js?v=20260924-sidebar"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script src="workspace.js?v=20260925-sidebar-hierarchy2"></script>
+<script src="workspace.js?v=20260925-sidebar-bands"></script>
 </body></html>

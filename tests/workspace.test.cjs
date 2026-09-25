@@ -97,8 +97,11 @@ test('stale or malformed deep links recover without selecting another course les
 
 // A minimal DOM adapter exercises controller navigation/state, not browser layout or engine rendering.
 class Element {
-  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.listeners = {}; this.textContent = ''; this.hidden=false; }
+  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.listeners = {}; this.textContent = ''; this.hidden=false; this.style={}; }
   append(...children) { this.children.push(...children); }
+  focus() {}
+  removeAttribute(name) { delete this.attrs[name]; }
+  getBoundingClientRect() { return {left:20,right:100,top:50,bottom:90,width:280,height:240}; }
   getAttribute(name) { return this.attrs[name] ?? null; }
   querySelectorAll(selector) {
     const name=selector.split(':')[0].slice(1),found=[];
@@ -118,7 +121,9 @@ function app(search = '', storage = new Map(), live = null, configure = () => {}
   const events = {};
   const setURL = (_state, _unused, url) => { location.search = new URL(url, 'https://example.com/Space-Whale/').search; };
   const sessionHeading = new Element('a');
+  const body=new Element('body');nodes.set('body',body);
   const document = {
+    body, addEventListener(){},
     getElementById(id) { if(!nodes.has(id)) nodes.set(id,new Element('div')); return nodes.get(id); },
     createElement(tag) {return new Element(tag);},
     querySelectorAll() { return []; },
@@ -139,6 +144,7 @@ function app(search = '', storage = new Map(), live = null, configure = () => {}
     }},
     SpaceWhaleCollaboration: live?.collaboration || null,
     SpaceWhaleClassroom: live?.classroom || null,
+    innerWidth:1280,innerHeight:900,
     setInterval(){return 1;},clearInterval(){},
     addEventListener(name, cb) {events[name]=cb;}
   };
@@ -152,7 +158,7 @@ function app(search = '', storage = new Map(), live = null, configure = () => {}
 function descendants(el) { return el.children.flatMap(child => [child, ...descendants(child)]); }
 function anchors(app) { const visit=el=>el.hidden?[]:el.children.flatMap(child=>[...(child.tagName==='a'&&(child.className||'').includes('workspace-stage-link')?[child]:[]),...visit(child)]); return visit(app.nodes.get('workspaceTopics')); }
 
-function buttons(state) { return descendants(state.nodes.get('workspaceTopics')).filter(el => el.tagName === 'button'); }
+function buttons(state) { return [...['workspaceTopics','workspaceCourseControls'].flatMap(id=>descendants(state.nodes.get(id))),...state.nodes.get('body').children.filter(el=>!el.hidden).flatMap(el=>descendants(el))].filter(el => el.tagName === 'button'); }
 
 test('sidebar accordions preserve active exercise and answers without inline guides', () => {
   const state = app('?view=unassigned&lesson=first-day-school');
@@ -175,11 +181,13 @@ test('sidebar accordions preserve active exercise and answers without inline gui
   assert.equal(JSON.stringify(app(restored.location.search, restored.storage).mounts.at(-1).config.answers), '{}');
 });
 
-test('catalog expands levels and Whales; adding a whole Whale includes empty topics and survives reload', () => {
+test('compact course controls keep whole-Whale selection and restore it after reload', () => {
   const state=app();
   assert.equal(state.nodes.get('libraryTab').attrs['aria-pressed'],'true');
   assert.ok(buttons(state).some(b=>b.textContent==='A1.1'));
-  assert.ok(buttons(state).some(b=>b.textContent==='Whale 1 · Short Talk'));
+  assert.ok(buttons(state).some(b=>b.textContent==='W 1'));
+  assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-level-toggle').length,0);
   buttons(state).find(b=>b.textContent==='Как я рад встрече!').click();
   assert.equal(state.mounts.length,0);
   assert.ok(!buttons(state).some(b=>b.textContent==='Tasks'));
@@ -213,7 +221,7 @@ test('Class retains a standalone lesson and timer is independent of exercise and
   assert.equal(restored.nodes.get('workspaceClockTime').textContent,'60:00');
   assert.equal(restored.nodes.get('startLesson').attrs['aria-pressed'],'false');
   restored.nodes.get('classTab').click();
-  buttons(restored).find(b=>b.textContent==='Убрать из класса').click();
+  buttons(restored).find(b=>b.attrs['aria-label']==='Убрать из класса: Готовим школьную ярмарку').click();
   assert.equal(anchors(restored).length,0);
   assert.ok(restored.mounts.at(-1).destroyed);
 });
@@ -402,13 +410,17 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   assert.equal(student.mounts.length,0);
   assert.equal(teacher.nodes.get('startLesson').disabled,false);
   assert.equal(student.nodes.get('startLesson').disabled,true);
+  buttons(teacher).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
+  buttons(teacher).find(b=>b.textContent==='A1.2').click();
+  buttons(teacher).find(b=>b.attrs['aria-label']==='Выбрать Whale').click();
+  buttons(teacher).find(b=>b.textContent==='Whale 4 · Описываем и объясняем выбор').click();
   buttons(teacher).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.2 · Whale 4 · Описываем и объясняем выбор').click();
   await flush();
   student.nodes.get('classTab').click();
   assert.ok(buttons(student).some(b=>b.textContent==='Описываем одежду'));
   assert.ok(!buttons(student).some(b=>b.textContent==='Как я рад встрече!'));
   student.nodes.get('libraryTab').click();
-  buttons(teacher).find(b=>b.textContent==='A1.2').click();
+  buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
   buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
   anchors(teacher).find(a=>a.textContent==='Words').click();
   await flush();await flush();
@@ -421,7 +433,7 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   assert.equal(teacher.mounts.at(-1).answers.pw2,'dark');
   assert.equal(teacher.mounts.at(-1).answers.__sw_checked,true);
   const before=student.location.search;
-  buttons(student).find(b=>b.textContent==='Как я рад встрече!').click();
+  buttons(student).find(b=>b.textContent==='Описываем внешний вид одежды').click();
   assert.equal(student.location.search,before);
   const server=collaboration.create('server');
   server.merge(saved.get(teacher.mounts.at(-1).exercise.id));
@@ -447,4 +459,24 @@ test('one compact lesson list retains materials from every former section',()=>{
   assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-guide').length,0);
   assert.equal(anchors(state).filter(link=>link.getAttribute('aria-current')==='page').length,1);
   assert.ok(buttons(state).some(button=>button.getAttribute('aria-label')==='Об уроке: Первый день в новой школе'));
+});
+
+
+test('selectors isolate a single Whale, expose templates and keep the clock visible',()=>{
+  const state=app();
+  assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
+  assert.equal(buttons(state).filter(b=>b.className==='workspace-topic-toggle').length,7);
+  buttons(state).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
+  buttons(state).find(b=>b.textContent==='A1.2').click();
+  assert.equal(new URLSearchParams(state.location.search).get('level'),'A1.2');
+  buttons(state).find(b=>b.attrs['aria-label']==='Выбрать Whale').click();
+  buttons(state).find(b=>b.textContent==='Whale 4 · Описываем и объясняем выбор').click();
+  assert.ok(buttons(state).some(b=>b.textContent==='Описываем одежду'));
+  assert.ok(!buttons(state).some(b=>b.textContent==='Как я рад встрече!'));
+  buttons(state).find(b=>b.textContent==='Описываем внешний вид одежды').click();
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-body:not([hidden])').length,1);
+  buttons(state).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
+  buttons(state).find(b=>b.textContent==='Шаблоны упражнений').click();
+  assert.equal(anchors(state).length,31);
+  assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
 });
