@@ -449,3 +449,21 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 #workspaceLessonGauge[hidden]{display:none!important}
 .workspace-card-picker .workspace-picker-option{grid-template-columns:36px minmax(0,1fr)}
 .workspace-card-picker .workspace-picker-number{font-size:10px}
+/* Lesson badges, start-in-clock and the student profile placeholder. */
+.workspace-lesson-status{display:grid;place-items:center;min-width:32px;height:29px;padding:0 6px;box-sizing:border-box;border-radius:10px;background:var(--sidebar-accent);color:#fff;font:600 12px/1 Onest,sans-serif;white-space:nowrap}
+.workspace-lesson-selector>.workspace-lesson-status{align-self:center;margin-top:4px;font-size:14px;min-width:34px;height:31px}
+.workspace-card-picker .workspace-picker-option:has(.workspace-lesson-status){position:relative;padding-right:62px}
+.workspace-card-picker .workspace-picker-option>.workspace-lesson-status{position:absolute;right:12px;top:50%;transform:translateY(-50%);grid-column:auto}
+.unified-workspace #workspaceProfileButton{width:48px;height:48px;border-radius:50%;background:var(--key-face);color:var(--sw-neu-muted);box-shadow:0 3px 0 var(--key-edge),5px 9px 10px var(--key-shadow);border:1px solid #ffffff20}
+#workspaceProfileButton svg{width:23px;height:23px}
+#workspaceProfileButton:hover{transform:translateY(-1px);color:var(--sidebar-accent)}
+.unified-workspace .workspace-clock #startLesson{position:absolute;inset:0;z-index:3;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:50%;display:grid;place-content:center;background:var(--sw-neu-surface);color:var(--sidebar-accent);box-shadow:var(--sw-neu-small);font:600 18px/1.4 Onest,sans-serif;letter-spacing:-.02em;cursor:pointer;transition:filter 180ms,transform 180ms}
+.unified-workspace .workspace-clock #startLesson:hover{filter:brightness(1.06);transform:translateY(-1px);background:var(--sw-neu-surface);color:var(--sidebar-accent)}
+.unified-workspace .workspace-clock #startLesson[hidden]{display:none!important}
+.workspace-clock[data-started=false]>svg,.workspace-clock[data-started=false]>.workspace-clock-face{visibility:hidden}
+.workspace-clock::before{content:'';position:absolute;inset:17%;border-radius:50%;background:conic-gradient(color-mix(in srgb,var(--sw-neu-muted) 27%,transparent) var(--clock-spent,0deg),transparent 0);pointer-events:none}
+.workspace-clock[data-started=false]::before{display:none}
+.workspace-clock-face{z-index:1}.workspace-clock-progress{opacity:0}
+.workspace-student-profile{position:absolute;inset:0;z-index:30;background:var(--sw-neu-bg);padding:28px;box-sizing:border-box}
+.workspace-student-profile[hidden]{display:none}
+.workspace-student-profile .workspace-icon{background:var(--sw-neu-surface);color:var(--sw-neu-muted)}

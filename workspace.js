@@ -287,14 +287,14 @@
     if(current>=0)entry.last=route.exercise;
     saveJourney();return {...entry,count:entry.done.length,total,current};
   }
-  function lessonStatus(lesson){const entry=journeys[lesson.id];return entry?.status==='skipped'?'Skipped':lesson.stages.length&&entry?.done?.length===lesson.stages.length?'Done':'';}
+  function lessonStatus(lesson){const entry=journeys[lesson.id];if(entry?.status==='skipped')return 'Skipped';const count=(entry?.done||[]).filter(id=>lesson.stages.some(stage=>stage.exercise.id===id)).length;return count&&lesson.stages.length?(count===lesson.stages.length?'Done':`${Math.round(count/lesson.stages.length*100)}%`):'';}
   function markLesson(action){
     const lesson=selectedLesson();if(!lesson||locked())return;
     journey(lesson);const entry=journeys[lesson.id];
-    if(action==='reset'){entry.done=[];entry.unmarked=lesson.stages.map(stage=>stage.exercise.id);entry.status='';entry.closed=false;}
+    if(action==='reset'){entry.done=[];entry.unmarked=[];entry.status='';entry.closed=false;}
     if(action==='done'){entry.done=lesson.stages.map(stage=>stage.exercise.id);entry.unmarked=[];entry.status='done';entry.closed=false;}
     if(action==='skip'){entry.status='skipped';entry.closed=true;}
-    saveJourney();renderSidebar();renderMilestones();host.hidden=Boolean(entry.closed);
+    saveJourney();if(action==='reset'&&lesson.stages.length){const first=lesson.stages[0];go({...route,exercise:first.exercise.id,section:stageSection(first)});return;}renderSidebar();renderMilestones();host.hidden=Boolean(entry.closed);
   }
   function milestonePurpose(stage){
     const def=stage.exercise,text=[stage.purpose,stage.menu,stage.title,def.title,stage.guide?.aim].filter(Boolean).join(' ').toLowerCase();
@@ -432,7 +432,7 @@
     const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,'Lesson',lessonOptions),'workspace-lesson-selector');
     lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label','Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
     lessonCard.append(node('span',stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
-    if(lesson&&lessonStatus(lesson))lessonCard.append(node('span',lessonStatus(lesson)==='Done'?'✓ Done':'Skipped','workspace-lesson-status'));
+    if(lesson&&lessonStatus(lesson))lessonCard.append(node('span',lessonStatus(lesson)==='Done'?'✓':lessonStatus(lesson),'workspace-lesson-status'));
     overview.append(lessonCard);
     if(lesson&&journeys[lesson.id]?.closed){tree.append(overview);return;}
     const copy=node('p','','workspace-info-copy');
@@ -741,7 +741,7 @@
   const scheduledStart=()=>{const value=Date.parse(liveSession?.scheduled_at||'');return Number.isFinite(value)?value:null;};
   function timerState(){
     const scheduled=scheduledStart(),duration=Math.max(1,Number(liveSession?.duration_minutes)||60)*60000;
-    const began=scheduled??timer.startedAt;
+    const began=timer.startedAt===null?null:(scheduled??timer.startedAt);
     const remaining=began===null?duration:Math.max(0,Math.min(duration,began+duration-Date.now()));
     return {duration,began,remaining,active:began!==null,waiting:began!==null&&Date.now()<began};
   }
@@ -750,6 +750,7 @@
     document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
     document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/state.duration*100));
     const clock=document.getElementById('workspaceClock');clock.setAttribute('aria-valuemax',String(state.duration/60000));clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${Math.floor(seconds/60)} мин. ${seconds%60} сек. осталось`);
+    clock.dataset.started=String(state.active);clock.style.setProperty('--clock-spent',`${spent/state.duration*360}deg`);start.hidden=state.active;
     clock.setAttribute('data-time-state',state.active&&seconds===0?'ended':state.active&&seconds<=300?'ending':'normal');
     const label=!state.active?'Start Lesson':state.waiting?'Ожидаем начало':seconds===0?'Занятие завершено':'Занятие идёт';
     start.setAttribute('aria-pressed',String(state.active));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);start.disabled=locked()||state.active;
@@ -758,6 +759,10 @@
   function tick(){paintTimer();const state=timerState();if(state.active&&state.remaining>0&&ticker===null)ticker=window.setInterval(paintTimer,1000);}
   start.addEventListener('click',()=>{if(locked()||timerState().active)return;timer.startedAt=Date.now();try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}tick();});
   tick();
+  const profile=document.getElementById('workspaceStudentProfile');
+  document.getElementById('workspaceProfileButton').addEventListener('click',()=>{profile.hidden=false;document.getElementById('workspaceBackToClass').focus();});
+  document.getElementById('workspaceBackToClass').addEventListener('click',()=>{profile.hidden=true;document.getElementById('workspaceProfileButton').focus();});
+  profile.addEventListener('keydown',event=>{if(event.key==='Escape'){profile.hidden=true;document.getElementById('workspaceProfileButton').focus();}});
 
   window.addEventListener('popstate', () => {
     if (liveMode && liveReady && liveRole === 'student') {
@@ -832,7 +837,7 @@
       const list=node('div','',`workspace-picker-options ${options.some(option=>option.number)?'workspace-card-picker':'workspace-number-picker'}`);
       options.forEach(option=>{
         const control=option.href?node('a',option.label,'workspace-picker-option'):button(option.label,()=>{closeInfo();option.action();},'workspace-picker-option');
-        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status)control.append(node('span',option.status==='Done'?'✓ Done':'Skipped','workspace-lesson-status'));}
+        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));}
         if(option.href)control.href=option.href;else control.setAttribute('aria-pressed',String(Boolean(option.selected)));
         list.append(control);
       });
