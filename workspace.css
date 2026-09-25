@@ -411,3 +411,25 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-lesson-popover,.workspace-control-tooltip{--workspace-accent:var(--sidebar-accent);background:var(--sw-neu-bg);color:var(--sw-neu-ink)}
 [data-theme=dark] .workspace-control-tooltip{box-shadow:0 5px 18px #0005,inset 0 1px 0 #ffffff10}
 @media(max-width:768px){.unified-workspace .app-sidebar{display:flex;height:calc(52dvh - 24px)!important;overflow:hidden;gap:10px}.workspace-instruments{width:245px;align-self:center;grid-template-columns:137px minmax(0,1fr);padding:0}.workspace-instruments .workspace-course-controls{grid-column:2;grid-row:1}.workspace-middle{flex:1 1 0;min-height:70px}.workspace-brand-row,.workspace-mini-dock{flex:none}}
+
+/* Two course keys; the selected lesson is its own full-width card. */
+.workspace-instruments .workspace-course-controls{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;height:132px}
+.unified-workspace .workspace-console-selector.selector-level,.unified-workspace .workspace-console-selector.selector-module{position:relative;inset:auto;width:66px;height:58px;min-height:58px;flex:none;border-radius:18px;font-size:14px}
+.unified-workspace .workspace-console-selector:is(:hover,:focus-visible){background:linear-gradient(145deg,color-mix(in srgb,var(--sw-neu-bg) 82%,white),var(--sw-neu-bg));box-shadow:0 3px 0 var(--key-edge),3px 6px 12px var(--key-shadow),inset 0 1px 0 #ffffff50}
+.workspace-lesson-overview{padding:18px 20px 22px;background:var(--sidebar-top);min-height:0}
+.workspace-lesson-selector{position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;padding:16px 34px 16px 16px;margin:0 0 18px;border:0;border-radius:17px;background:var(--sw-neu-surface);color:var(--sw-neu-ink);box-shadow:var(--sw-neu-small);text-align:left;cursor:pointer;transition:transform 180ms,box-shadow 180ms,filter 180ms;font-family:Onest,sans-serif}
+.workspace-lesson-selector .workspace-info-eyebrow{margin:0;font-size:10px}
+.workspace-lesson-selector-title{font-size:15px;line-height:1.45;font-weight:600}
+.workspace-lesson-selector-tags{font-size:11px;line-height:1.5;color:var(--sw-neu-muted)}
+.workspace-lesson-selector .workspace-selector-chevron{position:absolute;right:16px;top:21px}
+.workspace-lesson-selector:is(:hover,:focus-visible){transform:translateY(-1px);filter:brightness(1.035)}
+.workspace-lesson-selector[aria-expanded=true]{box-shadow:var(--sw-neu-inset)}
+.workspace-lesson-selector[aria-expanded=true] .workspace-selector-chevron{transform:rotate(225deg)}
+.workspace-current-overview{background:var(--sidebar-lower);padding:22px 20px;min-height:0}
+.unified-workspace .app-sidebar{--sidebar-lower:#dfe3e6}
+[data-theme=dark].unified-workspace .app-sidebar{--sidebar-lower:#272c32}
+.workspace-lesson-path{display:grid;grid-template-columns:repeat(var(--path-columns,8),minmax(0,1fr));row-gap:9px;overflow:visible;margin:17px 0 0;padding:6px 0 3px}
+.workspace-path-point{min-width:0;width:100%;height:29px}
+.workspace-path-point.is-row-end::after{display:none}
+.workspace-path-point:hover .workspace-path-dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--sidebar-accent) 18%,transparent)}
+@media(prefers-reduced-motion:reduce){.workspace-lesson-selector{transition:none}}

@@ -305,16 +305,18 @@
     const nav=document.getElementById('workspaceLessonPath'),lesson=selectedLesson();
     if(nav){
       nav.replaceChildren();
-      const {count,current}=journey(lesson);
+      const {count,current,total}=journey(lesson);
+      const columns=Math.max(1,Math.ceil(total/Math.max(1,Math.ceil(total/8))));nav.style.setProperty('--path-columns',String(columns));
       (lesson?.stages||[]).forEach((stage,index)=>{
         const purpose=milestonePurpose(stage),active=index===current;
         const control=link('',{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)},active,'workspace-path-point');
+        if((index+1)%columns===0)control.classList.add('is-row-end');
         control.dataset.state=active?'current':index<count?'passed':'upcoming';
         control.setAttribute('aria-label',`Milestone ${index+1}: ${purpose.name}`);control.setAttribute('data-tooltip',`${index+1} · ${purpose.name}`);
         control.append(node('span',String(index+1),'workspace-path-dot'));
         nav.append(control);
       });
-      requestAnimationFrame(()=>{const active=nav.querySelector('[aria-current]');if(active)nav.scrollLeft=active.offsetLeft-nav.offsetLeft-(nav.clientWidth-active.clientWidth)/2;});
+
     }
     renderLessonGauge();
   }
@@ -401,9 +403,11 @@
     };
     selector(view==='library'?level?.id||'—':view==='templates'?'TPL':'Level','Level',levelOptions,'level');
     selector(view==='library'&&whale?`M${whale.id}`:'M—','Module',moduleOptions,'module');
-    selector(stageIndex>=0?`L${stageIndex+1}`:'L—','Lesson',lessonOptions,'lesson');
     const overview=node('section','','workspace-lesson-overview');
-    overview.append(node('span','LESSON','workspace-info-eyebrow'),node('h2',lesson?.title||'Выберите Lesson'));
+    const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,'Lesson',lessonOptions),'workspace-lesson-selector');
+    lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label','Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
+    lessonCard.append(node('span',stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
+    overview.append(lessonCard);
     const copy=node('p','','workspace-info-copy');
     if(lesson){
       const goal=lesson.summary||lesson.description||lesson.goal;
