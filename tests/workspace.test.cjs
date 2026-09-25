@@ -156,18 +156,19 @@ function app(search = '', storage = new Map(), live = null, configure = () => {}
   return {nodes,mounts,location,events,storage,sessionHeading};
 }
 function descendants(el) { return el.children.flatMap(child => [child, ...descendants(child)]); }
-function anchors(app) { const visit=el=>el.hidden?[]:el.children.flatMap(child=>[...(child.tagName==='a'&&(child.className||'').includes('workspace-stage-link')?[child]:[]),...visit(child)]); return visit(app.nodes.get('workspaceTopics')); }
+function anchors(app) { const visit=el=>el.hidden?[]:el.children.flatMap(child=>[...(child.tagName==='a'&&(child.className||'').includes('workspace-stage-link')?[child]:[]),...visit(child)]); return visit(app.nodes.get('workspaceMilestones')); }
 
 function buttons(state) { return [...['workspaceTopics','workspaceCourseControls'].flatMap(id=>descendants(state.nodes.get(id))),...state.nodes.get('body').children.filter(el=>!el.hidden).flatMap(el=>descendants(el))].filter(el => el.tagName === 'button'); }
 
-test('sidebar accordions preserve active exercise and answers without inline guides', () => {
+test('flat Stage selection preserves active exercise and keeps milestones outside the sidebar', () => {
   const state = app('?view=unassigned&lesson=first-day-school');
   const first = state.mounts.at(-1);
   first.config.onChange({m1:'o5'});
   assert.equal(state.nodes.has('taskGuide'),false);
   assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-guide').length,0);
   buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
-  assert.equal(anchors(state).length, 0);
+  assert.ok(anchors(state).length>0);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-body').length,0);
   assert.equal(state.mounts.length, 1);
   buttons(state).find(el => el.textContent === 'Первый день в новой школе').click();
   anchors(state).find(el => el.textContent === 'Words in context').click();
@@ -474,9 +475,25 @@ test('selectors isolate a single Whale, expose templates and keep the clock visi
   assert.ok(buttons(state).some(b=>b.textContent==='Описываем одежду'));
   assert.ok(!buttons(state).some(b=>b.textContent==='Как я рад встрече!'));
   buttons(state).find(b=>b.textContent==='Описываем внешний вид одежды').click();
-  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-body:not([hidden])').length,1);
+  assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-body').length,0);
+  assert.equal(buttons(state).filter(b=>b.className==='workspace-topic-toggle'&&b.getAttribute('aria-current')==='page').length,1);
   buttons(state).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
   buttons(state).find(b=>b.textContent==='Шаблоны упражнений').click();
   assert.equal(anchors(state).length,31);
   assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
+});
+
+
+test('Stage completion is explicit, reversible and restored independently from milestone selection',()=>{
+  const state=app('?view=unassigned&lesson=first-day-school');
+  const complete=()=>buttons(state).find(b=>b.attrs['aria-label']==='Отметить Stage завершённым: Первый день в новой школе');
+  assert.equal(complete().attrs['aria-pressed'],'false');
+  const initial=state.mounts.at(-1);
+  complete().click();
+  assert.equal(state.mounts.at(-1),initial);
+  assert.ok(new URLSearchParams(state.location.search).get('completed_stages').includes('first-day-school'));
+  const restored=app(state.location.search,state.storage);
+  const undo=buttons(restored).find(b=>b.attrs['aria-label']==='Снять отметку завершения: Первый день в новой школе');
+  assert.equal(undo.attrs['aria-pressed'],'true');undo.click();
+  assert.equal(new URLSearchParams(restored.location.search).get('completed_stages'),'');
 });
