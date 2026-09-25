@@ -467,3 +467,41 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-student-profile{position:absolute;inset:0;z-index:30;background:var(--sw-neu-bg);padding:28px;box-sizing:border-box}
 .workspace-student-profile[hidden]{display:none}
 .workspace-student-profile .workspace-icon{background:var(--sw-neu-surface);color:var(--sw-neu-muted)}
+/* One continuous lesson path. */
+.workspace-middle{display:flex;flex-direction:column;background:var(--sidebar-lower)}
+.unified-workspace .workspace-tree{flex:1;display:flex;flex-direction:column}
+.workspace-current-overview{flex:1;padding-bottom:25px}
+.workspace-lesson-path{position:relative;display:block;height:290px;margin:20px 0 0;padding:0;overflow:visible}
+.workspace-lesson-path>svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--sw-neu-muted);stroke-opacity:.5;stroke-width:1.1;overflow:visible}
+.workspace-lesson-path .workspace-path-point{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;min-width:0;z-index:1}
+.workspace-lesson-path .workspace-path-point::after{display:none!important}
+.workspace-lesson-path .workspace-path-dot{width:22px;height:22px;background:var(--sidebar-lower)}
+.workspace-lesson-path .workspace-path-point[data-state=passed] .workspace-path-dot{background:var(--sidebar-accent)}
+.workspace-lesson-path .workspace-path-point[aria-current] .workspace-path-dot{border:2px solid var(--sidebar-accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--sidebar-accent) 16%,var(--sidebar-lower))}
+.workspace-snake-label{position:absolute;left:8px;right:8px;text-align:center;font:500 11px/1.4 Onest,sans-serif;color:var(--sw-neu-ink);pointer-events:none}
+.workspace-milestone-actions .workspace-progress-reset{display:inline-grid;place-items:center;width:36px;height:36px;min-height:36px;padding:8px;border:0;border-radius:50%;background:transparent;box-shadow:none;color:var(--sw-neu-muted)}
+.workspace-progress-reset svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.workspace-milestone-actions .workspace-progress-reset:hover:not(:disabled){background:var(--sw-neu-hover);color:var(--sw-neu-ink);transform:none;filter:none}
+.workspace-lesson-selector{padding-right:65px}
+.workspace-lesson-selector>.workspace-lesson-status{position:absolute;right:13px;top:50%;transform:translateY(-50%);margin:0}
+.workspace-lesson-selector .workspace-selector-chevron{right:21px;top:15px}
+.workspace-card-picker .workspace-picker-option{min-width:0;padding-right:65px}
+.workspace-card-picker strong,.workspace-card-picker small{min-width:0;overflow-wrap:anywhere}
+.workspace-card-picker .workspace-picker-option.is-progressed{background:color-mix(in srgb,var(--sw-neu-bg) 93%,var(--sw-neu-muted));box-shadow:var(--sw-neu-inset)}
+.workspace-card-picker .is-progressed strong{color:var(--sw-neu-muted);font-weight:500}
+.workspace-collection-option{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:8px;align-items:center}
+.workspace-collection-mark{width:29px;height:29px;border:1px solid color-mix(in srgb,var(--sw-neu-muted) 25%,transparent);border-radius:10px;background:var(--sw-neu-bg);color:var(--sw-neu-muted);cursor:pointer}
+.workspace-collection-mark[aria-pressed=true]{background:var(--sidebar-accent);color:white;border-color:transparent}
+.unified-workspace .app-sidebar.is-profile>.workspace-instruments,.unified-workspace .app-sidebar.is-profile>.workspace-middle,.unified-workspace .app-sidebar.is-profile>.workspace-mini-dock,.unified-workspace .app-sidebar.is-profile>.workspace-session-tools{display:none}
+#workspaceStudentProfile{position:relative;inset:auto;flex:1;width:100%;min-height:0;padding:0;background:transparent;z-index:auto}
+.workspace-session-dialog{width:min(390px,calc(100vw - 48px));border:0;border-radius:25px;padding:25px;background:var(--sw-neu-bg);color:var(--sw-neu-ink);font:400 14px/1.6 Onest,sans-serif;box-shadow:0 18px 60px #0005}
+.workspace-session-dialog::backdrop{background:#15191d66;backdrop-filter:blur(3px)}
+.workspace-session-dialog h2{font-size:20px;margin:0 0 12px}.workspace-dialog-actions,.workspace-device-controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.workspace-dialog-button{border:0;border-radius:15px;padding:11px 15px;background:var(--sw-neu-surface);color:var(--sw-neu-ink);box-shadow:var(--sw-neu-small);font:500 13px Onest,sans-serif;cursor:pointer}.workspace-dialog-button:hover{filter:brightness(1.08)}
+.workspace-device-preview{width:100%;max-height:210px;border-radius:16px;margin-top:15px;background:#15191d}.workspace-session-dialog meter{width:100%;margin-top:14px}.workspace-device-status{font-size:12px;color:var(--sw-neu-muted)}
+#workspaceStopLesson{position:absolute;inset:0;z-index:3;border:0;border-radius:50%;background:var(--sw-neu-bg);color:var(--sidebar-accent);font:600 18px Onest,sans-serif;opacity:0;cursor:pointer;transition:opacity 180ms}
+.workspace-clock:hover #workspaceStopLesson,#workspaceStopLesson:focus-visible{opacity:.96}
+#workspaceStopLesson[hidden]{display:none}
+@media(pointer:coarse){#workspaceStopLesson{inset:auto 20% 8%;border-radius:10px;font-size:11px;padding:4px;opacity:.8}}
+.workspace-lesson-popover:has(.workspace-card-picker){width:min(360px,calc(100vw - 24px))}
+.workspace-collection-option .workspace-picker-option{width:100%}

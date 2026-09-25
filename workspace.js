@@ -276,6 +276,14 @@
     }
     heading.append(tools);card.append(heading);parent.append(card);
   }
+  const collectionKey=`space-whale:collection-marks:${classScope}`;
+  let collectionMarks={};try{collectionMarks=JSON.parse(localStorage.getItem(collectionKey))||{};}catch(_){}
+  function collectionStatus(key,lessons){
+    if(collectionMarks[key])return 'Done';
+    const total=lessons.reduce((n,l)=>n+l.stages.length,0),done=lessons.reduce((n,l)=>n+(journeys[l.id]?.done||[]).filter(id=>l.stages.some(stage=>stage.exercise.id===id)).length,0);
+    return total&&done?(done===total?'Done':`${Math.round(done/total*100)}%`):'';
+  }
+  function toggleCollection(key){if(locked())return;collectionMarks[key]=!collectionMarks[key];try{localStorage.setItem(collectionKey,JSON.stringify(collectionMarks));}catch(_){}renderSidebar();renderMilestones();}
   function saveJourney(){try{localStorage.setItem(journeyKey,JSON.stringify(journeys));}catch(_){} }
   function journey(lesson){
     const total=lesson?.stages.length||0;
@@ -316,7 +324,7 @@
     if(nav){
       nav.replaceChildren();
       const {done,current,total,unmarked}=journey(lesson);
-      const columns=Math.max(1,Math.ceil((total+1)/Math.max(1,Math.ceil((total+1)/8))));nav.style.setProperty('--path-columns',String(columns));
+      const columns=total+1;
       (lesson?.stages||[]).forEach((stage,index)=>{
         const purpose=milestonePurpose(stage),active=index===current;
         const control=button('',()=>{
@@ -341,9 +349,19 @@
         nav.append(control);
       });
       const finish=button('✓',()=>markLesson('done'),'workspace-path-point workspace-path-done');finish.disabled=locked();finish.setAttribute('aria-label','Done — отметить все Milestones');finish.setAttribute('data-tooltip','Done');finish.setAttribute('aria-pressed',String(total>0&&done.length===total));nav.append(finish);
-
+      drawMilestoneSnake(nav,total+1,current,lesson);
     }
     renderLessonGauge();
+  }
+  function drawMilestoneSnake(nav,count,current,lesson){
+    const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),path=document.createElementNS(ns,'path');
+    const rows=Math.max(3,Math.ceil(count/4)),gap=72,height=48+(rows-1)*gap+40;
+    let d='M 30 24 H 210';
+    for(let row=1;row<rows;row++){const y=24+row*gap,side=row%2?210:30;d+=` C ${side+(row%2?24:-24)} ${y-gap} ${side+(row%2?24:-24)} ${y} ${side} ${y} H ${row%2?30:210}`;}
+    svg.setAttribute('viewBox',`0 0 240 ${height}`);svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');path.setAttribute('d',d);svg.append(path);nav.prepend(svg);nav.style.height=`${height}px`;
+    const points=[...nav.querySelectorAll('.workspace-path-point')],length=path.getTotalLength();
+    points.forEach((control,index)=>{const point=path.getPointAtLength(length*index/Math.max(1,count-1));control.style.left=`${point.x/240*100}%`;control.style.top=`${point.y}px`;});
+    if(current>=0&&lesson){const point=path.getPointAtLength(length*current/Math.max(1,count-1)),label=node('span',milestonePurpose(lesson.stages[current]).name,'workspace-snake-label');label.style.top=`${point.y+19}px`;nav.append(label);}
   }
   function answerProgress(def,value={}){
     const filled=value=>Array.isArray(value)?value.length>0:typeof value==='string'?value.trim().length>0:typeof value==='number';
@@ -406,7 +424,7 @@
     const view=route.view==='templates'&&!inClass&&!guestAllowedLessons?'templates':route.view==='unassigned'?'unassigned':'library';
     const topics=view==='templates'?catalog.topics({view:'templates'}):view==='unassigned'?loose:whale?catalog.topics({view:'library',level:level.id,whale:whale.id}).filter(permitted):[];
     const lesson=selectedLesson(),stageIndex=topics.findIndex(item=>item.id===lesson?.id),milestoneIndex=lesson?.stages.findIndex(item=>item.exercise.id===route.exercise)??-1;
-    const levelOptions=levels.map(item=>({label:item.id,number:'LEVEL',card:true,tags:item.whales.length?item.whales.slice(0,3).map(module=>module.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,'')).join(' • '):({'A2.1':'Повседневные ситуации • общение','A2.2':'Рассказы • планы • впечатления','A2.3':'Обсуждение опыта • самостоятельная речь','B1.1':'Мнения • связные рассказы','B1.2':'Обсуждение тем • аргументы','B1.3':'Подробные объяснения • диалоги','B1.4':'Свободнее выражаем мысли'}[item.id]||'Программа готовится'),selected:item.id===route.level,action:()=>chooseCollection({...route,view:'library',level:item.id,whale:availableWhales(item)[0]?.id||0})}));
+    const levelOptions=levels.map(item=>({label:item.id,number:'LEVEL',card:true,tags:item.whales.length?item.whales.slice(0,3).map(module=>module.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,'')).join(' • '):({'A2.1':'Повседневные ситуации • общение','A2.2':'Рассказы • планы • впечатления','A2.3':'Обсуждение опыта • самостоятельная речь','B1.1':'Мнения • связные рассказы','B1.2':'Обсуждение тем • аргументы','B1.3':'Подробные объяснения • диалоги','B1.4':'Свободнее выражаем мысли'}[item.id]||'Программа готовится'),status:collectionStatus(`level:${item.id}`,catalog.lessons.filter(l=>l.level===item.id)),mark:()=>toggleCollection(`level:${item.id}`),selected:item.id===route.level,action:()=>chooseCollection({...route,view:'library',level:item.id,whale:availableWhales(item)[0]?.id||0})}));
     if(loose.length)levelOptions.push({label:'Отдельные уроки',action:()=>chooseCollection({...route,view:'unassigned'})});
     if(!inClass&&!guestAllowedLessons)levelOptions.push({label:'Шаблоны упражнений',action:()=>chooseCollection({...route,view:'templates'})},{label:'Управление материалами',href:'library-manage.html'});
     const tagsFor=item=>{
@@ -419,7 +437,7 @@
     const moduleOptions=whales.map(item=>{
       const lessons=catalog.topics({view:'library',level:level.id,whale:item.id}).filter(permitted);
       const names=[...new Set(lessons.flatMap(item=>tagsFor(item).split(' • ')))].filter(Boolean).slice(0,3);
-      return {label:item.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,''),number:String(item.id).padStart(2,'0'),tags:names.join(' • '),selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})};
+      return {label:item.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,''),number:String(item.id).padStart(2,'0'),tags:names.join(' • '),status:collectionStatus(`module:${level.id}:${item.id}`,lessons),mark:()=>toggleCollection(`module:${level.id}:${item.id}`),selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})};
     });
     const lessonOptions=topics.map((item,index)=>({label:item.title,number:String(index+1).padStart(2,'0'),tags:tagsFor(item),status:lessonStatus(item),selected:item.id===lesson?.id,action:()=>{if(journeys[item.id])journeys[item.id].closed=false;saveJourney();go({...route,...lessonLocation(item),lesson:item.id,exercise:'',section:'tasks'});}}));
     const selector=(label,title,options,size)=>{
@@ -447,7 +465,7 @@
     overview.append(copy);tree.append(overview);
     const current=node('section','','workspace-current-overview'),stage=lesson?.stages[milestoneIndex];
     current.append(node('span',stage?`MILESTONE ${String(milestoneIndex+1).padStart(2,'0')}`:'MILESTONE','workspace-info-eyebrow'));
-    const actions=node('div','','workspace-milestone-actions');const skip=button('Skip',()=>markLesson('skip'),'workspace-progress-skip');const reset=button('↶',()=>markLesson('reset'),'workspace-progress-reset');skip.disabled=reset.disabled=studentLocked;reset.setAttribute('aria-label','Сбросить отметки Milestones');reset.setAttribute('data-tooltip','Сбросить отметки');actions.append(skip,reset);current.append(actions);
+    const actions=node('div','','workspace-milestone-actions');const skip=button('Skip',()=>markLesson('skip'),'workspace-progress-skip');const reset=button('',()=>markLesson('reset'),'workspace-progress-reset');reset.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>';skip.disabled=reset.disabled=studentLocked;reset.setAttribute('aria-label','Сбросить отметки Milestones');reset.setAttribute('data-tooltip','Сбросить отметки');actions.append(skip,reset);current.append(actions);
     if(stage){const purpose=milestonePurpose(stage);current.append(node('h3',purpose.name),node('p',purpose.description,'workspace-info-copy'));}
     else current.append(node('p','Задания появятся после выбора урока.','workspace-info-copy'));
     const path=node('nav','','workspace-lesson-path');path.id='workspaceLessonPath';path.setAttribute('aria-label','Milestones текущего Lesson');current.append(path);tree.append(current);
@@ -737,12 +755,12 @@
   // Scheduled sessions keep their fixed start/end; previews use one uninterrupted hour.
   const timerKey=`space-whale:clock:${classScope}`;
   let timer={startedAt:null},ticker=null;
-  try{const saved=JSON.parse(sessionStorage.getItem(timerKey));if(Number.isFinite(saved?.startedAt))timer.startedAt=saved.startedAt;}catch(_){}
+  try{const saved=JSON.parse(sessionStorage.getItem(timerKey));if(Number.isFinite(saved?.startedAt))timer.startedAt=saved.startedAt;if(saved?.ended)timer.ended=true;}catch(_){}
   const scheduledStart=()=>{const value=Date.parse(liveSession?.scheduled_at||'');return Number.isFinite(value)?value:null;};
   function timerState(){
     const scheduled=scheduledStart(),duration=Math.max(1,Number(liveSession?.duration_minutes)||60)*60000;
-    const began=timer.startedAt===null?null:(scheduled??timer.startedAt);
-    const remaining=began===null?duration:Math.max(0,Math.min(duration,began+duration-Date.now()));
+    const began=timer.startedAt===null?null:Math.max(scheduled??timer.startedAt,timer.startedAt);
+    const remaining=timer.ended?0:began===null?duration:Math.max(0,Math.min(duration,began+duration-Date.now()));
     return {duration,began,remaining,active:began!==null,waiting:began!==null&&Date.now()<began};
   }
   function paintTimer(){
@@ -750,19 +768,49 @@
     document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
     document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/state.duration*100));
     const clock=document.getElementById('workspaceClock');clock.setAttribute('aria-valuemax',String(state.duration/60000));clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${Math.floor(seconds/60)} мин. ${seconds%60} сек. осталось`);
-    clock.dataset.started=String(state.active);clock.style.setProperty('--clock-spent',`${spent/state.duration*360}deg`);start.hidden=state.active;
+    clock.dataset.started=String(state.active);clock.style.setProperty('--clock-spent',`${spent/state.duration*360}deg`);start.hidden=state.active&&!timer.ended;start.innerHTML=timer.ended?'Lesson<br>ended':'Start<br>Lesson';document.getElementById('workspaceStopLesson').hidden=!state.active||Boolean(timer.ended);document.getElementById('workspaceStopLesson').disabled=locked();
     clock.setAttribute('data-time-state',state.active&&seconds===0?'ended':state.active&&seconds<=300?'ending':'normal');
     const label=!state.active?'Start Lesson':state.waiting?'Ожидаем начало':seconds===0?'Занятие завершено':'Занятие идёт';
-    start.setAttribute('aria-pressed',String(state.active));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);start.disabled=locked()||state.active;
+    start.setAttribute('aria-pressed',String(state.active));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);start.disabled=locked()||state.active||Boolean(timer.ended);
     if(state.active&&seconds===0){document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';if(ticker!==null){window.clearInterval(ticker);ticker=null;}}
   }
   function tick(){paintTimer();const state=timerState();if(state.active&&state.remaining>0&&ticker===null)ticker=window.setInterval(paintTimer,1000);}
-  start.addEventListener('click',()=>{if(locked()||timerState().active)return;timer.startedAt=Date.now();try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}tick();});
+  const sessionDialog=node('dialog','','workspace-session-dialog');document.body.append(sessionDialog);
+  let deviceStreams=[],audioContext=null,meterFrame=null,deviceGeneration=0;
+  function releaseDevices(){deviceGeneration++;deviceStreams.forEach(stream=>stream.getTracks().forEach(track=>track.stop()));deviceStreams=[];if(meterFrame)cancelAnimationFrame(meterFrame);meterFrame=null;if(audioContext){audioContext.close();audioContext=null;}}
+  sessionDialog.addEventListener('close',releaseDevices);
+  const dialogClose=()=>{releaseDevices();sessionDialog.close();};
+  start.addEventListener('click',()=>{
+    if(locked()||timerState().active||timer.ended)return;
+    sessionDialog.replaceChildren(node('h2','Перед уроком'),node('p','Проверьте камеру и микрофон, затем подтвердите готовность.'));
+    const preview=node('video','','workspace-device-preview');preview.autoplay=true;preview.muted=true;preview.playsInline=true;preview.hidden=true;
+    const status=node('p','','workspace-device-status');status.setAttribute('role','status');
+    const meter=node('meter');meter.min=0;meter.max=1;meter.value=0;meter.setAttribute('aria-label','Уровень микрофона');meter.hidden=true;
+    const controls=node('div','','workspace-device-controls');
+    const check=(kind,label)=>{const control=button(label,async()=>{
+      control.disabled=true;const generation=deviceGeneration;
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia(kind==='video'?{video:true}:{audio:true});
+        if(!sessionDialog.open||generation!==deviceGeneration){stream.getTracks().forEach(track=>track.stop());return;}
+        deviceStreams.push(stream);
+        if(kind==='video'){preview.srcObject=stream;preview.hidden=false;status.textContent='Камера подключена. Проверьте изображение.';}
+        else {const AudioCtx=window.AudioContext||window.webkitAudioContext;audioContext=new AudioCtx();await audioContext.resume();const analyser=audioContext.createAnalyser();analyser.fftSize=256;audioContext.createMediaStreamSource(stream).connect(analyser);const samples=new Uint8Array(analyser.fftSize);meter.hidden=false;const animate=()=>{if(!audioContext)return;analyser.getByteTimeDomainData(samples);meter.value=Math.min(1,Math.sqrt(samples.reduce((sum,value)=>sum+((value-128)/128)**2,0)/samples.length)*4);meterFrame=requestAnimationFrame(animate);};animate();status.textContent='Микрофон подключён. Скажите несколько слов — шкала должна двигаться.';}
+      }catch(error){status.textContent='Не удалось подключить устройство. Проверьте разрешение браузера или продолжите без него.';control.disabled=false;}
+    },'workspace-dialog-button');controls.append(control);};
+    check('video','Камера');check('audio','Микрофон');
+    const actions=node('div','','workspace-dialog-actions');actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),button('OK — я готова',()=>{timer.startedAt=Date.now();timer.ended=false;try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}dialogClose();tick();},'workspace-dialog-button'));
+    sessionDialog.append(controls,preview,meter,status,actions);sessionDialog.showModal();
+  });
+  document.getElementById('workspaceStopLesson').addEventListener('click',()=>{
+    if(locked()||timer.ended)return;
+    sessionDialog.replaceChildren(node('h2','Завершить занятие?'),node('p','Таймер остановится, соединение с учеником будет отключено. Продолжить из этого окна не получится.'));
+    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+    const finish=button('Да, завершить',async()=>{finish.disabled=true;try{if(classroom?.state?.channel)await classroom.disconnect();liveReady=false;timer.ended=true;timer.startedAt=null;if(ticker!==null){clearInterval(ticker);ticker=null;}try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}dialogClose();paintTimer();}catch(_){error.textContent='Не удалось завершить соединение. Попробуйте ещё раз.';finish.disabled=false;}},'workspace-dialog-button');actions.append(button('Нет, продолжить',dialogClose,'workspace-dialog-button'),finish);sessionDialog.append(actions,error);sessionDialog.showModal();
+  });
   tick();
-  const profile=document.getElementById('workspaceStudentProfile');
-  document.getElementById('workspaceProfileButton').addEventListener('click',()=>{profile.hidden=false;document.getElementById('workspaceBackToClass').focus();});
-  document.getElementById('workspaceBackToClass').addEventListener('click',()=>{profile.hidden=true;document.getElementById('workspaceProfileButton').focus();});
-  profile.addEventListener('keydown',event=>{if(event.key==='Escape'){profile.hidden=true;document.getElementById('workspaceProfileButton').focus();}});
+  const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
+  const personIcon=profileButton.innerHTML,returnIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>';
+  profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});
 
   window.addEventListener('popstate', () => {
     if (liveMode && liveReady && liveRole === 'student') {
@@ -837,9 +885,9 @@
       const list=node('div','',`workspace-picker-options ${options.some(option=>option.number)?'workspace-card-picker':'workspace-number-picker'}`);
       options.forEach(option=>{
         const control=option.href?node('a',option.label,'workspace-picker-option'):button(option.label,()=>{closeInfo();option.action();},'workspace-picker-option');
-        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));}
+        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));if(option.status)control.classList.add('is-progressed');}
         if(option.href)control.href=option.href;else control.setAttribute('aria-pressed',String(Boolean(option.selected)));
-        list.append(control);
+        if(option.mark){const row=node('div','','workspace-collection-option');const mark=button('✓',()=>{closeInfo();option.mark();},'workspace-collection-mark');mark.setAttribute('aria-label',`Отметить выполненным: ${option.label}`);mark.setAttribute('aria-pressed',String(option.status==='Done'));mark.disabled=locked();row.append(control,mark);list.append(row);}else list.append(control);
       });
       if(!options.length)list.append(node('p','Материалы пока не добавлены.','workspace-muted'));
       popover.append(list);owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();
@@ -858,7 +906,7 @@
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();
 
-  initLiveSession().catch(error => {
+  if(!timer.ended)initLiveSession().catch(error => {
     console.error('[Space Whale] Live Workspace connection failed', error);
     notice.textContent = error.message;
     if (sessionHeading) sessionHeading.textContent = guestToken ? 'Guest lesson · ссылка недействительна' : 'Live lesson · ошибка подключения';
