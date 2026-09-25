@@ -54,6 +54,9 @@
 
   const classScope = sessionId || (guestToken ? `guest:${guestToken.slice(0,12)}` : 'standalone');
   const completionKey=`space-whale:completed-stages:${classScope}`;
+  const milestonesKey=`space-whale:milestones:${classScope}`;
+  let completedMilestones;
+  try{completedMilestones=new Set(JSON.parse(sessionStorage.getItem(milestonesKey))||[]);}catch(_){completedMilestones=new Set();}
   let completedStages;
   try { completedStages=new Set(JSON.parse(sessionStorage.getItem(completionKey))||[]); } catch (_) { completedStages=new Set(); }
   const topicsKey = liveMode ? `space-whale:class-topics:${classScope}` : 'space-whale:class-topics';
@@ -254,7 +257,7 @@
         if(locked())return;
         if(completedStages.has(lesson.id))completedStages.delete(lesson.id);else completedStages.add(lesson.id);
         try{sessionStorage.setItem(completionKey,JSON.stringify([...completedStages]));}catch(_){}
-        history.replaceState(null,'',`classroom.html${query(route)}`);renderSidebar();syncTeacherNavigation();
+        history.replaceState(null,'',`classroom.html${query(route)}`);renderSidebar();renderMilestones();syncTeacherNavigation();
       },`workspace-stage-status${done?' is-complete':''}`);
       status.setAttribute('aria-label',`${done?'Снять отметку завершения':'Отметить Stage завершённым'}: ${lesson.title}`);status.setAttribute('aria-pressed',String(done));status.setAttribute('data-tooltip',done?'Выполнено':'Завершить');status.disabled=studentLocked;
       const info=button('',()=>showLessonInfo(info,lesson),'workspace-lesson-info');
@@ -274,13 +277,33 @@
     const visible=lesson&&(route.panel!=='class'||Boolean(liveMode&&liveReady)||hasClassLesson(lesson));
     milestoneRail.hidden=!visible||!lesson.stages.length;
     if(milestoneRail.hidden)return;
+    milestoneRail.append(node('span','Milestones','workspace-rail-caption'));
+    const track=node('div','','workspace-milestone-track');milestoneRail.append(track);
+    let filled=0;for(const item of lesson.stages){if(completedStages.has(lesson.id)||completedMilestones.has(item.exercise.id))filled++;else break;}
+    track.style.setProperty('--milestone-fill',`${lesson.stages.length>1?Math.min(100,filled/(lesson.stages.length-1)*100):0}%`);
     lesson.stages.forEach((stage,index)=>{
       const title=(stage.menu||stage.title||stage.exercise.title||`Milestone ${index+1}`).replace(/^\s*\d+\s*[.·]\s*/,'');
       const active=route.exercise===stage.exercise.id;
-      const control=link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)},active,'workspace-stage-link workspace-milestone-dot');
+      const control=link(title,{...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)},active,`workspace-stage-link workspace-milestone-dot${completedStages.has(lesson.id)||completedMilestones.has(stage.exercise.id)?' is-complete':''}`);
       control.setAttribute('aria-label',`Milestone ${index+1}: ${title}`);control.setAttribute('data-tooltip',`${String(index+1).padStart(2,'0')} · ${title}`);control.setAttribute('data-step',String(index+1));
-      milestoneRail.append(control);
+      track.append(control);
     });
+  }
+  function updateMilestoneProgress(exercise,answers){
+    const checked=(def,value)=>{
+      if(def.kind==='stage'){
+        const blocks=def.exercises.filter(block=>!['text','rule','speaking','listen_repeat'].includes(block.exercise.kind));
+        return blocks.length>0&&blocks.every(block=>checked(block.exercise,value?.[block.id]));
+      }
+      if(['guided_discovery','discovery'].includes(def.kind)){
+        const blocks=(def.blocks||[]).filter(block=>block.type==='exercise');
+        return blocks.length>0&&blocks.every(block=>checked(block.exercise,value?.[block.id]));
+      }
+      return value?.__sw_checked===true;
+    };
+    if(checked(exercise,answers))completedMilestones.add(exercise.id);else completedMilestones.delete(exercise.id);
+    try{sessionStorage.setItem(milestonesKey,JSON.stringify([...completedMilestones]));}catch(_){}
+    renderMilestones();
   }
   function availableWhales(level) {
     return level.whales.filter(whale=>{
@@ -303,7 +326,7 @@
     const studentLocked=locked(),inClass=route.panel==='class';
     panels.forEach(panel=>document.getElementById(`${panel}Tab`).setAttribute('aria-pressed',String(route.panel===panel)));
     document.getElementById('workspaceClockPanel').hidden=false;
-    start.disabled=studentLocked;document.getElementById('workspaceTimerReset').disabled=studentLocked;
+    start.disabled=studentLocked;paintTimer();
     const levels=catalog.levels.filter(level=>availableWhales(level).length);
     const level=levels.find(level=>level.id===route.level)||levels[0];
     const whales=level?availableWhales(level):[];
@@ -320,11 +343,7 @@
     controls.append(pickerButton(view==='templates'?'TPL':view==='unassigned'?'STAGES':level?.id||route.level,'Выбрать уровень',levelOptions,'workspace-course-key workspace-level-key'));
     if(view==='library'){
       controls.append(pickerButton(whale?`W ${whale.id}`:'W','Выбрать Whale',whales.map(item=>({label:item.title,selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})})),'workspace-course-key workspace-whale-key'));
-      if(whale&&!guestAllowedLessons){
-        const chosen=classWhales.has(whaleKey(level.id,whale.id));
-        const add=button(chosen?'−':'+',()=>toggleWhale(level.id,whale.id),'workspace-icon workspace-collection-add');
-        add.setAttribute('aria-label',`${chosen?'Убрать из класса':'Добавить в класс'}: ${level.id} · ${whale.title}`);add.setAttribute('data-tooltip',chosen?'Убрать Whale из класса':'Добавить весь Whale в класс');add.disabled=studentLocked;controls.append(add);
-      }
+
     }
     const topics=view==='templates'?catalog.topics({view:'templates'}):view==='unassigned'?loose:whale?catalog.topics({view:'library',level:level.id,whale:whale.id}).filter(permitted):[];
     topics.forEach((lesson,index)=>renderTopic(lesson,tree,studentLocked,previouslyOpen,index));
@@ -377,6 +396,8 @@
 
     if (route.exercise === exerciseId && mounted?.setAnswers) {
       mounted.setAnswers(response);
+      const activeExercise=selectedLesson()?.stages.find(item=>item.exercise.id===exerciseId)?.exercise;
+      if(activeExercise)updateMilestoneProgress(activeExercise,response);
       if (mountedStorage) storeAnswers(mountedStorage.key, mountedStorage.signature, collaborative() ? replica(exerciseId).snapshot() : response);
     }
     return true;
@@ -458,13 +479,14 @@
 
     mounted = kit.mount(host, exercise, {
       answers: initialAnswers,
-      syncChecks: collaborative(),
+      syncChecks: true,
       readOnly: false,
       onChange: answers => {
         const response = collaborative() ? replica(exercise.id).update(answers) : answers;
         liveAnswers.set(exercise.id, answers);
         liveSeenAt.set(exercise.id, Date.now());
         storeAnswers(storageKey, signature, response);
+        updateMilestoneProgress(exercise,answers);
         if (liveMode && liveReady && (liveRole === 'student' || collaborative())) {
           classroom.sendExerciseDraft(exercise.id, response)
             .catch(error => { console.error('[Space Whale] Live answer sync failed', error); notice.textContent='Связь прервана. Ответы сохранены на этом устройстве; дождитесь подключения.'; });
@@ -472,6 +494,7 @@
       }
     });
 
+    updateMilestoneProgress(exercise,initialAnswers);
     hydrateLiveExercise(exercise.id, localAnswers);
   }
 
@@ -550,6 +573,7 @@
     liveReady = true;
     liveRole = result.role;
     liveSession = result.session;
+    tick();
     const inviteButton=document.getElementById('inviteStudent');
     if (inviteButton) { inviteButton.hidden=liveRole!=='teacher';inviteButton.setAttribute('aria-label','Ссылка для ученика');inviteButton.setAttribute('data-tooltip','Ссылка для ученика'); }
     guestAllowedLessons = guestToken && !result.session.allowed_lesson_ids?.includes('*') ? new Set(result.session.allowed_lesson_ids || []) : null;
@@ -607,32 +631,29 @@
   }));
 
 
-  // One local lesson clock survives exercise changes and page reloads. Account duration can be connected here later.
-  const timerKey=`space-whale:clock:${classScope}`, duration=60*60*1000;
-  let timer={elapsed:0,startedAt:null},ticker=null;
-  try {const saved=JSON.parse(sessionStorage.getItem(timerKey));if(saved&&Number.isFinite(saved.elapsed)&&saved.elapsed>=0&&(saved.startedAt===null||Number.isFinite(saved.startedAt)))timer=saved;}catch(_){}
-  function saveTimer(){try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}}
-  function elapsed(){return Math.min(duration,Math.max(0,timer.elapsed+(timer.startedAt===null?0:Date.now()-timer.startedAt)));}
-  function paintTimer(){
-    const spent=elapsed(),remaining=Math.ceil((duration-spent)/1000);
-    if(spent>=duration&&timer.startedAt!==null){timer={elapsed:duration,startedAt:null};saveTimer();document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';}
-    const running=timer.startedAt!==null;
-    document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
-    document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/duration*100));
-    const clock=document.getElementById('workspaceClock');clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${Math.floor(remaining/60)} мин. ${remaining%60} сек. осталось`);
-    const label=running?'Pause Lesson':spent>0&&spent<duration?'Resume Lesson':'Start Lesson';
-    start.setAttribute('aria-pressed',String(running));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);
-    if(!running&&ticker!==null){window.clearInterval(ticker);ticker=null;}
+  // Scheduled sessions keep their fixed start/end; previews use one uninterrupted hour.
+  const timerKey=`space-whale:clock:${classScope}`;
+  let timer={startedAt:null},ticker=null;
+  try{const saved=JSON.parse(sessionStorage.getItem(timerKey));if(Number.isFinite(saved?.startedAt))timer.startedAt=saved.startedAt;}catch(_){}
+  const scheduledStart=()=>{const value=Date.parse(liveSession?.scheduled_at||'');return Number.isFinite(value)?value:null;};
+  function timerState(){
+    const scheduled=scheduledStart(),duration=Math.max(1,Number(liveSession?.duration_minutes)||60)*60000;
+    const began=scheduled??timer.startedAt;
+    const remaining=began===null?duration:Math.max(0,Math.min(duration,began+duration-Date.now()));
+    return {duration,began,remaining,active:began!==null,waiting:began!==null&&Date.now()<began};
   }
-  function tick(){paintTimer();if(timer.startedAt!==null&&ticker===null)ticker=window.setInterval(paintTimer,1000);}
-  start.addEventListener('click',()=>{
-    if(locked())return;
-    if(timer.startedAt!==null)timer={elapsed:elapsed(),startedAt:null};
-    else timer={elapsed:elapsed()>=duration?0:elapsed(),startedAt:Date.now()};
-    saveTimer();tick();
-    render();
-  });
-  document.getElementById('workspaceTimerReset').addEventListener('click',()=>{if(locked())return;timer={elapsed:0,startedAt:null};saveTimer();paintTimer();document.getElementById('workspaceTimerStatus').textContent='Таймер сброшен.';});
+  function paintTimer(){
+    const state=timerState(),seconds=Math.ceil(state.remaining/1000),spent=state.duration-state.remaining;
+    document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/state.duration*100));
+    const clock=document.getElementById('workspaceClock');clock.setAttribute('aria-valuemax',String(state.duration/60000));clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${Math.floor(seconds/60)} мин. ${seconds%60} сек. осталось`);
+    clock.setAttribute('data-time-state',state.active&&seconds===0?'ended':state.active&&seconds<=300?'ending':'normal');
+    const label=!state.active?'Start Lesson':state.waiting?'Ожидаем начало':seconds===0?'Занятие завершено':'Занятие идёт';
+    start.setAttribute('aria-pressed',String(state.active));start.setAttribute('aria-label',label);start.setAttribute('data-tooltip',label);start.disabled=locked()||state.active;
+    if(state.active&&seconds===0){document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';if(ticker!==null){window.clearInterval(ticker);ticker=null;}}
+  }
+  function tick(){paintTimer();const state=timerState();if(state.active&&state.remaining>0&&ticker===null)ticker=window.setInterval(paintTimer,1000);}
+  start.addEventListener('click',()=>{if(locked()||timerState().active)return;timer.startedAt=Date.now();try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}tick();});
   tick();
 
   window.addEventListener('popstate', () => {
