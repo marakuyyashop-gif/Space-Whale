@@ -505,3 +505,20 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 @media(pointer:coarse){#workspaceStopLesson{inset:auto 20% 8%;border-radius:10px;font-size:11px;padding:4px;opacity:.8}}
 .workspace-lesson-popover:has(.workspace-card-picker){width:min(360px,calc(100vw - 24px))}
 .workspace-collection-option .workspace-picker-option{width:100%}
+
+/* Timer phases, compact status controls and point-anchored labels. */
+.workspace-clock-face{display:flex;flex-direction:column;align-items:center;gap:3px}
+.workspace-clock-label{font-size:9px;font-weight:400;letter-spacing:0;color:var(--sw-neu-muted)}
+.unified-workspace .workspace-clock[data-phase=before] #startLesson{opacity:0}
+.unified-workspace .workspace-clock[data-phase=before]:hover #startLesson,.unified-workspace .workspace-clock[data-phase=before] #startLesson:focus-visible{opacity:1}
+.workspace-clock[data-phase=expired] #workspaceStopLesson{inset:0;opacity:1;border-radius:50%;font-size:18px}
+.workspace-clock #startLesson:disabled{cursor:default}
+.workspace-session-dialog{position:fixed}
+.workspace-dialog-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--sw-neu-muted);font-size:24px;cursor:pointer}
+.workspace-dialog-button.is-brand{background:var(--sidebar-accent);color:white}
+.workspace-dialog-button.is-finish{background:var(--sw-neu-surface);color:var(--sw-neu-ink)}
+.workspace-snake-label{width:max-content;max-width:105px;font-size:10px;line-height:1.25;pointer-events:none}
+.workspace-lesson-selector .workspace-lesson-status,.workspace-card-picker .workspace-lesson-status{min-width:25px;height:23px;padding:0 4px;font-size:10px;line-height:23px;border-radius:8px}
+.workspace-lesson-status[role=button]{cursor:pointer}
+.workspace-lesson-status.is-empty{background:transparent;color:var(--sw-neu-muted);box-shadow:var(--sw-neu-inset);opacity:.65}
+.workspace-collection-mark{width:24px;height:24px;min-width:24px;font-size:12px;border-radius:8px}
