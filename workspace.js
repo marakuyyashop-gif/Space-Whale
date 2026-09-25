@@ -256,7 +256,7 @@
         try{sessionStorage.setItem(completionKey,JSON.stringify([...completedStages]));}catch(_){}
         history.replaceState(null,'',`classroom.html${query(route)}`);renderSidebar();syncTeacherNavigation();
       },`workspace-stage-status${done?' is-complete':''}`);
-      status.setAttribute('aria-label',`${done?'Снять отметку завершения':'Отметить Stage завершённым'}: ${lesson.title}`);status.setAttribute('aria-pressed',String(done));status.setAttribute('data-tooltip',done?'Stage завершён · нажмите, чтобы отменить':'Отметить Stage завершённым');status.disabled=studentLocked;
+      status.setAttribute('aria-label',`${done?'Снять отметку завершения':'Отметить Stage завершённым'}: ${lesson.title}`);status.setAttribute('aria-pressed',String(done));status.setAttribute('data-tooltip',done?'Выполнено':'Завершить');status.disabled=studentLocked;
       const info=button('',()=>showLessonInfo(info,lesson),'workspace-lesson-info');
       info.setAttribute('aria-label',`Об уроке: ${lesson.title}`);info.setAttribute('aria-haspopup','dialog');info.setAttribute('aria-expanded','false');info.setAttribute('aria-controls','workspaceLessonInfo');
       info.addEventListener('pointerenter',event=>{if(event.pointerType!=='touch')openLessonPopover?.(info,lesson,true);});
