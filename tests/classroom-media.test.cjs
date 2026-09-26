@@ -137,3 +137,37 @@ test('left resize keeps the right edge anchored and video starts at the top of t
  assert.equal(parseFloat(dock.style.width),180);assert.equal(right(),before);
  fire(dock,'pointerup',{pointerId:1});await s.api.stopMedia();
 });
+
+test('default video corner recovers after viewport/sidebar changes and view toggles',async()=>{
+ const s=fixture();let areaLeft=280;
+ const area=s.document.querySelector('.class-area');area.getBoundingClientRect=()=>({left:areaLeft,top:0,right:s.window.innerWidth,bottom:s.window.innerHeight});
+ await s.api.connect(session);s.api.setView('mini');
+ const dock=s.document.getElementById('videoDock');dock.getBoundingClientRect=()=>({left:parseFloat(dock.style.left),top:parseFloat(dock.style.top),width:parseFloat(dock.style.width),height:parseFloat(dock.style.height)});
+ s.events.resize();const original={x:dock.style.left,y:dock.style.top,width:dock.style.width};
+ s.window.innerWidth=390;s.window.innerHeight=400;areaLeft=0;s.events.resize();
+ assert.notEqual(dock.style.left,original.x);
+ s.api.setView('hidden');s.api.setView('mini');s.api.setView('expanded');s.api.setView('mini');
+ s.window.innerWidth=1280;s.window.innerHeight=800;areaLeft=280;s.events.resize();
+ assert.deepEqual({x:dock.style.left,y:dock.style.top,width:dock.style.width},original);
+ areaLeft=0;s.events.resize();assert.equal(dock.style.left,original.x);await s.api.stopMedia();
+});
+test('user anchor and preferred width survive temporary viewport clamping',async()=>{
+ const s=fixture();await s.api.connect(session);s.api.setView('mini');
+ const dock=s.document.getElementById('videoDock'),resize=s.document.getElementById('mediaResize');
+ dock.getBoundingClientRect=()=>({left:parseFloat(dock.style.left),top:parseFloat(dock.style.top),width:parseFloat(dock.style.width),height:parseFloat(dock.style.height)});
+ dock.setPointerCapture=resize.setPointerCapture=()=>{};
+ const fire=(target,type,props)=>{const e=new s.dom.Event(type,{bubbles:true,cancelable:true});Object.assign(e,props);target.dispatchEvent(e);};
+ fire(dock,'pointerdown',{button:0,pointerId:1,clientX:1100,clientY:10});
+ fire(dock,'pointermove',{pointerId:1,clientX:1000,clientY:90});fire(dock,'pointerup',{pointerId:1});
+ fire(resize,'pointerdown',{button:0,pointerId:2,clientX:950,clientY:90});
+ fire(dock,'pointermove',{pointerId:2,clientX:850,clientY:90});fire(dock,'pointerup',{pointerId:2});
+ const original={x:dock.style.left,y:dock.style.top,width:dock.style.width};
+ s.window.innerWidth=300;s.window.innerHeight=180;s.events.resize();
+ assert.notEqual(dock.style.width,original.width);s.api.setView('expanded');s.api.setView('mini');
+ s.window.innerWidth=1280;s.window.innerHeight=800;s.events.resize();
+ assert.deepEqual({x:dock.style.left,y:dock.style.top,width:dock.style.width},original);
+ // Explicit movement creates a new anchor, which also survives later clamping.
+ fire(dock,'keydown',{key:'ArrowLeft'});const moved=dock.style.left;assert.notEqual(moved,original.x);
+ s.window.innerWidth=390;s.events.resize();s.window.innerWidth=1280;s.events.resize();assert.equal(dock.style.left,moved);
+ await s.api.stopMedia();
+});

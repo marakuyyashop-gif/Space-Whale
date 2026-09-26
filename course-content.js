@@ -111,8 +111,8 @@
       }),'Выбрать look / looks и отличить look + adjective от look like + noun.'),
       step('Short Production',2,exercise('short-production','writing','Write a reply.',{
         responseMode:'open',instruction:'Complete the replies.',items:[
-          {id:'reply1',prompt:'Alex: How does the sweater look? · Use: warm',possibleAnswers:['It looks warm.']},
-          {id:'reply2',prompt:'Alex: Is this your coat? · Use: my old coat',possibleAnswers:['It looks like my old coat.']}
+          {id:'reply1',prompt:'Alex: How does the sweater look?',hint:'Use: warm',possibleAnswers:['It looks warm.']},
+          {id:'reply2',prompt:'Alex: Is this your coat?',hint:'Use: my old coat',possibleAnswers:['It looks like my old coat.']}
         ]
       }),'Написать свободные ответы; преподаватель оценивает формулировку. Примеры появляются после OK.'),
       step('Final Speaking',3,exercise('final-speaking','presentation','Talk to your partner.',{

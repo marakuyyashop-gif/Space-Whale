@@ -585,3 +585,34 @@ test('Listen & Repeat view synchronizes word/example steps; pupils cannot advanc
  teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'This shirt is bright.');assert.equal(pupil.button('Next phrase').hidden,true);
  teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'Dark');assert.equal(teacher.button('Next phrase'),undefined);
 });
+
+test('writing hints sit under the field and never enter submitted answer examples',()=>{
+ const def={version:1,id:'writing-hint',kind:'writing',title:'Write a reply.',responseMode:'open',items:[{id:'reply',prompt:'How does it look?',hint:'Use: warm',possibleAnswers:['It looks warm.']}]};
+ const s=setup(def),input=s.host.querySelector('input'),hint=s.host.querySelector('.ek-writing-hint');
+ assert.equal(input.nextElementSibling,hint);assert.equal(input.getAttribute('aria-describedby'),hint.id);
+ input.value='It looks very warm.';s.fire(input,'input');s.click('OK');
+ const feedback=s.host.querySelector('.ek-writing-answers');assert.match(feedback.textContent,/How does it look\?/);assert.doesNotMatch(feedback.textContent,/Use:/);
+ assert.equal(feedback.querySelector('.ek-answer-pairs strong').textContent,'It looks warm.');assert.equal(input.dataset.feedback,'review');
+ assert.throws(()=>kit.validate({...def,items:[{...def.items[0],hint:42}]}),/hint/);
+});
+test('opening a disclosure scrolls its complete content, with the beginning taking priority',()=>{
+ for(const [bottom,expected] of [[850,166],[1500,484]]){
+   const s=setup({version:1,id:'script-scroll',kind:'presentation',title:'Listen',blocks:[{type:'disclosure',title:'See the script',text:'A long script',open:false}]}),scroll=s.document.createElement('div');
+   scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=100;
+   scroll.getBoundingClientRect=()=>({top:100,bottom:800,height:700});let target;
+   scroll.scrollTo=value=>{target=value.top;};
+   const detail=s.host.querySelector('details');detail.getBoundingClientRect=()=>({top:500,bottom,height:bottom-500});
+   s.fire(detail.querySelector('summary'),'click');assert.equal(detail.open,true);assert.equal(target,expected);
+   target=null;s.fire(detail.querySelector('summary'),'click');assert.equal(target,null);
+ }
+});
+test('next task scrolling includes the next-step controls beneath the revealed content',()=>{
+ const make=id=>({version:1,id,title:'Choose',kind:'choice',items:[{id:'q',prompt:'Question?',options:[{id:'a',text:'A'},{id:'b',text:'B'}],correctId:'a'}]});
+ const s=setup({version:1,id:'scroll-stage',kind:'stage',title:'Practice',progressive:true,exercises:[{id:'one',exercise:make('one-task')},{id:'two',exercise:make('two-task')}]});
+ const scroll=s.document.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=0;
+ scroll.getBoundingClientRect=()=>({top:0,bottom:600,height:600});let target;scroll.scrollTo=value=>{target=value.top;};
+ // Use the DOM creation hook to supply layout for the just-mounted task.
+ const create=s.document.createElement.bind(s.document);s.document.createElement=tag=>{const el=create(tag);el.getBoundingClientRect=()=>({top:300,bottom:620,height:320});return el;};
+ s.host.querySelector('.ek-stage-navigation').getBoundingClientRect=()=>({top:650,bottom:700,height:50});
+ s.click('Show next exercise');assert.equal(target,116);
+});

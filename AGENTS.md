@@ -16,3 +16,10 @@
 - Persistent floating notices and dialogs require a visible, keyboard-accessible close control. Dismiss the notice, not the lesson, call, or saved state. New messages may be shown again.
 - Preserve approved visual tokens and current shared Workspace. Do not create a second classroom page.
 - Other work may land on main concurrently. Fetch latest main, use an isolated branch/worktree, and preserve independent video/audio/live-session changes when merging.
+
+## Shared interaction refinements
+
+- All inline disclosures (including See the script and Useful phrases), progressive steps, rules and submitted feedback scroll their full newly visible range into view after expansion. Include next-step controls when possible. Fit the whole range when it fits; otherwise keep its beginning visible near the top. Never sacrifice the beginning to reach the end of a tall block.
+- Writing cues belong in `items[].hint`, below the response field in smaller muted text, linked with `aria-describedby`. Keep `prompt` as the question alone. Feedback repeats only question and answer, never the hint. Both correct answers and possible answer examples use bold emphasis. A thin divider separates the feedback message from its answer section.
+- The video dock retains preferred offsets from the nearest viewport/workspace edges. Only explicit user drag/resize or keyboard movement updates that preference. Temporary viewport, orientation, sidebar, or expanded/mini/hidden changes clamp the display without overwriting the saved preference or preferred width.
+- Keep the theme utility bar completely transparent, including pseudo-elements, border, shadow and backdrop. Retain its content clearance so controls cannot cover exercises. Do not change the approved Listen & Repeat sequence unless separately requested.
