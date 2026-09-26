@@ -63,10 +63,10 @@ test('two-option gaps show complete corrected sentences with muted context',()=>
  const s=setup(stage('language-practice'),{syncChecks:true});
  s.handle.setAnswers({look1:'looks like',look2:'look like',look3:'looks',look4:'looks like',look5:'look',__sw_checked:true});
  const rows=s.host.querySelectorAll('.ek-answer-pairs>li');assert.equal(rows.length,5);
- assert.equal(rows[0].textContent,'This coat looks expensive.');
- assert.equal(rows[0].querySelector('strong').textContent,'looks');
- assert.equal(rows[0].querySelector('.ek-muted').textContent,'This coat ');
- assert.equal(rows[4].textContent,'How does this suit look?');
+ assert.equal(rows[0].textContent,'This blouse looks like my old blouse.');
+ assert.equal(rows[0].querySelector('strong').textContent,'looks like');
+ assert.equal(rows[0].querySelector('.ek-muted').textContent,'This blouse ');
+ assert.equal(rows[2].textContent,'How does this suit look?');
 });
 test('language focus has one heading and interaction instruction',()=>{
  const s=setup(stage('language-focus'));
@@ -103,7 +103,7 @@ test('listening retains audio with the first question and unlocks transcript onl
 test('language rule and possible responses stay concealed until requested',()=>{
  const focus=setup(stage('language-focus'));assert.equal(focus.host.querySelectorAll('.ek-rule-block:not([hidden])').length,0);
  const ruleButton=focus.host.querySelector('.ek-rule-page .ek-stage-down')||focus.host.querySelector('.ek-stage-down');assert.ok(ruleButton);focus.fire(ruleButton,'click');
- assert.match(focus.host.textContent,/После does используем look/);
+ assert.match(focus.host.textContent,/После does глагол look стоит без окончания -s/);
  const writing=setup(stage('short-production'));assert.equal(writing.host.querySelector('.ek-writing-answers'),null);
  const input=writing.host.querySelector('input');input.value='The sweater looks very warm.';writing.fire(input,'input');writing.click('OK');
  assert.equal(input.dataset.feedback,'review');assert.match(writing.host.querySelector('.ek-writing-answers').textContent,/It looks warm/);
@@ -122,8 +122,8 @@ test('Listen & Repeat exposes the word and example as separate clips and steps',
 test('speaking questions sit below the image, matching has no subtitle and rule is one multiline block',()=>{
  const opening=setup(stage('opening'));assert.equal(opening.host.querySelector('.ek-instruction').textContent,'Use the phrases below to help you.');assert.equal(opening.host.querySelector('.ek-body>img').nextElementSibling.textContent,'What clothes can you name?\nWhich items do you like?\nChoose one item. How does it look?');
  assert.equal(setup(stage('words')).host.querySelector('.ek-instruction'),null);
- const focus=setup(stage('language-focus'));assert.equal(focus.host.querySelectorAll('.ek-rule-block').length,1);assert.match(focus.host.querySelector('.ek-rule-block').textContent,/good\.\nThe sweater/);
- const final=setup(stage('final-speaking'));assert.equal(final.host.querySelector('.ek-instruction').textContent,'You are in a clothes shop with a friend.');assert.match(final.host.querySelector('.ek-body>img').nextElementSibling.textContent,/Ask about two items/);
+ const focus=setup(stage('language-focus'));assert.equal(focus.host.querySelectorAll('.ek-rule-block').length,1);assert.match(focus.host.querySelector('.ek-rule-block').textContent,/I \/ you \/ we \/ they → look\nhe \/ she \/ it → looks/);
+ const final=setup(stage('final-speaking'));assert.equal(final.host.querySelector('.ek-instruction').textContent,'You are in a clothes shop with a friend.');assert.match(final.host.querySelector('.ek-body>img').nextElementSibling.textContent,/Choose an item and ask your partner about it/);
 });
 
 test('English word highlighting preserves every space and line break in the lesson rule',()=>{
@@ -131,7 +131,7 @@ test('English word highlighting preserves every space and line break in the less
  vm.runInNewContext(fs.readFileSync(require.resolve('../workspace-word-focus.js'),'utf8'),context);
  const before=s.host.textContent,focus=context.window.SpaceWhaleWordFocus.create({root:s.host,actor:'test',storageKey:'test'});
  focus.setExercise('a12w4l1-language-focus');focus.decorate();assert.equal(s.host.textContent,before);
- const rule=s.host.querySelector('.ek-rule-block .ek-copy');assert.match(rule.textContent,/The coat looks good\.\nThe sweater looks warm\./);
+ const rule=s.host.querySelector('.ek-rule-block .ek-copy');assert.match(rule.textContent,/I \/ you \/ we \/ they → look\nhe \/ she \/ it → looks/);
  assert.equal(rule.querySelectorAll('.sw-word-focus').length>0,true);
  s.fire(s.host.querySelector('.ek-match-slot'),'click');focus.decorate();const prompt=s.host.querySelector('.ek-prompt');assert.equal(prompt.querySelector('.ek-prompt-text').textContent,'The coat looks good.');assert.equal(prompt.querySelector(':scope > .sw-word-focus'),null,'word spans must not become flex items and collapse spaces');focus.destroy();
 });

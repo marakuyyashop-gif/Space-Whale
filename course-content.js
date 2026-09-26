@@ -18,7 +18,7 @@
     A1M4L1_IMAGE_06: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp',width:1254,height:1254,alt:'A hat',target:'hat'},
     A1M4L1_IMAGE_TWO_COATS: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp',width:1122,height:1402,copies:2,alt:'Two coats',target:'coats'},
     A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
-    A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes. And this sweater?\nBen: It looks warm.\nAnna: I like it. I need a sweater for the weekend.\nBen: The sweater looks good.\nAnna: Great. I want the sweater."},
+    A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes, it does. And this sweater?\nBen: It looks warm.\nAnna: I like it. How much is it?\nBen: Thirty euros.\nAnna: Okay, I want it. Can you hold it for me, please?\nBen: Of course."},
     A1M4L1_WORD_01: {type:'audio',src:null,word:'coat',sentence:'I need a coat for work.'},
     A1M4L1_WORD_02: {type:'audio',src:null,word:'sweater',sentence:'My sweater is in the wardrobe.'},
     A1M4L1_WORD_03: {type:'audio',src:null,word:'blouse',sentence:'My sister wants this blouse.'},
@@ -90,27 +90,28 @@
             items:[{id:'meaning1',text:'The coat looks good.',correctId:'C'},{id:'meaning2',text:'It looks like your old coat.',correctId:'B'},{id:'meaning3',text:'The sweater looks warm.',correctId:'A'}],
             options:[{id:'A',text:'Свитер выглядит тёплым.'},{id:'B',text:'Пальто похоже на ваше старое пальто.'},{id:'C',text:'Пальто выглядит хорошо.'}]
           })},
-          {type:'rule',text:'look / looks + adjective\nОписываем, как что-то выглядит.\nThe coat looks good.\nThe sweater looks warm.\n\nlook / looks like + noun\nГоворим, что что-то похоже на другой предмет.\nIt looks like your old coat.\n\nlook / looks\nI / you / we / they → look\nhe / she / it → looks\n\nHow does it look?\nПосле does используем look.',highlights:['look / looks + adjective','look / looks like + noun','How does it look?']}
+          {type:'rule',title:'Как описать внешний вид вещи',text:"Когда вы хотите сказать, как выглядит вещь, используйте look / looks + прилагательное. Например, The sweater looks warm — «Свитер выглядит тёплым». Вы делитесь впечатлением по внешнему виду.\n\nЕсли вещь напоминает вам другую, используйте look / looks like + существительное или сочетание с ним: This coat looks like my old coat — «Это пальто похоже на моё старое пальто». Здесь like означает сходство, а не «нравится».\n\nСравните:\nIt looks good. — Мы описываем впечатление.\nIt looks like my coat. — Мы говорим, на что вещь похожа.\n\nФорма глагола зависит от того, о ком или о чём вы говорите:\nI / you / we / they → look\nhe / she / it → looks\n\nПоэтому об одном предмете говорим The coat looks good, а о нескольких — The coats look good.\n\nПосле like действуют знакомые правила артиклей: like a coat, like an old coat, но like my coat — перед my артикль не нужен.\n\nЧтобы спросить о внешнем впечатлении, используйте How does it look? — «Как это выглядит?» После does глагол look стоит без окончания -s.",highlights:["look / looks + прилагательное", "The sweater looks warm", "look / looks like + существительное или сочетание с ним", "This coat looks like my old coat", "like", "It looks good.", "It looks like my coat.", "I / you / we / they → look", "he / she / it → looks", "The coat looks good", "The coats look good", "like a coat", "like an old coat", "like my coat", "my", "How does it look?", "does", "look", "-s"]}
         ]
       }),'Различить описание признака и сравнение с предметом, затем раскрыть правило.'),
       step('Language Practice',3,exercise('language-practice','gaps','Choose the correct option.',{
-        inputMode:'select',instruction:'Complete the sentences with the correct option.',items:[
-          {id:'sentence1',segments:['This coat ',{id:'look1',answers:['looks'],options:['looks','looks like']},' expensive.']},
+        inputMode:'select',items:[
+          {id:'sentence4',segments:['This blouse ',{id:'look4',answers:['looks like'],options:['looks like','looks']},' my old blouse.']},
           {id:'sentence2',segments:['These sweaters ',{id:'look2',answers:['look like'],options:['look','look like']},' my sweaters at home.']},
-          {id:'sentence3',segments:['This hat ',{id:'look3',answers:['looks'],options:['look','looks']},' unusual.']},
-          {id:'sentence4',segments:['This blouse ',{id:'look4',answers:['looks like'],options:['looks','looks like']},' my old blouse.']},
-          {id:'sentence5',segments:['How does this suit ',{id:'look5',answers:['look'],options:['look','looks']},'?']}
+          {id:'sentence5',segments:['How does this suit ',{id:'look5',answers:['look'],options:['looks','look']},'?']},
+          {id:'sentence1',segments:['This coat ',{id:'look1',answers:['looks'],options:['looks','looks like']},' expensive.']},
+          {id:'sentence3',segments:['This hat ',{id:'look3',answers:['looks'],options:['looks','look']},' unusual.']}
         ]
       }),'Выбрать look / looks и отличить look + adjective от look like + noun.'),
-      step('Short Production',2,exercise('short-production','writing','Write a reply.',{
-        responseMode:'open',instruction:'Complete the replies.',items:[
-          {id:'reply1',prompt:'Alex: How does the sweater look?',hint:'Use: warm',possibleAnswers:['It looks warm.']},
-          {id:'reply2',prompt:'Alex: Is this your coat?',hint:'Use: my old coat',possibleAnswers:['It looks like my old coat.']}
+      step('Short Production',2,exercise('short-production','writing','Write the replies.',{
+        responseMode:'open',instruction:'Use the prompts to write complete replies.',items:[
+          {id:'reply1',prompt:'Alex: How does the sweater look?',hint:'Use: it / look / warm',possibleAnswers:['It looks warm.']},
+          {id:'reply2',prompt:'Alex: Is this your coat?',hint:'Use: no / but / it / look like / my old coat',possibleAnswers:['No, but it looks like my old coat.']},
+          {id:'reply3',prompt:'Alex: Do you like these hats?',hint:'Use: yes / they / look / good',possibleAnswers:['Yes, they look good.']}
         ]
       }),'Написать свободные ответы; преподаватель оценивает формулировку. Примеры появляются после OK.'),
       step('Final Speaking',3,exercise('final-speaking','presentation','Talk to your partner.',{
         instruction:'You are in a clothes shop with a friend.',
-        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'text',text:'Look at the clothes.\nAsk about two items.\nDescribe the clothes.\nCompare one item with something you have.\nSay which item you want.'},{type:'disclosure',title:'Useful phrases',open:true,text:'How does it look?\nIt looks …\nIt looks like my …\nI like …\nI want …'},{type:'text',text:'Useful adjectives: good · new · old · warm · expensive · unusual'},{type:'disclosure',title:'Possible answers',text:'— How does the sweater look?\n— It looks warm.\n— How does the coat look?\n— It looks good. It looks like my old coat.\n— Which item do you want?\n— I want the sweater.'}]
+        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'text',text:'Choose an item and ask your partner about it. Then change roles.\n\nDo you like this item?\nHow does it look?\nDoes it look like something you have at home?\nWhat do you want?'},{type:'disclosure',title:'Useful phrases',open:true,text:'It looks …\nIt looks like my …\nYes, it does. / No, it doesn’t.\nI like …\nI want …'},{type:'text',text:'Words to help: good · new · warm'},{type:'disclosure',title:'Possible answers',text:'— How does the sweater look?\n— It looks warm.\n— How does the coat look?\n— It looks good. It looks like my old coat.\n— Which item do you want?\n— I want the sweater.'}]
       }),'Использовать лексику и конструкции в разговоре о выборе одежды, без автоматической оценки.')
     ]
   };
