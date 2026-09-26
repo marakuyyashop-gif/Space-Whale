@@ -1,7 +1,13 @@
 /* Inline paint only: no padding/borders that could reflow an exercise. */
 .exercise-kit .sw-word-focus{display:inline;border-radius:4px;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .12s,box-shadow .12s}
-@media(hover:hover){.exercise-kit .sw-word-focus:hover{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 12%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 16%,transparent)}}
-.exercise-kit .sw-word-focus.is-peer-hovered{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 12%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 16%,transparent)}
+@media(hover:hover){.exercise-kit .sw-word-focus:hover{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 8%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 10%,transparent)}}
+.exercise-kit .sw-word-focus.is-peer-hovered{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 8%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 10%,transparent)}
 .exercise-kit .sw-word-focus.is-word-selected{background:color-mix(in srgb,var(--sw-brand-accent,#718888) 27%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-brand-accent,#718888) 55%,transparent)}
 .exercise-kit .sw-word-focus:focus-visible{outline:2px solid var(--sw-brand-accent,#718888);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.exercise-kit .sw-word-focus{transition:none}}
+
+.sw-word-popup{position:fixed;z-index:1200;box-sizing:border-box;width:max-content;max-width:min(280px,calc(100vw - 16px));padding:13px 36px 13px 15px;border:1px solid color-mix(in srgb,var(--sw-neu-muted,#767c83) 18%,transparent);border-radius:14px;background:var(--sw-neu-bg,#f1f2f3);color:var(--sw-neu-ink,#343a40);box-shadow:var(--sw-neu-small,0 5px 20px #0002);font:14px/1.45 Onest,sans-serif;overflow-wrap:anywhere}
+.sw-word-popup strong{display:block;font-weight:600;margin-bottom:4px}
+.sw-word-translation{color:var(--sw-neu-muted,#767c83)}
+.sw-word-popup-close{position:absolute;top:5px;right:5px;width:28px;height:28px;padding:0;border:0;border-radius:8px;background:transparent;color:inherit;font:20px/1 sans-serif;cursor:pointer}
+.sw-word-popup-close:is(:hover,:focus-visible){background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 12%,transparent)}
