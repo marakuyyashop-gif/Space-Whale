@@ -17,6 +17,9 @@
   const tree = document.getElementById('workspaceTopics');
   const milestoneRail = document.getElementById('workspaceMilestones');
   const notice = document.getElementById('workspaceNotice');
+  document.getElementById('workspaceNoticeClose')?.addEventListener('click',()=>{notice.textContent='';clearTimeout(noticeTimer);});
+  document.getElementById('lessonAudioDismiss')?.addEventListener('click',()=>{document.getElementById('lessonAudioEnable').hidden=true;});
+  document.getElementById('mediaStatusClose')?.addEventListener('click',()=>{document.getElementById('mediaStatus').hidden=true;});
   let noticeTimer;
   function toast(text){notice.textContent=text;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{notice.textContent='';},4500);}
 
@@ -244,8 +247,8 @@
     const value=text=>Array.isArray(text)?text.join(' · '):typeof text==='string'?text:'';
     const add=(label,text)=>{const copy=value(text);if(copy)rows.push([label,copy]);};
     add('Цель',lesson.goal || lesson.summary || lesson.description);
-    add('Grammar',lesson.grammar);add('Lexis',lesson.lexis);add('Words',lesson.words);
-    if(!lesson.lexis){
+    add('Grammar',lesson.grammar);add('Конструкции',lesson.constructions);
+    if(!lesson.grammar&&!lesson.constructions){
       const phrases=[...new Set(lesson.stages.flatMap(stage=>String(stage.guide?.tl||'').split(/;|\n/)).map(text=>text.trim()).filter(Boolean))];
       if(phrases.length)add('Фразы',phrases.slice(0,8).join(' · ')+(phrases.length>8?' …':''));
     }
@@ -312,8 +315,8 @@
     saveJourney();renderSidebar();renderMilestones();
   }
   function lessonBadge(lesson){
-    const status=lessonStatus(lesson),badge=node('span',status==='Done'||status==='Skipped'?'✓':status||'✓','workspace-lesson-status');
-    badge.classList.toggle('is-empty',!status);badge.setAttribute('role','button');badge.tabIndex=locked()?-1:0;
+    const status=lessonStatus(lesson),badge=node('span','✓','workspace-lesson-status');
+    badge.classList.toggle('is-empty',status!=='Done'&&status!=='Skipped');badge.setAttribute('role','button');badge.tabIndex=locked()?-1:0;
     badge.setAttribute('aria-label',(status==='Done'||status==='Skipped')?'Снять отметку выполнения':'Отметить Lesson выполненным');badge.setAttribute('aria-pressed',String(status==='Done'||status==='Skipped'));
     const toggle=event=>{event.preventDefault();event.stopPropagation();toggleLessonCompletion(lesson);};
     badge.addEventListener('click',toggle);badge.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')toggle(event);});return badge;
@@ -470,7 +473,7 @@
     if(loose.length)levelOptions.push({label:'Отдельные уроки',action:()=>chooseCollection({...route,view:'unassigned'})});
     if(!inClass&&!guestAllowedLessons)levelOptions.push({label:'Шаблоны упражнений',action:()=>chooseCollection({...route,view:'templates'})},{label:'Управление материалами',href:'library-manage.html'});
     const tagsFor=item=>{
-      const explicit=[item.grammar,item.lexis].flat().filter(value=>typeof value==='string'&&value.trim());
+      const explicit=[item.grammar,item.constructions].flat().filter(value=>typeof value==='string'&&value.trim());
       if(explicit.length)return explicit.join(' • ').slice(0,90);
       const subject=[item.title,item.goal,item.summary].filter(Boolean).join(' ').toLowerCase();
       const themes=[[/привет|встреч|поздор|самочувств/,'greetings'],[/знаком/,'meeting people'],[/зовут|имени|алфавит|spell/,'names • spelling'],[/анкет|личные данн/,'personal information'],[/контакт|телефон|email/,'contact details'],[/погод/,'weather'],[/одежд/,'clothes'],[/покуп|shopping/,'shopping'],[/ед[ауы]|food/,'food'],[/дом|комнат/,'home']].filter(([pattern])=>pattern.test(subject)).map(([,label])=>label);
@@ -482,29 +485,34 @@
       return {label:item.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,''),number:String(item.id).padStart(2,'0'),tags:names.join(' • '),status:collectionStatus(`module:${level.id}:${item.id}`,lessons),mark:()=>toggleCollection(`module:${level.id}:${item.id}`,lessons),selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})};
     });
     const lessonOptions=topics.map((item,index)=>({label:item.title,number:String(index+1).padStart(2,'0'),tags:tagsFor(item),status:lessonStatus(item),mark:()=>toggleLessonCompletion(item),selected:item.id===lesson?.id,action:()=>{if(journeys[item.id])journeys[item.id].closed=false;saveJourney();go({...route,...lessonLocation(item),lesson:item.id,exercise:'',section:'tasks'});}}));
-    const selector=(label,title,options,size)=>{
+    const levelControl=document.getElementById('workspaceLevelControl');levelControl.replaceChildren();
+    const selector=(label,title,options,size,parent=controls)=>{
       const control=button(label,()=>openSidebarPicker?.(control,title,options),`workspace-console-selector selector-${size}`);
-      control.disabled=studentLocked;control.setAttribute('aria-label',title);control.setAttribute('data-tooltip',title);control.setAttribute('aria-haspopup','dialog');control.setAttribute('aria-expanded','false');controls.append(control);
+      control.disabled=studentLocked;control.setAttribute('aria-label',title);control.setAttribute('data-tooltip',title);control.setAttribute('aria-haspopup','dialog');control.setAttribute('aria-expanded','false');parent.append(control);
     };
-    selector(view==='library'?level?.id||'—':view==='templates'?'TPL':'Level','Level',levelOptions,'level');
+    selector(view==='library'?level?.id||'—':view==='templates'?'TPL':'Level','Level',levelOptions,'level',levelControl);
     selector(view==='templates'?'TPL':view==='library'&&whale?`M${whale.id}`:'M—',view==='templates'?'Группа шаблонов':'Module',view==='templates'?lessonOptions:moduleOptions,'module');
+    selector(stageIndex>=0?`L${stageIndex+1}`:'L—',view==='templates'?'Группа шаблонов':'Lesson',lessonOptions,'lesson');
     const overview=node('section','','workspace-lesson-overview');
-    const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,view==='templates'?'Группа шаблонов':'Lesson',lessonOptions),'workspace-lesson-selector');
-    lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label',view==='templates'?'Выбрать группу шаблонов':'Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
-    lessonCard.append(node('span',view==='templates'?'ШАБЛОНЫ':stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
-    if(lesson){lessonCard.append(lessonBadge(lesson));if(lessonStatus(lesson)==='Skipped')lessonCard.append(node('span','Skip','workspace-skip-badge'));}
-    overview.append(lessonCard);
-    if(lesson&&journeys[lesson.id]?.closed){tree.append(overview);return;}
+    const heading=node('div','','workspace-lesson-heading');
+    heading.append(node('h2',lesson?.title||'Выберите урок','workspace-lesson-title'));
+    if(lesson)heading.append(lessonBadge(lesson));
+    overview.append(heading);
     const copy=node('p','','workspace-info-copy');
     if(lesson){
       const goal=lesson.summary||lesson.description||lesson.goal;
-      if(goal)copy.append(document.createTextNode(goal));
-      else copy.append(document.createTextNode('Тема урока — '),node('strong',lesson.title),document.createTextNode('. Рассмотрим материал и потренируем его использование.'));
-      const highlights=[lesson.grammar,lesson.lexis].flat().filter(value=>typeof value==='string'&&value);
-      if(highlights.length){copy.append(document.createTextNode(' В центре внимания: '));highlights.slice(0,2).forEach((text,index)=>{if(index)copy.append(document.createTextNode(' и '));copy.append(node('strong',text));});copy.append(document.createTextNode('.'));}
-      else if(goal){const terms=['самочувствии','поздороваться','попрощаться','знакомстве','личные данные','погоду','контактами'];const raw=copy.textContent;const re=new RegExp('('+terms.join('|')+')','gi');copy.replaceChildren();raw.split(re).forEach((part,index)=>copy.append(index%2?node('strong',part):document.createTextNode(part)));}
-    }else copy.textContent='Выберите урок с помощью кнопок рядом с таймером.';
-    overview.append(copy);tree.append(overview);
+      if(goal)copy.textContent=goal;
+      const grammar=[lesson.grammar].flat().filter(value=>typeof value==='string'&&value.trim());
+      const constructions=[lesson.constructions].flat().filter(value=>typeof value==='string'&&value.trim());
+      overview.append(copy);
+      for(const [label,values] of [['Grammar',grammar],['Конструкции',constructions]]){
+        if(!values.length)continue;
+        const line=node('p','','workspace-info-copy workspace-lesson-grammar');
+        line.append(node('strong',label+': '),document.createTextNode(values.join(' · ')));overview.append(line);
+      }
+    }else{copy.textContent='Выберите урок с помощью кнопок рядом с таймером.';overview.append(copy);}
+    tree.append(overview);
+    if(lesson&&journeys[lesson.id]?.closed)return;
     const current=node('section','','workspace-current-overview'),stage=lesson?.stages[milestoneIndex];
     current.append(node('span',stage?`MILESTONE ${String(milestoneIndex+1).padStart(2,'0')}`:'MILESTONE','workspace-info-eyebrow'));
     const actions=node('div','','workspace-milestone-actions');const skip=button('Skip',()=>markLesson('skip'),'workspace-progress-skip');const reset=button('',()=>markLesson('reset'),'workspace-progress-reset');reset.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>';skip.disabled=reset.disabled=studentLocked;reset.setAttribute('aria-label','Сбросить отметки Milestones');reset.setAttribute('data-tooltip','Сбросить отметки');actions.append(skip,reset);current.append(actions);

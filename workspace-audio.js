@@ -13,6 +13,7 @@
     const paint=()=>{
       for(const el of clips()){
         const wrap=el.closest('.ek-audio-player,.ek-repeat-audio'),button=wrap?.querySelector('button');if(!button)continue;
+        if(!el.getAttribute('src')){button.disabled=true;button.setAttribute('aria-label','Audio pending');wrap.dataset.state='pending';continue;}
         const active=current?.exercise_id===exerciseId()&&current?.key===el.dataset.ekAudioKey;
         const playing=active&&!player.paused&&!player.ended;
         button.textContent=playing?'❚❚':'▶';button.setAttribute('aria-label',(playing?'Pause ':'Play ')+(el.getAttribute('aria-label')||'audio'));
@@ -47,6 +48,7 @@
       if(command.exercise_id!==exerciseId()){pending=command;return;}
       const el=find(command.key);
       if(!el&&command.action!=='stop'){pending=command;return;}
+      if(el&&!el.getAttribute('src')&&command.action!=='stop'){pending=null;return;}
       pending=null;clearTimeout(timer);player.pause();
       current=command;
       if(command.action==='stop'){current=null;paint();return;}
@@ -63,7 +65,7 @@
       apply(command);
     }
     async function issue(key,action,time=0){
-      if(!canControl()||!isLive())return;
+      if(!canControl()||!isLive()||(action!=='stop'&&!find(key)?.getAttribute('src')))return;
       const command={exercise_id:exerciseId(),key,action,position:time,at:now()+(action==='play'?250:0),revision:now(),serial:++serial};
       revision=command.revision;
       // Sending and local scheduling happen together; a failed transport is visible.
@@ -74,7 +76,7 @@
     const click=event=>{
       const button=event.target.closest?.('.ek-audio-play,.ek-repeat-play');if(!button||!isLive())return;
       const el=button.parentElement.querySelector('audio');if(!el)return;
-      event.preventDefault();event.stopImmediatePropagation();if(!canControl())return;
+      event.preventDefault();event.stopImmediatePropagation();if(!canControl()||!el.getAttribute('src'))return;
       const key=el.dataset.ekAudioKey;if(!key)return;
       const active=current?.key===key&&current.exercise_id===exerciseId();
       const action=active&&current.action==='play'&&!player.ended?'pause':'play';

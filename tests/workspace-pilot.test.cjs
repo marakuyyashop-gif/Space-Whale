@@ -24,7 +24,7 @@ function fixture(guest=false,options={}){
  return {document,location,copied,calls,click,get handlers(){return handlers;},sessionStorage:context.sessionStorage};
 }
 test('actual workspace renders the current sidebar and creates an isolated invitation without a link field',async()=>{
- const s=fixture();assert.ok(s.document.querySelector('.workspace-lesson-selector'));assert.equal(s.document.querySelector('#guestInviteLink'),null);
+ const s=fixture();assert.ok(s.document.querySelector('.workspace-lesson-heading'));assert.equal(s.document.querySelector('#guestInviteLink'),null);
  s.click(s.document.querySelector('#inviteStudent'));await settled();
  assert.equal(s.calls.filter(c=>c.name==='create_guest_workspace').length,1);
  assert.equal(new URL(s.copied[0]).searchParams.get('guest'),'new-token');
@@ -52,7 +52,7 @@ test('Start/Finish keeps the teacher cabinet available and preserves the selecte
  s.click([...s.document.querySelectorAll('.workspace-session-dialog button')].find(b=>b.textContent==='Завершить'));await settled();
  const target=new URL(s.location.href);assert.equal(target.searchParams.has('room'),false);assert.equal(target.searchParams.has('guest'),false);assert.equal(target.searchParams.get('lesson'),'a1-1-w1-l2');
  assert.equal(JSON.parse(s.sessionStorage.getItem('space-whale:clock:guest:old-token')).ended,false);
- const reopened=fixture();assert.equal(reopened.document.querySelector('#startLesson').disabled,false);assert.ok(reopened.document.querySelector('.workspace-lesson-selector'));
+ const reopened=fixture();assert.equal(reopened.document.querySelector('#startLesson').disabled,false);assert.ok(reopened.document.querySelector('.workspace-lesson-heading'));
 });
 test('old ended timer never blocks role verification; an owner opening an expired invitation recovers',async()=>{
  const s=fixture(true,{ended:true,invalid:true});await settled();
@@ -123,8 +123,28 @@ test('template groups use the existing selectors and stay inside the same Worksp
  for(const [title,count] of [['Материалы / элементы',6],['Механики ответа',9],['Композиции / примеры',6]]){
    choose('.selector-module',title);
    assert.match(s.location.search,/view=templates/);
-   assert.equal(s.document.querySelector('.workspace-lesson-selector-title').textContent,title);
+   assert.equal(s.document.querySelector('.workspace-lesson-title').textContent,title);
    assert.equal(s.document.querySelectorAll('#workspaceLessonPath .workspace-path-point').length,count+1);
    assert.ok(s.document.querySelector('#workspaceExercise h2'));
  }
+});
+
+test('level is beside session controls; module and lesson pickers navigate; overview is plain text',()=>{
+ const s=fixture(),d=s.document;
+ assert.ok(d.querySelector('#workspaceClockPanel .selector-level'));
+ assert.deepEqual([...d.querySelectorAll('#workspaceCourseControls button')].map(b=>b.textContent),['M1','L2']);
+ assert.equal(d.querySelector('button.workspace-lesson-selector'),null);
+ assert.ok(d.querySelector('.workspace-lesson-heading [role=button]'));
+ const choose=(selector,label)=>{s.click(d.querySelector(selector));s.click([...d.querySelectorAll('.workspace-picker-option')].find(el=>el.textContent.includes(label)));};
+ choose('.selector-level','A1.2');choose('.selector-module','04');choose('.selector-lesson','Как выглядит эта вещь?');
+ const overview=d.querySelector('.workspace-lesson-overview');assert.match(overview.textContent,/look \/ looks/);assert.doesNotMatch(overview.textContent,/coat|sweater|blouse/);
+ assert.match(s.location.search,/lesson=a1-2-w4-l1/);
+});
+test('persistent notices can be dismissed and later messages still appear',()=>{
+ const s=fixture(),d=s.document,n=d.getElementById('workspaceNotice');
+ n.textContent='Аудио не загрузилось';s.click(d.getElementById('workspaceNoticeClose'));assert.equal(n.textContent,'');
+ n.textContent='Новое сообщение';assert.equal(n.textContent,'Новое сообщение');
+ d.getElementById('lessonAudioEnable').hidden=false;s.click(d.getElementById('lessonAudioDismiss'));assert.equal(d.getElementById('lessonAudioEnable').hidden,true);
+ d.getElementById('mediaStatus').hidden=false;s.click(d.getElementById('mediaStatusClose'));assert.equal(d.getElementById('mediaStatus').hidden,true);
+ assert.equal(s.calls.filter(c=>c?.name==='media-stop').length,0);
 });

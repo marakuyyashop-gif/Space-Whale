@@ -320,12 +320,19 @@
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
     let syncStage=null, syncTranscript=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
-    const centerSection=element=>{
+    // Fit the entire newly revealed range, with its beginning taking priority.
+    const centerSection=(element,last=element)=>{
       if(!element||element.hidden)return;
       const scroller=host.closest?.('.lesson-scroll');
       const behavior=doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
-      if(scroller?.scrollTo&&element.getBoundingClientRect){const a=element.getBoundingClientRect(),b=scroller.getBoundingClientRect();scroller.scrollTo({top:Math.max(0,scroller.scrollTop+a.top-b.top-Math.max(16,(b.height-a.height)/2)),behavior});}
-      else element.scrollIntoView?.({behavior,block:'center'});
+      if(scroller?.scrollTo&&element.getBoundingClientRect){
+        const first=element.getBoundingClientRect(),end=last.getBoundingClientRect(),viewport=scroller.getBoundingClientRect(),padding=16;
+        const top=first.top-viewport.top,bottom=end.bottom-viewport.top,available=viewport.height-padding*2;
+        let delta=0;
+        if(end.bottom-first.top>available||top<padding)delta=top-padding;
+        else if(bottom>viewport.height-padding)delta=bottom-viewport.height+padding;
+        if(delta)scroller.scrollTo({top:Math.max(0,scroller.scrollTop+delta),behavior});
+      }else element.scrollIntoView?.({behavior,block:'start'});
     };
     const getViewState=()=>({repeat:repeatIndex,revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
     const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
@@ -579,7 +586,8 @@
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
     host.replaceChildren();
-    host.append(node('h2', 'ek-title', def.title), node('p', 'ek-instruction', def.instruction || ''));
+    if(!config.hideHeading)host.append(node('h2', 'ek-title', def.title));
+    if(def.instruction && def.instruction.trim()!==def.title.trim())host.append(node('p', 'ek-instruction', def.instruction));
     const body = node('div', 'ek-body');
     const actions = node('div', 'ek-actions');
     const status = node('p', 'ek-status'); status.setAttribute('role', 'status');
@@ -710,7 +718,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -798,6 +806,7 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
+              hideHeading:block.exercise.title===def.title,
               audioPath:(config.audioPath||def.id)+':'+block.id,
               onSkip:()=>{if(revealable.length&&!answers.__sw_rule_visible){answers.__sw_rule_visible=true;syncRules?.(true);viewChanged();}else config.onSkip?.();},
               navigationReadOnly:Boolean(config.navigationReadOnly),
@@ -823,7 +832,7 @@
           navigation.hidden=Boolean(config.navigationReadOnly);toggle.disabled=Boolean(config.readOnly||config.navigationReadOnly);navigation.append(toggle);revealable[0].before(navigation);
           syncRules=(animate=false)=>{
             const open=Boolean(answers.__sw_rule_visible),changed=rulesOpen!==null&&rulesOpen!==open;rulesOpen=open;
-            revealable.forEach((section,index)=>{if(animate&&changed)expand(section,open,index===revealable.length-1?()=>centerSection(open?revealable[0]:page.querySelector('.ek-discovery-block')):undefined);else if(!animate){section.hidden=!open;section.inert=!open;}});
+            revealable.forEach((section,index)=>{if(animate&&changed)expand(section,open,index===revealable.length-1?()=>centerSection(open?revealable[0]:page.querySelector('.ek-discovery-block'),open?revealable[revealable.length-1]:page.querySelector('.ek-discovery-block')):undefined);else if(!animate){section.hidden=!open;section.inert=!open;}});
             toggle.classList.toggle('ek-stage-up',open);toggle.classList.toggle('ek-stage-down',!open);toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Свернуть следующий блок':'Далее');toggle.title=open?'Свернуть следующий блок':'Далее';
           };
           syncRules();
@@ -1097,7 +1106,7 @@
       const needsSolution=id=>['retry','empty'].includes(feedback[id]);
       if(attempted){
         if(def.kind==='gaps')def.items.forEach(item=>{
-          if(!item.segments.some(segment=>typeof segment!=='string' && segment.answers && needsSolution(segment.id) && !(segment.options?.length===2)))return;
+          if(!Object.values(feedback).some(value=>value==='retry'||value==='empty'))return;
           const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
         else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' → '));
@@ -1105,7 +1114,6 @@
         else if(def.items)def.items.forEach(item=>{
           if(!needsSolution(item.id))return;
           const choices=item.options||def.options||def.groups||[];
-          if(def.kind==='choice' && !def.multiple && choices.length===2)return;
           const ids=def.multiple?item.correctIds:[item.correctId];
           pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));
         });

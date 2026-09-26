@@ -6,13 +6,13 @@
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
 <link rel="stylesheet" href="exercise-kit.css?v=20260926-floating-dimmer">
 <link rel="stylesheet" href="learning-space.css?v=20260924-core-neu">
-<link rel="stylesheet" href="workspace.css?v=20260926-floating-dimmer">
+<link rel="stylesheet" href="workspace.css?v=20260926-lesson-workspace-fixes">
 <link rel="stylesheet" href="classroom-media.css?v=20260926-floating-dimmer">
 <link rel="stylesheet" href="workspace-word-focus.css?v=20260926-word-focus">
 </head><body class="learning-space unified-workspace" data-theme="light">
 <script>if(new URLSearchParams(location.search).has("session")||new URLSearchParams(location.search).has("guest")||new URLSearchParams(location.search).has("room"))document.body.dataset.workspaceRole="connecting";</script>
 <div class="workspace-connection-state" id="workspaceConnectionState" role="status" hidden>Подключаемся к занятию…</div>
-<div class="workspace-session-tools"><p id="workspaceNotice" class="workspace-notice" role="status"></p></div>
+<div class="workspace-session-tools"><p id="workspaceNotice" class="workspace-notice" role="status"></p><button id="workspaceNoticeClose" class="workspace-notice-close" type="button" aria-label="Закрыть уведомление">×</button></div>
 <div class="reference-app">
 <div class="workspace-sidebar-shell"><aside id="workspaceSidebar" class="app-sidebar" aria-label="Библиотека и задания">
 <header class="workspace-brand-row"><a class="workspace-brand" href="index.html">space whale<span aria-hidden="true">°</span></a><div class="workspace-top-controls"><a class="workspace-icon workspace-home" href="index.html" aria-label="Home" data-tooltip="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a><button id="workspaceProfileButton" class="workspace-power workspace-icon" type="button" aria-label="Профиль ученика" data-tooltip="Профиль ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg></button></div></header>
@@ -22,6 +22,7 @@
 <div class="workspace-session-heading workspace-visually-hidden"><a href="schedule.html" role="status"></a></div>
 <section id="workspaceClockPanel" class="workspace-clock-panel" aria-label="Таймер занятия">
 <div id="workspaceClock" class="workspace-clock" data-started="false" role="progressbar" aria-label="Ход занятия" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0"><svg viewBox="0 0 160 160" aria-hidden="true"><circle class="workspace-clock-track" cx="80" cy="80" r="65"/><circle id="workspaceClockProgress" class="workspace-clock-progress" cx="80" cy="80" r="65" pathLength="100"/><path class="workspace-clock-ticks" d="M80.00 7.00L80.00 14.00 M87.63 7.40L87.21 11.38 M95.18 8.60L94.35 12.51 M102.56 10.57L101.32 14.38 M109.69 13.31L108.06 16.97 M116.50 16.78L113.00 22.84 M122.91 20.94L120.56 24.18 M128.85 25.75L126.17 28.72 M134.25 31.15L131.28 33.83 M139.06 37.09L135.82 39.44 M143.22 43.50L137.16 47.00 M146.69 50.31L143.03 51.94 M149.43 57.44L145.62 58.68 M151.40 64.82L147.49 65.65 M152.60 72.37L148.62 72.79 M153.00 80.00L146.00 80.00 M152.60 87.63L148.62 87.21 M151.40 95.18L147.49 94.35 M149.43 102.56L145.62 101.32 M146.69 109.69L143.03 108.06 M143.22 116.50L137.16 113.00 M139.06 122.91L135.82 120.56 M134.25 128.85L131.28 126.17 M128.85 134.25L126.17 131.28 M122.91 139.06L120.56 135.82 M116.50 143.22L113.00 137.16 M109.69 146.69L108.06 143.03 M102.56 149.43L101.32 145.62 M95.18 151.40L94.35 147.49 M87.63 152.60L87.21 148.62 M80.00 153.00L80.00 146.00 M72.37 152.60L72.79 148.62 M64.82 151.40L65.65 147.49 M57.44 149.43L58.68 145.62 M50.31 146.69L51.94 143.03 M43.50 143.22L47.00 137.16 M37.09 139.06L39.44 135.82 M31.15 134.25L33.83 131.28 M25.75 128.85L28.72 126.17 M20.94 122.91L24.18 120.56 M16.78 116.50L22.84 113.00 M13.31 109.69L16.97 108.06 M10.57 102.56L14.38 101.32 M8.60 95.18L12.51 94.35 M7.40 87.63L11.38 87.21 M7.00 80.00L14.00 80.00 M7.40 72.37L11.38 72.79 M8.60 64.82L12.51 65.65 M10.57 57.44L14.38 58.68 M13.31 50.31L16.97 51.94 M16.78 43.50L22.84 47.00 M20.94 37.09L24.18 39.44 M25.75 31.15L28.72 33.83 M31.15 25.75L33.83 28.72 M37.09 20.94L39.44 24.18 M43.50 16.78L47.00 22.84 M50.31 13.31L51.94 16.97 M57.44 10.57L58.68 14.38 M64.82 8.60L65.65 12.51 M72.37 7.40L72.79 11.38"/></svg><div class="workspace-clock-face"><span id="workspaceClockTime">60:00</span></div><button id="workspaceStopLesson" type="button" aria-label="Завершить занятие" hidden>Pause</button><button id="startLesson" type="button" aria-label="Start Lesson">Start<br>Lesson</button></div>
+<div id="workspaceLevelControl" class="workspace-level-control"></div>
 <span id="workspaceTimerStatus" class="workspace-visually-hidden" role="status"></span>
 </section>
 </div>
@@ -36,7 +37,7 @@
 </nav>
 <div class="workspace-mini-dock" aria-label="Будущие инструменты"><button id="newGuestLesson" type="button" aria-label="Новый ученик / закрыть ссылку" data-tooltip="Новый ученик / закрыть ссылку"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button><button id="inviteStudent" type="button" aria-label="Ссылка для ученика" data-tooltip="Ссылка для ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></button></div>
 <section id="workspaceStudentProfile" class="workspace-student-profile" aria-label="Профиль ученика" hidden></section></aside><button id="workspaceSidebarToggle" class="workspace-sidebar-toggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Свернуть меню"><span aria-hidden="true"></span></button></div>
-<section class="class-area"><div class="workspace-utility-bar" id="workspaceUtilityBar"><button id="workspaceThemeToggle" class="workspace-theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема" title="Переключить тему"><span class="theme-sky" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars">✦ · ✧</span><span class="theme-orb"><i></i><i></i><i></i></span></span></button></div><button id="lessonAudioEnable" type="button" class="workspace-audio-enable" title="Браузер приостановил аудио упражнений. Нажмите, чтобы разрешить воспроизведение." hidden>Разрешить аудио упражнений</button><aside id="videoDock" class="workspace-video-dock" tabindex="0" aria-label="Видеосвязь: перетащите окно" hidden>
+<section class="class-area"><div class="workspace-utility-bar" id="workspaceUtilityBar"><button id="workspaceThemeToggle" class="workspace-theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема" title="Переключить тему"><span class="theme-sky" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars">✦ · ✧</span><span class="theme-orb"><i></i><i></i><i></i></span></span></button></div><div class="workspace-audio-notice"><button id="lessonAudioEnable" type="button" class="workspace-audio-enable" title="Браузер приостановил аудио упражнений. Нажмите, чтобы разрешить воспроизведение." hidden>Разрешить аудио упражнений</button><button id="lessonAudioDismiss" type="button" aria-label="Закрыть уведомление об аудио">×</button></div><aside id="videoDock" class="workspace-video-dock" tabindex="0" aria-label="Видеосвязь: перетащите окно" hidden>
 <div class="workspace-video-toolbar">
 
 <button id="mediaSize" type="button" class="workspace-video-tool" aria-label="Свернуть видео" title="Свернуть видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="media-collapse-icon" d="M4 9h5V4m11 11h-5v5M9 9 3 3m12 12 6 6"/><path class="media-expand-icon" d="M9 4H4v5m11 11h5v-5M4 4l6 6m10 10-6-6"/></svg></button>
@@ -50,7 +51,7 @@
 <button id="mediaRetry" type="button" class="workspace-video-action" hidden>Подключить снова</button>
 <button id="mediaEnableAudio" type="button" class="workspace-video-action" hidden>Включить звук</button>
 </div>
-<p id="mediaStatus" class="workspace-video-status" role="status" aria-live="polite"></p>
+<div class="workspace-media-notice"><p id="mediaStatus" class="workspace-video-status" role="status" aria-live="polite"></p><button id="mediaStatusClose" type="button" aria-label="Закрыть сообщение видеосвязи">×</button></div>
 </aside><button id="mediaRestore" type="button" class="workspace-video-restore" aria-label="Вернуть видео" title="Вернуть видео" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button><nav id="workspaceMilestones" class="workspace-milestone-rail" aria-label="Milestones"></nav><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
 </div>
 <noscript>Для открытия упражнений включите JavaScript.</noscript>
@@ -59,15 +60,15 @@
 <script src="teacher-access.js?v=20260926-fast-sync"></script>
 <script src="classroom-realtime.js?v=20260926-classroom-controls"></script>
 <script src="workspace-word-focus.js?v=20260926-word-focus"></script>
-<script src="workspace-audio.js?v=20260926-floating-dimmer"></script>
+<script src="workspace-audio.js?v=20260926-lesson-workspace-fixes"></script>
 <script src="classroom-media.js?v=20260926-floating-dimmer"></script>
-<script src="exercise-kit.js?v=20260926-floating-dimmer"></script>
+<script src="exercise-kit.js?v=20260926-lesson-workspace-fixes"></script>
 <script src="template-gallery.js?v=20260926-template-layers"></script>
 <script src="lesson-draft-first-day-school.js?v=20260926-phrases"></script>
 <script src="lesson-draft-school-fair.js?v=20260926-phrases"></script>
-<script src="course-content.js?v=20260926-floating-dimmer"></script>
+<script src="course-content.js?v=20260926-lesson-workspace-fixes"></script>
 <script src="whale1-content.js?v=20260926-feedback"></script>
 <script src="workspace-catalog.js?v=20260926-clothes-lesson-one"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-floating-dimmer";document.body.append(script);}});</script>
+<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-lesson-workspace-fixes";document.body.append(script);}});</script>
 </body></html>

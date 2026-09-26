@@ -44,7 +44,7 @@
     id:'a1-2-w4-l1',title:'Как выглядит эта вещь?',level:'A1.2',whale:4,
     summary:'Учимся называть предметы одежды, описывать их внешний вид и сравнивать со знакомыми вещами.',
     grammar:'look / looks + adjective; look / looks like + noun; How does it look?',
-    lexis:wordList.join(', '),durationMinutes:29,
+    words:wordList,durationMinutes:29,
     stages:[
       step('Opening Speaking',2,exercise('opening','presentation','Look at the clothes and talk about them.',{
         instruction:'What clothes can you name?\nWhich one do you like?\nHow does it look?',
@@ -59,21 +59,25 @@
         layout:'listen-repeat',audioPending:true,instruction:'Listen to the words and sentences. Repeat them out loud.',
         items:wordList.map((word,i)=>{const suffix=String(i+1).padStart(2,'0'),audioId='A1M4L1_WORD_'+suffix,exampleAudioId='A1M4L1_SENTENCE_'+suffix,slot=lesson1Media[audioId];return {id:word,text:word,...audioSlot(audioId),example:slot.sentence,exampleAudioId,...(lesson1Media[exampleAudioId].src?{exampleAudio:lesson1Media[exampleAudioId].src}:{})};})
       }),'Повторить шесть слов и шесть предложений: отдельный шаг и отдельная запись для каждого слова и примера.'),
-      step('Words Practice · Choice',2,exercise('word-choice','choice','Choose the correct word.',{
-        instruction:'Look at the pictures and choose the correct word.',items:[
-          {id:'coat',...wordImage('coat'),prompt:'I need a ______ for cold days.',options:options(['coat','skirt','suit']),correctId:'coat'},
-          {id:'skirt',...wordImage('skirt'),prompt:'This ______ is for my sister.',options:options(['blouse','skirt','hat']),correctId:'skirt'},
-          {id:'suit',...wordImage('suit'),prompt:'My father has a ______ for work.',options:options(['suit','sweater','coat']),correctId:'suit'},
-          {id:'hat',...wordImage('hat'),prompt:'I like this ______.',options:options(['blouse','hat','skirt']),correctId:'hat'}
-        ]
-      }),'Выбрать название предмета по изображению и контексту.'),
-      step('Words Practice · Type',2,exercise('word-type','gaps','Complete the sentences.',{
-        inputMode:'text',instruction:'Look at the pictures and write the correct word.',items:[
-          {id:'sweater',...wordImage('sweater'),segments:['My ',{id:'sweater-gap',answers:['sweater']},' is in the wardrobe.']},
-          {id:'blouse',...wordImage('blouse'),segments:['My sister wants this ',{id:'blouse-gap',answers:['blouse']},'.']},
-          {id:'coats',...imageSlot('A1M4L1_IMAGE_TWO_COATS'),segments:['These ',{id:'coats-gap',answers:['coats']},' are new.']}
-        ]
-      }),'Написать sweater, blouse и форму множественного числа coats.'),
+      step('Words Practice · Choice',2,exercise('word-choice','stage','Choose the correct word.',{
+        instruction:'Look at the picture and choose the word in the sentence.',exercises:[
+          ['coat','I need a ',' for cold days.',['coat','skirt','suit']],
+          ['skirt','This ',' is for my sister.',['blouse','skirt','hat']],
+          ['suit','My father has a ',' for work.',['suit','sweater','coat']],
+          ['hat','I like this ','.',['blouse','hat','skirt']]
+        ].map(([word,before,after,choices],i)=>({id:word,exercise:exercise('word-choice-'+word,'gaps','Choose the correct word.',{
+          inputMode:'select',items:[{id:word,...wordImage(word),segments:[before,{id:word+'-gap',answers:[word],options:choices},after]}]
+        })}))
+      }),'Выбрать название предмета в предложении. Одна картинка и одно предложение на шаг.'),
+      step('Words Practice · Type',2,exercise('word-type','stage','Complete the sentences.',{
+        instruction:'Look at the picture and write the missing word.',exercises:[
+          ['sweater','My ',' is in the wardrobe.',wordImage('sweater')],
+          ['blouse','My sister wants this ','.',wordImage('blouse')],
+          ['coats','These ',' are new.',imageSlot('A1M4L1_IMAGE_TWO_COATS')]
+        ].map(([word,before,after,image])=>({id:word,exercise:exercise('word-type-'+word,'gaps','Complete the sentences.',{
+          inputMode:'text',items:[{id:word,...image,segments:[before,{id:word+'-gap',answers:[word]},after]}]
+        })}))
+      }),'Написать sweater, blouse и форму множественного числа coats. Следующая картинка открывается стрелкой.'),
       step('Listening',5,exercise('listening','stage','Listen to the conversation.',{
         layout:'grouped',instruction:'Anna is looking at clothes with Ben. Listen and answer the question.',
         exercises:[
@@ -85,7 +89,7 @@
         transcript:lesson1Media.A1M4L1_AUDIO_01.script,transcriptAfter:['question1','question2','question3']
       }),'Понять выбор Анны и детали описания. Транскрипт можно раскрыть после заполнения и проверки всех трёх вопросов.'),
       step('Language Focus',4,exercise('language-focus','rule-page','Match the sentences with their meanings.',{
-        instruction:'Match each sentence with the correct meaning.',blocks:[
+        instruction:'Click the button next to each sentence and choose its meaning.',blocks:[
           {type:'exercise',id:'meaning',exercise:exercise('meaning','matching','Match the sentences with their meanings.',{
             items:[{id:'meaning1',text:'The coat looks good.',correctId:'C'},{id:'meaning2',text:'It looks like your old coat.',correctId:'B'},{id:'meaning3',text:'The sweater looks warm.',correctId:'A'}],
             options:[{id:'A',text:'Свитер выглядит тёплым.'},{id:'B',text:'Пальто похоже на ваше старое пальто.'},{id:'C',text:'Пальто выглядит хорошо.'}]

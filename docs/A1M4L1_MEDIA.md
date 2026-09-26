@@ -56,3 +56,7 @@ Listen & Repeat uses twelve separate files and reveal steps: one word, then its 
 - Step 9 is ungraded open writing. `possibleAnswers` display only after OK; alternative formulations are not marked incorrect. The owner explicitly asked to retain “Is this your coat?” pending visual review; revisit that prompt after publishing.
 - Step 1/10 Useful phrases begin closed. Speaking has no automatic correctness check.
 - Source/gap/choice images reuse the existing illustration renderer. No CSS or image sizing adjustments accompany this content revision.
+
+## Picture practice revision
+
+Steps 4 and 5 now group each existing picture slot with one sentence and reveal subsequent pairs with the shared arrow. Step 4 uses a real inline dropdown; step 5 keeps authored text entry. No additional images are required. The word bank belongs in lesson `words` metadata, not sidebar constructions.
