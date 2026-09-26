@@ -8,6 +8,7 @@
   const classroom = window.SpaceWhaleClassroom || null;
   const sessionId = new URLSearchParams(location.search).get('session');
   const guestToken = new URLSearchParams(location.search).get('guest');
+  const showInviteOnJoin = new URLSearchParams(location.search).get('share')==='1';
   const liveMode = Boolean(sessionId || guestToken);
 
   const host = document.getElementById('workspaceExercise');
@@ -572,9 +573,19 @@
       catch (error) { console.error('[Space Whale] Could not request peer state', error); }
     }
 
-    if (liveRole === 'student' && !collaborative() && hasAnswers(localAnswers)) {
-      try { await classroom.sendExerciseSnapshot(exerciseId, localAnswers); }
-      catch (error) { console.error('[Space Whale] Could not restore pending student state', error); }
+    if (liveRole === 'student' && !collaborative()) {
+      const revision=liveSeenAt.get(exerciseId);
+      try {
+        const saved=await classroom.loadExerciseResponse(exerciseId);
+        const pending=classroom.getPendingSnapshot?.(exerciseId);
+        // Never overwrite typing that happened while the server response was loading.
+        const answers=pending??(liveSeenAt.get(exerciseId)!==revision?liveAnswers.get(exerciseId):saved?.response??localAnswers);
+        if(answers&&typeof answers==='object'){
+          liveAnswers.set(exerciseId,answers);
+          if(route.exercise===exerciseId&&mounted?.setAnswers){mounted.setAnswers(answers);if(mountedStorage)storeAnswers(mountedStorage.key,mountedStorage.signature,answers);}
+          await classroom.sendExerciseSnapshot(exerciseId,answers);
+        }
+      } catch(error){liveHydrated.delete(exerciseId);console.error('[Space Whale] Could not restore student answers',error);}
     }
   }
 
@@ -680,9 +691,11 @@
 
     const handlers = {
       onReconnect: async () => {
+        await classroom.flushPendingSnapshots?.();
         liveHydrated.clear();
         const shared=await classroom.loadSharedState(sessionId);
         if (liveRole==='student' && shared) applyRemoteNavigation(shared);
+        if (liveRole==='teacher') await syncTeacherNavigation();
         if (route.exercise) {
           await hydrateLiveExercise(route.exercise, {});
           if (collaborative()) await classroom.sendExerciseDraft(route.exercise, replica(route.exercise).snapshot());
@@ -771,6 +784,7 @@
     }
 
     if (route.exercise) hydrateLiveExercise(route.exercise, mounted?.getAnswers?.() || {});
+    if(showInviteOnJoin&&liveRole==='teacher') document.getElementById('inviteStudent')?.click();
   }
 
   panels.forEach(panel => document.getElementById(`${panel}Tab`).addEventListener('click', () => {
@@ -850,20 +864,20 @@
 
   const invite = document.getElementById('inviteStudent');
   if (invite) {
-    invite.hidden = Boolean(sessionId);
+    invite.hidden = false;
     invite.addEventListener('click', async () => {
       invite.disabled=true;
       try {
-        if (!guestToken) {
+        if (!guestToken&&!sessionId) {
           if (!await classroom.getCurrentUser()) { location.href='login.html?next='+encodeURIComponent('classroom.html'); return; }
           const result=await window.spaceWhaleSupabase.rpc('create_guest_workspace');
           if (result.error) throw result.error;
-          location.href='classroom.html?guest='+encodeURIComponent(result.data.token);
+          const joined=new URL('classroom.html'+query(route),location.href);joined.searchParams.set('guest',result.data.token);joined.searchParams.set('share','1');location.href=joined.href;
           return;
         }
-        const url=new URL('classroom.html',location.href);url.searchParams.set('guest',guestToken);
+        const url=new URL('classroom.html',location.href);url.searchParams.set(guestToken?'guest':'session',guestToken||sessionId);
         const field=document.getElementById('guestInviteLink');field.value=url.href;field.hidden=false;
-        try { await navigator.clipboard.writeText(url.href); notice.textContent='Ссылка скопирована. Отправь её ученице — регистрация ей не нужна.'; }
+        try { await navigator.clipboard.writeText(url.href); notice.textContent=guestToken?'Ссылка скопирована. Откройте её в другом браузере без входа в аккаунт преподавателя.':'Ссылка скопирована. Ученик должен войти в свой аккаунт.'; }
         catch { field.focus();field.select();notice.textContent='Скопируй ссылку из поля и отправь ученице.'; }
       } catch(error) {notice.textContent=error.message || 'Не удалось создать занятие.';}
       finally {invite.disabled=false;}

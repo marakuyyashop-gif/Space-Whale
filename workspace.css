@@ -535,3 +535,6 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .unified-workspace[data-workspace-role=student] .workspace-theme-switch{right:16px;top:max(14px,env(safe-area-inset-top))}
 .unified-workspace[data-workspace-role=student] #workspaceExercise{min-width:0;max-width:100%}
 }
+
+.workspace-session-tools:has(.workspace-notice:not(:empty)),.workspace-session-tools:has(.workspace-invite-link:not([hidden])){display:block!important;flex:none}
+.workspace-mini-dock #inviteStudent{cursor:pointer;opacity:1}

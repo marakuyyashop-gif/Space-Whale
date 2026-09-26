@@ -33,3 +33,36 @@ test('guest transport permits both editors, persists merged envelopes and verifi
     await api.disconnect();assert.equal(timers.size,0);
   }
 });
+
+test('failed snapshots survive reload, retry, and retain the newest answer',async()=>{
+  const storage=new Map(),saved=[],timers=new Map();let fail=true,subscription,counter=0;
+  const make=()=>{
+    const channel={on(){return this;},subscribe(fn){subscription=fn;queueMicrotask(()=>fn('SUBSCRIBED'));return this;},async track(){},async send(){return 'ok';}};
+    const client={auth:{async getUser(){return {data:{user:null}};}},channel(){return channel;},async removeChannel(){},
+      async rpc(name,args){if(name==='resolve_guest_lesson_link')return {data:{is_host:false,room_topic:'r',allowed_lesson_ids:['*']}};
+        if(fail)return {error:new Error('offline')};saved.push(args.p_response);return {data:true};}};
+    const window={spaceWhaleSupabase:client,sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}};
+    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console:{error(){}},setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
+    return window.SpaceWhaleClassroom;
+  };
+  let api=make();await api.connectGuest('recovery-token');
+  await api.sendExerciseDraft('e1',{answer:'old'});
+  await api.flushPendingSnapshots();assert.equal(api.getPendingSnapshot('e1').answer,'old');
+  timers.clear();api=make();await api.connectGuest('recovery-token');
+  assert.equal(api.getPendingSnapshot('e1').answer,'old');
+  await api.sendExerciseDraft('e1',{answer:'new'});fail=false;
+  await api.flushPendingSnapshots();assert.equal(saved.at(-1).answer,'new');assert.equal(api.getPendingSnapshot('e1'),undefined);
+  await api.disconnect();assert.equal(timers.size,0);
+});
+
+test('authenticated session invokes recovery after resubscription',async()=>{
+  let subscription,reconnected=0;
+  const channel={on(){return this;},subscribe(fn){subscription=fn;queueMicrotask(()=>fn('SUBSCRIBED'));return this;},async track(){}};
+  const query={select(){return this;},eq(){return this;},async single(){return {data:{id:'s1',teacher_id:'t1',student_id:'u1',room_topic:'room'}};}};
+  const client={auth:{async getUser(){return {data:{user:{id:'u1'}}};}},from(){return query;},channel(){return channel;},async removeChannel(){}};
+  const window={spaceWhaleSupabase:client};
+  vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout,clearTimeout});
+  await window.SpaceWhaleClassroom.connect('s1',{onReconnect(){reconnected++;}});
+  assert.equal(reconnected,0);await subscription('SUBSCRIBED');assert.equal(reconnected,1);
+  await window.SpaceWhaleClassroom.disconnect();
+});

@@ -111,6 +111,7 @@
       .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
       .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
 
+    let subscribedOnce = false;
     await new Promise((resolve, reject) => {
       channel.subscribe(async (status, error) => {
         if (error) reject(error);
@@ -120,7 +121,9 @@
             role: state.role,
             online_at: new Date().toISOString()
           });
+          const reconnect = subscribedOnce; subscribedOnce = true;
           resolve();
+          if (reconnect) Promise.resolve(handlers.onReconnect?.()).catch(console.error);
         }
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           reject(error || new Error(status));
@@ -129,6 +132,7 @@
     });
 
     state.channel = channel;
+    restorePendingSnapshots();
     return { session, role: state.role };
   }
 
@@ -207,6 +211,7 @@
     });
 
     state.channel = channel;
+    restorePendingSnapshots();
     return { session: state.session, role: state.role, meta };
   }
 
@@ -327,6 +332,32 @@
   }
 
   const draftTimers = new Map();
+  const pendingSnapshots = new Map(), savingSnapshots = new Map();
+  const pendingKey = () => `space-whale:pending-snapshots:${state.guestToken || state.session?.id}:${state.guestToken ? state.role : state.user?.id}`;
+  function storePendingSnapshots(){try{window.sessionStorage?.setItem(pendingKey(),JSON.stringify([...pendingSnapshots]));}catch(_) {}}
+  function restorePendingSnapshots(){
+    try{const saved=JSON.parse(window.sessionStorage?.getItem(pendingKey())||'[]');for(const [id,response] of saved)pendingSnapshots.set(id,response);}catch(_){}
+    for(const id of pendingSnapshots.keys()) scheduleSnapshot(id,0);
+  }
+  const getPendingSnapshot = id => pendingSnapshots.get(id);
+  function scheduleSnapshot(id,delay=750){
+    clearTimeout(draftTimers.get(id));
+    draftTimers.set(id,setTimeout(()=>{draftTimers.delete(id);return flushSnapshot(id);},delay));
+  }
+  async function flushSnapshot(id){
+    if(savingSnapshots.has(id))return savingSnapshots.get(id);
+    if(!pendingSnapshots.has(id))return;
+    const response=pendingSnapshots.get(id);
+    const work=(async()=>{
+      let failed=false;
+      try{await persistDraftSnapshot(id,response);if(pendingSnapshots.get(id)===response){pendingSnapshots.delete(id);storePendingSnapshots();}}
+      catch(error){failed=true;console.error('[Space Whale] Snapshot pending; will retry',error);}
+      finally{savingSnapshots.delete(id);if(pendingSnapshots.has(id))scheduleSnapshot(id,failed?5000:0);}
+    })();
+    savingSnapshots.set(id,work);return work;
+  }
+  async function flushPendingSnapshots(){await Promise.all([...pendingSnapshots.keys()].map(flushSnapshot));}
+
 
   async function persistDraftSnapshot(exerciseId, response) {
     if (state.guestToken) {
@@ -357,14 +388,10 @@
     if (error) throw error;
   }
 
-  function queueGuestSnapshot(exerciseId, response) {
-    clearTimeout(draftTimers.get(exerciseId));
-    draftTimers.set(exerciseId, setTimeout(() => {
-      draftTimers.delete(exerciseId);
-      persistDraftSnapshot(exerciseId, response).catch(error => {
-        console.error('[Space Whale] Snapshot failed', error);
-      });
-    }, 750));
+  function queueGuestSnapshot(exerciseId,response){
+    // Clone now so later UI edits cannot change a save already in flight.
+    pendingSnapshots.set(exerciseId,JSON.parse(JSON.stringify(response)));
+    storePendingSnapshots();scheduleSnapshot(exerciseId);
   }
 
   async function sendExerciseDraft(exerciseId, response) {
@@ -466,6 +493,7 @@
   }
 
   async function disconnect() {
+    await flushPendingSnapshots();
     draftTimers.forEach(timer => clearTimeout(timer));
     draftTimers.clear();
     if (!client || !state.channel) return;
@@ -490,6 +518,8 @@
     syncAudio,
     sendExerciseDraft,
     queueGuestSnapshot,
+    getPendingSnapshot,
+    flushPendingSnapshots,
     saveExerciseResponse,
     requestExerciseState,
     sendExerciseSnapshot,
