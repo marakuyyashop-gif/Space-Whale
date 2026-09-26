@@ -649,11 +649,12 @@
 
     const exercise = stage.exercise;
     document.title = `${selected.title} — Space Whale`;
-    const storageKey = sessionId
-      ? `space-whale:workspace:live:v1:${sessionId}:${selected.id}:${exercise.id}`
+    const exerciseStorageKey = id => sessionId
+      ? `space-whale:workspace:live:v1:${sessionId}:${selected.id}:${id}`
       : guestToken
-        ? `space-whale:workspace:guest:v1:${guestToken.slice(0, 12)}:${selected.id}:${exercise.id}`
-        : `space-whale:workspace:v1:${selected.id}:${exercise.id}`;
+        ? `space-whale:workspace:guest:v1:${guestToken.slice(0, 12)}:${selected.id}:${id}`
+        : `space-whale:workspace:v1:${selected.id}:${id}`;
+    const storageKey = exerciseStorageKey(exercise.id);
     const signature = JSON.stringify(exercise);
     const localAnswers = readAnswers(storageKey, signature);
     mountedStorage = {key:storageKey, signature};
@@ -668,6 +669,13 @@
 
     mounted = kit.mount(host, exercise, {
       answers: initialAnswers,
+      isMilestoneAttempted: id => {
+        const target=selected.stages.find(stage=>stage.exercise.id===id)?.exercise;
+        if(!target)return false;
+        const state=liveAnswers.get(id)||readAnswers(exerciseStorageKey(id),JSON.stringify(target));
+        const blocks=target.kind==='stage'?target.exercises.filter(block=>['matching','gaps','choice','order','sort','writing'].includes(block.exercise.kind)):[{id:null,exercise:target}];
+        return blocks.length>0&&blocks.every(block=>{const answer=block.id?state[block.id]||{}:state,values=Object.values(kit.grade(block.exercise,answer));return answer.__sw_checked===true&&values.length>0&&!values.includes('empty');});
+      },
       syncChecks: true,
       readOnly: false,
       audioReadOnly:liveMode&&liveRole==='student',

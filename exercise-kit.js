@@ -63,15 +63,19 @@
       if (def.layout != null && !['separate', 'grouped'].includes(def.layout)) fail('Unsupported stage layout');
       if (def.layout === 'grouped' && def.progressive) fail('Grouped components cannot reveal as separate exercises');
       if (def.progressive != null && typeof def.progressive !== 'boolean') fail('progressive must be boolean');
+      if(def.revealStops!=null){
+        array(def.revealStops,'revealStops');
+        if(!def.progressive || def.revealStops.some((n,i)=>!Number.isInteger(n)||n<1||n>def.exercises.length||(i>0&&n<=def.revealStops[i-1])) || def.revealStops[def.revealStops.length-1]!==def.exercises.length)fail('Invalid progressive reveal stops');
+      }
       def.exercises.forEach(block => {
         if (block.id === 'revealed') fail('Reserved stage state key');
         if (block.exercise?.kind === 'stage') fail('Stage containers cannot be nested');
         validate(block.exercise);
       });
       if (def.transcript != null) {
-        text(def.transcript, 'transcript'); array(def.transcriptAfter, 'transcriptAfter');
+        text(def.transcript, 'transcript'); if(def.transcriptGate){safeId(def.transcriptGate,'transcriptGate');}else array(def.transcriptAfter, 'transcriptAfter');
         const checkable = new Set(['matching','gaps','choice','image-label','order','sort','writing']);
-        if (new Set(def.transcriptAfter).size !== def.transcriptAfter.length || def.transcriptAfter.some(id => !def.exercises.some(block => block.id === id && checkable.has(block.exercise.kind)))) fail('transcriptAfter must reference distinct response blocks');
+        if (!def.transcriptGate && (new Set(def.transcriptAfter).size !== def.transcriptAfter.length || def.transcriptAfter.some(id => !def.exercises.some(block => block.id === id && checkable.has(block.exercise.kind))))) fail('transcriptAfter must reference distinct response blocks');
       } else if (def.transcriptAfter != null) fail('transcriptAfter requires a transcript');
       return def;
     }
@@ -210,7 +214,7 @@
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
     }
     if (def.kind === 'writing') def.items.forEach(item => {
-      text(item.prompt,'prompt');
+      media(item); text(item.prompt,'prompt');
       if(item.hint!=null)text(item.hint,'hint');
       for (const field of ['possibleAnswers','acceptedAnswers']) {
         if (item[field] != null) { array(item[field],field); item[field].forEach(answer=>text(answer,field)); }
@@ -305,7 +309,7 @@
     const taskKinds = new Set(['matching','gaps','choice','image-label','order','sort','writing','rule-page']);
     let stageStops = [];
     if (def.kind === 'stage') {
-      if (def.progressive) stageStops = def.exercises.map((_,i)=>i+1);
+      if (def.progressive) stageStops = def.revealStops || def.exercises.map((_,i)=>i+1);
       else {
         const tasks = def.exercises.flatMap((block,i)=>taskKinds.has(block.exercise.kind)?[i]:[]);
         if (tasks.length > 1) {
@@ -314,7 +318,7 @@
         }
       }
     }
-    const stageCount = value => Math.max(stageStops[0] || 1, Math.min(def.exercises?.length || 1, Number(value) || 0));
+    const stageCount = value => {const count=Math.max(stageStops[0]||1,Math.min(def.exercises?.length||1,Number(value)||0));return def.revealStops ? (stageStops.find(stop=>stop>=count)||def.exercises.length) : count;};
 
     if (config.discovery && !def.multiple && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
     const normalizeAnswers=value=>{const state=clone(value||{});if(def.kind==='gaps'&&def.layout==='picture-rows')for(const item of def.items)if(state[item.id]&&typeof state[item.id]==='object'){for(const segment of item.segments)if(typeof segment!=='string'&&state[segment.id]===undefined&&state[item.id][segment.id]!==undefined)state[segment.id]=state[item.id][segment.id];delete state[item.id];}return state;};
@@ -397,7 +401,7 @@
     };
     const illustration = item => {
       if (item.imagePending && !item.image) {
-        const blank = node('div', 'ek-image ek-image-pending'+(['gaps','choice'].includes(def.kind)?' ek-task-image':''));
+        const blank = node('div', 'ek-image ek-image-pending'+(['gaps','choice','writing'].includes(def.kind)?' ek-task-image':''));
         blank.setAttribute('aria-label', 'Изображение');
         blank.setAttribute('role', 'img');
         return blank;
@@ -415,7 +419,7 @@
       }
       const image = node('img', 'ek-image'); image.src = item.image; image.alt = item.alt || item.text || ''; image.loading = 'eager'; image.decoding = 'async';
       if(item.imageWidth && item.imageHeight){image.setAttribute('width',String(item.imageWidth));image.setAttribute('height',String(item.imageHeight));image.style.aspectRatio=item.imageWidth+' / '+item.imageHeight;}
-      if(['gaps','choice'].includes(def.kind))image.classList.add('ek-task-image');
+      if(['gaps','choice','writing'].includes(def.kind))image.classList.add('ek-task-image');
       return image;
     };
     const formatTime = value => {
@@ -618,6 +622,7 @@
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
+    host.classList.toggle('ek-stage-compact',def.kind==='stage'&&def.compact===true);
     host.replaceChildren();
     if(!config.hideHeading)host.append(node('h2', 'ek-title', def.title));
     if(def.instruction && def.instruction.trim()!==def.title.trim())host.append(node('p', 'ek-instruction', def.instruction));
@@ -799,10 +804,10 @@
       if (def.kind === 'stage') {
         const stack = node('div', 'ek-stage-stack');
         const transcript = def.transcript ? node('details', 'ek-disclosure') : null;
-        if(transcript)transcript.append(node('summary','','See the script'),node('p','ek-copy',def.transcript));
+        if(transcript)transcript.append(node('summary','',def.transcriptTitle||'See the script'),node('p','ek-copy',def.transcript));
         syncTranscript=()=>{
           if(!transcript)return;
-          const complete=def.transcriptAfter.every(id=>{
+          const complete=def.transcriptGate ? Boolean(config.isMilestoneAttempted?.(def.transcriptGate)) : def.transcriptAfter.every(id=>{
             const block=def.exercises.find(block=>block.id===id),state=answers[id]||{};
             const results=Object.values(grade(block.exercise,state));
             return state.__sw_checked===true && results.length>0 && results.every(result=>result!=='empty');
@@ -816,7 +821,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -836,6 +841,10 @@
             if (config.readOnly||config.navigationReadOnly) return;
             answers.revealed=stageStops.find(stop=>stop>visibleCount)||def.exercises.length;syncStage(answers.revealed,true);updateNavigation('down');viewChanged();
           });
+          if(down && def.requireCheckBeforeNext){
+            const tasks=def.exercises.slice(0,visibleCount).filter(block=>['matching','gaps','choice','order','sort','writing'].includes(block.exercise.kind));
+            down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>{const state=answers[block.id]||{},values=Object.values(grade(block.exercise,state));return !state.__sw_checked||!values.length||values.includes('empty');});
+          }
           if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly||config.navigationReadOnly) return;
             answers.revealed=[...stageStops].reverse().find(stop=>stop<visibleCount)||stageStops[0];syncStage(answers.revealed,true);updateNavigation('up');viewChanged();
@@ -1155,10 +1164,13 @@
         bank.hidden=!bank.children.length;body.append(groups, bank);
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
-        const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
+        const compact=def.layout==='picture-rows';
+        const row=compact?node('div','ek-picture-sentence'):body;
+        if(item.image||item.imagePending){const pictures=node('div','ek-picture-sentence-images');pictures.append(illustration(item));row.append(pictures);}
+        const label = node('label', 'ek-writing', compact ? `${index+1}.` : `${index + 1}. ${item.prompt}`);
         const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
-        body.append(label); controls.set(item.id, input);
+        row.append(label);if(compact)body.append(row); controls.set(item.id, input);
       });
     }
     const lamps=new Map();
@@ -1177,6 +1189,9 @@
         else control.after(lamp);
         lamps.set(id,lamp);
       });
+      decorateDisclosures();
+    }
+    function decorateDisclosures(){
       host.querySelectorAll('details.ek-disclosure').forEach(detail=>{
         if(detail.dataset.motionReady)return;detail.dataset.motionReady='true';
         const summary=detail.querySelector('summary'),content=node('div','ek-disclosure-content');
@@ -1229,6 +1244,7 @@
         }
         else if(def.kind==='writing')def.items.forEach(item=>{if(needsSolution(item.id))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
         else if(def.items)def.items.forEach(item=>{
+          if(item.feedbackText){const row=node('li');row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
           if(!needsSolution(item.id))return;
           const choices=item.options||def.options||def.groups||[];
           const ids=def.multiple?item.correctIds:[item.correctId];
@@ -1237,8 +1253,8 @@
       }
       if(list.children.length){solution.prepend(node('strong','ek-feedback-heading',def.kind==='order'?'Correct Answer':'Correct answers'));resultsBox.append(solution);}
       if(examples.length){
-        const section=node('li','ek-correction ek-writing-answers');section.append(node('strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));
-        const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});section.append(list);resultsBox.append(section);
+        const section=node('li','ek-correction ek-writing-answers'),container=def.revealPossibleAnswers?node('details','ek-disclosure'):section;container.append(node(def.revealPossibleAnswers?'summary':'strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));if(container!==section)section.append(container);
+        const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});container.append(list);resultsBox.append(section);decorateDisclosures();
       }
       if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
@@ -1307,7 +1323,7 @@
         const count = def.progressive ? stageCount(answers.revealed) : def.exercises.length;
         if (count !== visibleCount) syncStage(count);
         def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
-        syncTranscript?.();
+        syncTranscript?.(); if(def.requireCheckBeforeNext)syncStage(count,false);
         return;
       }
 

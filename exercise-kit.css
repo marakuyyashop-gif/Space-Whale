@@ -964,3 +964,10 @@
 @media(max-width:600px){.exercise-kit .ek-picture-sentence{grid-template-columns:84px minmax(0,1fr);gap:12px}.exercise-kit .ek-picture-sentence-images{width:84px}.exercise-kit.ek-modern .ek-picture-sentence-images>.ek-task-image{height:72px;max-height:72px}}
 
 .exercise-kit .ek-picture-sentence+.ek-picture-sentence{margin-top:12px}
+
+/* Compact compositions opt in; existing lesson layouts stay unchanged. */
+.exercise-kit.ek-stage-compact>.ek-body>.ek-stage-stack{gap:20px}
+.exercise-kit.ek-stage-compact>.ek-body>.ek-stage-stack>.ek-stage-section+.ek-stage-section{padding-top:20px}
+.exercise-kit .ek-picture-sentence>.ek-writing{min-width:0;max-width:420px}
+.exercise-kit.ek-modern .ek-picture-sentence-images>.ek-image-pending{min-height:0}
+.exercise-kit .ek-writing{white-space:pre-line}
