@@ -311,7 +311,7 @@
     let feedback = {};
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
-    let syncStage=null, syncRules=null, rulesOpen=null;
+    let syncStage=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
     const centerSection=element=>{
       if(!element||element.hidden)return;
       const scroller=host.closest?.('.lesson-scroll');
@@ -319,11 +319,12 @@
       if(scroller?.scrollTo&&element.getBoundingClientRect){const a=element.getBoundingClientRect(),b=scroller.getBoundingClientRect();scroller.scrollTo({top:Math.max(0,scroller.scrollTop+a.top-b.top-Math.max(16,(b.height-a.height)/2)),behavior});}
       else element.scrollIntoView?.({behavior,block:'center'});
     };
-    const getViewState=()=>({revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
+    const getViewState=()=>({repeat:repeatIndex,revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
     const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
     const setViewState=(view,animate=true)=>{
       if(!view||typeof view!=='object')return;
       if(def.kind==='stage'&&def.progressive){const count=stageCount(view.revealed);answers.revealed=count;if(count!==visibleCount)syncStage?.(count,animate);}
+      if(def.kind==='audio'&&def.layout==='listen-repeat'&&Number.isFinite(view.repeat)){repeatIndex=Math.max(0,Math.floor(view.repeat));syncRepeat?.();}
       if(def.kind==='rule-page'){answers.__sw_rule_visible=Boolean(view.rule);syncRules?.(animate);}
       for(const [id,handle] of nestedMountsByBlock)handle.setViewState(view.children?.[id],animate);
     };
@@ -377,14 +378,14 @@
       const seconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
       return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
     };
-    const audioPlayer = (src, label = 'Audio') => {
+    const audioPlayer = (src, label = 'Audio', key='player') => {
       const wrap = node('div', 'ek-audio-player'); wrap.dataset.state = 'paused';
-      const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
+      const audio = node('audio'); audio.preload = 'auto'; audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
       let completed = false;
       const play = button('▶', async () => {
         if (audio.paused || completed) {
           if (completed) { audio.currentTime = 0; completed = false; sync(); }
-          doc.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
+          doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
           try { await audio.play(); } catch { announce('Audio could not be played.'); sync(); }
         } else audio.pause();
       }, 'ek-audio-play');
@@ -435,7 +436,7 @@
       track.append(range); wrap.append(audio, play, track, time);
       return wrap;
     };
-    const repeatAudioButton = (src, label) => {
+    const repeatAudioButton = (src, label, key) => {
       const wrap = node('span', 'ek-repeat-audio');
       if (!src) {
         const pending = button('▶', () => announce('Audio will be connected to this item when its file is added.'), 'ek-repeat-play ek-audio-pending');
@@ -444,11 +445,11 @@
         wrap.append(pending);
         return wrap;
       }
-      const audio = node('audio'); audio.preload = 'metadata'; audio.src = src; audio.setAttribute('aria-label', label);
+      const audio = node('audio'); audio.preload = 'auto'; audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
       const play = button('▶', async () => {
         host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
         if (audio.paused) {
-          doc.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
+          doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
           try { await audio.play(); } catch { announce('Audio could not be played.'); }
         } else audio.pause();
       }, 'ek-repeat-play');
@@ -467,7 +468,7 @@
       resultsBox.replaceChildren(); announce('');
       if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');});}
     };
-    const save = () => { if (config.syncChecks) delete answers.__sw_checked; clearFeedback(); config.onChange?.(clone(answers)); };
+    const save = () => { delete answers.__sw_skipped;if (config.syncChecks) delete answers.__sw_checked; clearFeedback();updateActions();config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
     const layoutSnapshot=()=>new Map([...body.querySelectorAll('[data-ek-drag-id]:not(.ek-drag-source-hidden)')].map(el=>[el.dataset.ekDragId,el.getBoundingClientRect()]));
     const animateLayout=before=>{
@@ -687,7 +688,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
+          const handle = mount(child, block.exercise, { audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -774,6 +775,8 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
+              audioPath:(config.audioPath||def.id)+':'+block.id,
+              onSkip:()=>{if(revealable.length&&!answers.__sw_rule_visible){answers.__sw_rule_visible=true;syncRules?.(true);viewChanged();}else config.onSkip?.();},
               navigationReadOnly:Boolean(config.navigationReadOnly),
               onViewChange:config.onViewChange?viewChanged:undefined,
               syncChecks: Boolean(config.syncChecks),
@@ -805,18 +808,18 @@
       }
       if (def.kind === 'audio') {
         if (def.layout === 'listen-repeat') {
-          const list = node('div', 'ek-repeat-list');
-          def.items.forEach(item => {
-            const wordRow = node('article', 'ek-repeat-item');
-            wordRow.append(repeatAudioButton(item.audio, item.text), node('span', 'ek-repeat-line', item.text));
-            list.append(wordRow);
-            if (item.example) {
-              const exampleRow = node('article', 'ek-repeat-item');
-              exampleRow.append(repeatAudioButton(item.exampleAudio, item.example), node('span', 'ek-repeat-line', item.example));
-              list.append(exampleRow);
-            }
-          });
-          body.append(list);
+          const list=node('div','ek-repeat-list'),navigation=node('div','ek-stage-navigation');
+          const steps=def.items.flatMap(item=>[{text:item.text,audio:item.audio,key:item.id+':word'},...(item.example?[{text:item.example,audio:item.exampleAudio,key:item.id+':example'}]:[])]);
+          syncRepeat=()=>{
+            repeatIndex=Math.min(steps.length-1,Math.max(0,repeatIndex));
+            list.querySelectorAll('audio').forEach(audio=>audio.pause());list.replaceChildren();navigation.replaceChildren();
+            const step=steps[repeatIndex],row=node('article','ek-repeat-item');
+            row.append(repeatAudioButton(step.audio,step.text,step.key),node('span','ek-repeat-line',step.text));list.append(row);
+            const control=(direction,index,label)=>{const b=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;repeatIndex=index;syncRepeat();viewChanged();},'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
+            if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
+            if(repeatIndex<steps.length-1)control('down',repeatIndex+1,'Next phrase');
+          };
+          body.append(list,navigation);syncRepeat();
         } else {
           body.append(audioPlayer(def.audio, def.title));
         }
@@ -998,7 +1001,7 @@
           const control = tokenButton(token, () => move(token.id), index); draggable(control, token.id); bank.append(control);
         });
         dropzone(bank, id => { changed('order', picked.filter(value => value !== id)); render(); });
-        body.append(ordered, bank); controls.set('order', ordered);
+        bank.hidden=!bank.children.length;body.append(ordered, bank); controls.set('order', ordered);
       }
       if (def.kind === 'sort') {
         const bank = node('div', 'ek-bank'); const groups = node('div', 'ek-group-grid');
@@ -1013,7 +1016,7 @@
         });
         def.items.filter(item => !answers[item.id]).forEach(item => bank.append(itemButton(item)));
         dropzone(bank, id => { delete answers[id]; save(); render(); });
-        body.append(groups, bank);
+        bank.hidden=!bank.children.length;body.append(groups, bank);
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
@@ -1119,10 +1122,20 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     };
+    function updateActions(){
+      const check=actions.querySelector('.ek-check');if(!check)return;
+      const values=Object.values(grade(def,answers));
+      check.hidden=!values.length||values.includes('empty');
+      const skip=actions.querySelector('.ek-skip');if(skip)skip.hidden=Boolean(config.navigationReadOnly||answers.__sw_skipped);
+    }
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
       checkFeedback();
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
-    });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);}
+    });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
+    if(['presentation','audio'].includes(def.kind)&&config.onSkip){
+      const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;config.onChange?.(clone(answers));config.onSkip();},'ek-button ek-secondary ek-skip');
+      skip.setAttribute('aria-label','Skip exercise');skip.hidden=Boolean(config.navigationReadOnly);actions.append(skip);
+    }
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {
       const reset = button('', () => { closeDialog(); answers = {}; save(); render(); announce(''); }, 'ek-button ek-secondary ek-reset');
       const icon=doc.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -1181,7 +1194,7 @@
 
       render();
     };
-    const setAnswers = next => { setAnswersCore(next); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    const setAnswers = next => { setAnswersCore(next);updateActions(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
 
     const renderReadOnly = () => {
       if (!config.readOnly) return;
@@ -1192,7 +1205,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate(); renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate();updateActions();renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);

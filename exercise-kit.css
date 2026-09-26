@@ -891,3 +891,7 @@
 .exercise-kit.ek-modern.ek-reading-width input.ek-typed-gap{box-sizing:border-box;appearance:none;font:400 var(--ek-text-size)/1.5 var(--ek-font);height:2em;min-height:2em;padding:.25em 0;vertical-align:middle}
 .exercise-kit.ek-modern input.ek-writing-input{line-height:1.5}
 .exercise-kit .ek-feedback-heading{display:block;margin:0 0 8px;font-size:.88em;font-weight:600}
+
+.exercise-kit .ek-bank[hidden],.exercise-kit .ek-check[hidden],.exercise-kit .ek-skip[hidden]{display:none!important}
+.exercise-kit.ek-modern .ek-bank:empty{min-height:0;margin:0;padding:0}
+.exercise-kit.ek-modern .ek-skip{padding:8px 12px;font-size:12px;color:var(--sw-neu-muted);background:transparent;box-shadow:none}

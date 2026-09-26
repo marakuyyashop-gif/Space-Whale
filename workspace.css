@@ -567,3 +567,16 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:var(
 .unified-workspace[data-workspace-role=student] .class-content{top:calc(52px + env(safe-area-inset-top))}
 .unified-workspace[data-workspace-role=student] .lesson-scroll{padding-top:16px!important}
 }
+/* Utility controls have their own row; scrolling exercises can never pass under it. */
+.unified-workspace .class-area{--workspace-bar-height:54px}
+.workspace-utility-bar{position:absolute;inset:0 0 auto;z-index:5;box-sizing:border-box;min-height:54px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:9px 20px;background:var(--sw-neu-bg)}
+.unified-workspace .class-content{top:var(--workspace-bar-height)}
+.unified-workspace .lesson-scroll{padding-top:24px!important}
+.workspace-utility-bar .workspace-theme-switch{position:relative;inset:auto;display:flex;flex:none;width:auto;padding:0;gap:6px;background:none;box-shadow:none}
+.workspace-utility-bar .workspace-theme-switch::before{display:none}
+.workspace-utility-bar .workspace-theme-switch button{width:30px;height:30px;padding:6px;background:transparent;color:var(--sw-neu-muted)}
+.workspace-utility-bar .workspace-theme-switch button[aria-pressed=true]{background:var(--sw-neu-surface);box-shadow:var(--sw-neu-inset)}
+.workspace-theme-switch svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.workspace-utility-bar .workspace-student-timer{position:relative;inset:auto;gap:7px;padding:6px 9px;font-size:11px}
+.workspace-audio-enable{border:0;border-radius:12px;padding:6px 10px;font:400 11px Onest,sans-serif;color:var(--sw-neu-ink);background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small)}
+@media(max-width:600px){.workspace-utility-bar{padding:8px 12px;gap:6px}.workspace-student-timer-caption{display:none}}

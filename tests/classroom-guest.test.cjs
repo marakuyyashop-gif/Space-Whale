@@ -77,11 +77,11 @@ test('waiting guest receives the start transition even when navigation has not c
 });
 
 test('private websocket drafts arrive before a stalled database save; snapshots have a bounded debounce',async()=>{
- const peers=[],scheduled=[],received=[],focus=[];let writes=0;
- const make=()=>{
+ const peers=[],scheduled=[],received=[],focus=[],audio=[];let writes=0;
+ const make=(owner=false)=>{
   const channels=[];
   const client={auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>{
-   if(name==='resolve_guest_lesson_link')return {data:{is_host:false,room_topic:'private-test',started_at:new Date().toISOString(),allowed_lesson_ids:['*']}};
+   if(name==='resolve_guest_lesson_link')return {data:{is_host:owner,room_topic:'private-test',started_at:new Date().toISOString(),allowed_lesson_ids:['*']}};
    if(name.includes('response')){writes++;return new Promise(()=>{});}
    return {data:{started_at:new Date().toISOString()}};
   },channel(topic,options){
@@ -93,7 +93,12 @@ test('private websocket drafts arrive before a stalled database save; snapshots 
   vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,queueMicrotask,setTimeout(fn,delay){scheduled.push({id:++next,fn,delay});return next;},clearTimeout(){}});
   return window.SpaceWhaleClassroom;
  };
- const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response),onWordFocus:p=>focus.push(p)});await Promise.resolve();
+ const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response),onWordFocus:p=>focus.push(p),onAudio:p=>audio.push(p)});await Promise.resolve();
+ const teacher=make(true);await teacher.connectGuest('one');await Promise.resolve();
+ await teacher.syncAudio({exercise_id:'e1',key:'phrase',action:'play',position:0,at:Date.now()+250});
+ assert.equal(audio.at(-1).action,'play');assert.equal(writes,0,'audio bypasses database writes');
+ await assert.rejects(first.syncAudio({action:'play'}),/Only the teacher/);
+ await assert.rejects(first.broadcast('audio',{action:'play'}),/Only the teacher/);
  await first.broadcast('word_focus',{exercise_id:'e1',kind:'hover',word:{key:'paragraph:0',text:'Hello'},source_id:first.state.clientId});
  assert.equal(focus.at(-1).word.text,'Hello');assert.equal(writes,0,'word focus uses the existing socket without answer snapshots');
  await first.sendExerciseDraft('e1',{text:'a'});await first.sendExerciseDraft('e1',{text:'ab'});

@@ -97,6 +97,7 @@
 
   let route = readRoute(location.search);
   const wordFocus=window.SpaceWhaleWordFocus?.create({root:host,actor:classroom?.state?.clientId||'local',storageKey:`space-whale:word-focus:${classScope}`,canShare:()=>liveMode&&liveReady&&!pupilWaiting(),send:payload=>classroom.broadcast('word_focus',payload)});
+  const lessonAudio=window.SpaceWhaleLessonAudio?.create({root:host,enable:document.getElementById('lessonAudioEnable'),isLive:()=>liveMode&&liveReady&&!pupilWaiting(),canControl:()=>liveRole==='teacher',exerciseId:()=>route.exercise,now:()=>Date.now()+guestClockOffset,send:payload=>classroom.syncAudio(payload),requestState:()=>classroom.broadcast('audio_request',{source_id:classroom.state.clientId}).catch(()=>{}),notice:text=>{notice.textContent=text;}});
   if (route.lesson) expanded.add(route.lesson);
 
   function query(next) {
@@ -660,6 +661,7 @@
       syncChecks: true,
       readOnly: false,
       navigationReadOnly:locked(),
+      onSkip:()=>{if(locked())return;const stages=selectedLesson()?.stages||[],index=stages.findIndex(s=>s.exercise.id===exercise.id),next=stages[index+1];if(next)go({...route,exercise:next.exercise.id,exerciseView:null,section:stageSection(next)});},
       onViewChange:view=>{
         if(locked())return;
         route.exerciseView=view;
@@ -680,7 +682,7 @@
       }
     });
 
-    mounted.setViewState?.(route.exerciseView,false);
+    mounted.setViewState?.(route.exerciseView,false);lessonAudio?.refresh();
     updateMilestoneProgress(exercise,initialAnswers);
     hydrateLiveExercise(exercise.id, localAnswers);
   }
@@ -722,9 +724,12 @@
     }
 
     const handlers = {
+      onAudio:payload=>lessonAudio?.receive(payload),
+      onAudioRequest:()=>lessonAudio?.share(),
+      onAudioReady:()=>lessonAudio?.reconnect(),
       onLessonState:applyGuestLessonState,
       onEnded:()=>{
-        void window.SpaceWhaleMedia?.stopMedia();
+        lessonAudio?.stop();void window.SpaceWhaleMedia?.stopMedia();
         if(managingInvitation&&liveRole==='teacher')return;
         if(liveRole==='teacher'||window.SpaceWhaleIsTeacher===true){returnToTeacherWorkspace('closed');return;}
         liveReady=false;mounted?.destroy?.();host.replaceChildren();studentTimer.hidden=true;
@@ -737,7 +742,7 @@
         else if(notice.textContent==='Восстанавливаем соединение…')toast('Соединение восстановлено');
       },
       onReconnect: async () => {
-        wordFocus?.reconnect();
+        wordFocus?.reconnect();lessonAudio?.reconnect();
         await classroom.flushPendingSnapshots?.();
         liveHydrated.clear();
         const shared=await classroom.loadSharedState(sessionId);
@@ -780,7 +785,7 @@
     if(!['teacher','student'].includes(result.role))throw new Error('Нет доступа к этому занятию.');
     liveReady = true;
     liveRole = result.role;
-    wordFocus?.reconnect();
+    wordFocus?.reconnect();lessonAudio?.reconnect();
     if(guestToken&&liveRole==='teacher')history.replaceState(null,'',`classroom.html${query(route)}`);
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';
@@ -866,7 +871,7 @@
     if(liveReady&&!wasStarted&&liveSession.started_at)window.SpaceWhaleMedia?.lessonStarted?.('guest:'+guestToken.slice(0,8));
     if(liveReady&&wasWaiting&&!pupilWaiting()){
       mountedKey='';applyRemoteNavigation(data);render();
-      connectLiveMedia();
+      connectLiveMedia();lessonAudio?.reconnect();
     }
   }
   function connectLiveMedia(){
@@ -890,7 +895,9 @@
   const clockLabel=node('small','','workspace-clock-label');document.querySelector('.workspace-clock-face').append(clockLabel);
   const studentTimer=node('div','','workspace-student-timer');studentTimer.hidden=true;
   studentTimer.innerHTML='<span class="workspace-student-timer-caption">До конца урока</span><span class="workspace-student-time" role="timer" aria-label="Осталось времени">60:00</span>';
-  document.querySelector('.class-area').append(studentTimer);
+  document.getElementById('workspaceUtilityBar').prepend(studentTimer);
+  const utilityBar=document.getElementById('workspaceUtilityBar');
+  if(window.ResizeObserver)new ResizeObserver(()=>document.querySelector('.class-area').style.setProperty('--workspace-bar-height',utilityBar.getBoundingClientRect().height+'px')).observe(utilityBar);
   function paintTimer(){
     const state=timerState(),seconds=Math.ceil(state.remaining/1000),spent=state.duration-state.remaining,expired=state.active&&seconds===0;
     document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
@@ -974,7 +981,7 @@
     return url.href;
   }
   function returnToTeacherWorkspace(reason){
-    void window.SpaceWhaleMedia?.stopMedia();
+    lessonAudio?.stop();void window.SpaceWhaleMedia?.stopMedia();
     timer={startedAt:null,readyAt:null,ended:false};saveTimer();
     if(ticker!==null){clearInterval(ticker);ticker=null;}
     location.replace(teacherWorkspaceURL(reason));

@@ -186,13 +186,12 @@ test('read-only drag cannot mutate answers', () => {
   s.drag(s.button('[Item 1]'),s.host.querySelector('.ek-sort-group'));
   assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
 });
-test('starting another repeat item stops the first audio', async () => {
-  const s = setup('listen-repeat-demo');
-  s.fire(s.host.querySelectorAll('.ek-repeat-play')[0],'click');
-  await Promise.resolve(); const audio = s.host.querySelectorAll('audio');assert.equal(audio[0].paused,false);
-  s.fire(s.host.querySelectorAll('.ek-repeat-play')[1],'click');await Promise.resolve();
-  assert.equal(audio[0].paused,true);assert.equal(audio[1].paused,false);
-  s.mount.destroy();assert.equal(audio[1].paused,true);
+test('Listen & Repeat reveals one phrase at a time and pauses the previous recording', async () => {
+  const s=setup('listen-repeat-demo');s.fire(s.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
+  const first=s.host.querySelector('audio');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item').length,1);
+  s.click('Next phrase');assert.equal(first.paused,true);s.fire(s.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
+  const second=s.host.querySelector('audio');assert.notEqual(first,second);assert.equal(second.paused,false);assert.equal(s.button('Next phrase'),undefined);
+  s.mount.destroy();assert.equal(second.paused,true);
 });
 
 test('pointer drag moves item through the actual gesture path and blocks accidental click', () => {
@@ -560,4 +559,29 @@ test('single compositions have no continuation; ordinary sequence starts with a 
   }
   const sequence=setup('sequence-template');
   assert.ok(sequence.host.querySelector('input[type=radio]'));assert.equal(sequence.host.querySelector('.ek-typed-gap'),null);
+});
+
+test('OK becomes available only after every field is filled and hides when an answer is removed',()=>{
+ const s=setup({version:1,id:'ready-test',kind:'writing',title:'Write',items:[{id:'a',prompt:'First'},{id:'b',prompt:'Second'}]});
+ const check=s.host.querySelector('.ek-check');assert.equal(check.hidden,true);
+ const inputs=s.host.querySelectorAll('input');inputs[0].value='Hello';s.fire(inputs[0],'input');assert.equal(check.hidden,true);
+ inputs[1].value='World';s.fire(inputs[1],'input');assert.equal(check.hidden,false);
+ inputs[0].value=' ';s.fire(inputs[0],'input');assert.equal(check.hidden,true);
+ s.mount.setAnswers({a:'One',b:'Two'});assert.equal(check.hidden,false);
+});
+test('filled order bank collapses; returning a token brings it back',()=>{
+ const s=setup('order-demo');while(s.host.querySelector('.ek-bank .ek-token'))s.fire(s.host.querySelector('.ek-bank .ek-token'),'click');
+ assert.equal(s.host.querySelector('.ek-bank').hidden,true);assert.equal(s.host.querySelector('.ek-check').hidden,false);
+ s.fire(s.host.querySelector('.ek-order-target .ek-token'),'click');assert.equal(s.host.querySelector('.ek-bank').hidden,false);assert.equal(s.host.querySelector('.ek-check').hidden,true);
+});
+test('Skip records a separate status and invokes teacher navigation without marking answers correct',()=>{
+ let skipped=0;const s=setup('choice-demo',{syncChecks:true,onSkip:()=>skipped++});s.click('Skip exercise');
+ assert.equal(skipped,1);assert.equal(s.mount.getAnswers().__sw_skipped,true);assert.equal(s.mount.getAnswers().__sw_checked,undefined);
+ const pupil=setup('choice-demo',{navigationReadOnly:true,onSkip:()=>skipped++});assert.equal(pupil.button('Skip exercise').hidden,true);pupil.click('Skip exercise');assert.equal(skipped,1);
+});
+test('Listen & Repeat view synchronizes word/example steps; pupils cannot advance',()=>{
+ const def={version:1,id:'repeat-steps',kind:'audio',layout:'listen-repeat',title:'Repeat',items:[{id:'a',text:'Bright',audio:'bright.wav',example:'This shirt is bright.',exampleAudio:'shirt.wav'},{id:'b',text:'Dark',audio:'dark.wav'}]};
+ let view;const teacher=setup(def,{onViewChange:v=>{view=v;}}),pupil=setup(def,{navigationReadOnly:true});
+ teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'This shirt is bright.');assert.equal(pupil.button('Next phrase').hidden,true);
+ teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'Dark');assert.equal(teacher.button('Next phrase'),undefined);
 });

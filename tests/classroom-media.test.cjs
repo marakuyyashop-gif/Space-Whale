@@ -94,7 +94,7 @@ test('Start presents video once; repeated state sync does not reopen a minimized
 });
 test('drag and keyboard movement clamp to viewport and recover on resize',async()=>{
  const s=fixture();await s.api.connect(session);s.api.setView('mini');
- const dock=s.document.getElementById('videoDock'),move=s.document.getElementById('mediaMove');
+ const dock=s.document.getElementById('videoDock'),move=dock;
  dock.getBoundingClientRect=()=>({left:parseFloat(dock.style.left)||0,top:parseFloat(dock.style.top)||0,width:164,height:240});move.setPointerCapture=()=>{};
  const event=(type,props)=>{const e=new s.dom.Event(type,{cancelable:true});Object.assign(e,props);move.dispatchEvent(e);};
  event('pointerdown',{button:0,pointerId:1,clientX:10,clientY:10});event('pointermove',{pointerId:1,clientX:-3000,clientY:3000});
@@ -108,4 +108,14 @@ test('group render includes every participant and guest token requests have a de
  for(let i=0;i<4;i++)s.media['peer'+i]={session_id:'peer'+i,local:false,user_name:'Ученик',tracks:{}};
  s.instances[0].handlers['participant-joined']();assert.equal(s.document.querySelectorAll('.workspace-video-tile').length,5);assert.equal(s.document.getElementById('videoDock').dataset.group,'true');
  assert.equal(s.document.querySelector('.workspace-video-tile').dataset.local,'false');await s.api.stopMedia();
+});
+
+test('compact mobile hides self, defaults to teacher and follows the remote active speaker',async()=>{
+ const s=fixture({mobile:true,role:'student'});await s.api.connect({...session,role:'student'});
+ s.media.teacher={session_id:'teacher',local:false,owner:true,tracks:{}};s.media.peer={session_id:'peer',local:false,owner:false,tracks:{}};
+ s.instances[0].handlers['participant-joined']();s.api.setView('mini');
+ const visible=()=>[...s.document.querySelectorAll('.workspace-video-tile')].filter(e=>!e.hidden);
+ assert.equal(visible().length,1);assert.match(visible()[0].textContent,/Участник/);
+ const first=visible()[0];s.instances[0].handlers['active-speaker-change']({activeSpeaker:{peerId:'peer'}});assert.notEqual(visible()[0],first);
+ s.api.setView('expanded');assert.equal(visible().length,3);await s.api.stopMedia();
 });

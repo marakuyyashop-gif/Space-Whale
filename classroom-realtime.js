@@ -96,6 +96,7 @@
     channel
       .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
+      .on("broadcast", { event: "audio_request" }, ({ payload }) => handlers.onAudioRequest?.(payload))
       .on("broadcast", { event: "word_focus" }, ({ payload }) => handlers.onWordFocus?.(payload))
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
       .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
@@ -175,6 +176,7 @@
       .on('broadcast',{event:'state_snapshot'},receive(guestHandlers.onStateSnapshot))
       .on('broadcast',{event:'state_request'},receive(guestHandlers.onStateRequest))
       .on('broadcast',{event:'word_focus'},receive(guestHandlers.onWordFocus))
+      .on('broadcast',{event:'audio_request'},receive(guestHandlers.onAudioRequest))
       .on('presence',{event:'sync'},()=>guestHandlers.onPresence?.(guestAnswers?.presenceState()||{}))
       .subscribe(status=>{
         guestRealtimeReady=status==='SUBSCRIBED';
@@ -188,8 +190,9 @@
       });
     guestControl
       .on('broadcast',{event:'navigate'},receive(payload=>{guestNavigationEpoch++;guestHandlers.onNavigate?.(payload);}))
+      .on('broadcast',{event:'audio'},receive(guestHandlers.onAudio))
       .on('broadcast',{event:'lesson_closed'},()=>closeGuestTransport())
-      .subscribe(()=>{});
+      .subscribe(status=>{if(status==='SUBSCRIBED')guestHandlers.onAudioReady?.();});
   }
   async function connectGuest(token, handlers = {}) {
     if (!client) throw new Error('Supabase client is not ready.');
@@ -253,9 +256,9 @@
   async function broadcast(event, payload) {
     if(state.guestToken){
       if(guestClosed||!state.channel)throw new Error('Занятие закрыто.');
-      if(event==='audio')throw new Error('Совместное аудио ещё не подключено.');
+      if(event==='audio'&&state.role!=='teacher')throw new Error('Only the teacher can control shared audio.');
       if(!guestUsable())throw new Error('Подтверждаем соединение с занятием.');
-      const channel=event==='navigate'?guestControl:guestAnswers;
+      const channel=['navigate','audio'].includes(event)?guestControl:guestAnswers;
       if(!channel||channel.state!=='joined')return 'fallback';
       const result=await channel.send({type:'broadcast',event,payload});
       if(result!=='ok')guestPoll?.();
@@ -338,15 +341,7 @@
 
     if (state.guestToken) return broadcast("audio", payload);
 
-    const { error } = await client
-      .from("lesson_state")
-      .update({
-        audio_state: payload,
-        updated_by: state.user.id
-      })
-      .eq("session_id", state.session.id);
-
-    if (error) throw error;
+    // Playback control uses the socket immediately, never a database round trip.
     return broadcast("audio", payload);
   }
 

@@ -9,59 +9,85 @@
   const retry=document.getElementById('mediaRetry'),playAudio=document.getElementById('mediaEnableAudio');
   const client=window.spaceWhaleSupabase;
   const state={call:null,sessionId:null,phase:'idle',view:'expanded'};
-  const move=document.getElementById('mediaMove'),size=document.getElementById('mediaSize');
+  const size=document.getElementById('mediaSize'),resize=document.getElementById('mediaResize');
   const hide=document.getElementById('mediaHide'),restore=document.getElementById('mediaRestore');
-  // This is a floating layer, never a column or reserved strip in the exercise layout.
   document.body.append(dock,restore);
   const participantId=window.crypto?.randomUUID?.();
   const mobile=()=>window.matchMedia?.('(max-width: 768px)').matches||false;
-  let position=null,drag=null,lessonPresented=null;
-  function bounds(){const v=window.visualViewport;return {x:v?.offsetLeft||0,y:v?.offsetTop||0,width:v?.width||window.innerWidth||1024,height:v?.height||window.innerHeight||768};}
+  let position=null,customWidth=null,drag=null,lessonPresented=null,activeSpeaker=null,speakerTimer=null;
+  function bounds(){
+    const v=window.visualViewport,x=v?.offsetLeft||0,y=v?.offsetTop||0,w=v?.width||window.innerWidth||1024,h=v?.height||window.innerHeight||768;
+    const area=document.querySelector('.class-area')?.getBoundingClientRect(),bar=document.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
+    const left=Math.max(x,area?.left||0),top=Math.max(y,bar?.bottom||0);
+    return {x:left,y:top,width:Math.max(120,Math.min(x+w,area?.right||x+w)-left),height:Math.max(120,Math.min(y+h,area?.bottom||y+h)-top)};
+  }
   function place(){
     if(dock.hidden)return;
-    const b=bounds(),r=dock.getBoundingClientRect();
-    const full=state.view==='expanded'&&mobile();
-    const wanted=full?{x:b.x+8,y:b.y+8}:position||{x:b.x+b.width-r.width-16,y:b.y+84};
-    const x=Math.max(b.x+8,Math.min(wanted.x,b.x+b.width-r.width-8));
-    const y=Math.max(b.y+8,Math.min(wanted.y,b.y+b.height-r.height-8));
-    dock.style.left=x+'px';dock.style.top=y+'px';
-    restore.style.top=Math.max(b.y+8,Math.min(y,b.y+b.height-52))+'px';
-    if(!full)position={x,y};
+    const b=bounds(),expanded=state.view==='expanded';
+    const count=state.call?Object.values(state.call.participants()).length:1;
+    const width=Math.max(110,Math.min(b.width-16,expanded?(mobile()?b.width-16:640):(customWidth||(mobile()?144:count>2?340:240))));
+    dock.style.width=width+'px';dock.style.setProperty('--video-max-height',Math.max(100,b.height-16)+'px');
+    const single=!expanded&&(mobile()||width<220||count>2&&width<280);
+    dock.dataset.speaker=String(single);
+    const cols=single||count<=2?1:count>6?3:2;
+    dock.style.setProperty('--video-columns',String(cols));
+    const rows=Math.ceil(Math.max(1,single?1:count)/cols);
+    const height=expanded?Math.max(100,b.height-16):Math.min(b.height-16,Math.max(110,rows*(width/cols*.75)+Math.max(0,rows-1)*4));
+    dock.style.height=height+'px';
+    const r=dock.getBoundingClientRect();
+    const wanted=expanded?{x:b.x+b.width-width-8,y:b.y+8}:position||{x:b.x+b.width-width-8,y:b.y+8};
+    const x=Math.max(b.x+8,Math.min(wanted.x,b.x+b.width-width-8));
+    const y=Math.max(b.y+8,Math.min(wanted.y,b.y+b.height-(r.height||height)-8));
+    dock.style.left=x+'px';dock.style.top=y+'px';restore.style.top=y+'px';
+    if(!expanded)position={x,y};
+    arrangeTiles();
+  }
+  function arrangeTiles(){
+    if(!state.call)return;
+    const participants=Object.values(state.call.participants());
+    const remote=participants.filter(p=>!p.local);
+    const preferred=remote.find(p=>p.session_id===activeSpeaker)||remote.find(p=>p.owner)||remote[0];
+    const single=dock.dataset.speaker==='true';
+    views.forEach((view,key)=>{view.root.hidden=single&&(!preferred||key!==preferred.session_id);});
+    dock.dataset.waiting=String(single&&!preferred);
   }
   function setView(view){
     if(!['expanded','mini','hidden'].includes(view))return;
     state.view=view;dock.dataset.view=view;dock.inert=view==='hidden';
     dock.setAttribute('aria-hidden',String(view==='hidden'));restore.hidden=dock.hidden||view!=='hidden';
-    const label=view==='expanded'?'Свернуть видео':'Развернуть видео';
-    size.setAttribute('aria-label',label);size.title=label;
+    const label=view==='expanded'?'Свернуть видео':'Развернуть видео';size.setAttribute('aria-label',label);size.title=label;
     place();
   }
-  function lessonStarted(id){
-    if(!id||lessonPresented===id)return;
-    lessonPresented=id;setView('expanded');
-  }
+  function lessonStarted(id){if(!id||lessonPresented===id)return;lessonPresented=id;setView('expanded');}
   size.addEventListener('click',()=>setView(state.view==='expanded'?'mini':'expanded'));
   hide.addEventListener('click',()=>{setView('hidden');restore.focus();});
   restore.addEventListener('click',()=>{setView('mini');size.focus();});
-  dock.addEventListener('keydown',event=>{if(event.key==='Escape'){setView('mini');size.focus();}});
-  move.addEventListener('pointerdown',event=>{
-    if(event.button!==0||state.view==='expanded'&&mobile())return;
-    const r=dock.getBoundingClientRect();drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top};
-    move.setPointerCapture(event.pointerId);event.preventDefault();
-  });
-  move.addEventListener('pointermove',event=>{
+  function startDrag(event,resizing){
+    if(event.button!==0)return;
+    if(!resizing&&event.target.closest?.('button,input,a'))return;
+    if(state.view==='expanded')setView('mini');
+    const r=dock.getBoundingClientRect();drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top,width:r.width,resizing};
+    (resizing?resize:dock).setPointerCapture(event.pointerId);event.preventDefault();
+  }
+  dock.addEventListener('pointerdown',e=>startDrag(e,false));
+  resize.addEventListener('pointerdown',e=>{e.stopPropagation();startDrag(e,true);});
+  dock.addEventListener('pointermove',event=>{
     if(!drag||event.pointerId!==drag.id)return;
-    position={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};place();
+    if(drag.resizing)customWidth=Math.max(110,drag.width+event.clientX-drag.x);
+    else position={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};
+    place();
   });
-  const endDrag=()=>{drag=null;};
-  for(const type of ['pointerup','pointercancel','lostpointercapture'])move.addEventListener(type,endDrag);
-  move.addEventListener('keydown',event=>{
-    const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];
-    if(!delta||state.view==='expanded'&&mobile())return;
-    event.preventDefault();const r=dock.getBoundingClientRect();position={x:r.left+delta[0],y:r.top+delta[1]};place();
+  for(const type of ['pointerup','pointercancel','lostpointercapture'])dock.addEventListener(type,()=>{drag=null;});
+  dock.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){setView('mini');size.focus();return;}
+    if(event.target!==dock&&event.target!==resize)return;
+    const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];if(!delta)return;
+    event.preventDefault();if(state.view==='expanded')setView('mini');
+    const r=dock.getBoundingClientRect();
+    if(event.target===resize)customWidth=Math.max(110,r.width+delta[0]+delta[1]);else position={x:r.left+delta[0],y:r.top+delta[1]};place();
   });
   window.addEventListener('resize',place);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
-  if(window.ResizeObserver)new window.ResizeObserver(place).observe(dock);
+  if(window.ResizeObserver){const observer=new window.ResizeObserver(place);observer.observe(document.querySelector('.class-area'));observer.observe(document.getElementById('workspaceUtilityBar'));}
   function message(text,notice=false){status.textContent=text;status.hidden=!text||!notice;}
   const views=new Map();
   let context=null,generation=0,connecting=null,sdkLoading=null,request=null;
@@ -121,6 +147,7 @@
     views.forEach((view,key)=>{if(!keep.has(key)){view.video.srcObject=view.audio.srcObject=null;view.root.remove();views.delete(key);}});
     // Keep remote participants first even when they arrive after the local tile.
     participants.forEach(p=>{const id=p.session_id||(p.local?'local':'remote');const view=views.get(id);if(view)tiles.append(view.root);const screen=views.get(id+':screen');if(screen)tiles.append(screen.root);});
+    place();
     const local=participants.find(p=>p.local);
     for(const [button,kind] of [[camera,'video'],[mic,'audio']]){
       const on=Boolean(local?.[kind]);button.classList.toggle('on',on);button.classList.toggle('off',!on);button.setAttribute('aria-pressed',String(on));
@@ -139,7 +166,7 @@
     try{await call.destroy();}catch(_){}
   }
   async function stopMedia(){
-    generation++;request?.abort();request=null;connecting=null;
+    generation++;clearTimeout(speakerTimer);activeSpeaker=null;request?.abort();request=null;connecting=null;
     const call=state.call;state.call=null;state.sessionId=null;
     clearMedia();phase('idle','');visibility(false);
     await dispose(call);
@@ -164,7 +191,7 @@
     if(next.status==='live')lessonStarted(next.sessionId);
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
     const previous=context?.sessionId;
-    const closing=stopMedia();if(previous!==next.sessionId){position=null;setView(mobile()&&next.role==='teacher'&&next.status!=='live'?'mini':'expanded');}
+    const closing=stopMedia();if(previous!==next.sessionId){position=null;customWidth=null;setView(next.status==='live'&&mobile()?'expanded':'mini');}
     context={...next};state.sessionId=next.sessionId;const epoch=generation;
     visibility(true);phase('connecting','Подключаем видеосвязь…');
     const work=(async()=>{
@@ -189,6 +216,11 @@
         call=daily.createCallObject({startVideoOff:true,startAudioOff:true});state.call=call;
         const refresh=()=>{if(state.call===call)renderParticipants();};
         for(const event of ['participant-joined','participant-updated','participant-left','track-started','track-stopped'])call.on(event,refresh);
+        call.on('active-speaker-change',event=>{
+          if(state.call!==call)return;
+          const peer=Object.values(call.participants()).find(p=>p.session_id===event.activeSpeaker?.peerId);
+          activeSpeaker=peer&&!peer.local?peer.session_id:null;arrangeTiles();
+        });
         call.on('camera-error',()=>{if(state.call===call){message('Нет доступа к камере или микрофону. Разрешите доступ в браузере и нажмите нужную кнопку ещё раз.',true);refresh();}});
         call.on('error',()=>{void failedCall(call,'Видеосвязь прервалась. Попробуйте подключиться снова.');});
         call.on('left-meeting',()=>{void failedCall(call,'Вы вышли из видеокомнаты.');});
