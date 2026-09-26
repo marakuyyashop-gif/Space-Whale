@@ -12,8 +12,8 @@ function fixture(guest=false,options={}){
  const location={href:'https://example.test/classroom.html',pathname:'/classroom.html',search:'?level=A1.1&whale=1&lesson=a1-1-w1-l2'+(guest?'&guest=old-token':'')};location.href+=location.search;location.replace=url=>{location.href=url;};location.reload=()=>{};
  const history={replaceState(a,b,url){location.search=new URL(url,location.href).search;},pushState(a,b,url){location.search=new URL(url,location.href).search;}};
  const copied=[],calls=[],storage=()=>{const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k)};};
- const channel={presenceState:()=>({})};
- const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:{guest:true,allowed_lesson_ids:['*']},role:options.student?'student':'teacher',meta:{started_at:options.startedAt||null,server_now:new Date().toISOString(),duration_minutes:60,allowed_lesson_ids:['*']}};},loadSharedState:async()=>null,startGuestLesson:async()=>{calls.push('start');if(options.startFails)throw new Error('offline');return {started_at:new Date().toISOString(),server_now:new Date().toISOString(),status:'live',duration_minutes:60,allowed_lesson_ids:['*']};},navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
+ const channel={presenceState:()=>({})},transportSession={guest:true,allowed_lesson_ids:['*']};
+ const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:transportSession,role:options.student?'student':'teacher',meta:{started_at:options.startedAt||null,server_now:new Date().toISOString(),duration_minutes:60,allowed_lesson_ids:['*']}};},loadSharedState:async()=>null,startGuestLesson:async()=>{calls.push('start');if(options.startFails)throw new Error('offline');return {started_at:new Date().toISOString(),server_now:new Date().toISOString(),status:'live',duration_minutes:60,allowed_lesson_ids:['*']};},navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
  const window={SpaceWhaleIsTeacher:!options.student,SpaceWhaleExerciseKit:kit,SpaceWhaleCatalog:require('../workspace-catalog.js'),SpaceWhaleClassroom:classroom,addEventListener(){},setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,innerWidth:1200,innerHeight:800,spaceWhaleSupabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:name==='create_guest_workspace'?{token:'new-token'}:true};}}};
  window.SpaceWhaleMedia={lessonStarted:id=>calls.push({name:'media-started',id}),connect:async context=>{calls.push({name:'media-connect',context});},stopMedia:async()=>{calls.push({name:'media-stop'});},createInvitation:async()=>{calls.push({name:'create_guest_workspace'});return {token:'new-token'};},endSession:async args=>{calls.push({name:'revoke_guest_lesson_link',args:{p_token:args.guestToken}});if(options.endVideo)await options.endVideo(handlers);}};
  const context={window,document,location,history,localStorage:storage(),sessionStorage:storage(),navigator:{clipboard:{writeText:async url=>copied.push(url)}},URL,URLSearchParams,console,setTimeout:()=>1,clearTimeout(){},clearInterval(){}};
@@ -21,7 +21,7 @@ function fixture(guest=false,options={}){
  vm.createContext(context);
  for(const f of ['template-gallery.js','lesson-draft-first-day-school.js','lesson-draft-school-fair.js','course-content.js','whale1-content.js','collaboration-state.js','workspace.js'])vm.runInContext(fs.readFileSync(require.resolve('../'+f),'utf8'),context,{filename:f});
  const click=el=>{assert.ok(el);el.dispatchEvent(new dom.Event('click',{bubbles:true}));};
- return {document,location,copied,calls,click,get handlers(){return handlers;},sessionStorage:context.sessionStorage};
+ return {document,location,copied,calls,click,transportState(data){Object.assign(transportSession,data);handlers.onLessonState(data);},get handlers(){return handlers;},sessionStorage:context.sessionStorage};
 }
 test('actual workspace renders the current sidebar and creates an isolated invitation without a link field',async()=>{
  const s=fixture();assert.ok(s.document.querySelector('.workspace-lesson-heading'));assert.equal(s.document.querySelector('#guestInviteLink'),null);
@@ -147,4 +147,16 @@ test('persistent notices can be dismissed and later messages still appear',()=>{
  d.getElementById('lessonAudioEnable').hidden=false;s.click(d.getElementById('lessonAudioDismiss'));assert.equal(d.getElementById('lessonAudioEnable').hidden,true);
  d.getElementById('mediaStatus').hidden=false;s.click(d.getElementById('mediaStatusClose'));assert.equal(d.getElementById('mediaStatus').hidden,true);
  assert.equal(s.calls.filter(c=>c?.name==='media-stop').length,0);
+});
+
+test('transport mutation before its Start callback cannot hide the waiting-to-live transition',async()=>{
+ const s=fixture(true,{student:true});await settled();
+ assert.equal(s.calls.filter(c=>c.name==='media-connect').length,0);
+ const state={status:'live',started_at:new Date().toISOString(),server_now:new Date().toISOString(),allowed_lesson_ids:['*'],current_page_id:'?level=A1.1&whale=1&lesson=a1-1-w1-l1'};
+ s.transportState(state);
+ assert.equal(s.calls.filter(c=>c.name==='media-connect').length,1);
+ assert.equal(s.calls.filter(c=>c.name==='media-started').length,1);
+ assert.doesNotMatch(s.document.querySelector('#workspaceExercise').textContent,/Ждём начала занятия/);
+ assert.equal(s.document.querySelector('.workspace-student-timer').hidden,false);
+ s.transportState(state);assert.equal(s.calls.filter(c=>c.name==='media-connect').length,1);
 });

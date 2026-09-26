@@ -799,7 +799,8 @@
     if(guestToken&&liveRole==='teacher')history.replaceState(null,'',`classroom.html${query(route)}`);
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';
-    liveSession = result.session;
+    // Preserve the UI snapshot: transport mutates its session before the callback.
+    liveSession = {...result.session};
     if(guestToken)applyGuestLessonState(result.meta||{});
     connectLiveMedia();
     tick();

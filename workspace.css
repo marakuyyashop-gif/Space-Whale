@@ -569,7 +569,7 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:var(
 }
 /* Floating utilities share the canvas; only content clearance is reserved. */
 .unified-workspace .class-area{--workspace-controls-clearance:58px;background-color:var(--workspace-canvas)!important;background-image:radial-gradient(circle,var(--workspace-grid) .8px,transparent 1px)!important;background-size:4px 4px!important}
-.unified-workspace .class-content{top:var(--workspace-controls-clearance);margin:0;background:transparent!important}
+.unified-workspace .class-content{top:max(calc(58px + env(safe-area-inset-top)),var(--workspace-controls-clearance,58px))!important;margin:0;background:transparent!important}
 .unified-workspace .lesson-scroll{padding-top:8px!important;background:transparent!important}
 .workspace-utility-bar{position:absolute;top:max(12px,env(safe-area-inset-top));left:20px;z-index:5;display:flex;align-items:center;gap:12px;width:max-content;max-width:calc(100% - 32px);padding:0;background:none;border:0;box-shadow:none}
 .workspace-utility-bar .workspace-student-timer{position:static;inset:auto;display:flex;align-items:center;min-height:30px;box-sizing:border-box;gap:7px;padding:5px 9px;font-size:11px;margin:0}
