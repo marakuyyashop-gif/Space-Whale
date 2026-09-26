@@ -67,6 +67,11 @@
         if (block.exercise?.kind === 'stage') fail('Stage containers cannot be nested');
         validate(block.exercise);
       });
+      if (def.transcript != null) {
+        text(def.transcript, 'transcript'); array(def.transcriptAfter, 'transcriptAfter');
+        const checkable = new Set(['matching','gaps','choice','image-label','order','sort','writing']);
+        if (new Set(def.transcriptAfter).size !== def.transcriptAfter.length || def.transcriptAfter.some(id => !def.exercises.some(block => block.id === id && checkable.has(block.exercise.kind)))) fail('transcriptAfter must reference distinct response blocks');
+      } else if (def.transcriptAfter != null) fail('transcriptAfter requires a transcript');
       return def;
     }
     if (def.kind === 'presentation') {
@@ -79,6 +84,7 @@
       return def;
     }
     if (def.kind === 'audio') {
+      if (def.audioPending != null && typeof def.audioPending !== 'boolean') fail('audioPending must be boolean');
       if (def.transcript != null) text(def.transcript, 'transcript');
       if (def.layout != null && !['player', 'listen-repeat'].includes(def.layout)) fail('Unsupported audio layout');
       if (def.layout === 'listen-repeat') {
@@ -92,7 +98,8 @@
           else if (item.example && !def.audioPending) fail('Listen & Repeat example needs its own audio unless audioPending is true');
         });
       } else {
-        audioSource(def.audio);
+        if (def.audio != null) audioSource(def.audio);
+        else if (!def.audioPending) fail('Audio player needs audio unless audioPending is true');
       }
       return def;
     }
@@ -187,7 +194,7 @@
       if (def.multiple != null && typeof def.multiple !== 'boolean') fail('multiple must be boolean');
       if (def.multiple && def.layout === 'dropdown') fail('Multiple choice needs visible checkboxes');
       def.items.forEach(item => {
-        text(item.prompt, 'prompt'); const valid = options(item.options); key(item, valid);
+        media(item); text(item.prompt, 'prompt'); const valid = options(item.options); key(item, valid);
         if (def.multiple) {
           if (item.correctId != null) fail('Multiple choice uses correctIds');
           if (item.correctIds != null) {
@@ -215,6 +222,7 @@
       if (def.bank) { array(def.bank, 'bank'); def.bank.forEach(word => text(word, 'bank word')); }
       const used = new Set();
       def.items.forEach(item => {
+        media(item);
         array(item.segments, 'segments');
         item.segments.forEach(segment => {
           if (typeof segment === 'string') return;
@@ -311,7 +319,7 @@
     let feedback = {};
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
-    let syncStage=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
+    let syncStage=null, syncTranscript=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
     const centerSection=element=>{
       if(!element||element.hidden)return;
       const scroller=host.closest?.('.lesson-scroll');
@@ -380,9 +388,10 @@
     };
     const audioPlayer = (src, label = 'Audio', key='player') => {
       const wrap = node('div', 'ek-audio-player'); wrap.dataset.state = 'paused';
-      const audio = node('audio'); audio.preload = 'auto'; audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
+      const audio = node('audio'); audio.preload = src ? 'auto' : 'none'; if(src)audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
       let completed = false;
       const play = button('▶', async () => {
+        if (!src) return;
         if (audio.paused || completed) {
           if (completed) { audio.currentTime = 0; completed = false; sync(); }
           doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
@@ -433,6 +442,7 @@
           completed = false; audio.currentTime = (Number(range.value) / 100) * audio.duration; sync();
         }
       });
+      if (!src) { play.disabled=true; play.setAttribute('aria-label','Audio pending'); play.title='Audio pending'; wrap.dataset.state='pending'; }
       track.append(range); wrap.append(audio, play, track, time);
       return wrap;
     };
@@ -682,13 +692,25 @@
       }
       if (def.kind === 'stage') {
         const stack = node('div', 'ek-stage-stack');
+        const transcript = def.transcript ? node('details', 'ek-disclosure') : null;
+        if(transcript)transcript.append(node('summary','','See the script'),node('p','ek-copy',def.transcript));
+        syncTranscript=()=>{
+          if(!transcript)return;
+          const complete=def.transcriptAfter.every(id=>{
+            const block=def.exercises.find(block=>block.id===id),state=answers[id]||{};
+            const results=Object.values(grade(block.exercise,state));
+            return state.__sw_checked===true && results.length>0 && results.every(result=>result!=='empty');
+          });
+          transcript.hidden=!complete;
+          if(!complete){transcript.open=false;transcript.querySelector('summary').setAttribute('aria-expanded','false');const content=transcript.querySelector('.ek-disclosure-content');if(content)content.hidden=true;}
+        };
         visibleCount = def.progressive ? stageCount(answers.revealed) : def.exercises.length;
         const reveal = () => {
           const index = nestedMounts.length;
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
+          const handle = mount(child, block.exercise, { audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -732,6 +754,7 @@
         while (nestedMounts.length < visibleCount) reveal();
         body.append(stack);
         if (def.progressive) { body.append(navigation); updateNavigation();navigation.hidden=Boolean(config.navigationReadOnly); }
+        if(transcript){body.append(transcript);syncTranscript();}
       }
       if (def.kind === 'rule-page') {
         const page = node('div', 'ek-rule-page');
@@ -886,6 +909,7 @@
         }
         let gapNumber = 0;
         def.items.forEach((item, index) => {
+          if(item.image || item.imagePending)body.append(illustration(item));
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
           if (!modern && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
@@ -910,6 +934,7 @@
         });
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
+        if(item.image || item.imagePending)body.append(illustration(item));
         if (def.layout === 'dropdown') {
           const row = node('div', 'ek-discovery-choice');
           row.append(doc.createTextNode(`${item.prompt} `));
@@ -1156,6 +1181,7 @@
         const count = def.progressive ? stageCount(answers.revealed) : def.exercises.length;
         if (count !== visibleCount) syncStage(count);
         def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
+        syncTranscript?.();
         return;
       }
 

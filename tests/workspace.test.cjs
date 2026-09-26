@@ -56,17 +56,17 @@ test('A1 course outline exposes real Whale names and catalog-only lesson titles'
   assert.equal(route.exercise, '');
 });
 
-test('A1.2 clothing lesson replaces its catalog outline with eight class stages and two self-study blocks', () => {
+test('A1.2 lesson one uses the replacement title and ten class stages', () => {
   const { lessons, templates } = content();
   const catalog = createCatalog(lessons, templates);
   const lesson = catalog.topics({view:'library',level:'A1.2',whale:4}).find(item => item.id === 'a1-2-w4-l1');
-  assert.equal(lesson.title, 'Описываем одежду');
+  assert.equal(lesson.title, 'Как выглядит эта вещь?');
   assert.equal(lesson.outline, undefined);
-  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 8);
-  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
+  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 10);
+  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 0);
   lesson.stages.forEach(stage => kit.validate(stage.exercise));
   assert.equal(lesson.stages[0].exercise.id, 'a12w4l1-opening');
-  assert.equal(lesson.stages[7].exercise.id, 'a12w4l1-final-speaking');
+  assert.equal(lesson.stages[9].exercise.id, 'a12w4l1-final-speaking');
 });
 
 test('A1.2 clothing appearance lesson replaces its second outline with nine class stages and two self-study blocks', () => {

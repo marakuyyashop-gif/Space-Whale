@@ -6,449 +6,112 @@
 
   const clothesImage = 'Clothes.png';
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
-  const lesson1Audio = courseAudioBase + '/a1-2/w4/l1';
   const lesson2Audio = courseAudioBase + '/a1-2/w4/l2';
 
+  // Stable media slots: fill src once to update every use. Pending slots never request a URL.
+  const lesson1Media = {
+    A1M4L1_IMAGE_01: {type:'image',src:null,alt:'A coat',target:'coat'},
+    A1M4L1_IMAGE_02: {type:'image',src:null,alt:'A sweater',target:'sweater'},
+    A1M4L1_IMAGE_03: {type:'image',src:null,alt:'A blouse',target:'blouse'},
+    A1M4L1_IMAGE_04: {type:'image',src:null,alt:'A skirt',target:'skirt'},
+    A1M4L1_IMAGE_05: {type:'image',src:null,alt:'A suit',target:'suit'},
+    A1M4L1_IMAGE_06: {type:'image',src:null,alt:'A hat',target:'hat'},
+    A1M4L1_IMAGE_TWO_COATS: {type:'image',src:null,alt:'Two coats',target:'coats'},
+    A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:null,alt:'A clothes shop display with a coat, sweater, blouse, skirt, suit and hat'},
+    A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes. And this sweater?\nBen: It looks warm.\nAnna: I like it. I need a sweater for the weekend.\nBen: The sweater looks good.\nAnna: Great. I want the sweater."},
+    A1M4L1_WORD_01: {type:'audio',src:null,word:'coat',sentence:'I need a coat for work.'},
+    A1M4L1_WORD_02: {type:'audio',src:null,word:'sweater',sentence:'My sweater is in the wardrobe.'},
+    A1M4L1_WORD_03: {type:'audio',src:null,word:'blouse',sentence:'My sister wants this blouse.'},
+    A1M4L1_WORD_04: {type:'audio',src:null,word:'skirt',sentence:'I like this skirt.'},
+    A1M4L1_WORD_05: {type:'audio',src:null,word:'suit',sentence:'My father has a suit for work.'},
+    A1M4L1_WORD_06: {type:'audio',src:null,word:'hat',sentence:'I like your hat.'}
+  };
+  window.SpaceWhaleLessonMedia = {...window.SpaceWhaleLessonMedia, 'a1-2-w4-l1':lesson1Media};
+  const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
+  const audioSlot = audioId => ({audioId,...(lesson1Media[audioId].src ? {audio:lesson1Media[audioId].src} : {audioPending:true})});
+  const wordList = ['coat','sweater','blouse','skirt','suit','hat'];
+  const wordImage = word => imageSlot('A1M4L1_IMAGE_'+String(wordList.indexOf(word)+1).padStart(2,'0'));
+  const exercise = (id,kind,title,extra) => ({version:1,id:'a12w4l1-'+id,kind,title,...extra});
+  const options = words => words.map(word=>({id:word,text:word}));
+  const step = (menu,minutes,definition,aim) => ({menu,section:'tasks',navigationTitle:menu,guide:{time:minutes+' min',aim},exercise:definition});
+  const listeningQuestion = (id,title,prompt,words,correctId) => exercise(id,'choice',title,{items:[{id:'answer',prompt,options:options(words),correctId}]});
   const lesson = {
-    id: 'a1-2-w4-l1',
-    title: 'Описываем одежду',
-    level: 'A1.2',
-    whale: 4,
-    stages: [
-      {
-        menu: 'Opening Speaking',
-        section: 'tasks',
-        guide: {
-          aim: 'Войти в тему одежды и активировать знакомые названия одежды и цветов.',
-          time: '3 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-opening',
-          kind: 'presentation',
-          title: 'Look at the clothes and talk about them.',
-          instruction: '',
-          blocks: [
-            {
-              type: 'image',
-              image: clothesImage,
-              alt: 'A clothes rack with a coat, denim jacket, sweater, T-shirt and green dress',
-              crop: { x: 57.5, y: 5.0, w: 40.5, h: 45.4 }
-            },
-            {
-              type: 'text',
-              text: '1. What clothes can you see?\n2. What colors can you see?\n3. Which one do you like?\n4. Which one don’t you like?'
-            },
-            {
-              type: 'disclosure',
-              title: 'Possible answers',
-              text: 'I like the blue dress.\nI don’t like the green jacket.'
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Words',
-        section: 'tasks',
-        guide: {
-          aim: 'Сначала закрепить четыре нужных названия одежды, затем понять и начать извлекать из памяти bright, dark, colorful, simple, pretty, strange.',
-          tl: 'jacket, sweater, T-shirt, hat; bright, dark, colorful, simple, pretty, strange',
-          time: '7 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-words',
-          kind: 'rule-page',
-          title: 'Words',
-          instruction: '',
-          blocks: [
-            {
-              type: 'exercise',
-              id: 'clothes-picture-word',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-clothes-picture-word',
-                kind: 'matching',
-                layout: 'picture-word',
-                title: 'Match the pictures with the words.',
-                instruction: 'Сначала закрепи названия одежды.',
-                items: [
-                  { id: 'cpw1', text: 'Jacket', image: clothesImage, alt: 'A bright yellow jacket', crop: { x: 3.0, y: 5.1, w: 15.0, h: 22.0 }, correctId: 'jacket' },
-                  { id: 'cpw2', text: 'Sweater', image: clothesImage, alt: 'A dark sweater', crop: { x: 20.3, y: 5.1, w: 15.2, h: 21.2 }, correctId: 'sweater' },
-                  { id: 'cpw3', text: 'T-shirt', image: clothesImage, alt: 'A simple white T-shirt', crop: { x: 3.0, y: 28.3, w: 15.0, h: 21.5 }, correctId: 'tshirt' },
-                  { id: 'cpw4', text: 'Hat', image: clothesImage, alt: 'A strange purple hat', crop: { x: 37.8, y: 29.2, w: 16.4, h: 19.0 }, correctId: 'hat' }
-                ],
-                options: [
-                  { id: 'sweater', text: 'sweater' },
-                  { id: 'hat', text: 'hat' },
-                  { id: 'jacket', text: 'jacket' },
-                  { id: 'tshirt', text: 'T-shirt' }
-                ]
-              }
-            },
-            {
-              type: 'exercise',
-              id: 'picture-word',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-picture-word',
-                kind: 'matching',
-                layout: 'picture-word',
-                title: 'Match the pictures with the words.',
-                instruction: 'Click the box and choose the correct word.',
-                items: [
-                  { id: 'pw1', text: 'Bright jacket', image: clothesImage, alt: 'A very bright yellow jacket', crop: { x: 3.0, y: 5.1, w: 15.0, h: 22.0 }, correctId: 'bright' },
-                  { id: 'pw2', text: 'Dark sweater', image: clothesImage, alt: 'A very dark sweater', crop: { x: 20.3, y: 5.1, w: 15.2, h: 21.2 }, correctId: 'dark' },
-                  { id: 'pw3', text: 'Colorful skirt', image: clothesImage, alt: 'A skirt with many different bright colors', crop: { x: 37.8, y: 5.1, w: 15.5, h: 22.2 }, correctId: 'colorful' },
-                  { id: 'pw4', text: 'Simple T-shirt', image: clothesImage, alt: 'A simple plain white T-shirt', crop: { x: 3.0, y: 28.3, w: 15.0, h: 21.5 }, correctId: 'simple' },
-                  { id: 'pw5', text: 'Pretty blouse', image: clothesImage, alt: 'A pretty pink blouse', crop: { x: 20.1, y: 28.2, w: 16.6, h: 21.0 }, correctId: 'pretty' },
-                  { id: 'pw6', text: 'Strange hat', image: clothesImage, alt: 'A strange purple hat', crop: { x: 37.8, y: 29.2, w: 16.4, h: 19.0 }, correctId: 'strange' }
-                ],
-                options: [
-                  { id: 'strange', text: 'strange' },
-                  { id: 'bright', text: 'bright' },
-                  { id: 'simple', text: 'simple' },
-                  { id: 'colorful', text: 'colorful' },
-                  { id: 'pretty', text: 'pretty' },
-                  { id: 'dark', text: 'dark' }
-                ]
-              }
-            },
-            {
-              type: 'exercise',
-              id: 'word-definition',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-word-definition',
-                kind: 'matching',
-                layout: 'word-definition',
-                title: 'Match the descriptions with the words.',
-                instruction: 'Прочитай описание и выбери английское слово.',
-                items: [
-                  { id: 'wd1', text: 'яркий, насыщенный по цвету', correctId: 'bright' },
-                  { id: 'wd2', text: 'тёмный по цвету', correctId: 'dark' },
-                  { id: 'wd3', text: 'разноцветный, с большим количеством цветов', correctId: 'colorful' },
-                  { id: 'wd4', text: 'простой, без лишних деталей', correctId: 'simple' },
-                  { id: 'wd5', text: 'симпатичный, красивый на вид', correctId: 'pretty' },
-                  { id: 'wd6', text: 'странный, необычный', correctId: 'strange' }
-                ],
-                options: [
-                  { id: 'simple', text: 'simple' },
-                  { id: 'pretty', text: 'pretty' },
-                  { id: 'dark', text: 'dark' },
-                  { id: 'strange', text: 'strange' },
-                  { id: 'bright', text: 'bright' },
-                  { id: 'colorful', text: 'colorful' }
-                ]
-              }
-            },
-            {
-              type: 'exercise',
-              id: 'listen-repeat',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-listen-repeat',
-                kind: 'audio',
-                layout: 'listen-repeat',
-                title: 'Listen and repeat.',
-                instruction: '',
-                items: [
-                  { id: 'lr1', text: 'bright', audio: lesson1Audio + '/bright.mp3', example: 'This shirt is bright.', exampleAudio: lesson1Audio + '/this-shirt-is-bright.mp3' },
-                  { id: 'lr2', text: 'dark', audio: lesson1Audio + '/dark.mp3', example: 'My coat is dark.', exampleAudio: lesson1Audio + '/my-coat-is-dark.mp3' },
-                  { id: 'lr3', text: 'colorful', audio: lesson1Audio + '/colorful.mp3', example: 'Her skirt is colorful.', exampleAudio: lesson1Audio + '/her-skirt-is-colorful.mp3' },
-                  { id: 'lr4', text: 'simple', audio: lesson1Audio + '/simple.mp3', example: 'This dress is simple.', exampleAudio: lesson1Audio + '/this-dress-is-simple.mp3' },
-                  { id: 'lr5', text: 'pretty', audio: lesson1Audio + '/pretty.mp3', example: 'The blouse is pretty.', exampleAudio: lesson1Audio + '/the-blouse-is-pretty.mp3' },
-                  { id: 'lr6', text: 'strange', audio: lesson1Audio + '/strange.mp3', example: 'That hat is strange.', exampleAudio: lesson1Audio + '/that-hat-is-strange.mp3' }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Context',
-        section: 'tasks',
-        guide: {
-          aim: 'Показать degree modifiers в естественном разговоре на уже знакомой лексике.',
-          tl: 'really, very, a little, a bit, too',
-          time: '3 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-context',
-          kind: 'rule-page',
-          title: 'Read the dialogue. Which clothes does Anna like?',
-          instruction: '',
-          blocks: [
-            {
-              type: 'text',
-              text: 'Tom: What do you think of this jacket?\nAnna: It’s really pretty, but it’s a little bright.\n\nTom: What about this dark sweater?\nAnna: I like it. It’s very simple.\n\nTom: And this colorful jacket?\nAnna: Hmm. It’s too colorful for me.\n\nTom: What about this hat?\nAnna: It’s a bit strange, but I like it.',
-              highlights: ['really pretty', 'a little bright', 'very simple', 'too colorful', 'a bit strange']
-            },
-            {
-              type: 'exercise',
-              id: 'short-check',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-context-check',
-                kind: 'writing',
-                title: 'Which clothes does Anna like?',
-                instruction: 'Write one short answer.',
-                items: [
-                  { id: 'answer', prompt: 'Anna likes ...' }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Discovery + Rule',
-        section: 'tasks',
-        guide: {
-          aim: 'Понять значения степени и форму modifier + adjective.',
-          tl: 'very / really; a little / a bit; too + adjective',
-          time: '5 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-discovery',
-          kind: 'rule-page',
-          title: 'Discover the rule',
-          instruction: '',
-          blocks: [
-            {
-              type: 'text',
-              title: 'Look at the model phrases.',
-              text: 'really pretty\na little bright\nvery simple\ntoo colorful\na bit strange',
-              highlights: ['really pretty', 'a little bright', 'very simple', 'too colorful', 'a bit strange']
-            },
-            {
-              type: 'exercise',
-              id: 'meaning',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-discovery-meaning',
-                kind: 'matching',
-                title: 'Match the groups with their meanings.',
-                instruction: 'Соедини английские группы с их значениями.',
-                items: [
-                  { id: 'm1', text: 'very / really', correctId: 'b' },
-                  { id: 'm2', text: 'a little / a bit', correctId: 'c' },
-                  { id: 'm3', text: 'too', correctId: 'a' }
-                ],
-                options: [
-                  { id: 'a', text: 'признак сильнее, чем нужно или подходит' },
-                  { id: 'b', text: 'признак выражен сильно' },
-                  { id: 'c', text: 'признак выражен немного' }
-                ]
-              }
-            },
-            {
-              type: 'exercise',
-              id: 'complete-rule',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-complete-rule',
-                kind: 'gaps',
-                inputMode: 'select',
-                title: 'Complete the rule.',
-                instruction: 'Выбери вариант прямо в пропуске.',
-                items: [
-                  { id: 'r1', segments: ['Very и really показывают ', { id: 'r1g', answers: ['сильную'], options: ['сильную', 'небольшую'] }, ' степень признака.'] },
-                  { id: 'r2', segments: ['A little и a bit показывают ', { id: 'r2g', answers: ['небольшую'], options: ['сильную', 'небольшую'] }, ' степень признака.'] },
-                  { id: 'r3', segments: ['Too значит, что признак ', { id: 'r3g', answers: ['сильнее, чем нужно'], options: ['сильнее, чем нужно', 'выражен совсем немного'] }, '.'] },
-                  { id: 'r4', segments: ['Модификатор ставится ', { id: 'r4g', answers: ['перед'], options: ['перед', 'после'] }, ' прилагательным.'] },
-                  { id: 'r5', segments: ['A little и a bit состоят из ', { id: 'r5g', answers: ['двух слов'], options: ['одного слова', 'двух слов'] }, '.'] }
-                ]
-              }
-            },
-            {
-              type: 'rule',
-              title: 'Rule',
-              text: 'very / really + adjective — признак выражен сильно.\na little / a bit + adjective — признак выражен немного.\ntoo + adjective — признак сильнее, чем нужно или подходит в ситуации.',
-              formula: 'modifier + adjective',
-              examples: ['very bright', 'really pretty', 'a little dark', 'a bit strange', 'too bright', 'too colorful']
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Form',
-        section: 'tasks',
-        guide: {
-          aim: 'Закрепить порядок слов и цельность a little / a bit.',
-          time: '3 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-form',
-          kind: 'sort',
-          title: 'Sort the phrases into two groups.',
-          instruction: 'Choose Correct or Incorrect for each phrase.',
-          groups: [
-            { id: 'correct', text: 'Correct' },
-            { id: 'incorrect', text: 'Incorrect' }
-          ],
-          items: [
-            { id: 's1', text: 'really pretty', correctId: 'correct' },
-            { id: 's2', text: 'bright very', correctId: 'incorrect' },
-            { id: 's3', text: 'a little dark', correctId: 'correct' },
-            { id: 's4', text: 'strange a bit', correctId: 'incorrect' },
-            { id: 's5', text: 'too colorful', correctId: 'correct' },
-            { id: 's6', text: 'simple really', correctId: 'incorrect' },
-            { id: 's7', text: 'a bit strange', correctId: 'correct' },
-            { id: 's8', text: 'very bright', correctId: 'correct' }
-          ]
-        }
-      },
-      {
-        menu: 'Meaning',
-        section: 'tasks',
-        guide: {
-          aim: 'Выбирать modifier по смыслу контекста.',
-          time: '4 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-meaning',
-          kind: 'gaps',
-          inputMode: 'select',
-          title: 'Choose the correct option.',
-          instruction: 'Open the choice inside each sentence.',
-          items: [
-            { id: 'g1', segments: ['I like this jacket, but the color is stronger than I want. It is ', {id:'g1a',answers:['too'],options:['too','very']}, ' bright for me.'] },
-            { id: 'g2', segments: ['This sweater is dark, but only a little. It is ', {id:'g2a',answers:['a little'],options:['a little','really']}, ' dark.'] },
-            { id: 'g3', segments: ['I love this blouse. It is ', {id:'g3a',answers:['really'],options:['really','too']}, ' pretty.'] },
-            { id: 'g4', segments: ['The hat is unusual, but only a bit. It is ', {id:'g4a',answers:['a bit'],options:['a bit','too']}, ' strange.'] },
-            { id: 'g5', segments: ['This skirt has many strong colors, and I love them. It is ', {id:'g5a',answers:['really'],options:['really','a little']}, ' colorful.'] },
-            { id: 'g6', segments: ['I need simple clothes for work. This jacket has many bright colors and big patterns. It is ', {id:'g6a',answers:['too'],options:['too','a bit']}, ' colorful for work.'] }
-          ]
-        }
-      },
-      {
-        menu: 'Writing',
-        section: 'tasks',
-        guide: {
-          aim: 'Самостоятельно построить modifier + adjective с заданным типом значения.',
-          time: '2 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-writing',
-          kind: 'rule-page',
-          title: 'Write one sentence about each picture.',
-          instruction: '',
-          blocks: [
-            {
-              type: 'image',
-              image: clothesImage,
-              alt: 'Clothes laid out on a wooden surface for writing practice',
-              crop: { x: 1.7, y: 58.0, w: 30.3, h: 37.8 }
-            },
-            {
-              type: 'exercise',
-              id: 'sentences',
-              exercise: {
-                version: 1,
-                id: 'a12w4l1-writing-sentences',
-                kind: 'writing',
-                title: 'Write one sentence about each picture.',
-                instruction: '',
-                items: [
-                  { id: 'w1', prompt: '1. Use very or really.' },
-                  { id: 'w2', prompt: '2. Use a little or a bit.' },
-                  { id: 'w3', prompt: '3. Use too.' }
-                ]
-              }
-            },
-            {
-              type: 'rule',
-              title: 'Possible answers',
-              examples: ['The jacket is really bright.', 'The skirt is a little strange.', 'The suit is too colorful.']
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Final Speaking',
-        section: 'tasks',
-        guide: {
-          aim: 'Соединить Words + Grammar и описывать одежду без готового предложения.',
-          time: '3 min'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-final-speaking',
-          kind: 'presentation',
-          title: 'Look at the clothes. Describe them.',
-          instruction: '',
-          blocks: [
-            {
-              type: 'image',
-              image: clothesImage,
-              alt: 'Six clothes showing bright, dark, colorful, simple, pretty and strange styles',
-              crop: { x: 1.7, y: 4.8, w: 52.5, h: 45.5 }
-            },
-            {
-              type: 'text',
-              text: 'Which item is really or very pretty / bright / dark / simple?\n\nWhich item is a little or a bit strange / bright / dark?\n\nWhich item is too bright, too colorful or too strange for you?'
-            },
-            {
-              type: 'disclosure',
-              title: 'Use phrases',
-              text: 'It’s very ...\nIt’s really ...\nIt’s a little ...\nIt’s a bit ...\nIt’s too ... for me.'
-            }
-          ]
-        }
-      },
-      {
-        menu: 'Homework 1',
-        section: 'self-study',
-        guide: {
-          aim: 'Перевести target-конструкции на английский.',
-          time: 'Self study'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-homework-1',
-          kind: 'writing',
-          title: 'Translate into English.',
-          instruction: '',
-          items: [
-            { id: 'h1', prompt: 'Эта куртка очень яркая.' },
-            { id: 'h2', prompt: 'Эта юбка немного тёмная.' },
-            { id: 'h3', prompt: 'Эта блузка действительно красивая.' },
-            { id: 'h4', prompt: 'Эта шляпа немного странная.' },
-            { id: 'h5', prompt: 'Этот костюм слишком пёстрый для меня.' }
-          ]
-        }
-      },
-      {
-        menu: 'Homework 2',
-        section: 'self-study',
-        guide: {
-          aim: 'Повторить target-конструкции в новом наборе предложений.',
-          time: 'Self study'
-        },
-        exercise: {
-          version: 1,
-          id: 'a12w4l1-homework-2',
-          kind: 'writing',
-          title: 'Translate into English.',
-          instruction: '',
-          items: [
-            { id: 'h1', prompt: 'Это платье очень простое.' },
-            { id: 'h2', prompt: 'Эта рубашка немного яркая.' },
-            { id: 'h3', prompt: 'Эта юбка действительно пёстрая.' },
-            { id: 'h4', prompt: 'Эта шляпа слишком странная для меня.' },
-            { id: 'h5', prompt: 'Этот свитер немного тёмный.' }
-          ]
-        }
-      }
+    id:'a1-2-w4-l1',title:'Как выглядит эта вещь?',level:'A1.2',whale:4,
+    summary:'Учимся называть предметы одежды, описывать их внешний вид и сравнивать со знакомыми вещами.',
+    grammar:'look / looks + adjective; look / looks like + noun; How does it look?',
+    lexis:wordList.join(', '),durationMinutes:29,
+    stages:[
+      step('Opening Speaking',2,exercise('opening','presentation','Look at the clothes and talk about them.',{
+        instruction:'What clothes can you name?\nWhich one do you like?\nHow does it look?',
+        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'disclosure',title:'Useful phrases',open:false,text:'I like …\nIt’s …\nIt looks …'}]
+      }),'Назвать знакомую одежду и выразить предпочтение; новые конструкции можно использовать с опорой.'),
+      step('New Words',3,exercise('words','matching','Match the pictures with the words.',{
+        layout:'picture-word',instruction:'Match each picture with the correct word.',
+        items:wordList.map((word,i)=>({id:'picture-'+word,text:'Picture '+(i+1),...wordImage(word),correctId:word})),
+        options:options(['skirt','hat','coat','suit','blouse','sweater'])
+      }),'Познакомиться с coat, sweater, blouse, skirt, suit, hat. Картинки идут в порядке слов; варианты перемешаны отдельно.'),
+      step('Listen & Repeat',3,exercise('listen-repeat','audio','Listen and repeat.',{
+        layout:'listen-repeat',audioPending:true,instruction:'Listen to the words and sentences. Repeat them out loud.',
+        items:wordList.map((word,i)=>{const audioId='A1M4L1_WORD_'+String(i+1).padStart(2,'0'),slot=lesson1Media[audioId];return {id:word,text:word+' — '+slot.sentence,...audioSlot(audioId)};})
+      }),'Послушать и повторить шесть слов с предложениями. Одна запись содержит слово и предложение.'),
+      step('Words Practice · Choice',2,exercise('word-choice','choice','Choose the correct word.',{
+        instruction:'Look at the pictures and choose the correct word.',items:[
+          {id:'coat',...wordImage('coat'),prompt:'I need a ______ for cold days.',options:options(['coat','skirt','suit']),correctId:'coat'},
+          {id:'skirt',...wordImage('skirt'),prompt:'This ______ is for my sister.',options:options(['blouse','skirt','hat']),correctId:'skirt'},
+          {id:'suit',...wordImage('suit'),prompt:'My father has a ______ for work.',options:options(['suit','sweater','coat']),correctId:'suit'},
+          {id:'hat',...wordImage('hat'),prompt:'I like this ______.',options:options(['blouse','hat','skirt']),correctId:'hat'}
+        ]
+      }),'Выбрать название предмета по изображению и контексту.'),
+      step('Words Practice · Type',2,exercise('word-type','gaps','Complete the sentences.',{
+        inputMode:'text',instruction:'Look at the pictures and write the correct word.',items:[
+          {id:'sweater',...wordImage('sweater'),segments:['My ',{id:'sweater-gap',answers:['sweater']},' is in the wardrobe.']},
+          {id:'blouse',...wordImage('blouse'),segments:['My sister wants this ',{id:'blouse-gap',answers:['blouse']},'.']},
+          {id:'coats',...imageSlot('A1M4L1_IMAGE_TWO_COATS'),segments:['These ',{id:'coats-gap',answers:['coats']},' are new.']}
+        ]
+      }),'Написать sweater, blouse и форму множественного числа coats.'),
+      step('Listening',5,exercise('listening','stage','Listen to the conversation.',{
+        layout:'grouped',instruction:'Anna is looking at clothes with Ben. Listen and answer the question.',
+        exercises:[
+          {id:'audio',exercise:exercise('dialogue','audio','Listening',audioSlot('A1M4L1_AUDIO_01'))},
+          {id:'question1',exercise:listeningQuestion('listening-q1','What does Anna want?','What does Anna want?',['A coat.','A sweater.','A blouse.'],'A sweater.')},
+          {id:'question2',exercise:listeningQuestion('listening-q2','Listen again.','The coat looks like …',["Anna’s old coat.",'Ben’s coat.','a suit.'],"Anna’s old coat.")},
+          {id:'question3',exercise:listeningQuestion('listening-q3','Listen again.','The sweater looks …',['old.','warm.','expensive.'],'warm.')}
+        ],
+        transcript:lesson1Media.A1M4L1_AUDIO_01.script,transcriptAfter:['question1','question2','question3']
+      }),'Понять выбор Анны и детали описания. Транскрипт можно раскрыть после заполнения и проверки всех трёх вопросов.'),
+      step('Language Focus',4,exercise('language-focus','rule-page','Match the sentences with their meanings.',{
+        instruction:'Match each sentence with the correct meaning.',blocks:[
+          {type:'exercise',id:'meaning',exercise:exercise('meaning','matching','Match the sentences with their meanings.',{
+            items:[{id:'meaning1',text:'The coat looks good.',correctId:'C'},{id:'meaning2',text:'It looks like your old coat.',correctId:'B'},{id:'meaning3',text:'The sweater looks warm.',correctId:'A'}],
+            options:[{id:'A',text:'Свитер выглядит тёплым.'},{id:'B',text:'Пальто похоже на ваше старое пальто.'},{id:'C',text:'Пальто выглядит хорошо.'}]
+          })},
+          {type:'rule',title:'look / looks + adjective',text:'Описываем, как что-то выглядит.',examples:['The coat looks good.','The sweater looks warm.']},
+          {type:'rule',title:'look / looks like + noun',text:'Говорим, что что-то похоже на другой предмет.',examples:['It looks like your old coat.']},
+          {type:'rule',title:'look / looks',formula:'I / you / we / they → look\nhe / she / it → looks'},
+          {type:'rule',title:'How does it look?',text:'После does используем look.'}
+        ]
+      }),'Различить описание признака и сравнение с предметом, затем раскрыть правило.'),
+      step('Language Practice',3,exercise('language-practice','gaps','Choose the correct option.',{
+        inputMode:'select',instruction:'Complete the sentences with the correct option.',items:[
+          {id:'sentence1',segments:['This coat ',{id:'look1',answers:['looks'],options:['looks','looks like']},' expensive.']},
+          {id:'sentence2',segments:['These sweaters ',{id:'look2',answers:['look like'],options:['look','look like']},' my sweaters at home.']},
+          {id:'sentence3',segments:['This hat ',{id:'look3',answers:['looks'],options:['look','looks']},' unusual.']},
+          {id:'sentence4',segments:['This blouse ',{id:'look4',answers:['looks like'],options:['looks','looks like']},' my old blouse.']},
+          {id:'sentence5',segments:['How does this suit ',{id:'look5',answers:['look'],options:['look','looks']},'?']}
+        ]
+      }),'Выбрать look / looks и отличить look + adjective от look like + noun.'),
+      step('Short Production',2,exercise('short-production','writing','Write a reply.',{
+        responseMode:'open',instruction:'Complete the replies.',items:[
+          {id:'reply1',prompt:'Alex: How does the sweater look? · Use: warm',possibleAnswers:['It looks warm.']},
+          {id:'reply2',prompt:'Alex: Is this your coat? · Use: my old coat',possibleAnswers:['It looks like my old coat.']}
+        ]
+      }),'Написать свободные ответы; преподаватель оценивает формулировку. Примеры появляются после OK.'),
+      step('Final Speaking',3,exercise('final-speaking','presentation','Talk to your partner.',{
+        instruction:'You are in a clothes shop with a friend.\nLook at the clothes.\nAsk about two items.\nDescribe the clothes.\nCompare one item with something you have.\nSay which item you want.',
+        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'disclosure',title:'Useful phrases',open:false,text:'How does it look?\nIt looks …\nIt looks like my …\nI like …\nI want …'},{type:'text',text:'Useful adjectives: good · new · old · warm · expensive · unusual'}]
+      }),'Использовать лексику и конструкции в разговоре о выборе одежды, без автоматической оценки.')
     ]
   };
-
 
   const lesson2 = {
     id: 'a1-2-w4-l2',

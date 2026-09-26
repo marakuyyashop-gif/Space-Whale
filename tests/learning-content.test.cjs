@@ -33,40 +33,19 @@ test('invalid highlight or unsafe ordering audio is rejected before render', () 
   assert.throws(() => kit.validate({version:1,id:'o',kind:'order',title:'Order',tokens:[{id:'a',text:'A'}],source:{audio:'javascript:alert(1)'}}));
 });
 
-test('A1.2 clothing lesson keeps the requested mechanics and self-study split', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'course-content.js'), 'utf8');
-  const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
-  vm.runInNewContext(source, { window });
-  const lesson = window.SpaceWhaleContent[0];
-  assert.equal(lesson.id, 'a1-2-w4-l1');
-  assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 8);
-  assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
-  lesson.stages.forEach(stage => kit.validate(stage.exercise));
-
-  const words = lesson.stages.find(stage => stage.exercise.id === 'a12w4l1-words').exercise;
-  assert.equal(words.kind, 'rule-page');
-  assert.equal(words.blocks[0].id, 'clothes-picture-word');
-  assert.equal(words.blocks[0].exercise.layout, 'picture-word');
-  assert.ok(words.blocks[0].exercise.items.every(item => item.image === 'Clothes.png' && item.crop));
-  assert.deepEqual(Array.from(words.blocks[0].exercise.options, option => option.text), ['sweater','hat','jacket','T-shirt']);
-  assert.equal(words.blocks[1].exercise.layout, 'picture-word');
-  assert.ok(words.blocks[1].exercise.items.every(item => item.image === 'Clothes.png' && item.crop));
-  assert.equal(words.blocks[2].exercise.layout, 'word-definition');
-  assert.ok(words.blocks[2].exercise.items.every(item => /[А-Яа-яЁё]/.test(item.text)));
-  assert.equal(words.blocks[3].exercise.layout, 'listen-repeat');
-  assert.ok(words.blocks[3].exercise.items.every(item => 'audio' in item && 'exampleAudio' in item));
-
-  const discovery = lesson.stages.find(stage => stage.exercise.id === 'a12w4l1-discovery').exercise;
-  assert.ok(discovery.blocks.some(block => block.type === 'rule'));
-  assert.ok(discovery.blocks.some(block => block.type === 'exercise' && block.exercise.kind === 'matching'));
-  assert.ok(discovery.blocks.some(block => block.type === 'exercise' && block.exercise.id === 'a12w4l1-complete-rule' && block.exercise.kind === 'gaps' && block.exercise.inputMode === 'select'));
-  const completeRule = discovery.blocks.find(block => block.type === 'exercise' && block.exercise.id === 'a12w4l1-complete-rule').exercise;
-  assert.equal(completeRule.items[0].segments[0], 'Very и really показывают ');
-  assert.equal(completeRule.items[0].segments[2], ' степень признака.');
-
-  const meaning = lesson.stages.find(stage => stage.exercise.id === 'a12w4l1-meaning').exercise;
-  assert.equal(meaning.kind, 'gaps');
-  assert.equal(meaning.inputMode, 'select');
+test('replacement clothing lesson contains ten class steps and pending media', () => {
+  const window = {SpaceWhaleExerciseKit:kit};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../course-content.js'),'utf8'),{window});
+  const lesson=window.SpaceWhaleContent[0];
+  assert.equal(lesson.id,'a1-2-w4-l1');assert.equal(lesson.stages.length,10);
+  assert.ok(lesson.stages.every(stage=>stage.section==='tasks'));
+  lesson.stages.forEach(stage=>kit.validate(stage.exercise));
+  const words=lesson.stages[1].exercise;
+  assert.equal(words.kind,'matching');assert.equal(words.layout,'picture-word');
+  assert.deepEqual(Array.from(words.items,item=>item.correctId),['coat','sweater','blouse','skirt','suit','hat']);
+  assert.ok(words.items.every(item=>item.imagePending&&!item.image));
+  assert.equal(lesson.stages[6].exercise.kind,'rule-page');
+  assert.equal(lesson.stages[7].exercise.inputMode,'select');
 });
 
 test('Listen Repeat accepts separate word and example audio tracks', () => {
@@ -142,21 +121,14 @@ test('A1.2 lesson 2 production answers are not exposed beside the writing task',
 });
 
 
-test('uploaded Clothes image is used for the visual lesson panels', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'course-content.js'), 'utf8');
-  const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
-  vm.runInNewContext(source, { window });
-
-  const lesson1 = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l1');
-  const lesson2 = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
-
-  const l1Opening = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-opening').exercise.blocks[0];
-  const l1Writing = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-writing').exercise.blocks.find(block => block.type === 'image');
-  const l1Final = lesson1.stages.find(stage => stage.exercise.id === 'a12w4l1-final-speaking').exercise.blocks[0];
-  const l2Final = lesson2.stages.find(stage => stage.exercise.id === 'a12w4l2-final-speaking').exercise.blocks[0];
-
-  for (const block of [l1Opening, l1Writing, l1Final, l2Final]) {
-    assert.equal(block.image, 'Clothes.png');
-    assert.ok(block.crop);
+test('lesson one reserves new visuals while lesson two retains its existing image', () => {
+  const window={SpaceWhaleExerciseKit:kit};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../course-content.js'),'utf8'),{window});
+  const [lesson1,lesson2]=window.SpaceWhaleContent;
+  for(const id of ['a12w4l1-opening','a12w4l1-final-speaking']){
+    const block=lesson1.stages.find(stage=>stage.exercise.id===id).exercise.blocks[0];
+    assert.equal(block.imagePending,true);assert.equal(block.image,undefined);
   }
+  const block=lesson2.stages.find(stage=>stage.exercise.id==='a12w4l2-final-speaking').exercise.blocks[0];
+  assert.equal(block.image,'Clothes.png');assert.ok(block.crop);
 });
