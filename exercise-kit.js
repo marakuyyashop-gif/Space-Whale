@@ -637,7 +637,8 @@
       const close=button(modern?'':'Close ×', () => closeDialog(), 'ek-close');close.setAttribute('aria-label','Close');
       dialog.append(close, node('h3', 'ek-title', def.title));
       const pictureOnly=def.kind==='matching'&&def.layout==='picture-word'&&(item.image||item.imagePending);
-      const prompt = node('div', pictureOnly?'ek-prompt ek-picture-prompt':'ek-prompt', pictureOnly?'':item.text);
+      const prompt = node('div', pictureOnly?'ek-prompt ek-picture-prompt':'ek-prompt');
+      if(!pictureOnly)prompt.append(node('span','ek-prompt-text',item.text));
       prompt.setAttribute('aria-label', 'Phrase to match');
       if (item.image || item.imagePending) {
         const picture=illustration(item),pictureDialog=dialog;

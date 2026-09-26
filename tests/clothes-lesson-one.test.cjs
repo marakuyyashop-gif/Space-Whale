@@ -132,5 +132,6 @@ test('English word highlighting preserves every space and line break in the less
  const before=s.host.textContent,focus=context.window.SpaceWhaleWordFocus.create({root:s.host,actor:'test',storageKey:'test'});
  focus.setExercise('a12w4l1-language-focus');focus.decorate();assert.equal(s.host.textContent,before);
  const rule=s.host.querySelector('.ek-rule-block .ek-copy');assert.match(rule.textContent,/The coat looks good\.\nThe sweater looks warm\./);
- assert.equal(rule.querySelectorAll('.sw-word-focus').length>0,true);focus.destroy();
+ assert.equal(rule.querySelectorAll('.sw-word-focus').length>0,true);
+ s.fire(s.host.querySelector('.ek-match-slot'),'click');focus.decorate();const prompt=s.host.querySelector('.ek-prompt');assert.equal(prompt.querySelector('.ek-prompt-text').textContent,'The coat looks good.');assert.equal(prompt.querySelector(':scope > .sw-word-focus'),null,'word spans must not become flex items and collapse spaces');focus.destroy();
 });
