@@ -2803,25 +2803,42 @@
                 "items": [
                   {
                     "id": "field1",
-                    "prompt": "First name:"
+                    "prompt": "First name:",
+                    "possibleAnswers": [
+                      "Alex"
+                    ]
                   },
                   {
                     "id": "field2",
-                    "prompt": "Last name:"
+                    "prompt": "Last name:",
+                    "possibleAnswers": [
+                      "Green"
+                    ]
                   },
                   {
                     "id": "field3",
-                    "prompt": "Age:"
+                    "prompt": "Age:",
+                    "possibleAnswers": [
+                      "29"
+                    ]
                   },
                   {
                     "id": "field4",
-                    "prompt": "Country:"
+                    "prompt": "Country:",
+                    "possibleAnswers": [
+                      "the UK"
+                    ]
                   },
                   {
                     "id": "field5",
-                    "prompt": "Date of birth:"
+                    "prompt": "Date of birth:",
+                    "possibleAnswers": [
+                      "10 March 1997",
+                      "10/03/1997"
+                    ]
                   }
-                ]
+                ],
+                "responseMode": "personal"
               }
             },
             {
@@ -2849,7 +2866,8 @@
                       }
                     ]
                   }
-                ]
+                ],
+                "responseMode": "personal"
               }
             },
             {
@@ -3390,17 +3408,27 @@
                 "items": [
                   {
                     "id": "field1",
-                    "prompt": "First name:"
+                    "prompt": "First name:",
+                    "possibleAnswers": [
+                      "Anna"
+                    ]
                   },
                   {
                     "id": "field2",
-                    "prompt": "Phone number:"
+                    "prompt": "Phone number:",
+                    "possibleAnswers": [
+                      "416 208 5730"
+                    ]
                   },
                   {
                     "id": "field3",
-                    "prompt": "Email address:"
+                    "prompt": "Email address:",
+                    "possibleAnswers": [
+                      "anna-b@example.com"
+                    ]
                   }
-                ]
+                ],
+                "responseMode": "personal"
               }
             }
           ],
@@ -4454,21 +4482,34 @@
                 "items": [
                   {
                     "id": "field1",
-                    "prompt": "First name:"
+                    "prompt": "First name:",
+                    "possibleAnswers": [
+                      "Leo"
+                    ]
                   },
                   {
                     "id": "field2",
-                    "prompt": "Last name:"
+                    "prompt": "Last name:",
+                    "possibleAnswers": [
+                      "King"
+                    ]
                   },
                   {
                     "id": "field3",
-                    "prompt": "Age:"
+                    "prompt": "Age:",
+                    "possibleAnswers": [
+                      "32"
+                    ]
                   },
                   {
                     "id": "field4",
-                    "prompt": "Country:"
+                    "prompt": "Country:",
+                    "possibleAnswers": [
+                      "the USA"
+                    ]
                   }
-                ]
+                ],
+                "responseMode": "personal"
               }
             }
           ],
@@ -4648,21 +4689,37 @@
                 "items": [
                   {
                     "id": "field1",
-                    "prompt": "Строка 1"
+                    "prompt": "Строка 1",
+                    "possibleAnswers": [
+                      "Hello!",
+                      "Hi!"
+                    ]
                   },
                   {
                     "id": "field2",
-                    "prompt": "Строка 2"
+                    "prompt": "Строка 2",
+                    "possibleAnswers": [
+                      "My first name is Anna.",
+                      "My name is Anna."
+                    ]
                   },
                   {
                     "id": "field3",
-                    "prompt": "Строка 3"
+                    "prompt": "Строка 3",
+                    "possibleAnswers": [
+                      "My email address is anna.b@example.com."
+                    ]
                   },
                   {
                     "id": "field4",
-                    "prompt": "Строка 4"
+                    "prompt": "Строка 4",
+                    "possibleAnswers": [
+                      "Bye!",
+                      "See you later!"
+                    ]
                   }
-                ]
+                ],
+                "responseMode": "open"
               }
             },
             {

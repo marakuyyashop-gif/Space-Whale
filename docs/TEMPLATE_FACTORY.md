@@ -49,7 +49,7 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | sort | `items[{id,text,correctId}]`, `groups[{id,text}]` | `{ itemId: groupId }` |
 | order | `tokens[{id,text,image?,alt?}]`, `correctOrder` | `{ order: [tokenIds] }` |
 | image-label | `image`, `alt`, `items[{id,x,y,prompt,correctId}]`, `options` | `{ targetId: optionId }` |
-| writing | `items[{id,prompt}]` | `{ itemId: freeText }` |
+| writing | `items[{id,prompt,possibleAnswers?}]` | `{ itemId: freeText }` |
 | presentation | `blocks` with text, image or disclosure | no automatic grade |
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
@@ -59,7 +59,7 @@ Typed gaps default to keyboard input. A bank is only a hint and may contain a ba
 
 Multiple Select uses checkboxes and exact set comparison; order of selected options does not matter. An omitted key requires teacher review.
 
-Useful Language disclosures open initially. Possible Answers and audio transcripts start closed. Open tasks never receive automatic correct/incorrect grades.
+Useful Language disclosures open initially. Standalone Possible Answers disclosures and audio transcripts start closed. Writing has OK: authored `items[].possibleAnswers` appear in the feedback panel only after submission, never before it. Editing or resetting hides the examples again; synchronized checked state restores them. Examples are not accepted-answer keys, and open tasks never receive automatic correct/incorrect grades. Personal forms can set `responseMode:"personal"` for a neutral confirmation. Do not invent correct keys for personal data.
 
 ## Interaction/state guarantees
 
@@ -83,7 +83,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 
 - The shared player uses decorative waveform bars, not measured signal amplitudes. Its fill follows actual media time. Play fills progressively, Pause greys the track without rewinding, natural completion leaves it fully filled, and replay starts at zero. The overlaid native range supports mouse/touch seeking and keyboard arrows; unavailable duration disables seeking. Starting another player pauses the previous one.
 - Change `--sw-audio-progress` / `--sw-audio-idle` in exercise-theme.css for all full players. Listen & Repeat remains a separate compact control.
-- Use `kind:"stage", layout:"grouped"` for components belonging to ONE exercise (audio/text plus one or more response components). Set the common title and instruction on the stage; child titles are hidden, optional child instructions remain available. Components keep their own answer state and local Check/Reset. Do not combine grouped layout with progressive reveal. Ordinary/progressive stages keep the large separation between independent exercises.
+- Use `kind:"stage", layout:"grouped"` for a source and its response component (audio/text plus one response component). Set the common title and instruction on the stage; child titles are hidden, optional child instructions remain available. Components keep their own answer state and local Check/Reset. Do not combine grouped layout with explicit progressive reveal. The renderer now automatically separates multiple independent response components into sequential steps, keeping leading source material with the first task and trailing support with the preceding task; answer IDs stay unchanged. Ordinary/progressive stages keep the large separation between independent exercises.
 - Grouped spacing: `--sw-component-gap`; independent exercise spacing: `--sw-stage-gap`.
 - The single `uiLabels.check` value in exercise-kit.js controls the validation button label for every shared exercise, including nested ones. Changing it to Done updates them on the next page load without changing validation behavior or lesson data. Exported as SpaceWhaleExerciseKit.uiLabels for configuration before mounting.
 - Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior remains in the separate Audio + script preview.
@@ -100,3 +100,9 @@ Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px ins
 - Whale 1 artwork mapping: `docs/whale1-image-manifest.json`; generation briefs: `docs/Whale_1_Image_Scenarios.md`. Weather conditions and temperature are separate matching sets.
 - `gap.normalization:'phone'` ignores spacing, parentheses and hyphens for phone input only. Email and symbol gaps retain their significant characters.
 - Audio remains script-only for this module. Teacher scripts live in stage guide data. They are not displayed in student live sessions. Listen & Repeat uses existing pending-audio support; do not attach template test tones.
+
+## Feedback contract (2026-09-26)
+
+- Closed tasks retain correct/retry indicators after OK. Incorrect or unanswered items in an attempted task reveal their authored solutions, including matching and picture tasks. Legacy `feedback.showAnswers:false` no longer suppresses these essential corrections in the modern workspace. A two-option single choice/dropdown omits redundant correction text.
+- Free writing and unkeyed gaps require teacher review; examples must be supplied by the author as `possibleAnswers`. No AI grammar or semantic grading is connected. Personal data can vary.
+- OK remains available after checking. Changing a response clears old feedback; reset clears both answers and feedback.

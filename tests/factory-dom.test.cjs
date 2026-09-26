@@ -26,7 +26,7 @@ function setup(id, config = {}) {
   };
   const host = document.querySelector('main');
   const changes = [];
-  const mount = kit.mount(host, fixture(id), {...config,onChange:value => changes.push(value)});
+  const mount = kit.mount(host, typeof id === 'string' ? fixture(id) : id, {...config,onChange:value => changes.push(value)});
   const fire = (el,type,extras = {}) => {assert.ok(el,`${type} target exists`);const event = new window.Event(type,{bubbles:true,cancelable:true});Object.assign(event,extras);el.dispatchEvent(event);return event;};
   const button = label => [...host.querySelectorAll('button')].find(el => el.textContent === label || el.getAttribute('aria-label') === label);
   const click = label => fire(button(label),'click');
@@ -123,8 +123,8 @@ test('image label stays in wrong target until Check and supports moving occupied
   assert.deepEqual(s.mount.getAnswers(),{target1:'label1'});
   s.click('Reset exercise');assert.equal(s.host.querySelectorAll('.ek-image-label-bank .ek-token').length,2);
 });
-test('open tasks have no Check; useful language open, possible answers and script closed', () => {
-  for (const id of ['writing-demo','presentation-demo','speaking-language-demo','possible-answers-demo','audio-script-demo']) {
+test('presentation and audio have no Check; disclosures retain their initial state', () => {
+  for (const id of ['presentation-demo','speaking-language-demo','possible-answers-demo','audio-script-demo']) {
     const s = setup(id);assert.equal(s.button('OK'),undefined);
     const details = s.host.querySelector('details');
     if (details) assert.equal(Boolean(details.open),id === 'speaking-language-demo');
@@ -403,10 +403,17 @@ test('writing uses one line; picture choices retain accessible names without vis
 });
 
 
-test('writing model answers start closed and never overwrite a learner response',()=>{
-  const s=setup('writing-demo');const input=s.host.querySelector('input');input.value='My own response';s.fire(input,'input');
-  const detail=s.host.querySelector('.ek-writing-answers');assert.equal(Boolean(detail.open),false);assert.equal(detail.querySelector('summary').textContent,'Possible answers');
-  s.fire(detail.querySelector('summary'),'click');assert.equal(detail.open,true);assert.ok(detail.textContent.includes('[Possible answer]'));assert.equal(s.mount.getAnswers().response,'My own response');
+test('writing checks reveal possible answers only after OK; edits, reset and remote restore agree',()=>{
+  const s=setup('writing-demo',{syncChecks:true});const input=s.host.querySelector('input');
+  assert.ok(s.button('OK'));assert.equal(s.host.querySelector('.ek-writing-answers'),null);
+  s.click('OK');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
+  input.value='My own response';s.fire(input,'input');s.click('OK');
+  assert.ok(s.host.querySelector('.ek-writing-answers').textContent.includes('[Possible answer]'));
+  assert.equal(input.dataset.feedback,'review');assert.equal(input.value,'My own response');assert.ok(s.button('OK'));
+  const snapshot=s.mount.getAnswers();const peer=setup('writing-demo',{syncChecks:true});peer.mount.setAnswers(snapshot);
+  assert.ok(peer.host.querySelector('.ek-writing-answers'));assert.equal(peer.host.querySelector('input').value,'My own response');
+  input.value='Another response';s.fire(input,'input');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
+  s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-writing-answers'),null);assert.equal(s.host.querySelector('input').value,'');
 });
 test('discovery uses the shared picker, grades IDs, closes on Escape and clears feedback on edit',()=>{
   const s=setup('rule-page-demo');assert.equal(s.host.querySelector('select'),null);const opener=s.host.querySelector('.ek-choice-trigger');
@@ -468,4 +475,50 @@ test('inline picker stays open during remote hydration, without discarding the n
  s.fire(s.host.querySelectorAll('.ek-inline-option')[1],'click');
  assert.match(opener.textContent,/\[Form 1\]/);
  assert.equal(s.mount.getAnswers().gap2,'remote');
+});
+
+const courseScope={SpaceWhaleExerciseKit:kit};
+vm.runInNewContext(fs.readFileSync(require.resolve('../whale1-content.js'),'utf8'),{window:courseScope});
+const courseExercise=id=>courseScope.SpaceWhaleContent.flatMap(lesson=>lesson.stages).find(stage=>stage.exercise.id===id).exercise;
+test('actual personal form keeps source with first task; gender is neutral and OK stays available',()=>{
+  let view;const definition=courseExercise('a1-1-w1-l4-e09');
+  const teacher=setup(definition,{syncChecks:true,onViewChange:next=>{view=next;}});
+  const student=setup(definition,{syncChecks:true,navigationReadOnly:true});
+  assert.equal(teacher.host.querySelectorAll('input[type=text]').length,5);
+  assert.equal(teacher.host.querySelector('input[type=radio]'),null);
+  const input=teacher.host.querySelector('input');input.value='Alex';teacher.fire(input,'input');teacher.click('OK');
+  assert.ok(teacher.host.querySelector('.ek-writing-answers').textContent.includes('Alex'));
+  teacher.click('Show next exercise');student.mount.setViewState(view);
+  for(const screen of [teacher,student])assert.equal(screen.host.querySelectorAll('input[type=radio]').length,2);
+  const section=[...teacher.host.querySelectorAll('.ek-stage-section')].find(el=>el.querySelector('input[type=radio]'));
+  for(const radio of section.querySelectorAll('input[type=radio]')){
+    radio.checked=true;teacher.fire(radio,'change');teacher.fire(section.querySelector('.ek-check'),'click');
+    assert.equal(section.querySelector('fieldset').dataset.feedback,'review');
+    assert.match(section.querySelector('.ek-status').textContent,/нет единственного/);
+    assert.ok(section.querySelector('.ek-check'));assert.equal(section.querySelector('[data-feedback=retry]'),null);
+  }
+  const before=student.mount.getViewState();student.mount.setAnswers(teacher.mount.getAnswers());
+  assert.deepEqual(student.mount.getViewState(),before);
+});
+test('successive course tasks reveal individually and collapse by task',()=>{
+  const s=setup(courseExercise('a1-1-w1-l3-e06'),{syncChecks:true});
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,1);
+  s.click('Show next exercise');assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
+  s.click('Show next exercise');assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,3);
+  s.click('Show next exercise');assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,5); // final task and its support
+  s.click('Свернуть задание');assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,3);
+});
+test('email matching reveals authored corrections despite imported showAnswers false',()=>{
+  const def=courseExercise('a1-1-w1-l5-e02').exercises.find(block=>block.exercise.kind==='matching').exercise;
+  const s=setup(def,{syncChecks:true});const wrong=def.options.find(option=>option.id!==def.items[0].correctId);
+  s.mount.setAnswers({[def.items[0].id]:wrong.id,__sw_checked:true});
+  const solution=s.host.querySelector('.ek-correction').textContent;
+  for(const item of def.items){assert.ok(solution.includes(item.text));assert.ok(solution.includes(def.options.find(option=>option.id===item.correctId).text));}
+  assert.match(solution,/Correct answers/);
+});
+test('two-option closed choice marks wrong answers without redundant solution text',()=>{
+  const def={version:1,id:'binary',title:'Choose',kind:'choice',items:[{id:'q',prompt:'Choose',options:[{id:'a',text:'A'},{id:'b',text:'B'}],correctId:'b'}]};
+  const s=setup(def,{syncChecks:true});s.mount.setAnswers({q:'a',__sw_checked:true});
+  assert.equal(s.host.querySelector('fieldset').dataset.feedback,'retry');assert.equal(s.host.querySelector('.ek-correction'),null);
+  s.mount.setAnswers({q:'b',__sw_checked:true});assert.equal(s.host.querySelector('fieldset').dataset.feedback,'correct');
 });

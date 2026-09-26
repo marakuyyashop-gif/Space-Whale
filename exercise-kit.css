@@ -886,3 +886,8 @@
 .exercise-kit.ek-modern .ek-card-grid>.ek-card{box-sizing:border-box;min-width:0;height:100%}
 @media(max-width:720px){.exercise-kit.ek-modern .ek-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:440px){.exercise-kit.ek-modern .ek-card-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Native caret uses the same fixed line box before and after typing. */
+.exercise-kit.ek-modern.ek-reading-width input.ek-typed-gap{box-sizing:border-box;appearance:none;font:400 var(--ek-text-size)/1.5 var(--ek-font);height:2em;min-height:2em;padding:.25em 0;vertical-align:middle}
+.exercise-kit.ek-modern input.ek-writing-input{line-height:1.5}
+.exercise-kit .ek-feedback-heading{display:block;margin:0 0 8px;font-size:.88em;font-weight:600}

@@ -54,6 +54,7 @@
     const key = (item, valid) => { if (item.correctId != null && !valid.has(item.correctId)) fail(`Unknown answer ID: ${item.correctId}`); };
     if (!def || def.version !== 1 || !kinds.includes(def.kind)) fail('Expected version 1 and a supported kind');
     safeId(def.id, 'id'); text(def.title, 'title');
+    if (def.responseMode != null && !['open','personal'].includes(def.responseMode)) fail('Unsupported response mode');
     if (def.instruction != null && typeof def.instruction !== 'string') fail('instruction must be text');
     if (def.kind === 'stage') {
       ids(def.exercises, 'exercises');
@@ -212,6 +213,7 @@
           safeId(segment?.id, 'gap id');
           if (used.has(segment.id)) fail(`Duplicate gap ID: ${segment.id}`);
           used.add(segment.id);
+          if (segment.possibleAnswers) { array(segment.possibleAnswers, 'possibleAnswers'); segment.possibleAnswers.forEach(answer => text(answer, 'possible answer')); }
           if (segment.answers) { array(segment.answers, 'answers'); segment.answers.forEach(answer => text(answer, 'answer')); }
           if (segment.options) { array(segment.options, 'gap options'); segment.options.forEach(option => text(option, 'gap option')); }
           const choices = def.inputMode === 'select' ? segment.options || def.bank : segment.options;
@@ -254,8 +256,9 @@
   const feedbackMessages=['Try again.','Take another look.','Good start.','So close.','All correct.'];
   function feedbackMessage(results,kind){
     const values=Object.values(results),correct=values.filter(value=>value==='correct').length;
-    if(!values.length||values.every(value=>value==='empty'))return kind==='gaps'?'Write an answer.':'Choose an answer.';
-    if(values.includes('review'))return 'Ready to discuss.';
+    if(!values.length||values.every(value=>value==='empty'))return ['gaps','writing'].includes(kind)?'Write an answer.':'Choose an answer.';
+    if(values.includes('retry')){const band=correct===0?0:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));return feedbackMessages[band];}
+    if(values.includes('review'))return values.includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. Обсудите его с преподавателем.';
     const band=correct===0?0:correct===values.length?4:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));
     return feedbackMessages[band];
   }
@@ -277,6 +280,21 @@
   function mount(host, definition, config = {}) {
     validate(definition);
     const def = clone(definition);
+    // Independent tasks reveal in sequence; a reading/audio source stays with its task.
+    const taskKinds = new Set(['matching','gaps','choice','image-label','order','sort','writing','rule-page']);
+    let stageStops = [];
+    if (def.kind === 'stage') {
+      if (def.progressive) stageStops = def.exercises.map((_,i)=>i+1);
+      else {
+        const tasks = def.exercises.flatMap((block,i)=>taskKinds.has(block.exercise.kind)?[i]:[]);
+        if (tasks.length > 1) {
+          stageStops = [...tasks.slice(1),def.exercises.length];
+          def.progressive = true; def.layout = 'separate';
+        }
+      }
+    }
+    const stageCount = value => Math.max(stageStops[0] || 1, Math.min(def.exercises?.length || 1, Number(value) || 0));
+
     if (config.discovery && !def.multiple && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
     let answers = clone(config.answers || {});
     let feedback = {};
@@ -294,7 +312,7 @@
     const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
     const setViewState=(view,animate=true)=>{
       if(!view||typeof view!=='object')return;
-      if(def.kind==='stage'&&def.progressive){const count=Math.max(1,Math.min(def.exercises.length,Number(view.revealed)||1));answers.revealed=count;if(count!==visibleCount)syncStage?.(count,animate);}
+      if(def.kind==='stage'&&def.progressive){const count=stageCount(view.revealed);answers.revealed=count;if(count!==visibleCount)syncStage?.(count,animate);}
       if(def.kind==='rule-page'){answers.__sw_rule_visible=Boolean(view.rule);syncRules?.(animate);}
       for(const [id,handle] of nestedMountsByBlock)handle.setViewState(view.children?.[id],animate);
     };
@@ -652,7 +670,7 @@
       }
       if (def.kind === 'stage') {
         const stack = node('div', 'ek-stage-stack');
-        visibleCount = def.progressive ? Math.max(1, Math.min(def.exercises.length, Number(answers.revealed) || 1)) : def.exercises.length;
+        visibleCount = def.progressive ? stageCount(answers.revealed) : def.exercises.length;
         const reveal = () => {
           const index = nestedMounts.length;
           const block = def.exercises[index];
@@ -676,23 +694,25 @@
           let down, up;
           if (visibleCount < def.exercises.length) down = addControl('down', 'Show next exercise', () => {
             if (config.readOnly||config.navigationReadOnly) return;
-            answers.revealed=visibleCount+1;syncStage(answers.revealed,true);updateNavigation('down');viewChanged();
+            answers.revealed=stageStops.find(stop=>stop>visibleCount)||def.exercises.length;syncStage(answers.revealed,true);updateNavigation('down');viewChanged();
           });
-          if (visibleCount > 1) up = addControl('up', 'Свернуть задание', () => {
+          if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly||config.navigationReadOnly) return;
-            answers.revealed=visibleCount-1;syncStage(answers.revealed,true);updateNavigation('up');viewChanged();
+            answers.revealed=[...stageStops].reverse().find(stop=>stop<visibleCount)||stageStops[0];syncStage(answers.revealed,true);updateNavigation('up');viewChanged();
           });
           if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus({preventScroll:true});
         };
         syncStage=(count,animate=true)=>{
           while(nestedMounts.length<count){const section=reveal();section.hidden=true;}
           const previousCount=visibleCount;visibleCount=count;
+          const lastTask=def.exercises.slice(0,count).map((block,index)=>taskKinds.has(block.exercise.kind)?index:-1).filter(index=>index>=0).pop();
+          const focusIndex=count>previousCount?previousCount:(lastTask??count-1);
           [...stack.children].forEach((section,index)=>{
             const open=index<count;
             if(!open)section.querySelectorAll('audio,video').forEach(media=>media.pause());
             if(section.hidden===open||Boolean(section.inert)===open){
               const lastChanged=index===(count>previousCount?count-1:previousCount-1);
-              if(animate)expand(section,open,lastChanged?()=>centerSection(stack.children[count-1]):undefined);else{section.hidden=!open;section.inert=!open;}
+              if(animate)expand(section,open,lastChanged?()=>centerSection(stack.children[focusIndex]):undefined);else{section.hidden=!open;section.inert=!open;}
             }
           });
           updateNavigation();return stack.children[count-1];
@@ -987,7 +1007,6 @@
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
         const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
-        if(item.possibleAnswers?.length){const detail=node('details','ek-disclosure ek-writing-answers');detail.append(node('summary','',POSSIBLE_ANSWERS_TITLE));item.possibleAnswers.forEach(answer=>detail.append(node('p','ek-copy',answer)));body.append(detail);}
       });
     }
     const lamps=new Map();
@@ -1024,19 +1043,43 @@
         const badge=card.querySelector('.ek-order-number');if(badge){badge.dataset.result=def.correctOrder?.[index]===card.dataset.ekDragId?'correct':'retry';badge.setAttribute('aria-label',badge.dataset.result==='correct'?'Correct':'Try again');}
       });
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
-      const showAnswers=def.feedback?.showAnswers??(def.layout!=='image-grid'&&def.layout!=='picture-word'&&def.kind!=='image-label');
-      if(showAnswers&&Object.values(feedback).some(value=>value!=='empty')){
-        const correction=node('li','ek-correction'),list=node('ol','ek-answer-pairs');correction.append(list);
-        const pair=(prompt,answer)=>{if(!answer)return;const row=node('li');row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '),node('strong','',answer));list.append(row);};
-        if(def.kind==='gaps')def.items.forEach(item=>{const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.[0]||'…')));list.append(row);});
-        else if(def.kind==='order')pair('',def.correctOrder?.map(id=>def.tokens.find(token=>token.id===id).text).join(' '));
-        else def.items.forEach(item=>{const choices=item.options||def.options||def.groups||[];const ids=def.multiple?item.correctIds:[item.correctId];pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));});
-        if(list.children.length)resultsBox.append(correction);
+      // Legacy showAnswers:false hid essential solutions across the imported course.
+      // Personal/open responses are never graded against example text.
+      const attempted=Object.values(feedback).some(value=>value!=='empty');
+      const examples=[];
+      if(def.kind==='writing')def.items.forEach(item=>{
+        if(feedback[item.id]!=='empty' && item.possibleAnswers?.length) examples.push([item.prompt,item.possibleAnswers.join(' / ')]);
+      });
+      if(def.kind==='gaps')def.items.forEach(item=>item.segments.forEach(segment=>{
+        if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
+      }));
+      const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
+      const pair=(prompt,answer)=>{if(!answer)return;const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
+      const needsSolution=id=>['retry','empty'].includes(feedback[id]);
+      if(attempted){
+        if(def.kind==='gaps')def.items.forEach(item=>{
+          if(!item.segments.some(segment=>typeof segment!=='string' && segment.answers && needsSolution(segment.id) && !(segment.options?.length===2)))return;
+          const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
+        });
+        else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' → '));
+        else if(def.kind!=='writing' && def.items)def.items.forEach(item=>{
+          if(!needsSolution(item.id))return;
+          const choices=item.options||def.options||def.groups||[];
+          if(def.kind==='choice' && !def.multiple && choices.length===2)return;
+          const ids=def.multiple?item.correctIds:[item.correctId];
+          pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));
+        });
       }
+      if(list.children.length){solution.prepend(node('strong','ek-feedback-heading','Correct answers'));resultsBox.append(solution);}
+      if(examples.length){
+        const section=node('li','ek-correction ek-writing-answers');section.append(node('strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));
+        const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('span','',answer));list.append(row);});section.append(list);resultsBox.append(section);
+      }
+      if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
     }
     const checkFeedback = () => {
-      if(modern){showFeedback();return;}
+      if(modern||def.kind==='writing'){showFeedback();return;}
       feedback = grade(def, answers);
       const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
@@ -1064,7 +1107,7 @@
       const values = Object.values(feedback);
       announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
     };
-    if (!['presentation', 'writing', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
+    if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
       checkFeedback();
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);}
@@ -1085,7 +1128,7 @@
       clearFeedback();
 
       if (def.kind === 'stage') {
-        const count = def.progressive ? Math.max(1, Math.min(def.exercises.length, Number(answers.revealed) || 1)) : def.exercises.length;
+        const count = def.progressive ? stageCount(answers.revealed) : def.exercises.length;
         if (count !== visibleCount) syncStage(count);
         def.exercises.forEach(block => nestedMountsByBlock.get(block.id)?.setAnswers(answers[block.id] || {}));
         return;
