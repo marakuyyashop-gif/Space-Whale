@@ -104,9 +104,9 @@
       }),'Выбрать look / looks и отличить look + adjective от look like + noun.'),
       step('Short Production',2,exercise('short-production','writing','Write the replies.',{
         responseMode:'open',instruction:'Use the prompts to write complete replies.',items:[
-          {id:'reply1',prompt:'Alex: How does the sweater look?',hint:'Use: it / look / warm',possibleAnswers:['It looks warm.']},
-          {id:'reply2',prompt:'Alex: Is this your coat?',hint:'Use: no / but / it / look like / my old coat',possibleAnswers:['No, but it looks like my old coat.']},
-          {id:'reply3',prompt:'Alex: Do you like these hats?',hint:'Use: yes / they / look / good',possibleAnswers:['Yes, they look good.']}
+          {id:'reply1',prompt:'Alex: How does the sweater look?',hint:'Use: warm',possibleAnswers:['It looks warm.']},
+          {id:'reply2',prompt:'Alex: Is this your coat?',hint:'Use: look like / my old coat',possibleAnswers:['No, but it looks like my old coat.']},
+          {id:'reply3',prompt:'Alex: Do you like these hats?',hint:'Use: look / good',possibleAnswers:['Yes, they look good.']}
         ]
       }),'Написать свободные ответы; преподаватель оценивает формулировку. Примеры появляются после OK.'),
       step('Final Speaking',3,exercise('final-speaking','presentation','Talk to your partner.',{
