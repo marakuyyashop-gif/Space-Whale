@@ -123,3 +123,9 @@ Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px ins
 - Closed tasks retain correct/retry indicators after OK. Incorrect or unanswered items in an attempted task reveal their authored solutions, including matching and picture tasks. Legacy `feedback.showAnswers:false` no longer suppresses these essential corrections in the modern workspace. A two-option single choice/dropdown omits redundant correction text.
 - Free writing and unkeyed gaps require teacher review; examples must be supplied by the author as `possibleAnswers`. No AI grammar or semantic grading is connected. Personal data can vary.
 - OK remains available after checking. Changing a response clears old feedback; reset clears both answers and feedback.
+
+## Pending source media and post-task transcript (2026-09-26)
+
+- Choice and gaps items accept optional `image`/`alt`/`crop` or `imagePending:true`/`assetId` cues, rendered beside the corresponding prompt through the shared illustration renderer.
+- A full audio player may use `audioPending:true` without a URL. The player retains its layout with a disabled play control and no source request. A supplied URL takes precedence.
+- A stage may supply `transcript` and `transcriptAfter:[blockId,...]`. IDs must reference distinct directly nested response components. The disclosure unlocks after each referenced component has a submitted, non-empty response; correctness is not required. The stage records/checks child submission state even in a standalone preview. Edits/reset relock the disclosure, and `setAnswers` restores it without emitting changes.
