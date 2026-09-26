@@ -35,3 +35,8 @@ test('pupil Play cannot broadcast and commands cannot load arbitrary URLs or ano
  p.api.receive({...cmd,key:'https://untrusted.invalid/track'});p.run();assert.equal(p.api.player.paused,true);
  p.api.receive({...cmd,exercise_id:'other',serial:2});p.run();assert.equal(p.api.player.paused,true);p.api.destroy();
 });
+test('answer hydration replacing an unchanged audio clip keeps pupil controls disabled',async()=>{
+ const p=fixture();p.api.reconnect();await flush();assert.equal(p.root.querySelector('button').disabled,true);
+ const copy=p.root.firstElementChild.cloneNode(true);copy.querySelector('button').disabled=false;p.root.replaceChildren(copy);
+ await flush();assert.equal(p.root.querySelector('button').disabled,true);p.api.destroy();
+});

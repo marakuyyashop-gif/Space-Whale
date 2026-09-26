@@ -103,11 +103,13 @@
     player.addEventListener('loadedmetadata',()=>{seekCurrent();paint();});
     player.addEventListener('canplay',()=>{if(current?.action==='play'&&!timer&&!applying){applying=true;void playCurrent().finally(()=>{applying=false;});}});
     const Observer=doc.defaultView?.MutationObserver;
+    let observedClips=[];
     const observer=Observer?new Observer(()=>{
       // UI writes do not mutate the list of audio elements. Compare their identity
       // before refreshing to avoid observing our own button/time text changes.
-      const signature=clips().map(el=>el.dataset.ekAudioKey+'='+el.getAttribute('src')).join('|');
-      if(signature!==observer.signature){observer.signature=signature;refresh();}
+      const elements=clips(),signature=elements.map(el=>el.dataset.ekAudioKey+'='+el.getAttribute('src')).join('|');
+      const replaced=elements.length!==observedClips.length||elements.some((el,index)=>el!==observedClips[index]);
+      if(replaced||signature!==observer.signature){observedClips=elements;observer.signature=signature;refresh();}
     }):null;
     observer?.observe(root,{childList:true,subtree:true});
     return {receive,share,reconnect,refresh,stop,player,destroy(){destroyed=true;stop();observer?.disconnect();root.removeEventListener('click',click,true);root.removeEventListener('input',seek,true);player.remove();}};
