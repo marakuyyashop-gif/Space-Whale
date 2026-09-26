@@ -12,7 +12,7 @@ For one sheet containing the six objects, give its URL to all six entries and ad
 
 The seven original GitHub attachment URLs remain in `assets/lesson-media/a1-2/module-4/lesson-1/images/README.md` as sources. Runtime uses same-size WebP copies beside that README, with dimensions in the slot registry to reserve layout space before decoding. Total transfer size is approximately 1.3 MB instead of 14.7 MB. Artwork and its original backgrounds are preserved. Their README order is: speaking composition, hat, suit, blouse, sweater, coat, skirt. Runtime slot order remains coat, sweater, blouse, skirt, suit, hat; options remain independently shuffled. The shared composition is used in both Speaking steps. Object cards are reused in Matching and picture-led choice/writing practice.
 
-`A1M4L1_IMAGE_TWO_COATS` is still pending: none of the seven uploaded pictures depicts two coats. All audio slots remain pending. Connecting these images does not change Workspace styles, dimensions, answer keys or reveal behavior.
+`A1M4L1_IMAGE_TWO_COATS` reuses the existing coat image twice side by side (`imageCopies: 2`); no new artwork is needed. All audio slots remain pending. Connecting these images does not change Workspace styles, dimensions, answer keys or reveal behavior.
 
 ## Image slots and visual scenarios
 

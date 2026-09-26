@@ -32,6 +32,7 @@
       return used;
     };
     const media = item => {
+      if (item.imageCopies != null && (!Number.isInteger(item.imageCopies) || item.imageCopies < 1 || item.imageCopies > 4)) fail('imageCopies must be between 1 and 4');
       if (item.imagePending != null && typeof item.imagePending !== 'boolean') fail('imagePending must be boolean');
       if (item.image != null) {
         text(item.image, 'image'); text(item.alt, 'image alt');
@@ -218,7 +219,7 @@
       if (['open','personal'].includes(def.responseMode) && item.acceptedAnswers) fail('Open writing cannot have acceptedAnswers');
     });
     if (def.kind === 'gaps') {
-      if (def.layout != null && !['sentences', 'paragraph'].includes(def.layout)) fail('Unsupported gaps layout');
+      if (def.layout != null && !['sentences', 'paragraph', 'picture-rows'].includes(def.layout)) fail('Unsupported gaps layout');
       if (def.inputMode != null && !['text', 'select'].includes(def.inputMode)) fail('Unsupported gaps inputMode');
       if (def.bank) { array(def.bank, 'bank'); def.bank.forEach(word => text(word, 'bank word')); }
       const used = new Set();
@@ -316,7 +317,8 @@
     const stageCount = value => Math.max(stageStops[0] || 1, Math.min(def.exercises?.length || 1, Number(value) || 0));
 
     if (config.discovery && !def.multiple && def.kind === 'choice' && def.layout !== 'image-grid') def.layout = 'dropdown';
-    let answers = clone(config.answers || {});
+    const normalizeAnswers=value=>{const state=clone(value||{});if(def.kind==='gaps'&&def.layout==='picture-rows')for(const item of def.items)if(state[item.id]&&typeof state[item.id]==='object'){for(const segment of item.segments)if(typeof segment!=='string'&&state[segment.id]===undefined&&state[item.id][segment.id]!==undefined)state[segment.id]=state[item.id][segment.id];delete state[item.id];}return state;};
+    let answers = normalizeAnswers(config.answers);
     let feedback = {};
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
@@ -786,7 +788,7 @@
           else if (block.type === 'disclosure') {
             const detail = node('details', 'ek-disclosure');
             const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : /useful language/i.test(block.title) ? 'Use phrases' : block.title;
-            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || ['useful language','use phrases'].includes(normalize(block.title)));
+            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || ['useful language','useful phrases','use phrases'].includes(normalize(block.title)));
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
@@ -1013,7 +1015,11 @@
         }
         let gapNumber = 0;
         def.items.forEach((item, index) => {
-          if(item.image || item.imagePending)body.append(illustration(item));
+          const compact=def.layout==='picture-rows',container=compact?node('div','ek-picture-sentence'):body;
+          if(item.image || item.imagePending){
+            if(compact){const pictures=node('div','ek-picture-sentence-images');for(let i=0;i<(item.imageCopies||1);i++)pictures.append(illustration(item));container.append(pictures);}
+            else body.append(illustration(item));
+          }
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
           if (!modern && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
@@ -1034,7 +1040,7 @@
             field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
             controls.set(segment.id, field);
             if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);wrap.append(badge,field);row.append(wrap);}else row.append(field);
-          }); body.append(row);
+          }); container.append(row);if(compact)body.append(container);
         });
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
@@ -1292,7 +1298,7 @@
     const setAnswersCore = next => {
       if(JSON.stringify(answers)===JSON.stringify(next||{}))return;
       const priorView={revealed:answers.revealed,rule:answers.__sw_rule_visible};
-      answers = clone(next || {});
+      answers = normalizeAnswers(next);
       if(config.onViewChange||config.navigationReadOnly){if(priorView.revealed!==undefined)answers.revealed=priorView.revealed;else delete answers.revealed;answers.__sw_rule_visible=priorView.rule;}
       clearFeedback();
 

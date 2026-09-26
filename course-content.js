@@ -16,7 +16,7 @@
     A1M4L1_IMAGE_04: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/skirt.webp',width:1122,height:1402,alt:'A skirt',target:'skirt'},
     A1M4L1_IMAGE_05: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/suit.webp',width:1254,height:1254,alt:'A suit',target:'suit'},
     A1M4L1_IMAGE_06: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp',width:1254,height:1254,alt:'A hat',target:'hat'},
-    A1M4L1_IMAGE_TWO_COATS: {type:'image',src:null,alt:'Two coats',target:'coats'},
+    A1M4L1_IMAGE_TWO_COATS: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp',width:1122,height:1402,copies:2,alt:'Two coats',target:'coats'},
     A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
     A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes. And this sweater?\nBen: It looks warm.\nAnna: I like it. I need a sweater for the weekend.\nBen: The sweater looks good.\nAnna: Great. I want the sweater."},
     A1M4L1_WORD_01: {type:'audio',src:null,word:'coat',sentence:'I need a coat for work.'},
@@ -32,7 +32,7 @@
     lesson1Media['A1M4L1_SENTENCE_'+suffix]={type:'audio',src:null,sentence:lesson1Media['A1M4L1_WORD_'+suffix].sentence};
   }
   window.SpaceWhaleLessonMedia = {...window.SpaceWhaleLessonMedia, 'a1-2-w4-l1':lesson1Media};
-  const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,imageWidth:lesson1Media[assetId].width,imageHeight:lesson1Media[assetId].height,...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
+  const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,imageWidth:lesson1Media[assetId].width,imageHeight:lesson1Media[assetId].height,...(lesson1Media[assetId].copies?{imageCopies:lesson1Media[assetId].copies}:{}),...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
   const audioSlot = audioId => ({audioId,...(lesson1Media[audioId].src ? {audio:lesson1Media[audioId].src} : {audioPending:true})});
   const wordList = ['coat','sweater','blouse','skirt','suit','hat'];
   const wordImage = word => imageSlot('A1M4L1_IMAGE_'+String(wordList.indexOf(word)+1).padStart(2,'0'));
@@ -47,11 +47,11 @@
     words:wordList,durationMinutes:29,
     stages:[
       step('Opening Speaking',2,exercise('opening','presentation','Look at the clothes and talk about them.',{
-        instruction:'What clothes can you name?\nWhich one do you like?\nHow does it look?',
-        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'disclosure',title:'Useful phrases',open:false,text:'I like …\nIt’s …\nIt looks …'}]
+        instruction:'Use the phrases below to help you.',
+        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'text',text:'What clothes can you name?\nWhich items do you like?\nChoose one item. How does it look?'},{type:'disclosure',title:'Useful phrases',open:true,text:'I like …\nIt’s …\nIt looks …'},{type:'disclosure',title:'Possible answers',text:'I can name a coat, a sweater and a hat.\nI like the sweater. It looks warm.'}]
       }),'Назвать знакомую одежду и выразить предпочтение; новые конструкции можно использовать с опорой.'),
       step('New Words',3,exercise('words','matching','Match the pictures with the words.',{
-        layout:'picture-word',instruction:'Match each picture with the correct word.',
+        layout:'picture-word',
         items:wordList.map((word,i)=>({id:'picture-'+word,text:'Picture '+(i+1),...wordImage(word),correctId:word})),
         options:options(['skirt','hat','coat','suit','blouse','sweater'])
       }),'Познакомиться с coat, sweater, blouse, skirt, suit, hat. Картинки идут в порядке слов; варианты перемешаны отдельно.'),
@@ -59,25 +59,21 @@
         layout:'listen-repeat',audioPending:true,instruction:'Listen to the words and sentences. Repeat them out loud.',
         items:wordList.map((word,i)=>{const suffix=String(i+1).padStart(2,'0'),audioId='A1M4L1_WORD_'+suffix,exampleAudioId='A1M4L1_SENTENCE_'+suffix,slot=lesson1Media[audioId];return {id:word,text:word,...audioSlot(audioId),example:slot.sentence,exampleAudioId,...(lesson1Media[exampleAudioId].src?{exampleAudio:lesson1Media[exampleAudioId].src}:{})};})
       }),'Повторить шесть слов и шесть предложений: отдельный шаг и отдельная запись для каждого слова и примера.'),
-      step('Words Practice · Choice',2,exercise('word-choice','stage','Choose the correct word.',{
-        instruction:'Look at the picture and choose the word in the sentence.',exercises:[
+      step('Words Practice · Choice',2,exercise('word-choice','gaps','Choose the correct word.',{
+        layout:'picture-rows',inputMode:'select',items:[
           ['coat','I need a ',' for cold days.',['coat','skirt','suit']],
           ['skirt','This ',' is for my sister.',['blouse','skirt','hat']],
           ['suit','My father has a ',' for work.',['suit','sweater','coat']],
           ['hat','I like this ','.',['blouse','hat','skirt']]
-        ].map(([word,before,after,choices],i)=>({id:word,exercise:exercise('word-choice-'+word,'gaps','Choose the correct word.',{
-          inputMode:'select',items:[{id:word,...wordImage(word),segments:[before,{id:word+'-gap',answers:[word],options:choices},after]}]
-        })}))
-      }),'Выбрать название предмета в предложении. Одна картинка и одно предложение на шаг.'),
-      step('Words Practice · Type',2,exercise('word-type','stage','Complete the sentences.',{
-        instruction:'Look at the picture and write the missing word.',exercises:[
+        ].map(([word,before,after,choices])=>({id:word,...wordImage(word),segments:[before,{id:word+'-gap',answers:[word],options:choices},after]}))
+      }),'Выбрать название предмета в предложении. Все четыре пункта видны вместе.'),
+      step('Words Practice · Type',2,exercise('word-type','gaps','Complete the sentences.',{
+        layout:'picture-rows',inputMode:'text',items:[
           ['sweater','My ',' is in the wardrobe.',wordImage('sweater')],
           ['blouse','My sister wants this ','.',wordImage('blouse')],
           ['coats','These ',' are new.',imageSlot('A1M4L1_IMAGE_TWO_COATS')]
-        ].map(([word,before,after,image])=>({id:word,exercise:exercise('word-type-'+word,'gaps','Complete the sentences.',{
-          inputMode:'text',items:[{id:word,...image,segments:[before,{id:word+'-gap',answers:[word]},after]}]
-        })}))
-      }),'Написать sweater, blouse и форму множественного числа coats. Следующая картинка открывается стрелкой.'),
+        ].map(([word,before,after,image])=>({id:word,...image,segments:[before,{id:word+'-gap',answers:[word]},after]}))
+      }),'Написать sweater, blouse и форму множественного числа coats. Все три пункта видны вместе.'),
       step('Listening',5,exercise('listening','stage','Listen to the conversation.',{
         layout:'grouped',instruction:'Anna is looking at clothes with Ben. Listen and answer the question.',
         exercises:[
@@ -94,10 +90,7 @@
             items:[{id:'meaning1',text:'The coat looks good.',correctId:'C'},{id:'meaning2',text:'It looks like your old coat.',correctId:'B'},{id:'meaning3',text:'The sweater looks warm.',correctId:'A'}],
             options:[{id:'A',text:'Свитер выглядит тёплым.'},{id:'B',text:'Пальто похоже на ваше старое пальто.'},{id:'C',text:'Пальто выглядит хорошо.'}]
           })},
-          {type:'rule',title:'look / looks + adjective',text:'Описываем, как что-то выглядит.',examples:['The coat looks good.','The sweater looks warm.']},
-          {type:'rule',title:'look / looks like + noun',text:'Говорим, что что-то похоже на другой предмет.',examples:['It looks like your old coat.']},
-          {type:'rule',title:'look / looks',formula:'I / you / we / they → look\nhe / she / it → looks'},
-          {type:'rule',title:'How does it look?',text:'После does используем look.'}
+          {type:'rule',text:'look / looks + adjective\nОписываем, как что-то выглядит.\nThe coat looks good.\nThe sweater looks warm.\n\nlook / looks like + noun\nГоворим, что что-то похоже на другой предмет.\nIt looks like your old coat.\n\nlook / looks\nI / you / we / they → look\nhe / she / it → looks\n\nHow does it look?\nПосле does используем look.',highlights:['look / looks + adjective','look / looks like + noun','How does it look?']}
         ]
       }),'Различить описание признака и сравнение с предметом, затем раскрыть правило.'),
       step('Language Practice',3,exercise('language-practice','gaps','Choose the correct option.',{
@@ -116,8 +109,8 @@
         ]
       }),'Написать свободные ответы; преподаватель оценивает формулировку. Примеры появляются после OK.'),
       step('Final Speaking',3,exercise('final-speaking','presentation','Talk to your partner.',{
-        instruction:'You are in a clothes shop with a friend.\nLook at the clothes.\nAsk about two items.\nDescribe the clothes.\nCompare one item with something you have.\nSay which item you want.',
-        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'disclosure',title:'Useful phrases',open:false,text:'How does it look?\nIt looks …\nIt looks like my …\nI like …\nI want …'},{type:'text',text:'Useful adjectives: good · new · old · warm · expensive · unusual'}]
+        instruction:'You are in a clothes shop with a friend.',
+        blocks:[{type:'image',...imageSlot('A1M4L1_IMAGE_SPEAKING_01')},{type:'text',text:'Look at the clothes.\nAsk about two items.\nDescribe the clothes.\nCompare one item with something you have.\nSay which item you want.'},{type:'disclosure',title:'Useful phrases',open:true,text:'How does it look?\nIt looks …\nIt looks like my …\nI like …\nI want …'},{type:'text',text:'Useful adjectives: good · new · old · warm · expensive · unusual'},{type:'disclosure',title:'Possible answers',text:'— How does the sweater look?\n— It looks warm.\n— How does the coat look?\n— It looks good. It looks like my old coat.\n— Which item do you want?\n— I want the sweater.'}]
       }),'Использовать лексику и конструкции в разговоре о выборе одежды, без автоматической оценки.')
     ]
   };

@@ -27,15 +27,15 @@ test('image ordering is stable while all matching options occupy different posit
  assert.ok(def.items.every((item,i)=>item.correctId!==def.options[i].id));
  assert.ok(Object.values(kit.grade(def,Object.fromEntries(def.items.map(i=>[i.id,i.correctId])))).every(result=>result==='correct'));
 });
-test('uploaded images reuse slots while missing two-coat and audio assets stay pending',()=>{
+test('uploaded images reuse slots, including a repeated coat, while audio stays pending',()=>{
  assert.equal(Object.values(media).filter(s=>s.type==='image').length,8);
  assert.equal(Object.values(media).filter(s=>s.type==='audio').length,13);
- assert.equal(Object.values(media).filter(s=>s.type==='image'&&s.src).length,7);
- assert.equal(media.A1M4L1_IMAGE_TWO_COATS.src,null);
+ assert.equal(Object.values(media).filter(s=>s.type==='image'&&s.src).length,8);
+ assert.equal(media.A1M4L1_IMAGE_TWO_COATS.src,media.A1M4L1_IMAGE_01.src);assert.equal(media.A1M4L1_IMAGE_TWO_COATS.copies,2);
  assert.ok(Object.values(media).filter(s=>s.type==='audio').every(s=>s.src===null));
  const match=stage('words'),choice=stage('word-choice'),gaps=stage('word-type');
- choice.exercises.map(b=>b.exercise.items[0]).forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
- assert.equal(gaps.exercises[2].exercise.items[0].assetId,'A1M4L1_IMAGE_TWO_COATS');
+ choice.items.forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
+ assert.equal(gaps.items[2].assetId,'A1M4L1_IMAGE_TWO_COATS');
  assert.equal(stage('opening').blocks[0].assetId,stage('final-speaking').blocks[0].assetId);
  assert.equal(stage('listen-repeat').items.length,6);
  for(const item of lesson.stages){const s=setup(item.exercise);for(const img of s.host.querySelectorAll('img[src]'))assert.ok(Object.values(media).some(slot=>slot.src===img.getAttribute('src')));assert.equal(s.host.querySelector('audio[src]'),null);s.handle.destroy();}
@@ -43,22 +43,21 @@ test('uploaded images reuse slots while missing two-coat and audio assets stay p
 test('setting a single image or audio URL later connects all uses without changing answer keys',()=>{
  const attached=load(source.replace(media.A1M4L1_IMAGE_01.src,"assets/coat.png").replace("type:'audio',src:null,script:","type:'audio',src:'assets/dialogue.mp3',script:"));
  const words=attached.lesson.stages[1].exercise,choice=attached.lesson.stages[3].exercise;
- assert.equal(words.items[0].image,'assets/coat.png');assert.equal(choice.exercises[0].exercise.items[0].image,'assets/coat.png');
+ assert.equal(words.items[0].image,'assets/coat.png');assert.equal(choice.items[0].image,'assets/coat.png');
  assert.equal(words.items[0].correctId,'coat');assert.equal(words.items[0].imagePending,undefined);
  assert.equal(attached.lesson.stages[5].exercise.exercises[0].exercise.audio,'assets/dialogue.mp3');
 });
-test('picture practice reveals one picture and inline answer at a time',()=>{
+test('picture practice keeps every compact row together and reuses two coat images',()=>{
  for(const [id,count,mode] of [['word-choice',4,'select'],['word-type',3,'text']]){
-   const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('img[src], .ek-image-pending').length,1);
-   assert.equal(def.exercises.length,count);
-   assert.ok(def.exercises.every(b=>b.exercise.kind==='gaps'&&b.exercise.inputMode===mode));
-   for(let i=1;i<count;i++)s.click('Show next exercise');
-   assert.equal(s.host.querySelectorAll('img[src], .ek-image-pending').length,count);
+   const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('.ek-picture-sentence').length,count);
+   assert.equal(def.items.length,count);assert.equal(def.kind,'gaps');assert.equal(def.inputMode,mode);
+   assert.equal(s.host.querySelector('.ek-stage-navigation'),null);assert.equal(s.host.querySelectorAll('.ek-check').length,1);
    assert.ok(!s.host.textContent.includes('______'));
  }
- const def=stage('word-type').exercises[2].exercise;
- assert.equal(kit.grade(def,{'coats-gap':'coat'})['coats-gap'],'retry');
- assert.equal(kit.grade(def,{'coats-gap':'coats'})['coats-gap'],'correct');
+ const def=stage('word-type'),s=setup(def),coats=s.host.querySelectorAll('.ek-picture-sentence')[2];
+ assert.equal(coats.querySelectorAll('img').length,2);assert.equal(coats.querySelector('img').getAttribute('src'),media.A1M4L1_IMAGE_01.src);
+ assert.equal(kit.grade(def,{'coats-gap':'coat'})['coats-gap'],'retry');assert.equal(kit.grade(def,{'coats-gap':'coats'})['coats-gap'],'correct');
+ s.handle.setAnswers({sweater:{'sweater-gap':'sweater'},coats:{'coats-gap':'coats'}});assert.equal(s.handle.getAnswers()['coats-gap'],'coats');
 });
 test('two-option gaps show complete corrected sentences with muted context',()=>{
  const s=setup(stage('language-practice'),{syncChecks:true});
@@ -75,7 +74,7 @@ test('language focus has one heading and interaction instruction',()=>{
  assert.match(s.host.querySelector('.ek-instruction').textContent,/Click the button/);
 });
 test('rule reveal scrolls the full range and prioritizes its beginning when taller than viewport',()=>{
- for(const [end,expected] of [[850,166],[1400,584]]){
+ for(const [end,expected] of [[850,198],[1400,584]]){
    const s=setup(stage('language-focus')),doc=s.host.ownerDocument,scroll=doc.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);
    scroll.scrollTop=100;scroll.getBoundingClientRect=()=>({top:100,height:700,bottom:800});let target;
    scroll.scrollTo=value=>{target=value.top;};
@@ -108,7 +107,7 @@ test('language rule and possible responses stay concealed until requested',()=>{
  const writing=setup(stage('short-production'));assert.equal(writing.host.querySelector('.ek-writing-answers'),null);
  const input=writing.host.querySelector('input');input.value='The sweater looks very warm.';writing.fire(input,'input');writing.click('OK');
  assert.equal(input.dataset.feedback,'review');assert.match(writing.host.querySelector('.ek-writing-answers').textContent,/It looks warm/);
- const opening=setup(stage('opening'));assert.equal(Boolean(opening.host.querySelector('details').open),false);
+ for(const id of ['opening','final-speaking']){const speaking=setup(stage(id));const details=[...speaking.host.querySelectorAll('details')];assert.equal(details[0].open,true);assert.equal(Boolean(details[1].open),false);speaking.fire(details[1].querySelector('summary'),'click');assert.equal(details[1].open,true);}
 });
 
 test('Listen & Repeat exposes the word and example as separate clips and steps',()=>{
@@ -118,4 +117,20 @@ test('Listen & Repeat exposes the word and example as separate clips and steps',
  assert.equal(s.host.querySelectorAll('.ek-repeat-item').length,1);
  s.click('Next phrase');assert.equal(s.host.querySelector('.ek-repeat-line').textContent,'sweater');
  assert.equal(def.items[0].audioId,'A1M4L1_WORD_01');assert.equal(def.items[0].exampleAudioId,'A1M4L1_SENTENCE_01');
+});
+
+test('speaking questions sit below the image, matching has no subtitle and rule is one multiline block',()=>{
+ const opening=setup(stage('opening'));assert.equal(opening.host.querySelector('.ek-instruction').textContent,'Use the phrases below to help you.');assert.equal(opening.host.querySelector('.ek-body>img').nextElementSibling.textContent,'What clothes can you name?\nWhich items do you like?\nChoose one item. How does it look?');
+ assert.equal(setup(stage('words')).host.querySelector('.ek-instruction'),null);
+ const focus=setup(stage('language-focus'));assert.equal(focus.host.querySelectorAll('.ek-rule-block').length,1);assert.match(focus.host.querySelector('.ek-rule-block').textContent,/good\.\nThe sweater/);
+ const final=setup(stage('final-speaking'));assert.equal(final.host.querySelector('.ek-instruction').textContent,'You are in a clothes shop with a friend.');assert.match(final.host.querySelector('.ek-body>img').nextElementSibling.textContent,/Ask about two items/);
+});
+
+test('English word highlighting preserves every space and line break in the lesson rule',()=>{
+ const s=setup(stage('language-focus')),doc=s.host.ownerDocument,context={window:{},setTimeout,clearTimeout};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../workspace-word-focus.js'),'utf8'),context);
+ const before=s.host.textContent,focus=context.window.SpaceWhaleWordFocus.create({root:s.host,actor:'test',storageKey:'test'});
+ focus.setExercise('a12w4l1-language-focus');focus.decorate();assert.equal(s.host.textContent,before);
+ const rule=s.host.querySelector('.ek-rule-block .ek-copy');assert.match(rule.textContent,/The coat looks good\.\nThe sweater looks warm\./);
+ assert.equal(rule.querySelectorAll('.sw-word-focus').length>0,true);focus.destroy();
 });
