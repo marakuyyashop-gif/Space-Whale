@@ -29,7 +29,7 @@ Primary goal: recognize and use the six clothing nouns. In closed tasks the imag
 | `A1M4L1_IMAGE_TWO_COATS` | coats: exactly two separately readable coats of the same recognizable type as image 1 | No occlusion that makes them look like one; no other clothes | 5 question 3 |
 | `A1M4L1_IMAGE_SPEAKING_01` | One coherent shop display containing all six clothing types. Invite naming, preferences, descriptions and comparison with personal clothing | No people, text, price labels or separate framed cards. Warm knit and varied familiar shapes/colors support description; personal comparisons remain open | 1 and 10 |
 
-Speaking primary goal: `It looks …`, `It looks like my …`, `How does it look?`, and a choice using `I want …`. The image supplies recognizable objects and visible qualities; it does not prescribe the learner's personal comparison. The task instruction explicitly requires a comparison. Do not assume that an item looks expensive solely because of an arbitrary decorative symbol.
+Speaking primary goal: `It looks …`, `It looks like my …`, `How does it look?`, and a choice using `I want …`. The image supplies recognizable objects and visible qualities; it does not prescribe the learner's personal comparison. A negative answer about resemblance is valid; learners need not invent a personal comparison. Use suitable descriptions, not every helper word. Old/unusual are not required without visual support; expensive is an optional personal impression, never a required or keyed answer. Do not assume that an item looks expensive solely because of an arbitrary decorative symbol.
 
 `IMAGE_SET_01` in the supplied brief corresponds to the first six slots. `IMAGE_SPEAKING_01` corresponds to the prefixed speaking slot. Matching keeps picture order coat, sweater, blouse, skirt, suit, hat; the independent option order is skirt, hat, coat, suit, blouse, sweater. No position matches. Grade by IDs, never by visual array index.
 
@@ -59,8 +59,8 @@ Listen & Repeat uses twelve separate files and reveal steps: one word, then its 
 - Step 6: source and first response visible together; two following questions open with the existing arrows. Audio remains mounted throughout.
 - The transcript's disclosure is unavailable until all three questions have a non-empty submitted response (OK), regardless of correctness. Skip/empty responses do not unlock it. Editing/resetting an answer hides it again; restored checked state restores availability. Unlocking does not automatically expand the script.
 - Step 7: Matching first, the authored rule opens with the existing reveal arrow.
-- Step 9 is ungraded open writing. `possibleAnswers` display only after OK; alternative formulations are not marked incorrect. The owner explicitly asked to retain “Is this your coat?” pending visual review; revisit that prompt after publishing.
-- Step 1/10 Useful phrases begin closed. Speaking has no automatic correctness check.
+- Step 9 is ungraded open writing. `possibleAnswers` display only after OK; alternative formulations are not marked incorrect. The three prompts support complete replies; alternatives such as “No, it isn’t, but it looks like my old coat” are valid. Cues remain below the response fields, outside the submitted response.
+- Step 1/10 Useful phrases begin open; Possible answers begin closed. Speaking has no automatic correctness check.
 - Source/gap/choice images reuse the existing illustration renderer. No CSS or image sizing adjustments accompany this content revision.
 
 ## Picture practice revision
@@ -72,3 +72,7 @@ Steps 4 and 5 now group each existing picture slot with one sentence and reveal 
 Picture–Word cards use a portrait image area up to the answer control. Objects fit in full; there is no inner inset frame. Wrong matches show picture/answer cards in a horizontally scrollable correction strip with previous/next controls. Single picture cues are compact and left-aligned; shared speaking compositions remain larger and left-aligned.
 
 For future asset generation, use transparent backgrounds for isolated objects (especially across light/dark themes); use a consistent portrait 4:5 canvas for object cards and landscape 4:3 for shared speaking scenes. Runtime must contain the full artwork even when supplied ratios differ. These are canvas guidelines, not permission to crop an existing object.
+
+## Dialogue revision — 2026-09-26
+
+The recording script and displayed transcript both read the same `A1M4L1_AUDIO_01.script` value in the runtime registry. The revised eight-line dialogue includes the thirty-euro price and request to hold the sweater. Do not generate a new recording yet. The existing three questions and reveal logic are unchanged.
