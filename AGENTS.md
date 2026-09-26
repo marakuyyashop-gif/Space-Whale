@@ -43,3 +43,4 @@
 
 - Selection dialogs use a small close control at the top edge, outside content flow. Fit the full prompt and answer choices to visualViewport: shrink the image first, then tighten content only when needed. Refit after image load and orientation/viewport changes.
 - In live lessons learners see the audio player, waveform and synchronized progress but cannot play, pause or seek. Enforce this in nested exercise controls as well as shared audio transport. Keep remote teacher playback and the browser audio-permission recovery button operational.
+- Submitted feedback must reveal its full ending and the adjacent next-step arrow with 48px of bottom clearance, including feedback arriving through shared answers. For feedback taller than the viewport, prioritize its end; newly opened exercise/rule content still prioritizes its beginning. Measure after parent layout updates, and do not scroll again for identical synchronized snapshots or across another visible task.

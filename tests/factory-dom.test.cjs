@@ -596,7 +596,7 @@ test('writing hints sit under the field and never enter submitted answer example
  assert.throws(()=>kit.validate({...def,items:[{...def.items[0],hint:42}]}),/hint/);
 });
 test('opening a disclosure scrolls its complete content, with the beginning taking priority',()=>{
- for(const [bottom,expected] of [[850,166],[1500,484]]){
+ for(const [bottom,expected] of [[850,198],[1500,484]]){
    const s=setup({version:1,id:'script-scroll',kind:'presentation',title:'Listen',blocks:[{type:'disclosure',title:'See the script',text:'A long script',open:false}]}),scroll=s.document.createElement('div');
    scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=100;
    scroll.getBoundingClientRect=()=>({top:100,bottom:800,height:700});let target;
@@ -614,7 +614,7 @@ test('next task scrolling includes the next-step controls beneath the revealed c
  // Use the DOM creation hook to supply layout for the just-mounted task.
  const create=s.document.createElement.bind(s.document);s.document.createElement=tag=>{const el=create(tag);el.getBoundingClientRect=()=>({top:300,bottom:620,height:320});return el;};
  s.host.querySelector('.ek-stage-navigation').getBoundingClientRect=()=>({top:650,bottom:700,height:50});
- s.click('Show next exercise');assert.equal(target,116);
+ s.click('Show next exercise');assert.equal(target,148);
 });
 
 test('Order corrections are a plain sentence with singular heading and no arrows',()=>{
@@ -687,4 +687,40 @@ test('picture dialog shrinks artwork to leave every answer row inside a short ph
  s.fire(s.host.querySelector('.ek-match-slot'),'click');
  const dialog=s.host.querySelector('dialog');assert.equal(dialog.style.maxHeight,'476px');assert.ok(dialog.scrollHeight<=476);assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'187.20000000000002px');
  s.mount.destroy();
+});
+
+test('local and shared feedback reveal the following arrow with a comfortable bottom gap',()=>{
+ const task={version:1,id:'feedback-task',title:'Choose',kind:'choice',items:[{id:'q',prompt:'Pick one.',options:[{id:'a',text:'A'},{id:'b',text:'B'},{id:'c',text:'C'}],correctId:'a'}]};
+ for(const remote of [false,true]){
+   const s=setup({version:1,id:'feedback-stage',kind:'stage',title:'Practice',progressive:true,exercises:[{id:'one',exercise:task},{id:'two',exercise:{...task,id:'next-task'}}]},{syncChecks:true});
+   const scroll=s.document.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=100;
+   scroll.getBoundingClientRect=()=>({top:0,bottom:600,height:600});const targets=[];scroll.scrollTo=value=>targets.push(value.top);
+   const child=s.host.querySelector('.ek-stage-host');child.querySelector('.ek-status').getBoundingClientRect=()=>({top:400,bottom:450,height:50});child.querySelector('.ek-results').getBoundingClientRect=()=>({top:450,bottom:720,height:270});
+   s.host.querySelector('.ek-stage-navigation').getBoundingClientRect=()=>({top:760,bottom:800,height:40});
+   if(remote)s.mount.setAnswers({one:{q:'b',__sw_checked:true}});
+   else{s.mount.setAnswers({one:{q:'b'}});s.click('OK');}
+   assert.equal(targets.at(-1),348,'includes arrow bottom + 48px, not just feedback');
+   const count=targets.length;s.mount.setAnswers(s.mount.getAnswers());assert.equal(targets.length,count,'same snapshot must not pull the reader back down');
+ }
+});
+test('long feedback reaches its end, while another visible task is never included',()=>{
+ const s=setup({version:1,id:'long-feedback',kind:'choice',title:'Choose',items:[{id:'q1',prompt:'Pick.',options:[{id:'a',text:'A'},{id:'b',text:'B'},{id:'c',text:'C'}],correctId:'a'}]},{syncChecks:true}),scroll=s.document.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=0;
+ scroll.getBoundingClientRect=()=>({top:0,bottom:600,height:600});let target;scroll.scrollTo=value=>{target=value.top;};
+ s.host.querySelector('.ek-status').getBoundingClientRect=()=>({top:200,bottom:250,height:50});s.host.querySelector('.ek-results').getBoundingClientRect=()=>({top:250,bottom:1200,height:950});
+ const next=s.document.createElement('section');next.textContent='Another visible exercise';next.getBoundingClientRect=()=>({top:1200,bottom:2000,height:800});scroll.append(next);
+ s.mount.setAnswers({q1:'wrong',__sw_checked:true});assert.equal(target,648);
+});
+
+test('feedback scrolling waits for the final layout and is cancelled when the exercise unmounts',()=>{
+ const def={version:1,id:'frame-feedback',kind:'choice',title:'Choose',items:[{id:'q',prompt:'Pick.',options:[{id:'a',text:'A'},{id:'b',text:'B'},{id:'c',text:'C'}],correctId:'a'}]};
+ const s=setup(def,{syncChecks:true}),scroll=s.document.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=0;
+ scroll.getBoundingClientRect=()=>({top:0,bottom:600,height:600});let target,frame,bottom=620;scroll.scrollTo=value=>{target=value.top;};
+ const view=s.document.defaultView,original=view.requestAnimationFrame,originalCancel=view.cancelAnimationFrame;
+ view.requestAnimationFrame=fn=>{frame=fn;return 1;};view.cancelAnimationFrame=()=>{frame=null;};
+ try{
+   s.host.querySelector('.ek-status').getBoundingClientRect=()=>({top:300,bottom:350,height:50});s.host.querySelector('.ek-results').getBoundingClientRect=()=>({top:350,bottom,height:bottom-350});
+   s.mount.setAnswers({q:'b',__sw_checked:true});assert.equal(target,undefined);
+   bottom=800;frame();assert.equal(target,248,'uses the final height');
+   target=undefined;s.mount.setAnswers({q:'c',__sw_checked:true});s.mount.destroy();assert.equal(frame,null);assert.equal(target,undefined);
+ }finally{view.requestAnimationFrame=original;view.cancelAnimationFrame=originalCancel;}
 });

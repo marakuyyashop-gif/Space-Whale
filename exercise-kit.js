@@ -321,21 +321,42 @@
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
     let syncStage=null, syncTranscript=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
-    // Fit the entire newly revealed range, with its beginning taking priority.
-    const centerSection=(element,last=element)=>{
-      if(!element||element.hidden)return;
-      const scroller=host.closest?.('.lesson-scroll');
-      const behavior=doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
-      if(scroller?.scrollTo&&element.getBoundingClientRect){
-        const first=element.getBoundingClientRect(),end=last.getBoundingClientRect(),viewport=scroller.getBoundingClientRect(),padding=16;
-        const utility=doc.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
-        const startPadding=Math.max(padding,utility?.height?utility.bottom-viewport.top+14:0);
-        const top=first.top-viewport.top,bottom=end.bottom-viewport.top,available=viewport.height-startPadding-padding;
-        let delta=0;
-        if(end.bottom-first.top>available||top<startPadding)delta=top-startPadding;
-        else if(bottom>viewport.height-padding)delta=bottom-viewport.height+padding;
-        if(delta)scroller.scrollTo({top:Math.max(0,scroller.scrollTop+delta),behavior});
-      }else element.scrollIntoView?.({behavior,block:'start'});
+    let scrollFrame=null,disposed=false;
+    // Include adjacent navigation, but never jump across another visible task.
+    function rangeEnd(element,scroller){
+      let end=element;
+      for(let current=element;current&&current!==scroller;current=current.parentElement){
+        for(let next=current.nextElementSibling;next;next=next.nextElementSibling){
+          if(next.hidden||next.inert||next.matches('.ek-actions,.ek-status,.ek-results')&&!next.textContent.trim())continue;
+          if(next.matches('.ek-stage-navigation,.ek-disclosure')){end=next;continue;}
+          return end;
+        }
+      }
+      return end;
+    }
+    // Measure after feedback, parent disclosures and navigation have finished updating.
+    const centerSection=(element,last=element,preferEnd=false)=>{
+      const view=doc.defaultView;
+      if(scrollFrame!==null)view?.cancelAnimationFrame?.(scrollFrame);
+      const place=()=>{
+        scrollFrame=null;
+        if(disposed||!element||element.closest('[hidden],[inert]')||!host.contains(element))return;
+        const scroller=host.closest?.('.lesson-scroll');
+        const behavior=view?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+        const tail=rangeEnd(last,scroller);
+        if(scroller?.scrollTo&&element.getBoundingClientRect){
+          const first=element.getBoundingClientRect(),end=tail.getBoundingClientRect(),viewport=scroller.getBoundingClientRect(),padding=16,bottomPadding=48;
+          const utility=doc.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
+          const startPadding=Math.max(padding,utility?.height?utility.bottom-viewport.top+14:0);
+          const top=first.top-viewport.top,bottom=end.bottom-viewport.top,available=viewport.height-startPadding-bottomPadding;
+          let delta=0;
+          if(preferEnd&&end.bottom-first.top>available)delta=bottom-viewport.height+bottomPadding;
+          else if(end.bottom-first.top>available||top<startPadding)delta=top-startPadding;
+          else if(bottom>viewport.height-bottomPadding)delta=bottom-viewport.height+bottomPadding;
+          if(delta)scroller.scrollTo({top:Math.max(0,scroller.scrollTop+delta),behavior});
+        }else (preferEnd?tail:element).scrollIntoView?.({behavior,block:preferEnd?'end':'start'});
+      };
+      if(view?.requestAnimationFrame)scrollFrame=view.requestAnimationFrame(place);else place();
     };
     const getViewState=()=>({repeat:repeatIndex,revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
     const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
@@ -1252,8 +1273,8 @@
     }
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
       checkFeedback();
-      centerSection(status,resultsBox.hidden?status:resultsBox);
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
+      centerSection(status,resultsBox.hidden?status:resultsBox,true);
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
     if(['presentation','audio'].includes(def.kind)&&config.onSkip){
       const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;config.onChange?.(clone(answers));config.onSkip();},'ek-button ek-secondary ek-skip');
@@ -1318,7 +1339,11 @@
 
       render();
     };
-    const setAnswers = next => { setAnswersCore(next);updateActions(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    const setAnswers = next => {
+      const newFeedback=config.syncChecks&&next?.__sw_checked&&JSON.stringify(next)!==JSON.stringify(answers);
+      setAnswersCore(next);updateActions();
+      if(config.syncChecks&&answers.__sw_checked){checkFeedback();if(newFeedback)centerSection(status,resultsBox.hidden?status:resultsBox,true);}
+    };
 
     const renderReadOnly = () => {
       if (!config.readOnly) return;
@@ -1341,7 +1366,7 @@
       getViewState,
       setViewState,
       setAnswers,
-      destroy: () => { pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { disposed=true;if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, kinds, uiLabels, feedbackMessage, motion:{expand} };
