@@ -7,9 +7,11 @@
   ['A1.1','A1.2','A2.1','A2.2','A2.3','B1.1','B1.2','B1.3','B1.4'].forEach(id=>{if(!catalog.levels.some(level=>level.id===id))catalog.levels.push({id,whales:[],whaleCount:0});});
   const classroom = window.SpaceWhaleClassroom || null;
   const sessionId = new URLSearchParams(location.search).get('session');
-  const guestToken = new URLSearchParams(location.search).get('guest');
+  const teacherRoom = new URLSearchParams(location.search).get('room');
+  const guestToken = teacherRoom || new URLSearchParams(location.search).get('guest');
   const inviteCopyStatus = new URLSearchParams(location.search).get('share');
   const liveMode = Boolean(sessionId || guestToken);
+  const entryNotice=new URLSearchParams(location.search).get('notice');
 
   const host = document.getElementById('workspaceExercise');
   const tree = document.getElementById('workspaceTopics');
@@ -101,7 +103,7 @@
     if(next.exerciseView)params.set('exercise_view',JSON.stringify(next.exerciseView));
     params.set('completed_stages',[...completedStages].join(','));
     if (sessionId) params.set('session', sessionId);
-    if (guestToken) params.set('guest', guestToken);
+    if (guestToken) params.set(teacherRoom || liveRole==='teacher' || window.SpaceWhaleIsTeacher===true ? 'room':'guest', guestToken);
     params.set('class_whales',[...classWhales].join(','));
     params.set('class_loose',[...classIds].filter(id=>catalog.lessons.some(l=>l.id===id&&l.level===null)).join(','));
     return `?${params}`;
@@ -710,10 +712,10 @@
 
     const handlers = {
       onEnded:()=>{
+        if(liveRole==='teacher'||window.SpaceWhaleIsTeacher===true){returnToTeacherWorkspace('closed');return;}
         liveReady=false;mounted?.destroy?.();host.replaceChildren();
         document.body.dataset.workspaceRole='connection-error';
         const status=document.getElementById('workspaceConnectionState');status.textContent='Занятие закрыто или срок ссылки истёк. Попросите преподавателя прислать новую ссылку.';
-        if(liveRole==='teacher'){const link=node('a',' Вернуться в кабинет');link.href='classroom.html';status.append(link);}
       },
       onConnectionState:online=>{
         host.inert=!online;
@@ -761,6 +763,7 @@
     if(!['teacher','student'].includes(result.role))throw new Error('Нет доступа к этому занятию.');
     liveReady = true;
     liveRole = result.role;
+    if(guestToken&&liveRole==='teacher')history.replaceState(null,'',`classroom.html${query(route)}`);
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';
     liveSession = result.session;
@@ -826,7 +829,7 @@
   // Scheduled sessions keep their fixed start/end; previews use one uninterrupted hour.
   const timerKey=`space-whale:clock:${classScope}`;
   let timer={startedAt:null,readyAt:null,ended:false},ticker=null;
-  try{const saved=JSON.parse(sessionStorage.getItem(timerKey));if(Number.isFinite(saved?.startedAt))timer.startedAt=saved.startedAt;if(Number.isFinite(saved?.readyAt))timer.readyAt=saved.readyAt;else if(timer.startedAt!==null)timer.readyAt=timer.startedAt;timer.ended=Boolean(saved?.ended);}catch(_){}
+  try{const saved=JSON.parse(sessionStorage.getItem(timerKey));if(Number.isFinite(saved?.startedAt))timer.startedAt=saved.startedAt;if(Number.isFinite(saved?.readyAt))timer.readyAt=saved.readyAt;else if(timer.startedAt!==null)timer.readyAt=timer.startedAt;if(saved?.ended){timer.startedAt=null;timer.readyAt=null;}}catch(_){}
   const scheduledStart=()=>{const value=Date.parse(liveSession?.scheduled_at||'');return Number.isFinite(value)?value:null;};
   const saveTimer=()=>{try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}};
   function timerState(){
@@ -846,15 +849,15 @@
   function paintTimer(){
     const state=timerState(),seconds=Math.ceil(state.remaining/1000),spent=state.duration-state.remaining,expired=state.active&&seconds===0;
     document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-    clockLabel.textContent=state.pre?'До урока':'';
+    clockLabel.textContent=state.pre?'До урока':'';clockLabel.hidden=!state.pre;
     document.getElementById('workspaceClockProgress').setAttribute('stroke-dashoffset',String(100-spent/state.duration*100));
     clock.setAttribute('aria-valuemax',String(state.duration/60000));clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${state.pre?'До урока: ':''}${Math.floor(seconds/60)} мин. ${seconds%60} сек.`);
     clock.dataset.started=String(state.active||state.pre);clock.dataset.phase=timer.ended?'closed':expired?'expired':state.active?'running':state.pre?'before':'ready';clock.style.setProperty('--clock-spent',`${spent/state.duration*360}deg`);
     start.hidden=state.active&&!timer.ended;
     start.innerHTML=timer.ended?'Lesson<br>ended':state.waiting?'Ждём<br>ученика':'Start<br>Lesson';
-    start.disabled=locked()||!state.canStart;
-    start.setAttribute('aria-label',timer.ended?'Занятие завершено':state.waiting?'Ожидаем ученика':state.canStart?'Start Lesson':scheduledStart()===null?'Занятие не запланировано':'Начать можно за 5 минут до занятия');
-    start.removeAttribute('data-tooltip');stop.hidden=!state.active||timer.ended;stop.disabled=locked();stop.innerHTML=expired?'End<br>Lesson':'Pause';
+    start.disabled=locked()||(liveMode&&!state.canStart);
+    start.setAttribute('aria-label',timer.ended?'Занятие завершено':state.waiting?'Ожидаем ученика':state.canStart?'Start Lesson':!liveMode?'Создать приглашение на занятие':scheduledStart()===null?'Сначала подключитесь к занятию':'Начать можно за 5 минут до занятия');
+    start.removeAttribute('data-tooltip');stop.hidden=!state.active||timer.ended;stop.disabled=locked();stop.innerHTML='Finish<br>Lesson';
     clock.setAttribute('data-time-state','normal');
     if(expired)document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';
   }
@@ -863,16 +866,31 @@
   const dialogClose=()=>sessionDialog.close();
   function prepareDialog(title){sessionDialog.replaceChildren(node('h2',title));const close=button('×',dialogClose,'workspace-dialog-close');close.setAttribute('aria-label','Закрыть');sessionDialog.append(close);}
   start.addEventListener('click',()=>{
+    if(!liveMode){
+      prepareDialog('Пригласить ученика');
+      sessionDialog.append(node('p','Создадим отдельную ссылку и скопируем её. Ученик сможет открыть задания сразу; таймер можно запустить позже.'));
+      const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+      const create=button('Создать и скопировать ссылку',async()=>{create.disabled=true;try{await createInvitation();}catch(e){error.textContent=e.message;create.disabled=false;}},'workspace-dialog-button is-brand');
+      actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),create);sessionDialog.append(actions,error);sessionDialog.showModal();return;
+    }
     if(locked()||!timerState().canStart)return;
-    prepareDialog('Начать урок?');
+    prepareDialog('Запустить таймер?');
+    sessionDialog.append(node('p','Ученик уже может работать по ссылке. Эта кнопка запускает только таймер на 60 минут; подключение от него не зависит.'));
     const actions=node('div','','workspace-dialog-actions');actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),button('Start Lesson',()=>{if(!timerState().canStart)return;timer.readyAt=Date.now();if(liveSession?.guest)timer.startedAt=timer.readyAt;timer.ended=false;saveTimer();dialogClose();tick();},'workspace-dialog-button is-brand'));
     sessionDialog.append(actions);sessionDialog.showModal();
   });
   stop.addEventListener('click',()=>{
     if(locked()||timer.ended)return;
-    prepareDialog('Завершить занятие?');sessionDialog.append(node('p','Соединение будет закрыто. Продолжить занятие из этого окна не получится.'));
+    prepareDialog('Завершить занятие?');sessionDialog.append(node('p','Ссылка ученика закроется. Вы вернётесь в свой кабинет и сможете продолжить подготовку или пригласить следующего ученика.'));
     const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
-    const finish=button('Завершить',async()=>{finish.disabled=true;try{if(guestToken)await revokeInvitation();if(classroom?.state?.channel)await classroom.disconnect();liveReady=false;timer.ended=true;timer.startedAt=null;timer.readyAt=null;if(ticker!==null){clearInterval(ticker);ticker=null;}saveTimer();dialogClose();paintTimer();}catch(_){error.textContent='Не удалось завершить соединение. Попробуйте ещё раз.';finish.disabled=false;}},'workspace-dialog-button is-finish');
+    const finish=button('Завершить',async()=>{
+      finish.disabled=true;
+      try{
+        if(guestToken){await closeGuestRoom();return;}
+        if(classroom?.state?.channel)await classroom.disconnect();
+        returnToTeacherWorkspace('closed');
+      }catch(_){error.textContent='Не удалось закрыть занятие. Оно остаётся доступным; попробуйте ещё раз.';finish.disabled=false;}
+    },'workspace-dialog-button is-finish');
     actions.append(button('Продолжить',dialogClose,'workspace-dialog-button is-brand'),finish);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
   tick();
@@ -892,6 +910,23 @@
     syncTeacherNavigation();
   });
 
+  function teacherWorkspaceURL(reason){
+    const url=new URL('classroom.html'+query(route),location.href);
+    ['guest','room','session','share','exercise_view','completed_stages'].forEach(key=>url.searchParams.delete(key));
+    if(reason)url.searchParams.set('notice',reason);
+    return url.href;
+  }
+  function returnToTeacherWorkspace(reason){
+    timer={startedAt:null,readyAt:null,ended:false};saveTimer();
+    if(ticker!==null){clearInterval(ticker);ticker=null;}
+    location.replace(teacherWorkspaceURL(reason));
+  }
+  async function closeGuestRoom(){
+    await classroom.flushPendingSnapshots?.();
+    await revokeInvitation();
+    await classroom.disconnect();
+    returnToTeacherWorkspace('closed');
+  }
   const invite = document.getElementById('inviteStudent');
   const invitationURL=token=>{const url=new URL('classroom.html',location.href);url.searchParams.set('guest',token);return url.href;};
   async function copyInvitation(url){
@@ -905,7 +940,7 @@
     const copied=await copyInvitation(invitationURL(result.data.token));
     const nextRoute={...route,exercise:selectedLesson()?.stages[0]?.exercise.id||route.exercise};
     const joined=new URL('classroom.html'+query(nextRoute),location.href);
-    joined.searchParams.set('guest',result.data.token);joined.searchParams.delete('session');
+    joined.searchParams.set('room',result.data.token);joined.searchParams.delete('guest');joined.searchParams.delete('session');joined.searchParams.delete('notice');
     joined.searchParams.delete('completed_stages');joined.searchParams.delete('exercise_view');
     joined.searchParams.set('share',copied?'copied':'1');
     location.href=joined.href;
@@ -934,7 +969,7 @@
     sessionDialog.append(node('p','Новый ученик получит отдельную ссылку и пустые ответы. Прежние ссылки закроются. Ссылка действует 24 часа; её можно закрыть раньше.'));
     const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
     const create=button('Новый ученик',async()=>{create.disabled=true;close.disabled=true;try{await createInvitation();}catch(e){error.textContent=e.message;create.disabled=false;close.disabled=false;}},'workspace-dialog-button is-brand');
-    const close=button('Закрыть текущую ссылку',async()=>{close.disabled=true;create.disabled=true;try{await revokeInvitation();await classroom.disconnect();location.href='classroom.html';}catch(e){error.textContent=e.message;close.disabled=false;create.disabled=false;}},'workspace-dialog-button');
+    const close=button('Закрыть текущую ссылку',async()=>{close.disabled=true;create.disabled=true;try{await closeGuestRoom();}catch(e){error.textContent=e.message;close.disabled=false;create.disabled=false;}},'workspace-dialog-button');
     close.disabled=!guestToken;
     actions.append(create,close);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
@@ -999,12 +1034,19 @@
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();
 
-  if(timer.ended&&liveMode){document.body.dataset.workspaceRole='connection-error';document.getElementById('workspaceConnectionState').textContent='Занятие завершено.';}
-  if(!timer.ended)initLiveSession().catch(error => {
+  if(!liveMode){
+    document.body.dataset.workspaceRole='teacher';
+    if(entryNotice==='closed')toast('Занятие закрыто. Кабинет доступен — можно пригласить следующего ученика.');
+  }
+  initLiveSession().catch(error => {
+    if(error.code==='GUEST_LINK_CLOSED'&&window.SpaceWhaleIsTeacher===true){returnToTeacherWorkspace('closed');return;}
     console.error('[Space Whale] Live Workspace connection failed', error);
-    notice.textContent = error.message;
     document.body.dataset.workspaceRole='connection-error';
-    document.getElementById('workspaceConnectionState').textContent='Не удалось подключиться к занятию. Проверьте ссылку и соединение, затем обновите страницу.';
-    if (sessionHeading) sessionHeading.textContent = guestToken ? 'Guest lesson · ссылка недействительна' : 'Live lesson · ошибка подключения';
+    const status=document.getElementById('workspaceConnectionState');
+    status.textContent=error.code==='GUEST_LINK_CLOSED'?'Занятие закрыто. Попросите преподавателя прислать новую ссылку.':'Не удалось подключиться к занятию. Проверьте соединение и повторите попытку.';
+    const actions=node('div','','workspace-dialog-actions');
+    actions.append(button('Повторить подключение',()=>location.reload(),'workspace-dialog-button'));
+    if(window.SpaceWhaleIsTeacher===true)actions.append(button('Вернуться в кабинет',()=>returnToTeacherWorkspace(),'workspace-dialog-button is-brand'));
+    status.append(actions);
   });
 })();

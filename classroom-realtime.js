@@ -150,7 +150,7 @@
   async function connectGuest(token, handlers = {}) {
     if (!client) throw new Error("Supabase client is not ready.");
     const meta=await resolveGuestLink(token);
-    if(!meta)throw new Error("Ссылка закрыта или срок её действия истёк.");
+    if(!meta){const error=new Error("Ссылка закрыта или срок её действия истёк.");error.code="GUEST_LINK_CLOSED";throw error;}
     const user=await getCurrentUser();
     state.guestToken=token;state.role=meta.is_host?'teacher':'student';
     state.user=user||{id:`guest-${state.clientId}`};

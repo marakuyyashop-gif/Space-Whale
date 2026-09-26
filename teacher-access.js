@@ -2,14 +2,16 @@
   const params=new URLSearchParams(location.search);
   const guestPage=location.pathname.endsWith('/classroom.html')&&(params.has('guest')||params.has('session'));
   window.SpaceWhaleTeacherAccess=(async()=>{
-    if(guestPage){document.documentElement.removeAttribute('data-teacher-check');return true;}
     try {
       const client=window.spaceWhaleSupabase;
       if(!client)throw new Error('Сервис входа недоступен. Обновите страницу.');
       const {data,error}=await client.auth.getUser();
+      if(guestPage&&(!data?.user||error)){document.documentElement.removeAttribute('data-teacher-check');return true;}
       if(error||!data.user){location.replace('login.html?next='+encodeURIComponent(location.pathname.split('/').pop()+location.search));return false;}
       const result=await client.rpc('is_teacher_user');
       if(result.error)throw result.error;
+      window.SpaceWhaleIsTeacher=result.data===true;
+      if(guestPage){document.documentElement.removeAttribute('data-teacher-check');return true;}
       if(result.data!==true)throw new Error('Учительский кабинет закрыт. Для занятия используйте ссылку преподавателя.');
       document.documentElement.removeAttribute('data-teacher-check');return true;
     } catch(error){

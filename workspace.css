@@ -507,7 +507,9 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-collection-option .workspace-picker-option{width:100%}
 
 /* Timer phases, compact status controls and point-anchored labels. */
-.workspace-clock-face{display:flex;flex-direction:column;align-items:center;gap:3px}
+.workspace-clock-face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.workspace-clock-label[hidden]{display:none}
+.workspace-connection-state .workspace-dialog-actions{justify-content:center}
 .workspace-clock-label{font-size:9px;font-weight:400;letter-spacing:0;color:var(--sw-neu-muted)}
 .unified-workspace .workspace-clock[data-phase=before] #startLesson{opacity:0}
 .unified-workspace .workspace-clock[data-phase=before]:hover #startLesson,.unified-workspace .workspace-clock[data-phase=before] #startLesson:focus-visible{opacity:1}
