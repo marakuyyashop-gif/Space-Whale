@@ -45,3 +45,12 @@ test('a normal lesson interaction unlocks audio without an initial permission ba
  p.enable.ownerDocument.body.dispatchEvent(new p.window.Event('click',{bubbles:true}));await flush();assert.equal(p.enable.hidden,true);
  p.api.receive(cmd);p.setTime(1250);p.run();await flush();assert.equal(p.api.player.paused,false);p.api.destroy();
 });
+
+test('unfilled audio slots stay disabled and never send playback commands',async()=>{
+ for(const teacher of [true,false]){
+   const s=fixture(teacher);s.root.querySelector('audio').removeAttribute('src');s.api.refresh();
+   assert.equal(s.root.querySelector('button').disabled,true);assert.equal(s.root.querySelector('button').getAttribute('aria-label'),'Audio pending');
+   s.click();if(!teacher)s.api.receive(cmd);s.run();await flush();
+   assert.equal(s.sent.length,0);assert.equal(s.notices.length,0);assert.equal(s.api.player.getAttribute('src'),null);s.api.destroy();
+ }
+});

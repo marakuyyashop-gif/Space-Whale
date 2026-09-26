@@ -32,8 +32,8 @@ test('all media slots start empty, sources reuse IDs and two coats has its own i
  assert.equal(Object.values(media).filter(s=>s.type==='audio').length,13);
  assert.ok(Object.values(media).every(s=>s.src===null));
  const match=stage('words'),choice=stage('word-choice'),gaps=stage('word-type');
- choice.items.forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
- assert.equal(gaps.items[2].assetId,'A1M4L1_IMAGE_TWO_COATS');
+ choice.exercises.map(b=>b.exercise.items[0]).forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
+ assert.equal(gaps.exercises[2].exercise.items[0].assetId,'A1M4L1_IMAGE_TWO_COATS');
  assert.equal(stage('opening').blocks[0].assetId,stage('final-speaking').blocks[0].assetId);
  assert.equal(stage('listen-repeat').items.length,6);
  for(const item of lesson.stages){const s=setup(item.exercise);assert.equal(s.host.querySelector('img[src]'),null);assert.equal(s.host.querySelector('audio[src]'),null);s.handle.destroy();}
@@ -41,16 +41,46 @@ test('all media slots start empty, sources reuse IDs and two coats has its own i
 test('setting a single image or audio URL later connects all uses without changing answer keys',()=>{
  const attached=load(source.replace("src:null,alt:'A coat'","src:'assets/coat.png',alt:'A coat'").replace("type:'audio',src:null,script:","type:'audio',src:'assets/dialogue.mp3',script:"));
  const words=attached.lesson.stages[1].exercise,choice=attached.lesson.stages[3].exercise;
- assert.equal(words.items[0].image,'assets/coat.png');assert.equal(choice.items[0].image,'assets/coat.png');
+ assert.equal(words.items[0].image,'assets/coat.png');assert.equal(choice.exercises[0].exercise.items[0].image,'assets/coat.png');
  assert.equal(words.items[0].correctId,'coat');assert.equal(words.items[0].imagePending,undefined);
  assert.equal(attached.lesson.stages[5].exercise.exercises[0].exercise.audio,'assets/dialogue.mp3');
 });
-test('word practice images are mounted beside the correct question and typed answer',()=>{
- for(const [id,count] of [['word-choice',4],['word-type',3]]){
-   const s=setup(stage(id));assert.equal(s.host.querySelectorAll('.ek-image-pending').length,count);
+test('picture practice reveals one picture and inline answer at a time',()=>{
+ for(const [id,count,mode] of [['word-choice',4,'select'],['word-type',3,'text']]){
+   const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('.ek-image-pending').length,1);
+   assert.equal(def.exercises.length,count);
+   assert.ok(def.exercises.every(b=>b.exercise.kind==='gaps'&&b.exercise.inputMode===mode));
+   for(let i=1;i<count;i++)s.click('Show next exercise');
+   assert.equal(s.host.querySelectorAll('.ek-image-pending').length,count);
+   assert.ok(!s.host.textContent.includes('______'));
  }
- assert.equal(kit.grade(stage('word-type'),{'sweater-gap':'sweater','blouse-gap':'blouse','coats-gap':'coat'})['coats-gap'],'retry');
- assert.ok(Object.values(kit.grade(stage('word-type'),{'sweater-gap':'sweater','blouse-gap':'blouse','coats-gap':'coats'})).every(value=>value==='correct'));
+ const def=stage('word-type').exercises[2].exercise;
+ assert.equal(kit.grade(def,{'coats-gap':'coat'})['coats-gap'],'retry');
+ assert.equal(kit.grade(def,{'coats-gap':'coats'})['coats-gap'],'correct');
+});
+test('two-option gaps show complete corrected sentences with muted context',()=>{
+ const s=setup(stage('language-practice'),{syncChecks:true});
+ s.handle.setAnswers({look1:'looks like',look2:'look like',look3:'looks',look4:'looks like',look5:'look',__sw_checked:true});
+ const rows=s.host.querySelectorAll('.ek-answer-pairs>li');assert.equal(rows.length,5);
+ assert.equal(rows[0].textContent,'This coat looks expensive.');
+ assert.equal(rows[0].querySelector('strong').textContent,'looks');
+ assert.equal(rows[0].querySelector('.ek-muted').textContent,'This coat ');
+ assert.equal(rows[4].textContent,'How does this suit look?');
+});
+test('language focus has one heading and interaction instruction',()=>{
+ const s=setup(stage('language-focus'));
+ assert.equal([...s.host.querySelectorAll('.ek-title')].filter(h=>h.textContent==='Match the sentences with their meanings.').length,1);
+ assert.match(s.host.querySelector('.ek-instruction').textContent,/Click the button/);
+});
+test('rule reveal scrolls the full range and prioritizes its beginning when taller than viewport',()=>{
+ for(const [end,expected] of [[850,166],[1400,584]]){
+   const s=setup(stage('language-focus')),doc=s.host.ownerDocument,scroll=doc.createElement('div');scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);
+   scroll.scrollTop=100;scroll.getBoundingClientRect=()=>({top:100,height:700,bottom:800});let target;
+   scroll.scrollTo=value=>{target=value.top;};
+   const rules=[...s.host.querySelectorAll('.ek-rule-block')];
+   rules.forEach((rule,i)=>{rule.getBoundingClientRect=()=>({top:600+i*50,bottom:i===rules.length-1?end:650+i*50,height:50});});
+   s.click('Далее');assert.equal(target,expected);
+ }
 });
 test('listening retains audio with the first question and unlocks transcript only after all checks',()=>{
  const s=setup(stage('listening'));

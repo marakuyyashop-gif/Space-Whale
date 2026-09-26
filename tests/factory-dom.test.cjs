@@ -515,10 +515,10 @@ test('email matching reveals authored corrections despite imported showAnswers f
   for(const item of def.items){assert.ok(solution.includes(item.text));assert.ok(solution.includes(def.options.find(option=>option.id===item.correctId).text));}
   assert.match(solution,/Correct answers/);
 });
-test('two-option closed choice marks wrong answers without redundant solution text',()=>{
+test('two-option closed choice reveals the correct answer after a mistake',()=>{
   const def={version:1,id:'binary',title:'Choose',kind:'choice',items:[{id:'q',prompt:'Choose',options:[{id:'a',text:'A'},{id:'b',text:'B'}],correctId:'b'}]};
   const s=setup(def,{syncChecks:true});s.mount.setAnswers({q:'a',__sw_checked:true});
-  assert.equal(s.host.querySelector('fieldset').dataset.feedback,'retry');assert.equal(s.host.querySelector('.ek-correction'),null);
+  assert.equal(s.host.querySelector('fieldset').dataset.feedback,'retry');assert.match(s.host.querySelector('.ek-correction').textContent,/B/);
   s.mount.setAnswers({q:'b',__sw_checked:true});assert.equal(s.host.querySelector('fieldset').dataset.feedback,'correct');
 });
 

@@ -590,3 +590,23 @@ body.unified-workspace .app-sidebar,body.unified-workspace[data-theme=dark] .app
 .theme-clouds{position:absolute;width:32px;height:14px;right:-3px;bottom:-7px;border-radius:50%;background:#eff2f3;box-shadow:-10px 2px 0 0 #eff2f3,7px -8px 0 0 #eff2f3,-5px -4px 0 0 #dce5e9;transform:translateY(calc(var(--sw-theme-progress) * 20px))}
 .theme-stars{position:absolute;left:7px;top:5px;font:10px/1.5 Onest,sans-serif;color:#e5e9ec;opacity:var(--sw-theme-progress)}
 @media(prefers-reduced-motion:reduce){body.unified-workspace{transition:none}}
+
+/* Course navigation: module and lesson keys; level stays beside session controls. */
+.unified-workspace .workspace-console-selector.selector-lesson{position:relative;inset:auto;width:66px;height:58px;min-height:58px;flex:none;border-radius:18px;font-size:14px}
+.workspace-level-control{position:absolute;left:-12px;bottom:-10px;z-index:4}
+.unified-workspace .workspace-level-control .selector-level{width:48px;height:28px;min-height:28px;border-radius:9px;font-size:11px}
+.workspace-lesson-heading{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.workspace-lesson-title{flex:1;min-width:0;margin:0;font:600 15px/1.45 Onest,sans-serif;color:var(--sw-neu-ink)}
+.workspace-lesson-heading .workspace-lesson-status{position:static;flex:none;cursor:pointer}
+.workspace-lesson-grammar{margin-top:10px}
+/* Every persistent floating notice has a separate dismiss control. */
+.unified-workspace .workspace-session-tools{max-height:none;overflow:visible}
+.workspace-notice-close,.workspace-audio-notice>button:last-child,.workspace-media-notice>button:last-child{border:0;background:transparent;color:inherit;cursor:pointer;font:24px/1 sans-serif;width:32px;height:32px;flex:none}
+.workspace-notice-close{position:absolute;right:5px;top:5px}
+.workspace-notice:empty+.workspace-notice-close{display:none}
+.unified-workspace .workspace-notice:not(:empty){padding-right:42px}
+.workspace-audio-notice{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:41;display:flex;align-items:center;max-width:calc(100% - 32px);background:var(--sw-neu-bg);border-radius:12px;box-shadow:var(--sw-neu-small)}
+.workspace-audio-notice:has(#lessonAudioEnable[hidden]){display:none}
+.workspace-audio-notice #lessonAudioEnable{position:static;transform:none;box-shadow:none}
+.workspace-media-notice{display:flex;align-items:center}
+.workspace-media-notice:has(#mediaStatus[hidden]){display:none}
