@@ -88,7 +88,7 @@ test('minimize/hide/restore never disconnects or changes device state',async()=>
  await s.api.stopMedia();assert.equal(s.document.getElementById('mediaRestore').hidden,true);
 });
 test('Start presents video once; repeated state sync does not reopen a minimized panel',async()=>{
- const s=fixture({mobile:true});await s.api.connect({...session,status:'waiting'});s.api.setView('mini');
+ const s=fixture({mobile:true});await s.api.connect({...session,status:'waiting'});assert.equal(s.api.state.view,'mini');
  s.api.lessonStarted(session.sessionId);assert.equal(s.api.state.view,'expanded');s.api.setView('mini');
  await s.api.connect(session);assert.equal(s.api.state.view,'mini');assert.equal(s.instances.length,1);await s.api.stopMedia();
 });

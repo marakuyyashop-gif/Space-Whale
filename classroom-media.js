@@ -164,7 +164,7 @@
     if(next.status==='live')lessonStarted(next.sessionId);
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
     const previous=context?.sessionId;
-    const closing=stopMedia();if(previous!==next.sessionId){position=null;setView('expanded');}
+    const closing=stopMedia();if(previous!==next.sessionId){position=null;setView(mobile()&&next.role==='teacher'&&next.status!=='live'?'mini':'expanded');}
     context={...next};state.sessionId=next.sessionId;const epoch=generation;
     visibility(true);phase('connecting','Подключаем видеосвязь…');
     const work=(async()=>{
