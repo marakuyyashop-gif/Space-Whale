@@ -29,16 +29,22 @@ Speaking primary goal: `It looks …`, `It looks like my …`, `How does it look
 
 ## Audio slots
 
-Each Listen & Repeat recording contains the word followed by its sentence, in one file/Play action. The existing phrase navigation presents one complete item at a time. No test tones or generated speech are inserted.
+Listen & Repeat uses twelve separate files and reveal steps: one word, then its sentence. Only the current step is visible. `WORD_XX` holds only the word; `SENTENCE_XX` holds only its example. No test tones or generated speech are inserted.
 
 | Slot | Recording |
 |---|---|
-| `A1M4L1_WORD_01` | coat. I need a coat for work. |
-| `A1M4L1_WORD_02` | sweater. My sweater is in the wardrobe. |
-| `A1M4L1_WORD_03` | blouse. My sister wants this blouse. |
-| `A1M4L1_WORD_04` | skirt. I like this skirt. |
-| `A1M4L1_WORD_05` | suit. My father has a suit for work. |
-| `A1M4L1_WORD_06` | hat. I like your hat. |
+| `A1M4L1_WORD_01` | coat |
+| `A1M4L1_SENTENCE_01` | I need a coat for work. |
+| `A1M4L1_WORD_02` | sweater |
+| `A1M4L1_SENTENCE_02` | My sweater is in the wardrobe. |
+| `A1M4L1_WORD_03` | blouse |
+| `A1M4L1_SENTENCE_03` | My sister wants this blouse. |
+| `A1M4L1_WORD_04` | skirt |
+| `A1M4L1_SENTENCE_04` | I like this skirt. |
+| `A1M4L1_WORD_05` | suit |
+| `A1M4L1_SENTENCE_05` | My father has a suit for work. |
+| `A1M4L1_WORD_06` | hat |
+| `A1M4L1_SENTENCE_06` | I like your hat. |
 | `A1M4L1_AUDIO_01` | The complete Anna–Ben dialogue stored in the registry's `script` field |
 
 ## Interaction contract

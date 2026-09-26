@@ -11,14 +11,15 @@
   const state={call:null,sessionId:null,phase:'idle',view:'expanded'};
   const size=document.getElementById('mediaSize'),resize=document.getElementById('mediaResize');
   const hide=document.getElementById('mediaHide'),restore=document.getElementById('mediaRestore');
+  const continueLesson=document.getElementById('mediaLessonContinue');
   document.body.append(dock,restore);
   const participantId=window.crypto?.randomUUID?.();
   const mobile=()=>window.matchMedia?.('(max-width: 768px)').matches||false;
   let position=null,customWidth=null,drag=null,lessonPresented=null,activeSpeaker=null,speakerTimer=null;
   function bounds(){
     const v=window.visualViewport,x=v?.offsetLeft||0,y=v?.offsetTop||0,w=v?.width||window.innerWidth||1024,h=v?.height||window.innerHeight||768;
-    const area=document.querySelector('.class-area')?.getBoundingClientRect(),bar=document.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
-    const left=Math.max(x,area?.left||0),top=Math.max(y,bar?.bottom||0);
+    const area=document.querySelector('.class-area')?.getBoundingClientRect();
+    const left=Math.max(x,area?.left||0),top=Math.max(y,area?.top||0);
     return {x:left,y:top,width:Math.max(120,Math.min(x+w,area?.right||x+w)-left),height:Math.max(120,Math.min(y+h,area?.bottom||y+h)-top)};
   }
   function place(){
@@ -54,26 +55,30 @@
   function setView(view){
     if(!['expanded','mini','hidden'].includes(view))return;
     state.view=view;dock.dataset.view=view;dock.inert=view==='hidden';
+    document.body.dataset.videoView=view;
+    continueLesson.hidden=!(view==='expanded'&&context?.role==='student');
     dock.setAttribute('aria-hidden',String(view==='hidden'));restore.hidden=dock.hidden||view!=='hidden';
     const label=view==='expanded'?'Свернуть видео':'Развернуть видео';size.setAttribute('aria-label',label);size.title=label;
     place();
   }
   function lessonStarted(id){if(!id||lessonPresented===id)return;lessonPresented=id;setView('expanded');}
   size.addEventListener('click',()=>setView(state.view==='expanded'?'mini':'expanded'));
+  continueLesson.addEventListener('click',()=>setView('mini'));
   hide.addEventListener('click',()=>{setView('hidden');restore.focus();});
   restore.addEventListener('click',()=>{setView('mini');size.focus();});
   function startDrag(event,resizing){
     if(event.button!==0)return;
     if(!resizing&&event.target.closest?.('button,input,a'))return;
-    if(state.view==='expanded')setView('mini');
-    const r=dock.getBoundingClientRect();drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top,width:r.width,resizing};
+    const r=dock.getBoundingClientRect();
+    if(state.view==='expanded'){customWidth=r.width;position={x:r.left,y:r.top};setView('mini');}
+    drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top,width:r.width,right:r.left+r.width,resizing};
     (resizing?resize:dock).setPointerCapture(event.pointerId);event.preventDefault();
   }
   dock.addEventListener('pointerdown',e=>startDrag(e,false));
   resize.addEventListener('pointerdown',e=>{e.stopPropagation();startDrag(e,true);});
   dock.addEventListener('pointermove',event=>{
     if(!drag||event.pointerId!==drag.id)return;
-    if(drag.resizing)customWidth=Math.max(110,drag.width+event.clientX-drag.x);
+    if(drag.resizing){customWidth=Math.max(110,Math.min(bounds().width-16,drag.width-event.clientX+drag.x));position={x:drag.right-customWidth,y:drag.top};}
     else position={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};
     place();
   });
@@ -84,7 +89,7 @@
     const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];if(!delta)return;
     event.preventDefault();if(state.view==='expanded')setView('mini');
     const r=dock.getBoundingClientRect();
-    if(event.target===resize)customWidth=Math.max(110,r.width+delta[0]+delta[1]);else position={x:r.left+delta[0],y:r.top+delta[1]};place();
+    if(event.target===resize){customWidth=Math.max(110,Math.min(bounds().width-16,r.width-delta[0]+delta[1]));position={x:r.left+r.width-customWidth,y:r.top};}else position={x:r.left+delta[0],y:r.top+delta[1]};place();
   });
   window.addEventListener('resize',place);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
   if(window.ResizeObserver){const observer=new window.ResizeObserver(place);observer.observe(document.querySelector('.class-area'));observer.observe(document.getElementById('workspaceUtilityBar'));}
@@ -96,7 +101,7 @@
     state.phase=value;dock.dataset.state=value;status.textContent=message;status.hidden=value==='joined'||!message;
     camera.disabled=mic.disabled=value!=='joined';retry.hidden=value!=='error';
   }
-  function visibility(show){dock.hidden=!show;restore.hidden=!show||state.view!=='hidden';if(show)place();}
+  function visibility(show){dock.hidden=!show;restore.hidden=!show||state.view!=='hidden';document.body.dataset.videoView=show?state.view:'off';if(show)place();}
   function loadSdk(){
     if(window.DailyIframe)return Promise.resolve(window.DailyIframe);
     if(sdkLoading)return sdkLoading;
@@ -188,11 +193,14 @@
     if(!next?.sessionId || (next.guest&&!next.guestToken) || !['teacher','student'].includes(next.role) || isClosed(next.status)){
       context=null;await stopMedia();return false;
     }
-    if(next.status==='live')lessonStarted(next.sessionId);
+    if(state.sessionId===next.sessionId&&next.status==='live')lessonStarted(next.sessionId);
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
     const previous=context?.sessionId;
-    const closing=stopMedia();if(previous!==next.sessionId){position=null;customWidth=null;setView(next.status==='live'&&mobile()?'expanded':'mini');}
+    const initialView=lessonPresented===next.sessionId?state.view:'mini';
+    const closing=stopMedia();if(previous!==next.sessionId){position=null;customWidth=null;setView(initialView);}
     context={...next};state.sessionId=next.sessionId;const epoch=generation;
+    if(next.status==='live')lessonStarted(next.sessionId);
+    setView(state.view);
     visibility(true);phase('connecting','Подключаем видеосвязь…');
     const work=(async()=>{
       let call=null;

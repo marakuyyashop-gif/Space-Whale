@@ -839,8 +839,8 @@
             const step=steps[repeatIndex],row=node('article','ek-repeat-item');
             row.append(repeatAudioButton(step.audio,step.text,step.key),node('span','ek-repeat-line',step.text));list.append(row);
             const control=(direction,index,label)=>{const b=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;repeatIndex=index;syncRepeat();viewChanged();},'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
-            if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
             if(repeatIndex<steps.length-1)control('down',repeatIndex+1,'Next phrase');
+            if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
           };
           body.append(list,navigation);syncRepeat();
         } else {

@@ -29,7 +29,7 @@ test('image ordering is stable while all matching options occupy different posit
 });
 test('all media slots start empty, sources reuse IDs and two coats has its own image',()=>{
  assert.equal(Object.values(media).filter(s=>s.type==='image').length,8);
- assert.equal(Object.values(media).filter(s=>s.type==='audio').length,7);
+ assert.equal(Object.values(media).filter(s=>s.type==='audio').length,13);
  assert.ok(Object.values(media).every(s=>s.src===null));
  const match=stage('words'),choice=stage('word-choice'),gaps=stage('word-type');
  choice.items.forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
@@ -77,4 +77,13 @@ test('language rule and possible responses stay concealed until requested',()=>{
  const input=writing.host.querySelector('input');input.value='The sweater looks very warm.';writing.fire(input,'input');writing.click('OK');
  assert.equal(input.dataset.feedback,'review');assert.match(writing.host.querySelector('.ek-writing-answers').textContent,/It looks warm/);
  const opening=setup(stage('opening'));assert.equal(Boolean(opening.host.querySelector('details').open),false);
+});
+
+test('Listen & Repeat exposes the word and example as separate clips and steps',()=>{
+ const def=stage('listen-repeat'),s=setup(def);
+ assert.equal(s.host.querySelector('.ek-repeat-line').textContent,'coat');
+ s.click('Next phrase');assert.equal(s.host.querySelector('.ek-repeat-line').textContent,'I need a coat for work.');
+ assert.equal(s.host.querySelectorAll('.ek-repeat-item').length,1);
+ s.click('Next phrase');assert.equal(s.host.querySelector('.ek-repeat-line').textContent,'sweater');
+ assert.equal(def.items[0].audioId,'A1M4L1_WORD_01');assert.equal(def.items[0].exampleAudioId,'A1M4L1_SENTENCE_01');
 });

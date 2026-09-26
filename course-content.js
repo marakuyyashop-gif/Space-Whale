@@ -26,6 +26,11 @@
     A1M4L1_WORD_05: {type:'audio',src:null,word:'suit',sentence:'My father has a suit for work.'},
     A1M4L1_WORD_06: {type:'audio',src:null,word:'hat',sentence:'I like your hat.'}
   };
+  // A word and its example are distinct clips and distinct reveal steps.
+  for(let i=1;i<=6;i++){
+    const suffix=String(i).padStart(2,'0');
+    lesson1Media['A1M4L1_SENTENCE_'+suffix]={type:'audio',src:null,sentence:lesson1Media['A1M4L1_WORD_'+suffix].sentence};
+  }
   window.SpaceWhaleLessonMedia = {...window.SpaceWhaleLessonMedia, 'a1-2-w4-l1':lesson1Media};
   const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
   const audioSlot = audioId => ({audioId,...(lesson1Media[audioId].src ? {audio:lesson1Media[audioId].src} : {audioPending:true})});
@@ -52,8 +57,8 @@
       }),'Познакомиться с coat, sweater, blouse, skirt, suit, hat. Картинки идут в порядке слов; варианты перемешаны отдельно.'),
       step('Listen & Repeat',3,exercise('listen-repeat','audio','Listen and repeat.',{
         layout:'listen-repeat',audioPending:true,instruction:'Listen to the words and sentences. Repeat them out loud.',
-        items:wordList.map((word,i)=>{const audioId='A1M4L1_WORD_'+String(i+1).padStart(2,'0'),slot=lesson1Media[audioId];return {id:word,text:word+' — '+slot.sentence,...audioSlot(audioId)};})
-      }),'Послушать и повторить шесть слов с предложениями. Одна запись содержит слово и предложение.'),
+        items:wordList.map((word,i)=>{const suffix=String(i+1).padStart(2,'0'),audioId='A1M4L1_WORD_'+suffix,exampleAudioId='A1M4L1_SENTENCE_'+suffix,slot=lesson1Media[audioId];return {id:word,text:word,...audioSlot(audioId),example:slot.sentence,exampleAudioId,...(lesson1Media[exampleAudioId].src?{exampleAudio:lesson1Media[exampleAudioId].src}:{})};})
+      }),'Повторить шесть слов и шесть предложений: отдельный шаг и отдельная запись для каждого слова и примера.'),
       step('Words Practice · Choice',2,exercise('word-choice','choice','Choose the correct word.',{
         instruction:'Look at the pictures and choose the correct word.',items:[
           {id:'coat',...wordImage('coat'),prompt:'I need a ______ for cold days.',options:options(['coat','skirt','suit']),correctId:'coat'},

@@ -40,3 +40,8 @@ test('answer hydration replacing an unchanged audio clip keeps pupil controls di
  const copy=p.root.firstElementChild.cloneNode(true);copy.querySelector('button').disabled=false;p.root.replaceChildren(copy);
  await flush();assert.equal(p.root.querySelector('button').disabled,true);p.api.destroy();
 });
+test('a normal lesson interaction unlocks audio without an initial permission banner',async()=>{
+ const p=fixture();p.enable.hidden=true;p.api.reconnect();assert.equal(p.enable.hidden,true);
+ p.enable.ownerDocument.body.dispatchEvent(new p.window.Event('click',{bubbles:true}));await flush();assert.equal(p.enable.hidden,true);
+ p.api.receive(cmd);p.setTime(1250);p.run();await flush();assert.equal(p.api.player.paused,false);p.api.destroy();
+});

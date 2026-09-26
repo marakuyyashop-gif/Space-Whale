@@ -28,7 +28,7 @@
       if(unlocked)return;
       if(current){await playCurrent();return;}
       player.src=silence;
-      try{await player.play();player.pause();unlocked=true;enable.hidden=true;}catch(_){enable.hidden=false;}
+      try{await player.play();player.pause();unlocked=true;enable.hidden=true;}catch(_){}
     }
     function seekCurrent(){
       if(!current)return;
@@ -40,7 +40,7 @@
       seekCurrent();
       if(Number.isFinite(player.duration)&&position(command)>=player.duration){player.pause();paint();return;}
       try{await player.play();if(destroyed||current!==command||command.action!=='play'){player.pause();return;}unlocked=true;enable.hidden=true;paint();}
-      catch(error){if(current!==command)return;if(error?.name==='NotAllowedError'){enable.hidden=false;enable.textContent='Включить звук урока';}else if(error?.name!=='AbortError'){notice('Аудио не загрузилось. Повторите Play после восстановления связи.');}}
+      catch(error){if(current!==command)return;if(error?.name==='NotAllowedError'){enable.hidden=false;}else if(error?.name!=='AbortError'){notice('Аудио не загрузилось. Повторите Play после восстановления связи.');}}
     }
     function apply(command){
       if(!isLive()||destroyed)return;
@@ -96,7 +96,11 @@
       paint();
     }
     function share(){if(canControl()&&current&&isLive())void send({...current,position:player.currentTime||0,action:player.paused?'pause':'play',at:now(),revision:Math.max(now(),revision),serial:++serial}).catch(()=>{});}
-    const reconnect=()=>{if(!isLive())return;if(canControl())share();else{if(!unlocked)enable.hidden=false;void requestState?.();}refresh();};
+    const reconnect=()=>{if(!isLive())return;if(canControl())share();else{void requestState?.();}refresh();};
+    // A normal tap on camera/minimize/Continue can grant playback permission.
+    // No permission button is shown unless an actual recording is blocked.
+    const unlockOnInteraction=()=>{if(isLive()&&!canControl()&&!unlocked){if(current?.action==='play')void playCurrent();else void prime();}};
+    doc.addEventListener('click',unlockOnInteraction,true);
     root.addEventListener('click',click,true);root.addEventListener('input',seek,true);
     enable.addEventListener('click',()=>{if(current?.action==='play')void playCurrent();else void prime();});
     for(const type of ['play','pause','timeupdate','ended'])player.addEventListener(type,paint);
@@ -112,7 +116,7 @@
       if(replaced||signature!==observer.signature){observedClips=elements;observer.signature=signature;refresh();}
     }):null;
     observer?.observe(root,{childList:true,subtree:true});
-    return {receive,share,reconnect,refresh,stop,player,destroy(){destroyed=true;stop();observer?.disconnect();root.removeEventListener('click',click,true);root.removeEventListener('input',seek,true);player.remove();}};
+    return {receive,share,reconnect,refresh,stop,player,destroy(){destroyed=true;stop();observer?.disconnect();doc.removeEventListener('click',unlockOnInteraction,true);root.removeEventListener('click',click,true);root.removeEventListener('input',seek,true);player.remove();}};
   }
   window.SpaceWhaleLessonAudio={create};
 })();

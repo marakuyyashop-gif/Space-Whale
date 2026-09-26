@@ -4,10 +4,10 @@
 <title>Space Whale — Learning Space</title>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260921-sidebar-light-v1">
-<link rel="stylesheet" href="exercise-kit.css?v=20260926-classroom-controls">
+<link rel="stylesheet" href="exercise-kit.css?v=20260926-floating-dimmer">
 <link rel="stylesheet" href="learning-space.css?v=20260924-core-neu">
-<link rel="stylesheet" href="workspace.css?v=20260926-classroom-controls">
-<link rel="stylesheet" href="classroom-media.css?v=20260926-classroom-controls">
+<link rel="stylesheet" href="workspace.css?v=20260926-floating-dimmer">
+<link rel="stylesheet" href="classroom-media.css?v=20260926-floating-dimmer">
 <link rel="stylesheet" href="workspace-word-focus.css?v=20260926-word-focus">
 </head><body class="learning-space unified-workspace" data-theme="light">
 <script>if(new URLSearchParams(location.search).has("session")||new URLSearchParams(location.search).has("guest")||new URLSearchParams(location.search).has("room"))document.body.dataset.workspaceRole="connecting";</script>
@@ -36,16 +36,17 @@
 </nav>
 <div class="workspace-mini-dock" aria-label="Будущие инструменты"><button id="newGuestLesson" type="button" aria-label="Новый ученик / закрыть ссылку" data-tooltip="Новый ученик / закрыть ссылку"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button><button id="inviteStudent" type="button" aria-label="Ссылка для ученика" data-tooltip="Ссылка для ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></button></div>
 <section id="workspaceStudentProfile" class="workspace-student-profile" aria-label="Профиль ученика" hidden></section></aside><button id="workspaceSidebarToggle" class="workspace-sidebar-toggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Свернуть меню"><span aria-hidden="true"></span></button></div>
-<section class="class-area"><header class="workspace-utility-bar" id="workspaceUtilityBar"><div class="workspace-theme-switch" role="group" aria-label="Тема"><button data-workspace-theme="light" type="button" aria-pressed="true" aria-label="Светлая тема" title="Светлая тема"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button><button data-workspace-theme="dark" type="button" aria-pressed="false" aria-label="Тёмная тема" title="Тёмная тема"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.4A8.4 8.4 0 0 1 8.6 4 8.4 8.4 0 1 0 20 15.4Z"/></svg></button></div><button id="lessonAudioEnable" type="button" class="workspace-audio-enable" hidden>Включить звук урока</button></header><aside id="videoDock" class="workspace-video-dock" tabindex="0" aria-label="Видеосвязь: перетащите окно" hidden>
+<section class="class-area"><div class="workspace-utility-bar" id="workspaceUtilityBar"><button id="workspaceThemeToggle" class="workspace-theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема" title="Переключить тему"><span class="theme-sky" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars">✦ · ✧</span><span class="theme-orb"><i></i><i></i><i></i></span></span></button></div><button id="lessonAudioEnable" type="button" class="workspace-audio-enable" title="Браузер приостановил аудио упражнений. Нажмите, чтобы разрешить воспроизведение." hidden>Разрешить аудио упражнений</button><aside id="videoDock" class="workspace-video-dock" tabindex="0" aria-label="Видеосвязь: перетащите окно" hidden>
 <div class="workspace-video-toolbar">
 
 <button id="mediaSize" type="button" class="workspace-video-tool" aria-label="Свернуть видео" title="Свернуть видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="media-collapse-icon" d="M4 9h5V4m11 11h-5v5M9 9 3 3m12 12 6 6"/><path class="media-expand-icon" d="M9 4H4v5m11 11h5v-5M4 4l6 6m10 10-6-6"/></svg></button>
 <button id="mediaHide" type="button" class="workspace-video-tool" aria-label="Спрятать видео; звук продолжится" title="Спрятать видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
 </div>
-<button id="mediaResize" type="button" class="workspace-video-resize" aria-label="Размер видео: потяните угол или используйте стрелки" title="Изменить размер"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 20 10-10m-4 10 4-4"/></svg></button><div id="videoParticipants" class="workspace-video-participants"></div>
+<button id="mediaResize" type="button" class="workspace-video-resize" aria-label="Размер видео: потяните левый угол или используйте стрелки" title="Изменить размер"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 20 10-10m-4 10 4-4"/></svg></button><div id="videoParticipants" class="workspace-video-participants"></div>
 <div class="workspace-video-controls">
 <button id="micToggle" type="button" class="workspace-icon off" aria-label="Включить микрофон" data-tooltip="Включить микрофон" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/><path class="media-off-slash" d="M3 3 21 21"/></svg></button>
 <button id="cameraToggle" type="button" class="workspace-icon off" aria-label="Включить камеру" data-tooltip="Включить камеру" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="12.5" height="11" rx="2"/><path d="m16 10 4.5-2.5v9L16 14"/><path class="media-off-slash" d="M3 3 21 21"/></svg></button>
+<button id="mediaLessonContinue" type="button" class="workspace-video-action workspace-video-continue" hidden>К заданиям</button>
 <button id="mediaRetry" type="button" class="workspace-video-action" hidden>Подключить снова</button>
 <button id="mediaEnableAudio" type="button" class="workspace-video-action" hidden>Включить звук</button>
 </div>
@@ -58,15 +59,15 @@
 <script src="teacher-access.js?v=20260926-fast-sync"></script>
 <script src="classroom-realtime.js?v=20260926-classroom-controls"></script>
 <script src="workspace-word-focus.js?v=20260926-word-focus"></script>
-<script src="workspace-audio.js?v=20260926-shared-audio-2"></script>
-<script src="classroom-media.js?v=20260926-classroom-controls"></script>
-<script src="exercise-kit.js?v=20260926-clothes-lesson-one"></script>
+<script src="workspace-audio.js?v=20260926-floating-dimmer"></script>
+<script src="classroom-media.js?v=20260926-floating-dimmer"></script>
+<script src="exercise-kit.js?v=20260926-floating-dimmer"></script>
 <script src="template-gallery.js?v=20260926-template-layers"></script>
 <script src="lesson-draft-first-day-school.js?v=20260926-phrases"></script>
 <script src="lesson-draft-school-fair.js?v=20260926-phrases"></script>
-<script src="course-content.js?v=20260926-clothes-lesson-one"></script>
+<script src="course-content.js?v=20260926-floating-dimmer"></script>
 <script src="whale1-content.js?v=20260926-feedback"></script>
 <script src="workspace-catalog.js?v=20260926-clothes-lesson-one"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-classroom-controls";document.body.append(script);}});</script>
+<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-floating-dimmer";document.body.append(script);}});</script>
 </body></html>

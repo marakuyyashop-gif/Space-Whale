@@ -32,10 +32,12 @@
     sidebar.inert=closed;sidebarToggle.setAttribute('aria-expanded',String(!closed));
     sidebarToggle.setAttribute('aria-label',closed?'Открыть меню':'Свернуть меню');
   });
-  document.querySelectorAll('[data-workspace-theme]').forEach(button=>button.addEventListener('click',()=>{
-    document.body.dataset.theme=button.dataset.workspaceTheme;
-    document.querySelectorAll('[data-workspace-theme]').forEach(control=>control.setAttribute('aria-pressed',String(control===button)));
-  }));
+  const themeToggle=document.getElementById('workspaceThemeToggle');
+  themeToggle?.addEventListener('click',()=>{
+    const dark=document.body.dataset.theme!=='dark';
+    document.body.dataset.theme=dark?'dark':'light';
+    themeToggle.setAttribute('aria-checked',String(dark));
+  });
 
   const panels = ['class', 'library'];
   const sections = [['tasks', 'Tasks'], ['language', 'Language input'], ['self-study', 'Self study']];
@@ -876,7 +878,7 @@
   }
   function connectLiveMedia(){
     if(pupilWaiting())return;
-    void window.SpaceWhaleMedia?.connect({sessionId:guestToken?'guest:'+guestToken.slice(0,8):sessionId,guestToken:guestToken||undefined,role:liveRole,guest:Boolean(guestToken),status:liveSession?.status});
+    void window.SpaceWhaleMedia?.connect({sessionId:guestToken?'guest:'+guestToken.slice(0,8):sessionId,guestToken:guestToken||undefined,role:liveRole,guest:Boolean(guestToken),status:liveSession?.started_at?'live':liveSession?.status});
   }
   const saveTimer=()=>{try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}};
   function timerState(){
@@ -897,7 +899,7 @@
   studentTimer.innerHTML='<span class="workspace-student-timer-caption">До конца урока</span><span class="workspace-student-time" role="timer" aria-label="Осталось времени">60:00</span>';
   document.getElementById('workspaceUtilityBar').prepend(studentTimer);
   const utilityBar=document.getElementById('workspaceUtilityBar');
-  if(window.ResizeObserver)new ResizeObserver(()=>document.querySelector('.class-area').style.setProperty('--workspace-bar-height',utilityBar.getBoundingClientRect().height+'px')).observe(utilityBar);
+  if(window.ResizeObserver)new ResizeObserver(()=>document.querySelector('.class-area').style.setProperty('--workspace-controls-clearance',(utilityBar.getBoundingClientRect().bottom-document.querySelector('.class-area').getBoundingClientRect().top+14)+'px')).observe(utilityBar);
   function paintTimer(){
     const state=timerState(),seconds=Math.ceil(state.remaining/1000),spent=state.duration-state.remaining,expired=state.active&&seconds===0;
     document.getElementById('workspaceClockTime').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;

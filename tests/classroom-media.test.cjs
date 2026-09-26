@@ -119,3 +119,21 @@ test('compact mobile hides self, defaults to teacher and follows the remote acti
  const first=visible()[0];s.instances[0].handlers['active-speaker-change']({activeSpeaker:{peerId:'peer'}});assert.notEqual(visible()[0],first);
  s.api.setView('expanded');assert.equal(visible().length,3);await s.api.stopMedia();
 });
+test('server Start arriving before video connection still opens the full introduction',async()=>{
+ const s=fixture({mobile:true,role:'student'});s.api.lessonStarted(session.sessionId);
+ await s.api.connect({...session,role:'student'});
+ assert.equal(s.api.state.view,'expanded');assert.equal(s.document.getElementById('mediaLessonContinue').hidden,false);
+ s.click('mediaLessonContinue');assert.equal(s.api.state.view,'mini');
+ await s.api.connect({...session,role:'student'});assert.equal(s.api.state.view,'mini');await s.api.stopMedia();
+});
+test('left resize keeps the right edge anchored and video starts at the top of the workspace',async()=>{
+ const s=fixture();await s.api.connect(session);s.api.setView('mini');
+ const dock=s.document.getElementById('videoDock'),resize=s.document.getElementById('mediaResize');
+ dock.getBoundingClientRect=()=>({left:parseFloat(dock.style.left),top:parseFloat(dock.style.top),width:parseFloat(dock.style.width),height:parseFloat(dock.style.height)});
+ resize.setPointerCapture=()=>{};
+ const right=()=>parseFloat(dock.style.left)+parseFloat(dock.style.width),before=right();assert.equal(dock.style.top,'8px');
+ const fire=(target,type,props)=>{const e=new s.dom.Event(type,{bubbles:true,cancelable:true});Object.assign(e,props);target.dispatchEvent(e);};
+ fire(resize,'pointerdown',{button:0,pointerId:1,clientX:100,clientY:200});fire(dock,'pointermove',{pointerId:1,clientX:160,clientY:200});
+ assert.equal(parseFloat(dock.style.width),180);assert.equal(right(),before);
+ fire(dock,'pointerup',{pointerId:1});await s.api.stopMedia();
+});
