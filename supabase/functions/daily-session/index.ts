@@ -33,7 +33,7 @@ async function verifyUser(header:string|null){
 async function daily(path:string,method='GET',body?:unknown,allowed:number[]=[]){
   const response=await fetch('https://api.daily.co/v1'+path,{method,headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(12000)});
   const data=await response.json().catch(()=>null);
-  if(!response.ok&&!allowed.includes(response.status)){const error:any=new Error('DAILY');error.safeCode=`DAILY_${response.status}`;throw error;}
+  if(!response.ok&&!allowed.includes(response.status)){const error:any=new Error('DAILY');error.safeCode=`DAILY_${method}_${path.split('/').length}_${response.status}`;throw error;}
   return {status:response.status,data};
 }
 const hash=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))).map(b=>b.toString(16).padStart(2,'0')).join('');

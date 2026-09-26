@@ -8,12 +8,14 @@ export function createHandler({repo,verifyUser,daily,hash,now=()=>Date.now()}) {
   const reply=(status,data)=>new Response(JSON.stringify(data),{status,headers:{...cors,'Content-Type':'application/json'}});
   const alive=row=>row?.active && Date.parse(row.expires_at)>now();
   async function removeRoom(name){
-    // Expire first: previously issued tokens cannot enter while we eject occupants.
-    const room=await daily(`/rooms/${name}`,'POST',{properties:{exp:Math.floor(now()/1000)-1,eject_at_room_exp:true}},[404]);
+    // Daily rejects expiry timestamps in the past. Shorten the room lease, then
+    // eject/ban occupants and DELETE; deletion revokes previously issued tokens.
+    const room=await daily(`/rooms/${name}`,'POST',{properties:{exp:Math.floor(now()/1000)+30,eject_at_room_exp:true}},[404]);
     if(room.status===404)return;
     const presence=await daily(`/rooms/${name}/presence`,'GET',undefined,[404]);
     const ids=(presence.data?.data||[]).map(p=>p.id).filter(Boolean);
-    if(ids.length)await daily(`/rooms/${name}/eject`,'POST',{ids},[404]);
+    const userIds=(presence.data?.data||[]).map(p=>p.userId).filter(Boolean);
+    if(ids.length)await daily(`/rooms/${name}/eject`,'POST',{ids,...(userIds.length?{user_ids:userIds,ban:true}:{})},[404]);
     await daily(`/rooms/${name}`,'DELETE',undefined,[404]);
   }
   async function cleanGuest(row){
@@ -57,7 +59,7 @@ export function createHandler({repo,verifyUser,daily,hash,now=()=>Date.now()}) {
         }
         if(!alive(guest)){
           // Also recover cleanup after a tab was closed during Finish Lesson.
-          try{await cleanGuest(guest);}catch{/* Marker retained for the owner's retry. */}
+          try{await cleanGuest(guest);}catch(error){console.error('daily-session cleanup pending',error?.safeCode||'INTERNAL');}
           deny(403,'INVITATION_CLOSED');
         }
         if(role==='student'&&!guest.started_at)deny(425,'LESSON_NOT_STARTED');

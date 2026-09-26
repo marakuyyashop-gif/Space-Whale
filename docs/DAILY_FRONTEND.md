@@ -6,7 +6,7 @@
 2. The server closes previous invitation/video rooms, creates a clean invitation and the website copies the pupil link. The teacher enters the matching room automatically.
 3. The video panel connects with camera/microphone initially off. Use its existing-style camera and microphone buttons to prepare. A pupil opening the link remains in the existing waiting screen, without video or materials.
 4. Start Lesson admits the pupil to the materials and video room and starts the existing shared timer.
-5. Finish Lesson revokes the invitation, expires the Daily room, ejects its participants and deletes the room. The teacher returns to the permanent preparation Workspace. New pupil creates an isolated invitation/room with empty answers.
+5. Finish Lesson revokes the invitation, shortens the Daily room lifetime, ejects its participants and deletes the room. The teacher returns to the permanent preparation Workspace. New pupil creates an isolated invitation/room with empty answers.
 
 Mic/camera errors offer a retry. Remote audio autoplay restrictions have an explicit Enable audio action. A fatal call error releases devices before offering reconnect. Reloading does not end the lesson. Exercise synchronization remains independent; classroom-realtime.js is unchanged.
 
@@ -18,7 +18,7 @@ Gateway JWT verification is disabled deliberately for account-free pupil invitat
 
 Private Daily room names derive from the invitation hash, never the raw bearer token. Meeting tokens are per role, expire no later than the invitation/room (maximum four hours), and are held only in memory. Rooms admit two participants and enforce unique user IDs; the pupil has no owner/screenshare rights. This release is for individual lessons, not group clubs.
 
-The server-only daily_room_name column tracks rooms until cleanup succeeds. Rotation first revokes old invitations, retries outstanding room cleanup and only then creates the next invitation. Join rechecks authorization after token issuance to catch concurrent Finish/rotation. Cleanup expires the room before ejecting occupants and deleting it, so old meeting tokens cannot reenter. Failed cleanup keeps its marker for retry. No service-role or Daily secret is present in public code. No new public table access was granted.
+The server-only daily_room_name column tracks rooms until cleanup succeeds. Rotation first revokes old invitations, retries outstanding room cleanup and only then creates the next invitation. Join rechecks authorization after token issuance to catch concurrent Finish/rotation. Cleanup shortens the room lifetime, ejects/bans occupants and deletes it, so old meeting tokens cannot reenter. Daily requires the temporary expiry timestamp to be in the future; deletion is the immediate access cutoff. Failed cleanup keeps its marker for retry. No service-role or Daily secret is present in public code. No new public table access was granted.
 
 ## Frontend
 
@@ -29,7 +29,7 @@ The server-only daily_room_name column tracks rooms until cleanup succeeds. Rota
 
 ## Verification
 
-38 focused automated checks cover guest/account authorization, role forgery, pre-start admission, expiry, end/rotation, cleanup failure/retry, token-issuance races, device toggles, media teardown, autoplay recovery, reconnect and existing exercise/session synchronization. Live backend probes also verify a disposable invitation and real Daily room/token creation. Physical camera/microphone quality and a real two-device teacher/pupil call require a device smoke test; automated checks are not a claim of that result.
+38 focused automated checks cover guest/account authorization, role forgery, pre-start admission, expiry, end/rotation, cleanup failure/retry, token-issuance races, device toggles, media teardown, autoplay recovery, reconnect and existing exercise/session synchronization. Live backend probes verified waiting admission denial (425), pupil role and real room/token creation (200), forbidden pupil finish/rotation (403), revocation (403), and actual Daily cleanup. The published pupil page visibly joined Daily with enabled camera/mic controls, kept materials separate, and closed on revocation. The cloud browser has no available camera; its device-error message was verified. Physical camera/microphone quality and a real two-device teacher/pupil call require a device smoke test; automated checks are not a claim of that result.
 
 Security advisor output retains existing warnings about intentional capability-authenticated SECURITY DEFINER RPCs and disabled leaked-password checks; the invitation table remains closed by RLS with no public table policies. No such policies/functions were added by this change.
 

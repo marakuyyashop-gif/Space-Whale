@@ -19,7 +19,7 @@ function fixture(options={}){
   if(path.endsWith('/eject'))return {status:200,data:{ejectedIds:body.ids}};
   if(method==='DELETE'){rooms.delete(name);return {status:200,data:{deleted:true}};}
   if(!rooms.has(name))return {status:404,data:{}};
-  if(method==='POST')Object.assign(rooms.get(name).config,body.properties);
+  if(method==='POST'){assert.ok(body.properties.exp>time/1000,'Daily only accepts future room expiration');Object.assign(rooms.get(name).config,body.properties);}
   return {status:200,data:rooms.get(name)};
  };
  const handler=createHandler({repo,daily,hash,now:()=>time,verifyUser:async header=>header==='Bearer owner'?{id:'owner',teacher:true}:header==='Bearer stranger'?{id:'stranger',teacher:true}:header==='Bearer pupil'?{id:'pupil',teacher:false}:null});
