@@ -611,7 +611,22 @@
       const pictureOnly=def.kind==='matching'&&def.layout==='picture-word'&&(item.image||item.imagePending);
       const prompt = node('div', pictureOnly?'ek-prompt ek-picture-prompt':'ek-prompt', pictureOnly?'':item.text);
       prompt.setAttribute('aria-label', 'Phrase to match');
-      if (item.image || item.imagePending) prompt.prepend(illustration(item));
+      if (item.image || item.imagePending) {
+        const picture=illustration(item),pictureDialog=dialog;
+        pictureDialog.classList.add('ek-image-dialog');
+        const fitPicture=(width,height)=>{
+          const ratio=width>0&&height>0 ? width/height*(item.crop?item.crop.w/item.crop.h:1) : 4/5;
+          pictureDialog.style.setProperty('--ek-picture-dialog-width',Math.min(440,320*ratio+56)+'px');
+          pictureDialog.style.setProperty('--ek-dialog-image-ratio',String(ratio));
+        };
+        fitPicture(item.imageWidth,item.imageHeight);
+        if(picture.tagName==='IMG'){
+          const fitLoaded=()=>fitPicture(picture.naturalWidth||item.imageWidth,picture.naturalHeight||item.imageHeight);
+          picture.addEventListener('load',fitLoaded,{once:true});
+          if(picture.complete&&picture.naturalWidth)fitLoaded();
+        }
+        prompt.prepend(picture);
+      }
       dialog.append(prompt);
       const choices = node('div', 'ek-options');
       available.forEach(option => {

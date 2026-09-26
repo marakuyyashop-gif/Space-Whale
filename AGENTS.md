@@ -38,3 +38,5 @@
 - Picture matching corrections show each incorrect picture with its correct word; allow horizontal touch scroll and explicit previous/next buttons.
 - Explicit teacher video minimization sends a one-time minimize event. Learners can independently resize or expand afterwards; viewport changes must not resend it.
 - Invitation creation acknowledges the click immediately. Clipboard permission cannot indefinitely delay navigation into an already-created room; keep server room revocation before issuing a replacement invitation.
+
+- Image selection dialogs fit their picture’s intrinsic proportions. Do not force a square or landscape picture panel around portrait art, or leave a blank side strip. Keep answer button sizing unchanged when the dialog adapts.

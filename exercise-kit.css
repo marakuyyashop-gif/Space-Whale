@@ -935,3 +935,9 @@
 .exercise-kit .ek-picture-correction-controls .ek-button{width:36px;min-height:36px;padding:0;font-size:22px}
 /* Feedback dots belong on the card boundary/lamp, not behind the selected text. */
 .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]::before{background-image:none}
+
+/* Image dialogs fit the artwork's own ratio; no empty fixed-width picture panel. */
+.exercise-kit .ek-dialog.ek-image-dialog{box-sizing:border-box;width:min(var(--ek-picture-dialog-width,312px),calc(100vw - 32px))}
+.exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-image{display:block;width:100%;height:auto;max-height:none;aspect-ratio:auto!important;object-fit:contain;margin:0}
+.exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-crop-image,
+.exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-image-pending{aspect-ratio:var(--ek-dialog-image-ratio,0.8)!important}
