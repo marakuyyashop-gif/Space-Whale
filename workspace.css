@@ -165,7 +165,7 @@ body.unified-workspace{background:var(--sw-neu-bg);color:var(--sw-neu-ink);--lea
 body.unified-workspace{--workspace-accent:#c36631;--workspace-grid:rgba(66,72,78,.10)}
 .unified-workspace .lesson-scroll{background-color:#f6f6f5!important;background-image:radial-gradient(circle,var(--workspace-grid) .8px,transparent 1px)!important;background-size:4px 4px!important}
 [data-theme=dark].unified-workspace{--workspace-accent:#e59b6b;--workspace-grid:rgba(226,230,234,.055)}
-[data-theme=dark].unified-workspace .lesson-scroll{background-color:var(--sw-neu-bg)!important}
+[data-theme=dark].unified-workspace .lesson-scroll{background-color:transparent!important}
 .unified-workspace .app-sidebar{gap:12px}
 .workspace-session-heading{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%);margin:0;padding:0}
 .workspace-course-controls{display:flex;align-items:center;gap:10px;flex:none;padding:3px 6px}
@@ -614,3 +614,7 @@ body.unified-workspace .app-sidebar,body.unified-workspace[data-theme=dark] .app
 /* Utility clearance remains; the strip itself never paints a separate surface. */
 .unified-workspace .workspace-utility-bar{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important}
 .unified-workspace .workspace-utility-bar::before,.unified-workspace .workspace-utility-bar::after{content:none!important;display:none!important}
+
+/* One continuous textured canvas. Clearance is scroll padding, never a painted header. */
+body.unified-workspace .class-content,body.unified-workspace[data-workspace-role] .class-content{top:0!important;background:transparent!important}
+body.unified-workspace .lesson-scroll,body.unified-workspace[data-theme=dark] .lesson-scroll{background:transparent!important;background-image:none!important;padding-top:max(calc(66px + env(safe-area-inset-top)),calc(var(--workspace-controls-clearance,58px) + 8px))!important;scroll-padding-top:max(calc(66px + env(safe-area-inset-top)),calc(var(--workspace-controls-clearance,58px) + 8px))}
