@@ -722,6 +722,7 @@
       onLessonState:applyGuestLessonState,
       onEnded:()=>{
         void window.SpaceWhaleMedia?.stopMedia();
+        if(managingInvitation&&liveRole==='teacher')return;
         if(liveRole==='teacher'||window.SpaceWhaleIsTeacher===true){returnToTeacherWorkspace('closed');return;}
         liveReady=false;mounted?.destroy?.();host.replaceChildren();studentTimer.hidden=true;
         document.body.dataset.workspaceRole='connection-error';
@@ -777,8 +778,8 @@
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';
     liveSession = result.session;
-    void window.SpaceWhaleMedia?.connect({sessionId:sessionId,role:liveRole,guest:Boolean(guestToken),status:liveSession?.status});
     if(guestToken)applyGuestLessonState(result.meta||{});
+    connectLiveMedia();
     tick();
     const inviteButton=document.getElementById('inviteStudent');
     if (inviteButton) { inviteButton.hidden=liveRole!=='teacher';inviteButton.setAttribute('aria-label','Ссылка для ученика');inviteButton.setAttribute('data-tooltip','Ссылка для ученика'); }
@@ -857,7 +858,12 @@
     paintTimer();
     if(liveReady&&wasWaiting&&!pupilWaiting()){
       mountedKey='';applyRemoteNavigation(data);render();
+      connectLiveMedia();
     }
+  }
+  function connectLiveMedia(){
+    if(pupilWaiting())return;
+    void window.SpaceWhaleMedia?.connect({sessionId:guestToken?'guest:'+guestToken.slice(0,8):sessionId,guestToken:guestToken||undefined,role:liveRole,guest:Boolean(guestToken),status:liveSession?.status});
   }
   const saveTimer=()=>{try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}};
   function timerState(){
@@ -929,9 +935,10 @@
       finish.disabled=true;
       try{
         if(guestToken){await closeGuestRoom();return;}
+        if(sessionId)await window.SpaceWhaleMedia.endSession({sessionId});
         if(classroom?.state?.channel)await classroom.disconnect();
         returnToTeacherWorkspace('closed');
-      }catch(_){error.textContent='Не удалось закрыть занятие. Оно остаётся доступным; попробуйте ещё раз.';finish.disabled=false;}
+      }catch(_){error.textContent='Не удалось подтвердить завершение связи. Повторите завершение.';finish.disabled=false;}
     },'workspace-dialog-button is-finish');
     actions.append(button('Продолжить',dialogClose,'workspace-dialog-button is-brand'),finish);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
@@ -964,11 +971,15 @@
     if(ticker!==null){clearInterval(ticker);ticker=null;}
     location.replace(teacherWorkspaceURL(reason));
   }
+  let managingInvitation=false;
   async function closeGuestRoom(){
-    await classroom.flushPendingSnapshots?.();
-    await revokeInvitation();
-    await classroom.disconnect();
-    returnToTeacherWorkspace('closed');
+    managingInvitation=true;
+    try{
+      await classroom.flushPendingSnapshots?.();
+      await revokeInvitation();
+      await classroom.disconnect();
+      returnToTeacherWorkspace('closed');
+    }finally{managingInvitation=false;}
   }
   const invite = document.getElementById('inviteStudent');
   const invitationURL=token=>{const url=new URL('classroom.html',location.href);url.searchParams.set('guest',token);return url.href;};
@@ -977,21 +988,22 @@
     catch{toast('Браузер не разрешил копирование. Нажмите кнопку ссылки ещё раз.');return false;}
   }
   async function createInvitation(){
-    const result=await window.spaceWhaleSupabase.rpc('create_guest_workspace');
-    if(result.error)throw result.error;
-    if(!result.data?.token)throw new Error('Не удалось создать приглашение.');
-    const copied=await copyInvitation(invitationURL(result.data.token));
+    managingInvitation=true;
+    let data;
+    try{data=await window.SpaceWhaleMedia.createInvitation();}
+    catch(error){managingInvitation=false;throw error;}
+    if(!data?.token){managingInvitation=false;throw new Error('Не удалось создать приглашение.');}
+    const copied=await copyInvitation(invitationURL(data.token));
     const nextRoute={...route,exercise:selectedLesson()?.stages[0]?.exercise.id||route.exercise};
     const joined=new URL('classroom.html'+query(nextRoute),location.href);
-    joined.searchParams.set('room',result.data.token);joined.searchParams.delete('guest');joined.searchParams.delete('session');joined.searchParams.delete('notice');
+    joined.searchParams.set('room',data.token);joined.searchParams.delete('guest');joined.searchParams.delete('session');joined.searchParams.delete('notice');
     joined.searchParams.delete('completed_stages');joined.searchParams.delete('exercise_view');
     joined.searchParams.set('share',copied?'copied':'1');
     location.href=joined.href;
   }
   async function revokeInvitation(){
     if(!guestToken)return;
-    const result=await window.spaceWhaleSupabase.rpc('revoke_guest_lesson_link',{p_token:guestToken});
-    if(result.error)throw result.error;
+    await window.SpaceWhaleMedia.endSession({guestToken});
   }
   if(invite){
     invite.hidden=false;

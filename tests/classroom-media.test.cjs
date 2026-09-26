@@ -41,6 +41,21 @@ test('guest tokens and closed sessions are not misused as authenticated session 
 test('no login produces a clear error without invoking the token function',async()=>{
  const s=fixture({noAuth:true});assert.equal(await s.api.connect(session),false);assert.equal(s.requests.length,0);assert.match(s.document.getElementById('mediaStatus').textContent,/аккаунт/);
 });
+test('guest uses its invitation capability, without requiring or borrowing a teacher login',async()=>{
+ const s=fixture({noAuth:true,role:'student'});
+ assert.equal(await s.api.connect({...session,role:'student',guest:true,guestToken:'private-guest-capability'}),true);
+ assert.equal(s.requests[0].args.body.guestToken,'private-guest-capability');assert.equal(s.requests[0].args.body.sessionId,undefined);
+ assert.equal(s.document.body.textContent.includes('private-guest-capability'),false);await s.api.stopMedia();
+});
+test('room lifecycle commands use the authorized function, not local-only teardown',async()=>{
+ const s=fixture({invoke:async()=>({data:{ok:true,token:'new-token'}})});
+ await s.api.createInvitation();await s.api.endSession({guestToken:'old-token'});
+ assert.equal(s.requests[0].args.body.action,'rotate');assert.equal(s.requests[1].args.body.action,'end');assert.equal(s.requests[1].args.body.guestToken,'old-token');
+});
+test('fatal call failure releases devices and allows an explicit reconnect',async()=>{
+ const s=fixture();await s.api.connect(session);s.instances[0].handlers.error();await settle();assert.equal(s.api.state.call,null);assert.equal(s.api.state.phase,'error');assert.equal(s.calls.at(-1)[0],'destroy');
+ s.click('mediaRetry');await settle();assert.equal(s.api.state.phase,'joined');await s.api.stopMedia();
+});
 test('server error leaves workspace available; retry obtains a fresh token',async()=>{
  const s=fixture({failOnce:true});await s.api.connect(session);assert.equal(s.api.state.phase,'error');assert.equal(s.document.getElementById('workspaceExercise').inert,undefined);
  s.click('mediaRetry');await settle();assert.equal(s.api.state.phase,'joined');assert.equal(s.requests.length,2);await s.api.stopMedia();

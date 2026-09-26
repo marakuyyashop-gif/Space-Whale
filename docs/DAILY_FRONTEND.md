@@ -1,27 +1,42 @@
 # Daily in the existing Workspace
 
-Frontend integration, 2026-09-26. No backend or classroom-realtime.js changes.
+## Teacher workflow
 
-- classroom.html loads classroom-media.js; it lazily loads daily-js 0.92.2 only for an authorized account-based session.
-- Workspace calls connect after its existing participant authorization returns teacher/student. The controller sends {sessionId} to daily-session via the current Supabase user session, validates the response, and joins roomUrl using the individual meetingToken. Tokens stay in memory and never enter DOM, URLs, storage or logs.
-- Daily manages local and remote camera/microphone tracks. Users enable their devices with cameraToggle / micToggle. No local getUserMedia transport remains.
-- Participant join/update/leave events update tiles. Remote audio has an explicit playback recovery action if autoplay is blocked. Self audio is never played.
-- Video reserves space beside materials on desktop and below materials at smaller widths. Exercise synchronization is independent of video startup and failure.
-- Finish/navigation away destroys the local Daily call. Legacy classroom-session.html redirects to the same Workspace and preserves its query.
+1. Open the permanent teacher Workspace and use the existing invitation button (or Start Lesson → create invitation).
+2. The server closes previous invitation/video rooms, creates a clean invitation and the website copies the pupil link. The teacher enters the matching room automatically.
+3. The video panel connects with camera/microphone initially off. Use its existing-style camera and microphone buttons to prepare. A pupil opening the link remains in the existing waiting screen, without video or materials.
+4. Start Lesson admits the pupil to the materials and video room and starts the existing shared timer.
+5. Finish Lesson revokes the invitation, expires the Daily room, ejects its participants and deletes the room. The teacher returns to the permanent preparation Workspace. New pupil creates an isolated invitation/room with empty answers.
 
-## Verified backend contract and current launch blockers
+Mic/camera errors offer a retry. Remote audio autoplay restrictions have an explicit Enable audio action. A fatal call error releases devices before offering reconnect. Reloading does not end the lesson. Exercise synchronization remains independent; classroom-realtime.js is unchanged.
 
-Read deployed daily-session ACTIVE v2. Its auth mode is user; it requires a real lesson_sessions.id and membership through teacher_id, student_id or lesson_participants. Returns {ok,roomUrl,meetingToken,role}. Browser OPTIONS preflight returns 204 with the required CORS headers.
+## Server authorization
 
-The current temporary invitations are a different system: anon pupils with guest/room bearer tokens, and synthetic guest session IDs. Those are not UUID lesson_sessions and cannot call this function. Frontend deliberately does not send them as sessionId or expose/share teacher meeting tokens. Guest video remains disabled until the backend supports this authorized invitation flow.
+`daily-session` supports POST `{guestToken}`, `{sessionId}`, `{action:'end',guestToken|sessionId}` and owner-only `{action:'rotate'}`.
 
-The function reads session.status but does not reject ended/cancelled sessions. Meeting tokens last four hours. Local call teardown is implemented, but server-enforced end-for-everyone, token reissue denial and invitation revocation need backend support before claiming a complete guest-video lifecycle. These are not fixable with a frontend-only permission check.
+Gateway JWT verification is disabled deliberately for account-free pupil invitations. The function itself authenticates every request: invitation tokens must be 64-character random hexadecimal capabilities whose SHA-256 hashes match an active, unexpired database invitation. Pupils cannot enter before started_at. Owner actions require a Supabase JWT validated through auth.getUser, the is_teacher_user role check and invitation/session ownership. Client-provided role fields are ignored. Account sessions require explicit membership and reject closed sessions; pupils require live status.
 
-No real two-account camera/audio call was performed in this execution. Automated tests cover token invocation, role handling, guest/closed guards, duplicate starts, stale requests after leave, device toggles, remote tracks, autoplay recovery, retry and cleanup. Existing guest/Workspace tests remain passing.
+Private Daily room names derive from the invitation hash, never the raw bearer token. Meeting tokens are per role, expire no later than the invitation/room (maximum four hours), and are held only in memory. Rooms admit two participants and enforce unique user IDs; the pupil has no owner/screenshare rights. This release is for individual lessons, not group clubs.
+
+The server-only daily_room_name column tracks rooms until cleanup succeeds. Rotation first revokes old invitations, retries outstanding room cleanup and only then creates the next invitation. Join rechecks authorization after token issuance to catch concurrent Finish/rotation. Cleanup expires the room before ejecting occupants and deleting it, so old meeting tokens cannot reenter. Failed cleanup keeps its marker for retry. No service-role or Daily secret is present in public code. No new public table access was granted.
+
+## Frontend
+
+- classroom-media.js lazily loads daily-js 0.92.2, owns local/remote tracks and device controls, and calls the Edge Function through the current Supabase client.
+- workspace.js invokes media only after role validation, keeps a waiting pupil disconnected, joins on admission and awaits server cleanup before leaving as teacher.
+- classroom-media.css reserves space alongside/below the materials, using existing light/dark surface and shadow tokens.
+- Legacy classroom-session.html redirects to the unified classroom and preserves its query.
+
+## Verification
+
+38 focused automated checks cover guest/account authorization, role forgery, pre-start admission, expiry, end/rotation, cleanup failure/retry, token-issuance races, device toggles, media teardown, autoplay recovery, reconnect and existing exercise/session synchronization. Live backend probes also verify a disposable invitation and real Daily room/token creation. Physical camera/microphone quality and a real two-device teacher/pupil call require a device smoke test; automated checks are not a claim of that result.
+
+Security advisor output retains existing warnings about intentional capability-authenticated SECURITY DEFINER RPCs and disabled leaked-password checks; the invitation table remains closed by RLS with no public table policies. No such policies/functions were added by this change.
 
 References:
 - https://docs.daily.co/reference/daily-js/factory-methods/create-call-object
 - https://docs.daily.co/reference/daily-js/instance-methods/join
-- https://docs.daily.co/reference/daily-js/types/daily-track-state
 - https://docs.daily.co/reference/daily-js/instance-methods/destroy
+- https://docs.daily.co/reference/rest-api/rooms/session/eject
+- https://docs.daily.co/reference/rest-api/rooms/delete-room
 - https://supabase.com/docs/reference/javascript/functions-invoke

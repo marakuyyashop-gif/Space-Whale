@@ -67,7 +67,8 @@
     const local=participants.find(p=>p.local);
     for(const [button,kind] of [[camera,'video'],[mic,'audio']]){
       const on=Boolean(local?.[kind]);button.classList.toggle('on',on);button.classList.toggle('off',!on);button.setAttribute('aria-pressed',String(on));
-      button.setAttribute('aria-label',`${on?'Выключить':'Включить'} ${kind==='video'?'камеру':'микрофон'}`);
+      const label=`${on?'Выключить':'Включить'} ${kind==='video'?'камеру':'микрофон'}`;
+      button.setAttribute('aria-label',label);button.setAttribute('data-tooltip',label);
     }
   }
   function clearMedia(){
@@ -90,10 +91,17 @@
     const code=error?.context?.status;
     if(code===401)return 'Для видеосвязи нужно войти в аккаунт участника занятия.';
     if(code===403||code===404)return 'Нет доступа к видеокомнате этого занятия.';
+    if(code===425)return 'Видеосвязь будет доступна после начала занятия.';
     return 'Не удалось подключить видео. Упражнения доступны; попробуйте ещё раз.';
   }
+  async function failedCall(call,message){
+    if(state.call!==call)return;
+    const stopped=stopMedia(),epoch=generation;
+    await stopped;
+    if(epoch===generation){visibility(true);phase('error',message);}
+  }
   async function connect(next){
-    if(!next?.sessionId || next.guest || !['teacher','student'].includes(next.role) || isClosed(next.status)){
+    if(!next?.sessionId || (next.guest&&!next.guestToken) || !['teacher','student'].includes(next.role) || isClosed(next.status)){
       context=null;await stopMedia();return false;
     }
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
@@ -103,12 +111,14 @@
       let call=null;
       try{
         await closing;if(epoch!==generation)return false;
-        const auth=await client.auth.getSession();
-        if(epoch!==generation)return false;
-        if(!auth.data?.session){const error=new Error('AUTH');error.context={status:401};throw error;}
+        if(!next.guest){
+          const auth=await client.auth.getSession();
+          if(epoch!==generation)return false;
+          if(!auth.data?.session){const error=new Error('AUTH');error.context={status:401};throw error;}
+        }
         request=new AbortController();const timeout=setTimeout(()=>request?.abort(),20000);
         let response;
-        try{response=await client.functions.invoke('daily-session',{body:{sessionId:next.sessionId},signal:request.signal});}finally{clearTimeout(timeout);}
+        try{response=await client.functions.invoke('daily-session',{body:next.guest?{guestToken:next.guestToken}:{sessionId:next.sessionId},signal:request.signal});}finally{clearTimeout(timeout);}
         if(epoch!==generation)return false;
         if(response.error)throw response.error;
         const data=response.data;
@@ -120,17 +130,25 @@
         const refresh=()=>{if(state.call===call)renderParticipants();};
         for(const event of ['participant-joined','participant-updated','participant-left','track-started','track-stopped'])call.on(event,refresh);
         call.on('camera-error',()=>{if(state.call===call){status.textContent='Нет доступа к камере или микрофону. Разрешите доступ в браузере и нажмите нужную кнопку ещё раз.';refresh();}});
-        call.on('error',()=>{if(state.call===call){phase('error','Видеосвязь прервалась. Попробуйте подключиться снова.');}});
-        call.on('left-meeting',()=>{if(state.call===call){clearMedia();phase('error','Вы вышли из видеокомнаты.');}});
+        call.on('error',()=>{void failedCall(call,'Видеосвязь прервалась. Попробуйте подключиться снова.');});
+        call.on('left-meeting',()=>{void failedCall(call,'Вы вышли из видеокомнаты.');});
         let joinTimeout;
         try{await Promise.race([call.join({url:data.roomUrl,token:data.meetingToken,startVideoOff:true,startAudioOff:true}),new Promise((_,reject)=>{joinTimeout=setTimeout(()=>reject(new Error('JOIN_TIMEOUT')),30000);})]);}finally{clearTimeout(joinTimeout);}
         if(epoch!==generation){await dispose(call);return false;}
-        phase('joined','Видеосвязь подключена. Включите камеру и микрофон.');refresh();return true;
+        phase('joined',next.role==='teacher'?'Комната готова. Включите камеру и микрофон.':'Видеосвязь подключена. Включите камеру и микрофон.');refresh();return true;
       }catch(error){
         if(epoch!==generation)return false;
         state.call=null;await dispose(call);clearMedia();phase('error',friendlyError(error));return false;
       }finally{if(epoch===generation){connecting=null;request=null;}}
     })();connecting=work;return work;
+  }
+  async function roomAction(action,details={}){
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),60000);
+    try{
+      const result=await client.functions.invoke('daily-session',{body:{...details,action},signal:controller.signal});
+      if(result.error||!result.data?.ok)throw new Error(action==='rotate'?'Не удалось подготовить новую комнату. Попробуйте ещё раз.':'Не удалось подтвердить закрытие видеокомнаты. Повторите завершение.');
+      return result.data;
+    }finally{clearTimeout(timeout);}
   }
   async function toggle(kind){
     const call=state.call;if(!call||state.phase!=='joined')return;
@@ -145,5 +163,5 @@
     let blocked=false;await Promise.all([...views.values()].map(async view=>{if(view.audio.srcObject)try{await view.audio.play();}catch(_){blocked=true;}}));playAudio.hidden=!blocked;
   });
   window.addEventListener('pagehide',()=>{void stopMedia();});
-  window.SpaceWhaleMedia={state,connect,stopMedia,toggleCamera:()=>toggle('video'),toggleMic:()=>toggle('audio')};
+  window.SpaceWhaleMedia={state,connect,stopMedia,createInvitation:()=>roomAction('rotate'),endSession:details=>roomAction('end',details),toggleCamera:()=>toggle('video'),toggleMic:()=>toggle('audio')};
 })();

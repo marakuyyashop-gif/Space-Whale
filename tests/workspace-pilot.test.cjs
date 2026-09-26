@@ -15,6 +15,7 @@ function fixture(guest=false,options={}){
  const channel={presenceState:()=>({})};
  const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:{guest:true,allowed_lesson_ids:['*']},role:options.student?'student':'teacher',meta:{started_at:options.startedAt||null,server_now:new Date().toISOString(),duration_minutes:60,allowed_lesson_ids:['*']}};},loadSharedState:async()=>null,startGuestLesson:async()=>{calls.push('start');if(options.startFails)throw new Error('offline');return {started_at:new Date().toISOString(),server_now:new Date().toISOString(),status:'live',duration_minutes:60,allowed_lesson_ids:['*']};},navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
  const window={SpaceWhaleIsTeacher:!options.student,SpaceWhaleExerciseKit:kit,SpaceWhaleCatalog:require('../workspace-catalog.js'),SpaceWhaleClassroom:classroom,addEventListener(){},setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,innerWidth:1200,innerHeight:800,spaceWhaleSupabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:name==='create_guest_workspace'?{token:'new-token'}:true};}}};
+ window.SpaceWhaleMedia={connect:async context=>{calls.push({name:'media-connect',context});},stopMedia:async()=>{calls.push({name:'media-stop'});},createInvitation:async()=>{calls.push({name:'create_guest_workspace'});return {token:'new-token'};},endSession:async args=>{calls.push({name:'revoke_guest_lesson_link',args:{p_token:args.guestToken}});if(options.endVideo)await options.endVideo(handlers);}};
  const context={window,document,location,history,localStorage:storage(),sessionStorage:storage(),navigator:{clipboard:{writeText:async url=>copied.push(url)}},URL,URLSearchParams,console,setTimeout:()=>1,clearTimeout(){},clearInterval(){}};
  if(options.ended)context.sessionStorage.setItem('space-whale:clock:guest:old-token',JSON.stringify({startedAt:1,readyAt:1,ended:true}));
  vm.createContext(context);
@@ -96,4 +97,16 @@ test('failed Start stays waiting and offers retry instead of starting a local-on
  s.click([...s.document.querySelectorAll('.workspace-session-dialog button')].find(b=>b.textContent==='Start Lesson'));await settled();
  assert.equal(s.document.querySelector('#startLesson').hidden,false);
  assert.match(s.document.querySelector('.workspace-device-status').textContent,/Не удалось начать/);
+});
+
+test('waiting student has no video; server Start connects video with its own guest invitation',async()=>{
+ const s=fixture(true,{student:true});await settled();assert.equal(s.calls.filter(c=>c.name==='media-connect').length,0);
+ s.handlers.onLessonState({status:'live',started_at:new Date().toISOString(),server_now:new Date().toISOString(),allowed_lesson_ids:['*']});
+ const media=s.calls.find(c=>c.name==='media-connect');assert.equal(media.context.guestToken,'old-token');assert.equal(media.context.role,'student');
+});
+test('teacher prepares video before Start and does not navigate away before server cleanup finishes',async()=>{
+ let finish;const s=fixture(true,{endVideo:handlers=>{handlers.onEnded();return new Promise(resolve=>{finish=resolve;});}});await settled();
+ assert.equal(s.calls.find(c=>c.name==='media-connect').context.role,'teacher');
+ s.click(s.document.querySelector('#newGuestLesson'));s.click([...s.document.querySelectorAll('.workspace-session-dialog button')].find(el=>el.textContent==='Закрыть текущую ссылку'));await settled();
+ assert.equal(new URL(s.location.href).searchParams.get('guest'),'old-token');finish();await settled();assert.equal(new URL(s.location.href).searchParams.has('guest'),false);
 });
