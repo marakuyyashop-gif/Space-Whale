@@ -96,6 +96,7 @@
     channel
       .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
+      .on("broadcast", { event: "word_focus" }, ({ payload }) => handlers.onWordFocus?.(payload))
       .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
       .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
       .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
@@ -173,6 +174,7 @@
       .on('broadcast',{event:'exercise_response'},receive(guestHandlers.onExerciseResponse))
       .on('broadcast',{event:'state_snapshot'},receive(guestHandlers.onStateSnapshot))
       .on('broadcast',{event:'state_request'},receive(guestHandlers.onStateRequest))
+      .on('broadcast',{event:'word_focus'},receive(guestHandlers.onWordFocus))
       .on('presence',{event:'sync'},()=>guestHandlers.onPresence?.(guestAnswers?.presenceState()||{}))
       .subscribe(status=>{
         guestRealtimeReady=status==='SUBSCRIBED';
@@ -181,6 +183,7 @@
           // Replay the newest unsaved values after a socket reconnect; never wait for DB.
           for(const [id,response] of pendingSnapshots)broadcast('exercise_draft',{exercise_id:id,response,source_id:state.clientId,seq:nextSequence(id),sent_at:Date.now()}).catch(()=>{});
           broadcast('state_request',{exercise_id:state.currentExerciseId,source_id:state.clientId}).catch(()=>{});
+          guestHandlers.onWordFocusReady?.();
         }
       });
     guestControl

@@ -1,0 +1,7 @@
+/* Inline paint only: no padding/borders that could reflow an exercise. */
+.exercise-kit .sw-word-focus{display:inline;border-radius:4px;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .12s,box-shadow .12s}
+@media(hover:hover){.exercise-kit .sw-word-focus:hover{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 12%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 16%,transparent)}}
+.exercise-kit .sw-word-focus.is-peer-hovered{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 12%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 16%,transparent)}
+.exercise-kit .sw-word-focus.is-word-selected{background:color-mix(in srgb,var(--sw-brand-accent,#718888) 27%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-brand-accent,#718888) 55%,transparent)}
+.exercise-kit .sw-word-focus:focus-visible{outline:2px solid var(--sw-brand-accent,#718888);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.exercise-kit .sw-word-focus{transition:none}}

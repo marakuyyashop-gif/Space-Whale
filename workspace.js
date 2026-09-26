@@ -96,6 +96,7 @@
   }
 
   let route = readRoute(location.search);
+  const wordFocus=window.SpaceWhaleWordFocus?.create({root:host,actor:classroom?.state?.clientId||'local',storageKey:`space-whale:word-focus:${classScope}`,canShare:()=>liveMode&&liveReady&&!pupilWaiting(),send:payload=>classroom.broadcast('word_focus',payload)});
   if (route.lesson) expanded.add(route.lesson);
 
   function query(next) {
@@ -606,6 +607,7 @@
 
   function renderContent() {
     if(guestToken&&(!liveReady||pupilWaiting())){
+      wordFocus?.setExercise(null);
       mounted?.destroy?.();mounted=null;mountedKey='waiting';host.hidden=false;host.replaceChildren();
       if(liveReady){const waiting=node('section','','workspace-empty workspace-waiting');waiting.append(node('h1','Ждём начала занятия'),node('p','Вы подключились. Урок откроется автоматически, когда преподаватель нажмёт Start Lesson.'));host.append(waiting);}
       return;
@@ -615,6 +617,7 @@
     const stage = selected?.stages.find(stage => stage.exercise.id === route.exercise && stageSection(stage) === route.section);
     const allowedSelected = !selected || !guestAllowedLessons || guestAllowedLessons.has(selected.id);
     const visible = allowedSelected && (route.panel !== 'class' || Boolean(liveMode && liveReady) || hasClassLesson(selected));
+    wordFocus?.setExercise(stage&&visible&&!host.hidden?stage.exercise.id:null);
     const liveIdentity = sessionId
       ? `${sessionId}:${liveRole || 'connecting'}`
       : guestToken
@@ -734,6 +737,7 @@
         else if(notice.textContent==='Восстанавливаем соединение…')toast('Соединение восстановлено');
       },
       onReconnect: async () => {
+        wordFocus?.reconnect();
         await classroom.flushPendingSnapshots?.();
         liveHydrated.clear();
         const shared=await classroom.loadSharedState(sessionId);
@@ -745,6 +749,8 @@
         }
       },
       onNavigate: applyRemoteNavigation,
+      onWordFocus:payload=>wordFocus?.receive(payload),
+      onWordFocusReady:()=>wordFocus?.reconnect(),
       onExerciseDraft: payload => acceptLivePayload(payload),
       onExerciseResponse: payload => acceptLivePayload(payload),
       onStateSnapshot: payload => acceptLivePayload(payload),
@@ -774,6 +780,7 @@
     if(!['teacher','student'].includes(result.role))throw new Error('Нет доступа к этому занятию.');
     liveReady = true;
     liveRole = result.role;
+    wordFocus?.reconnect();
     if(guestToken&&liveRole==='teacher')history.replaceState(null,'',`classroom.html${query(route)}`);
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';

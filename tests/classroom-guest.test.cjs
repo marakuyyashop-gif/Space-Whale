@@ -77,7 +77,7 @@ test('waiting guest receives the start transition even when navigation has not c
 });
 
 test('private websocket drafts arrive before a stalled database save; snapshots have a bounded debounce',async()=>{
- const peers=[],scheduled=[],received=[];let writes=0;
+ const peers=[],scheduled=[],received=[],focus=[];let writes=0;
  const make=()=>{
   const channels=[];
   const client={auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>{
@@ -93,7 +93,9 @@ test('private websocket drafts arrive before a stalled database save; snapshots 
   vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,queueMicrotask,setTimeout(fn,delay){scheduled.push({id:++next,fn,delay});return next;},clearTimeout(){}});
   return window.SpaceWhaleClassroom;
  };
- const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response)});await Promise.resolve();
+ const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response),onWordFocus:p=>focus.push(p)});await Promise.resolve();
+ await first.broadcast('word_focus',{exercise_id:'e1',kind:'hover',word:{key:'paragraph:0',text:'Hello'},source_id:first.state.clientId});
+ assert.equal(focus.at(-1).word.text,'Hello');assert.equal(writes,0,'word focus uses the existing socket without answer snapshots');
  await first.sendExerciseDraft('e1',{text:'a'});await first.sendExerciseDraft('e1',{text:'ab'});
  assert.equal(received.at(-1).text,'ab');assert.equal(writes,0);
  const saveJobs=scheduled.filter(t=>t.delay===1500);assert.equal(saveJobs.length,1,'continuous edits do not reset the persistence timer');
