@@ -84,6 +84,7 @@
     if (params.get('panel') === 'self-study') route.section = 'self-study';
     const selected=catalog.topics(route).find(lesson=>lesson.id===route.lesson)?.stages.find(stage=>stage.exercise.id===route.exercise);
     if(selected)route.section=stageSection(selected);
+    try{route.exerciseView=JSON.parse(params.get('exercise_view')||'null');}catch(_){route.exerciseView=null;}
     return route;
   }
 
@@ -94,6 +95,7 @@
     const params = new URLSearchParams(catalog.query(next));
     params.set('panel', next.panel || 'library');
     params.set('section', next.section || 'tasks');
+    if(next.exerciseView)params.set('exercise_view',JSON.stringify(next.exerciseView));
     params.set('completed_stages',[...completedStages].join(','));
     if (sessionId) params.set('session', sessionId);
     if (guestToken) params.set('guest', guestToken);
@@ -121,10 +123,13 @@
     return null;
   }
 
+  let navigationWrites=Promise.resolve();
   async function syncTeacherNavigation() {
     if (!liveMode || !liveReady || liveRole !== 'teacher' || !classroom?.state?.channel) return;
     try {
-      await classroom.navigate(route.exercise || null, query(route));
+      const exerciseId=route.exercise||null,page=query(route);
+      navigationWrites=navigationWrites.catch(()=>{}).then(()=>classroom.navigate(exerciseId,page));
+      await navigationWrites;
     } catch (error) {
       console.error('[Space Whale] Navigation sync failed', error);
       notice.textContent = 'Не удалось синхронизировать переход. Повторите действие.';
@@ -134,11 +139,13 @@
   function go(next, options = {}) {
     if (liveMode && liveReady && liveRole === 'student' && !options.remote) return;
     if(next.lesson&&!next.exercise){const saved=journeys[next.lesson];if(saved?.last)next={...next,exercise:saved.last};}
+    if(next.exercise!==route.exercise&&!options.remote)next={...next,exerciseView:null};
     route = readRoute(query(next));
     if (route.lesson) expanded.add(route.lesson);
     openLevels.add(route.level);openWhales.add(whaleKey(route.level,route.whale));
     history[options.remote ? 'replaceState' : 'pushState'](null, '', `classroom.html${query(route)}`);
     render();
+    mounted?.setViewState?.(route.exerciseView,true);
     if (!options.remote) syncTeacherNavigation();
   }
 
@@ -289,14 +296,14 @@
   function toggleLessonCompletion(lesson){
     if(locked())return;
     const entry=journeys[lesson.id]||(journeys[lesson.id]={done:[],unmarked:[]});
-    const complete=journey(lesson).count===lesson.stages.length;
+    const complete=journeys[lesson.id]?.status==='skipped'||journey(lesson).count===lesson.stages.length;
     entry.done=complete?[]:lesson.stages.map(stage=>stage.exercise.id);entry.unmarked=[];entry.status=complete?'':'done';entry.closed=false;
     saveJourney();renderSidebar();renderMilestones();
   }
   function lessonBadge(lesson){
-    const status=lessonStatus(lesson),badge=node('span',status==='Done'?'✓':status||'✓','workspace-lesson-status');
+    const status=lessonStatus(lesson),badge=node('span',status==='Done'||status==='Skipped'?'✓':status||'✓','workspace-lesson-status');
     badge.classList.toggle('is-empty',!status);badge.setAttribute('role','button');badge.tabIndex=locked()?-1:0;
-    badge.setAttribute('aria-label',status==='Done'?'Снять отметку выполнения':'Отметить Lesson выполненным');badge.setAttribute('aria-pressed',String(status==='Done'));
+    badge.setAttribute('aria-label',(status==='Done'||status==='Skipped')?'Снять отметку выполнения':'Отметить Lesson выполненным');badge.setAttribute('aria-pressed',String(status==='Done'||status==='Skipped'));
     const toggle=event=>{event.preventDefault();event.stopPropagation();toggleLessonCompletion(lesson);};
     badge.addEventListener('click',toggle);badge.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')toggle(event);});return badge;
   }
@@ -474,7 +481,7 @@
     const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,'Lesson',lessonOptions),'workspace-lesson-selector');
     lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label','Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
     lessonCard.append(node('span',stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
-    if(lesson)lessonCard.append(lessonBadge(lesson));
+    if(lesson){lessonCard.append(lessonBadge(lesson));if(lessonStatus(lesson)==='Skipped')lessonCard.append(node('span','Skip','workspace-skip-badge'));}
     overview.append(lessonCard);
     if(lesson&&journeys[lesson.id]?.closed){tree.append(overview);return;}
     const copy=node('p','','workspace-info-copy');
@@ -636,6 +643,14 @@
       answers: initialAnswers,
       syncChecks: true,
       readOnly: false,
+      navigationReadOnly:locked(),
+      onViewChange:view=>{
+        if(locked())return;
+        route.exerciseView=view;
+        history.replaceState(null,'',`classroom.html${query(route)}`);
+        if(mountedStorage)storeAnswers(mountedStorage.key,mountedStorage.signature,mounted.getAnswers());
+        syncTeacherNavigation();
+      },
       onChange: answers => {
         const response = collaborative() ? replica(exercise.id).update(answers) : answers;
         liveAnswers.set(exercise.id, answers);
@@ -649,6 +664,7 @@
       }
     });
 
+    mounted.setViewState?.(route.exerciseView,false);
     updateMilestoneProgress(exercise,initialAnswers);
     hydrateLiveExercise(exercise.id, localAnswers);
   }
@@ -923,9 +939,9 @@
       const list=node('div','',`workspace-picker-options ${options.some(option=>option.number)?'workspace-card-picker':'workspace-number-picker'}`);
       options.forEach(option=>{
         const control=option.href?node('a',option.label,'workspace-picker-option'):button(option.label,()=>{closeInfo();option.action();},'workspace-picker-option');
-        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status&&!option.mark)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));if(option.status)control.classList.add('is-progressed');}
+        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label),node('small',option.tags||'Материалы готовятся'));if(option.status&&!option.mark)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));if(option.status)control.classList.add('is-progressed');if(option.status==='Skipped')control.append(node('span','Skip','workspace-skip-badge'));}
         if(option.href)control.href=option.href;else control.setAttribute('aria-pressed',String(Boolean(option.selected)));
-        if(option.mark){const row=node('div','','workspace-collection-option');const mark=button(option.status&&option.status!=='Done'?option.status:'✓',()=>{closeInfo();option.mark();},'workspace-collection-mark');mark.setAttribute('aria-label',`${option.status==='Done'?'Снять отметку выполнения':'Отметить выполненным'}: ${option.label}`);mark.setAttribute('aria-pressed',String(option.status==='Done'));mark.disabled=locked();row.append(control,mark);list.append(row);}else list.append(control);
+        if(option.mark){const row=node('div','','workspace-collection-option');const mark=button(option.status&&option.status!=='Done'&&option.status!=='Skipped'?option.status:'✓',()=>{closeInfo();option.mark();},'workspace-collection-mark');mark.setAttribute('aria-label',`${(option.status==='Done'||option.status==='Skipped')?'Снять отметку выполнения':'Отметить выполненным'}: ${option.label}`);mark.setAttribute('aria-pressed',String(option.status==='Done'||option.status==='Skipped'));mark.disabled=locked();row.append(control,mark);list.append(row);}else list.append(control);
       });
       if(!options.length)list.append(node('p','Материалы пока не добавлены.','workspace-muted'));
       popover.append(list);owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();

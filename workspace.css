@@ -538,3 +538,6 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 
 .workspace-session-tools:has(.workspace-notice:not(:empty)),.workspace-session-tools:has(.workspace-invite-link:not([hidden])){display:block!important;flex:none}
 .workspace-mini-dock #inviteStudent{cursor:pointer;opacity:1}
+body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:var(--sw-brand-accent)}
+.workspace-skip-badge{position:absolute;right:12px;top:7px;padding:2px 5px;border-radius:5px;background:color-mix(in srgb,var(--sidebar-accent) 16%,var(--sw-neu-bg));color:var(--sidebar-accent);font:500 9px/1.2 Onest,sans-serif;letter-spacing:0;white-space:nowrap}
+.workspace-lesson-selector:has(.workspace-skip-badge),.workspace-picker-option:has(.workspace-skip-badge){padding-top:22px}

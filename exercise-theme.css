@@ -60,3 +60,6 @@
   --sw-neu-glow:5px 6px 14px #14161b99,-5px -5px 16px #3b414a80;
   --sw-neu-feedback:#2e333a;--sw-neu-checked:#343b44;--sw-neu-hover:#363d46;
 }
+/* One brand token for navigation and correct answers. */
+:root{--sw-brand-accent:#718888;--sw-answer-correct:var(--sw-brand-accent);--sw-answer-incorrect:#86503f;--sw-neu-success:var(--sw-answer-correct);--sw-neu-error:var(--sw-answer-incorrect);--sw-exercise-correct:var(--sw-answer-correct);--sw-exercise-incorrect:var(--sw-answer-incorrect)}
+[data-theme=dark]{--sw-answer-incorrect:#b47b67}

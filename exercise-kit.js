@@ -282,7 +282,22 @@
     let feedback = {};
     const doc = host.ownerDocument;
     const modern=!doc.body?.classList.contains('design-preview');
-    let syncStage=null, syncRules=null;
+    let syncStage=null, syncRules=null, rulesOpen=null;
+    const centerSection=element=>{
+      if(!element||element.hidden)return;
+      const scroller=host.closest?.('.lesson-scroll');
+      const behavior=doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+      if(scroller?.scrollTo&&element.getBoundingClientRect){const a=element.getBoundingClientRect(),b=scroller.getBoundingClientRect();scroller.scrollTo({top:Math.max(0,scroller.scrollTop+a.top-b.top-Math.max(16,(b.height-a.height)/2)),behavior});}
+      else element.scrollIntoView?.({behavior,block:'center'});
+    };
+    const getViewState=()=>({revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
+    const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
+    const setViewState=(view,animate=true)=>{
+      if(!view||typeof view!=='object')return;
+      if(def.kind==='stage'&&def.progressive){const count=Math.max(1,Math.min(def.exercises.length,Number(view.revealed)||1));answers.revealed=count;if(count!==visibleCount)syncStage?.(count,animate);}
+      if(def.kind==='rule-page'){answers.__sw_rule_visible=Boolean(view.rule);syncRules?.(animate);}
+      for(const [id,handle] of nestedMountsByBlock)handle.setViewState(view.children?.[id],animate);
+    };
     let dialog;
     let trigger;
     let closeInline;
@@ -642,7 +657,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
+          const handle = mount(child, block.exercise, { syncChecks: Boolean(config.syncChecks), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -652,40 +667,38 @@
           const addControl = (direction, label, handler) => {
             const control = button('', handler, `ek-button ek-stage-toggle ek-stage-${direction}`);
             control.setAttribute('aria-label', label); control.title = label;
-            control.disabled = Boolean(config.readOnly);
+            control.disabled = Boolean(config.readOnly||config.navigationReadOnly);
             const chevron = node('span', 'ek-stage-chevron'); chevron.setAttribute('aria-hidden', 'true');
             control.append(chevron); navigation.append(control);
             return control;
           };
           let down, up;
           if (visibleCount < def.exercises.length) down = addControl('down', 'Show next exercise', () => {
-            if (config.readOnly) return;
-            visibleCount += 1; answers.revealed = visibleCount; save();
-            const section = syncStage(visibleCount); updateNavigation('down');
-            section.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+            if (config.readOnly||config.navigationReadOnly) return;
+            answers.revealed=visibleCount+1;syncStage(answers.revealed,true);updateNavigation('down');viewChanged();
           });
           if (visibleCount > 1) up = addControl('up', 'Свернуть задание', () => {
-            if (config.readOnly) return;
-            visibleCount -= 1; answers.revealed = visibleCount; save();
-            syncStage(visibleCount);
-            updateNavigation('up');
-            navigation.scrollIntoView?.({behavior:doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest'});
+            if (config.readOnly||config.navigationReadOnly) return;
+            answers.revealed=visibleCount-1;syncStage(answers.revealed,true);updateNavigation('up');viewChanged();
           });
-          if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus();
+          if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus({preventScroll:true});
         };
-        syncStage=count=>{
+        syncStage=(count,animate=true)=>{
           while(nestedMounts.length<count){const section=reveal();section.hidden=true;}
-          visibleCount=count;
+          const previousCount=visibleCount;visibleCount=count;
           [...stack.children].forEach((section,index)=>{
             const open=index<count;
             if(!open)section.querySelectorAll('audio,video').forEach(media=>media.pause());
-            if(section.hidden===open||Boolean(section.inert)===open)expand(section,open);
+            if(section.hidden===open||Boolean(section.inert)===open){
+              const lastChanged=index===(count>previousCount?count-1:previousCount-1);
+              if(animate)expand(section,open,lastChanged?()=>centerSection(stack.children[count-1]):undefined);else{section.hidden=!open;section.inert=!open;}
+            }
           });
           updateNavigation();return stack.children[count-1];
         };
         while (nestedMounts.length < visibleCount) reveal();
         body.append(stack);
-        if (def.progressive) { body.append(navigation); updateNavigation(); }
+        if (def.progressive) { body.append(navigation); updateNavigation();navigation.hidden=Boolean(config.navigationReadOnly); }
       }
       if (def.kind === 'rule-page') {
         const page = node('div', 'ek-rule-page');
@@ -695,7 +708,7 @@
             const section = node('section', 'ek-rule-section ek-rule-text-section');
             if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title === 'Examples' ? '[Exercise instruction]' : block.title));
             section.append(richText(block.text, block.highlights));
-            page.append(section);
+            if(afterExercise)revealable.push(section);page.append(section);
           }
           if (block.type === 'rule') {
             const possibleAnswers = isPossibleAnswersBlock(block);
@@ -718,16 +731,19 @@
             const figure = node('figure', 'ek-rule-visual');
             figure.append(illustration(block));
             if (block.caption) figure.append(node('figcaption', 'ek-muted', block.caption));
-            page.append(figure);
+            if(afterExercise)revealable.push(figure);page.append(figure);
           }
           if (block.type === 'exercise') {
-            afterExercise=true;
+            const isFollowing=afterExercise;afterExercise=true;
             const section = node('section', 'ek-discovery-block');
+            if(isFollowing)revealable.push(section);
             const child = node('div', 'ek-discovery-host');
             section.append(child);
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
+              navigationReadOnly:Boolean(config.navigationReadOnly),
+              onViewChange:config.onViewChange?viewChanged:undefined,
               syncChecks: Boolean(config.syncChecks),
               readOnly: Boolean(config.readOnly),
               answers: answers[block.id] || {},
@@ -744,10 +760,14 @@
         syncRules=null;
         if(revealable.length){
           const navigation=node('div','ek-stage-navigation');
-          const toggle=button('',()=>{answers.__sw_rule_visible=!answers.__sw_rule_visible;save();syncRules(true);},'ek-button ek-stage-toggle ek-stage-down');
+          const toggle=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;answers.__sw_rule_visible=!answers.__sw_rule_visible;syncRules(true);viewChanged();},'ek-button ek-stage-toggle ek-stage-down');
           const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');toggle.append(arrow);
-          navigation.append(toggle);revealable[0].before(navigation);
-          syncRules=(animate=false)=>{const open=Boolean(answers.__sw_rule_visible);revealable.forEach(section=>{if(animate)expand(section,open);else section.hidden=!open;});toggle.classList.toggle('ek-stage-up',open);toggle.classList.toggle('ek-stage-down',!open);toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Hide rule':'Show rule');toggle.title=open?'Hide rule':'Show rule';};
+          navigation.hidden=Boolean(config.navigationReadOnly);toggle.disabled=Boolean(config.readOnly||config.navigationReadOnly);navigation.append(toggle);revealable[0].before(navigation);
+          syncRules=(animate=false)=>{
+            const open=Boolean(answers.__sw_rule_visible),changed=rulesOpen!==null&&rulesOpen!==open;rulesOpen=open;
+            revealable.forEach((section,index)=>{if(animate&&changed)expand(section,open,index===revealable.length-1?()=>centerSection(open?revealable[0]:page.querySelector('.ek-discovery-block')):undefined);else if(!animate){section.hidden=!open;section.inert=!open;}});
+            toggle.classList.toggle('ek-stage-up',open);toggle.classList.toggle('ek-stage-down',!open);toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Свернуть следующий блок':'Далее');toggle.title=open?'Свернуть следующий блок':'Далее';
+          };
           syncRules();
         }
       }
@@ -1057,7 +1077,9 @@
     }
 
     const setAnswersCore = next => {
+      const priorView={revealed:answers.revealed,rule:answers.__sw_rule_visible};
       answers = clone(next || {});
+      if(config.onViewChange||config.navigationReadOnly){if(priorView.revealed!==undefined)answers.revealed=priorView.revealed;else delete answers.revealed;answers.__sw_rule_visible=priorView.rule;}
       clearFeedback();
 
       if (def.kind === 'stage') {
@@ -1120,6 +1142,8 @@
     render();
     return {
       getAnswers: () => clone(answers),
+      getViewState,
+      setViewState,
       setAnswers,
       destroy: () => { pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };

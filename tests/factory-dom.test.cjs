@@ -393,8 +393,8 @@ test('picture order grades each position and clears its badge on edit',()=>{
 });
 test('guided discovery reveals rule explicitly and preserves checked exercise on collapse',()=>{
   const s=setup('rule-page-demo',{syncChecks:true});const rule=s.host.querySelector('.ek-rule-block');assert.equal(rule.hidden,true);
-  const input=s.host.querySelector('.ek-choice-trigger');s.fire(input,'click');s.click('[Option B]');s.click('OK');s.click('Show rule');assert.equal(rule.hidden,false);assert.equal(input.getAttribute('data-feedback'),'correct');
-  s.click('Hide rule');assert.equal(rule.hidden,true);assert.ok(input.textContent.includes('[Option B]'));
+  const input=s.host.querySelector('.ek-choice-trigger');s.fire(input,'click');s.click('[Option B]');s.click('OK');s.click('Далее');assert.equal(rule.hidden,false);assert.equal(input.getAttribute('data-feedback'),'correct');
+  s.click('Свернуть следующий блок');assert.equal(rule.hidden,true);assert.ok(input.textContent.includes('[Option B]'));
   const count=s.changes.length;s.mount.setAnswers({notice:{question1:'A'},__sw_rule_visible:true});assert.equal(s.changes.length,count);assert.equal(rule.hidden,false);assert.ok(s.host.querySelector('.ek-choice-trigger').textContent.includes('[Option A]'));
 });
 test('writing uses one line; picture choices retain accessible names without visible option labels',()=>{
@@ -416,4 +416,36 @@ test('discovery uses the shared picker, grades IDs, closes on Escape and clears 
 });
 test('picture matching dialog shows just its image in the prompt',()=>{
   const s=setup('picture-word-demo');s.fire(s.host.querySelector('.ek-match-slot'),'click');const prompt=s.host.querySelector('.ek-picture-prompt');assert.ok(prompt.querySelector('img'));assert.equal(prompt.textContent,'');
+});
+
+
+test('teacher disclosure state reaches learner without allowing learner navigation or erasing answers',()=>{
+  let next;
+  const teacher=setup('progressive-stage-demo',{onViewChange:view=>{next=view;}});
+  const student=setup('progressive-stage-demo',{navigationReadOnly:true});
+  teacher.click('Show next exercise');
+  assert.equal(next.revealed,2);student.mount.setViewState(next);
+  assert.equal(student.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
+  assert.equal(student.host.querySelector('.ek-stage-navigation').hidden,true);
+  student.mount.setAnswers({revealed:1,block2:{question1:'B'}});
+  assert.equal(student.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
+  assert.equal(student.mount.getAnswers().block2.question1,'B');
+  student.click('Show next exercise');assert.equal(student.mount.getViewState().revealed,2);
+  teacher.click('Свернуть задание');student.mount.setViewState(next);
+  assert.equal(student.host.querySelectorAll('.ek-stage-section:not([hidden])').length,1);
+  assert.equal(student.mount.getAnswers().block2.question1,'B');
+  assert.equal(teacher.changes.length,0);assert.equal(student.changes.length,0);
+});
+
+test('rule disclosure belongs to teacher and scrolls the newly visible content on both screens',()=>{
+  let next;const teacher=setup('rule-page-demo',{onViewChange:view=>{next=view;}}),student=setup('rule-page-demo',{navigationReadOnly:true});
+  let teacherScroll=0,studentScroll=0;
+  teacher.host.querySelector('.ek-rule-block').scrollIntoView=()=>teacherScroll++;
+  student.host.querySelector('.ek-rule-block').scrollIntoView=()=>studentScroll++;
+  teacher.click('Далее');student.mount.setViewState(next);
+  assert.equal(teacherScroll,1);assert.equal(studentScroll,1);
+  student.mount.setAnswers({__sw_rule_visible:false});
+  assert.equal(student.host.querySelector('.ek-rule-block').hidden,false);
+  assert.equal(studentScroll,1);
+  student.click('Свернуть следующий блок');assert.equal(student.host.querySelector('.ek-rule-block').hidden,false);
 });
