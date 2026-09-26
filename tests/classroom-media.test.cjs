@@ -14,7 +14,7 @@ function fixture(options={}){
   return {data:{roomUrl:'https://example.daily.co/session-1',meetingToken:'private-meeting-token',role:options.role||'teacher'}};
  }}};
  const instances=[];
- const window={spaceWhaleSupabase:client,addEventListener:(name,fn)=>{events[name]=fn;},DailyIframe:{createCallObject:()=>{
+ const window={crypto:{randomUUID:()=>options.participantId||'11111111-1111-4111-8111-111111111111'},innerWidth:options.mobile?390:1280,innerHeight:options.mobile?844:800,matchMedia:()=>({matches:Boolean(options.mobile)}),spaceWhaleSupabase:client,addEventListener:(name,fn)=>{events[name]=fn;},DailyIframe:{createCallObject:()=>{
   const handlers={};const call={handlers,on(name,fn){handlers[name]=fn;return call;},participants:()=>media,
    async join(data){calls.push(['join',data]);if(options.join)await options.join();},async leave(){calls.push(['leave']);handlers['left-meeting']?.();},async destroy(){calls.push(['destroy']);},
    localVideo:()=>media.local.video,localAudio:()=>media.local.audio,
@@ -24,7 +24,7 @@ function fixture(options={}){
  class MediaStream{constructor(tracks){this.tracks=tracks;}getTracks(){return this.tracks;}}
  vm.runInNewContext(script,{window,document,MediaStream,URL,AbortController,setTimeout,clearTimeout,console});
  const click=id=>document.getElementById(id).dispatchEvent(new dom.Event('click'));
- return {document,api:window.SpaceWhaleMedia,events,calls,requests,instances,media,click,options};
+ return {window,dom,document,api:window.SpaceWhaleMedia,events,calls,requests,instances,media,click,options};
 }
 const session={sessionId:'session-1',role:'teacher',status:'live'};
 test('authorized session requests its own token; camera and microphone use Daily only',async()=>{
@@ -76,4 +76,36 @@ test('remote track changes update tiles; autoplay recovery and departure release
  s.options.blockAudio=false;s.click('mediaEnableAudio');await settle();assert.equal(s.document.getElementById('mediaEnableAudio').hidden,true);
  delete s.media.remote;s.instances[0].handlers['participant-left']();assert.equal(s.document.querySelectorAll('.workspace-video-tile').length,1);
  s.events.pagehide();await settle();assert.equal(s.document.querySelectorAll('.workspace-video-tile').length,0);
+});
+
+test('minimize/hide/restore never disconnects or changes device state',async()=>{
+ const s=fixture({mobile:true});await s.api.connect(session);s.click('micToggle');await settle();
+ s.click('mediaSize');assert.equal(s.api.state.view,'mini');
+ s.click('mediaHide');assert.equal(s.api.state.view,'hidden');assert.equal(s.document.getElementById('mediaRestore').hidden,false);assert.equal(s.document.getElementById('videoDock').inert,true);
+ assert.equal(s.media.local.audio,true);assert.equal(s.calls.filter(c=>c[0]==='destroy').length,0);
+ s.click('mediaRestore');assert.equal(s.api.state.view,'mini');assert.equal(s.document.getElementById('videoDock').inert,false);
+ s.click('mediaSize');assert.equal(s.api.state.view,'expanded');
+ await s.api.stopMedia();assert.equal(s.document.getElementById('mediaRestore').hidden,true);
+});
+test('Start presents video once; repeated state sync does not reopen a minimized panel',async()=>{
+ const s=fixture({mobile:true});await s.api.connect({...session,status:'waiting'});s.api.setView('mini');
+ s.api.lessonStarted(session.sessionId);assert.equal(s.api.state.view,'expanded');s.api.setView('mini');
+ await s.api.connect(session);assert.equal(s.api.state.view,'mini');assert.equal(s.instances.length,1);await s.api.stopMedia();
+});
+test('drag and keyboard movement clamp to viewport and recover on resize',async()=>{
+ const s=fixture();await s.api.connect(session);s.api.setView('mini');
+ const dock=s.document.getElementById('videoDock'),move=s.document.getElementById('mediaMove');
+ dock.getBoundingClientRect=()=>({left:parseFloat(dock.style.left)||0,top:parseFloat(dock.style.top)||0,width:164,height:240});move.setPointerCapture=()=>{};
+ const event=(type,props)=>{const e=new s.dom.Event(type,{cancelable:true});Object.assign(e,props);move.dispatchEvent(e);};
+ event('pointerdown',{button:0,pointerId:1,clientX:10,clientY:10});event('pointermove',{pointerId:1,clientX:-3000,clientY:3000});
+ assert.equal(dock.style.left,'8px');assert.equal(dock.style.top,'552px');event('pointerup',{pointerId:1});
+ event('keydown',{key:'ArrowRight'});assert.equal(dock.style.left,'32px');
+ s.window.innerHeight=400;s.events.resize();assert.equal(dock.style.top,'152px');await s.api.stopMedia();
+});
+test('group render includes every participant and guest token requests have a device identity',async()=>{
+ const s=fixture({role:'student',noAuth:true});await s.api.connect({...session,role:'student',guest:true,guestToken:'capability'});
+ assert.equal(s.requests[0].args.body.participantId,'11111111-1111-4111-8111-111111111111');
+ for(let i=0;i<4;i++)s.media['peer'+i]={session_id:'peer'+i,local:false,user_name:'Ученик',tracks:{}};
+ s.instances[0].handlers['participant-joined']();assert.equal(s.document.querySelectorAll('.workspace-video-tile').length,5);assert.equal(s.document.getElementById('videoDock').dataset.group,'true');
+ assert.equal(s.document.querySelector('.workspace-video-tile').dataset.local,'false');await s.api.stopMedia();
 });

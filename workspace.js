@@ -853,7 +853,7 @@
   const scheduledStart=()=>{const value=Date.parse(liveSession?.scheduled_at||'');return Number.isFinite(value)?value:null;};
   function applyGuestLessonState(data){
     if(!guestToken||!liveSession)return;
-    const wasWaiting=pupilWaiting();
+    const wasWaiting=pupilWaiting(),wasStarted=Boolean(liveSession.started_at);
     liveSession.started_at=data.started_at||null;
     liveSession.duration_minutes=data.duration_minutes||60;
     liveSession.status=data.status||'waiting';
@@ -863,6 +863,7 @@
     timer.startedAt=Number.isFinite(startedAt)?startedAt:null;timer.readyAt=timer.startedAt;timer.ended=false;saveTimer();
     if(Array.isArray(data.allowed_lesson_ids))guestAllowedLessons=data.allowed_lesson_ids.includes('*')?null:new Set(data.allowed_lesson_ids);
     paintTimer();
+    if(liveReady&&!wasStarted&&liveSession.started_at)window.SpaceWhaleMedia?.lessonStarted?.('guest:'+guestToken.slice(0,8));
     if(liveReady&&wasWaiting&&!pupilWaiting()){
       mountedKey='';applyRemoteNavigation(data);render();
       connectLiveMedia();

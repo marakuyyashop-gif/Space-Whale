@@ -19,7 +19,7 @@ function fixture(options={}){
   if(path.endsWith('/eject'))return {status:200,data:{ejectedIds:body.ids}};
   if(method==='DELETE'){rooms.delete(name);return {status:200,data:{deleted:true}};}
   if(!rooms.has(name))return {status:404,data:{}};
-  if(method==='POST'){assert.ok(body.properties.exp>time/1000,'Daily only accepts future room expiration');Object.assign(rooms.get(name).config,body.properties);}
+  if(method==='POST'){if(body.properties.exp)assert.ok(body.properties.exp>time/1000,'Daily only accepts future room expiration');Object.assign(rooms.get(name).config,body.properties);}
   return {status:200,data:rooms.get(name)};
  };
  const handler=createHandler({repo,daily,hash,now:()=>time,verifyUser:async header=>header==='Bearer owner'?{id:'owner',teacher:true}:header==='Bearer stranger'?{id:'stranger',teacher:true}:header==='Bearer pupil'?{id:'pupil',teacher:false}:null});
@@ -32,7 +32,7 @@ test('guest capabilities are hashed; waiting pupil receives no room or token',as
 test('verified invitation owner can prepare video before Start; pupil joins the same private room after Start',async()=>{
  const s=fixture({row:{started_at:null}});const teacher=await s.request({guestToken:raw},'owner');assert.equal(teacher.status,200);assert.equal(teacher.data.role,'teacher');assert.equal(s.tokens[0].is_owner,true);
  s.row.started_at=new Date(time).toISOString();const pupil=await s.request({guestToken:raw});assert.equal(pupil.status,200);assert.equal(pupil.data.roomUrl,teacher.data.roomUrl);assert.equal(pupil.data.role,'student');assert.equal(s.tokens[1].is_owner,false);assert.notEqual(s.tokens[1].user_id,s.tokens[0].user_id);assert.equal(s.tokens[1].enable_screenshare,false);
- assert.equal([...s.rooms.values()][0].config.max_participants,2);assert.equal(s.row.daily_room_name.includes(raw),false);assert.equal(s.events[0],'mark');
+ assert.equal([...s.rooms.values()][0].config.max_participants,12);assert.equal(s.row.daily_room_name.includes(raw),false);assert.equal(s.events[0],'mark');
 });
 test('wrong/expired/revoked invitations and forged teacher roles never get tokens',async()=>{
  for(const change of [{active:false},{expires_at:new Date(time-1000).toISOString()}]){const s=fixture({row:change});assert.equal((await s.request({guestToken:raw,role:'teacher'})).status,403);assert.equal(s.tokens.length,0);}
@@ -68,4 +68,17 @@ test('account sessions require verified membership and reject ended or not-yet-s
 test('account session finish is owner-only and stops token reissue',async()=>{
  const s=fixture();await s.request({sessionId:sid},'owner');assert.equal((await s.request({sessionId:sid,action:'end'},'pupil')).status,403);
  assert.equal((await s.request({sessionId:sid,action:'end'},'owner')).status,200);assert.equal(s.session.status,'completed');assert.equal(s.rooms.size,0);
+});
+
+test('one invitation supports distinct guests, stable retries, and cannot impersonate its owner',async()=>{
+ const s=fixture();const first='11111111-1111-4111-8111-111111111111',second='22222222-2222-4222-8222-222222222222';
+ await s.request({guestToken:raw},'owner');
+ for(const id of [first,second,first])assert.equal((await s.request({guestToken:raw,participantId:id,role:'teacher'})).status,200);
+ assert.equal(s.rooms.size,1);assert.equal(s.tokens[1].user_id,s.tokens[3].user_id);assert.notEqual(s.tokens[1].user_id,s.tokens[2].user_id);
+ assert.notEqual(s.tokens[0].user_id,s.tokens[1].user_id);assert.ok(s.tokens.slice(1).every(t=>t.is_owner===false));
+ assert.equal((await s.request({guestToken:raw,participantId:'owner'})).status,400);
+});
+test('old active rooms upgrade capacity without extending their lifetime',async()=>{
+ const s=fixture();await s.request({guestToken:raw});const room=[...s.rooms.values()][0],expiry=room.config.exp;room.config.max_participants=2;
+ assert.equal((await s.request({guestToken:raw})).status,200);assert.equal(room.config.max_participants,12);assert.equal(room.config.exp,expiry);
 });

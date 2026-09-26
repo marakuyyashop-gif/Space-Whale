@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="exercise-kit.css?v=20260926-feedback">
 <link rel="stylesheet" href="learning-space.css?v=20260924-core-neu">
 <link rel="stylesheet" href="workspace.css?v=20260926-fast-sync">
-<link rel="stylesheet" href="classroom-media.css?v=20260926-daily-guests">
+<link rel="stylesheet" href="classroom-media.css?v=20260926-floating-video">
 <link rel="stylesheet" href="workspace-word-focus.css?v=20260926-word-focus">
 </head><body class="learning-space unified-workspace" data-theme="light">
 <script>if(new URLSearchParams(location.search).has("session")||new URLSearchParams(location.search).has("guest")||new URLSearchParams(location.search).has("room"))document.body.dataset.workspaceRole="connecting";</script>
@@ -37,15 +37,20 @@
 <div class="workspace-mini-dock" aria-label="Будущие инструменты"><button id="newGuestLesson" type="button" aria-label="Новый ученик / закрыть ссылку" data-tooltip="Новый ученик / закрыть ссылку"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button><button id="inviteStudent" type="button" aria-label="Ссылка для ученика" data-tooltip="Ссылка для ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></button></div>
 <section id="workspaceStudentProfile" class="workspace-student-profile" aria-label="Профиль ученика" hidden></section></aside><button id="workspaceSidebarToggle" class="workspace-sidebar-toggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Свернуть меню"><span aria-hidden="true"></span></button></div>
 <section class="class-area"><div class="workspace-theme-switch" role="group" aria-label="Тема"><button data-workspace-theme="light" type="button" aria-pressed="true">Светлая</button><button data-workspace-theme="dark" type="button" aria-pressed="false">Тёмная</button></div><aside id="videoDock" class="workspace-video-dock" aria-label="Видеосвязь" hidden>
+<div class="workspace-video-toolbar">
+<button id="mediaMove" type="button" class="workspace-video-tool workspace-video-move" aria-label="Переместить видео: потяните или используйте стрелки клавиатуры" title="Перетащите видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9h8M8 15h8"/></svg></button>
+<button id="mediaSize" type="button" class="workspace-video-tool" aria-label="Свернуть видео" title="Свернуть видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="media-collapse-icon" d="M4 9h5V4m11 11h-5v5M9 9 3 3m12 12 6 6"/><path class="media-expand-icon" d="M9 4H4v5m11 11h5v-5M4 4l6 6m10 10-6-6"/></svg></button>
+<button id="mediaHide" type="button" class="workspace-video-tool" aria-label="Спрятать видео; звук продолжится" title="Спрятать видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+</div>
 <div id="videoParticipants" class="workspace-video-participants"></div>
 <div class="workspace-video-controls">
-<button id="micToggle" type="button" class="workspace-icon off" aria-label="Включить микрофон" data-tooltip="Включить микрофон" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></button>
-<button id="cameraToggle" type="button" class="workspace-icon off" aria-label="Включить камеру" data-tooltip="Включить камеру" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="12.5" height="11" rx="2"/><path d="m16 10 4.5-2.5v9L16 14"/></svg></button>
+<button id="micToggle" type="button" class="workspace-icon off" aria-label="Включить микрофон" data-tooltip="Включить микрофон" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/><path class="media-off-slash" d="M3 3 21 21"/></svg></button>
+<button id="cameraToggle" type="button" class="workspace-icon off" aria-label="Включить камеру" data-tooltip="Включить камеру" aria-pressed="false" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="12.5" height="11" rx="2"/><path d="m16 10 4.5-2.5v9L16 14"/><path class="media-off-slash" d="M3 3 21 21"/></svg></button>
 <button id="mediaRetry" type="button" class="workspace-video-action" hidden>Подключить снова</button>
 <button id="mediaEnableAudio" type="button" class="workspace-video-action" hidden>Включить звук</button>
 </div>
 <p id="mediaStatus" class="workspace-video-status" role="status" aria-live="polite"></p>
-</aside><nav id="workspaceMilestones" class="workspace-milestone-rail" aria-label="Milestones"></nav><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
+</aside><button id="mediaRestore" type="button" class="workspace-video-restore" aria-label="Вернуть видео" title="Вернуть видео" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button><nav id="workspaceMilestones" class="workspace-milestone-rail" aria-label="Milestones"></nav><main class="class-content"><div id="workspaceScroll" class="lesson-scroll"><section id="workspaceExercise" lang="en"></section></div></main></section>
 </div>
 <noscript>Для открытия упражнений включите JavaScript.</noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
@@ -53,7 +58,7 @@
 <script src="teacher-access.js?v=20260926-fast-sync"></script>
 <script src="classroom-realtime.js?v=20260926-word-focus"></script>
 <script src="workspace-word-focus.js?v=20260926-word-focus"></script>
-<script src="classroom-media.js?v=20260926-daily-guests"></script>
+<script src="classroom-media.js?v=20260926-floating-video"></script>
 <script src="exercise-kit.js?v=20260926-template-layers"></script>
 <script src="template-gallery.js?v=20260926-template-layers"></script>
 <script src="lesson-draft-first-day-school.js?v=20260926-phrases"></script>
@@ -62,5 +67,5 @@
 <script src="whale1-content.js?v=20260926-feedback"></script>
 <script src="workspace-catalog.js?v=20260926-template-layers"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-word-focus";document.body.append(script);}});</script>
+<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20260926-floating-video";document.body.append(script);}});</script>
 </body></html>

@@ -49,7 +49,9 @@ export function createHandler({repo,verifyUser,daily,hash,now=()=>Date.now()}) {
         if(!guest)deny(403,'INVALID_INVITATION');
         role=user?.teacher&&user.id===guest.teacher_id?'teacher':'student';
         roomName='sw-g-'+guest.token_hash.slice(0,48);
-        userId=role==='teacher'?user.id:'guest-'+guest.token_hash.slice(0,40);
+        // Per-device identity only; it never grants an account or teacher role.
+        if(body.participantId!==undefined&&(typeof body.participantId!=='string'||!uuid.test(body.participantId)))deny(400,'INVALID_PARTICIPANT');
+        userId=role==='teacher'?user.id:'guest-'+(await hash(guest.token_hash+':'+(body.participantId||crypto.randomUUID()))).slice(0,32);
         expiresAt=Math.floor(Date.parse(guest.expires_at)/1000);
         if(action==='end'){
           if(role!=='teacher')deny(403,'TEACHER_REQUIRED');
@@ -86,9 +88,12 @@ export function createHandler({repo,verifyUser,daily,hash,now=()=>Date.now()}) {
       const expiry=Math.min(expiresAt,Math.floor(now()/1000)+4*3600);
       let room=await daily(`/rooms/${roomName}`,'GET',undefined,[404]);
       if(room.status===404){
-        room=await daily('/rooms','POST',{name:roomName,privacy:'private',properties:{exp:expiry,eject_at_room_exp:true,max_participants:2,enforce_unique_user_ids:true,enable_chat:false,enable_screenshare:true,start_video_off:true,start_audio_off:true}},[400,409]);
+        room=await daily('/rooms','POST',{name:roomName,privacy:'private',properties:{exp:expiry,eject_at_room_exp:true,max_participants:12,enforce_unique_user_ids:true,enable_chat:false,enable_screenshare:true,start_video_off:true,start_audio_off:true}},[400,409]);
         if([400,409].includes(room.status))room=await daily(`/rooms/${roomName}`,'GET');
       }
+      // Upgrade existing one-to-one rooms without extending their lease or kicking
+      // current participants. New invitations and old active rooms use the same limit.
+      if(room.data?.config?.max_participants!==12)room=await daily(`/rooms/${roomName}`,'POST',{properties:{max_participants:12}});
       const tokenExpiry=Math.min(expiry,room.data?.config?.exp||expiry);
       if(tokenExpiry<=Math.floor(now()/1000))deny(403,'VIDEO_ROOM_EXPIRED');
       const token=await daily('/meeting-tokens','POST',{properties:{room_name:roomName,is_owner:role==='teacher',user_id:userId,user_name:role==='teacher'?'Преподаватель':'Ученик',exp:tokenExpiry,eject_at_token_exp:true,enable_screenshare:role==='teacher',start_video_off:true,start_audio_off:true}});

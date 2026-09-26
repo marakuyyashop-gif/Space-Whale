@@ -8,15 +8,69 @@
   const camera=document.getElementById('cameraToggle'),mic=document.getElementById('micToggle');
   const retry=document.getElementById('mediaRetry'),playAudio=document.getElementById('mediaEnableAudio');
   const client=window.spaceWhaleSupabase;
-  const state={call:null,sessionId:null,phase:'idle'};
+  const state={call:null,sessionId:null,phase:'idle',view:'expanded'};
+  const move=document.getElementById('mediaMove'),size=document.getElementById('mediaSize');
+  const hide=document.getElementById('mediaHide'),restore=document.getElementById('mediaRestore');
+  // This is a floating layer, never a column or reserved strip in the exercise layout.
+  document.body.append(dock,restore);
+  const participantId=window.crypto?.randomUUID?.();
+  const mobile=()=>window.matchMedia?.('(max-width: 768px)').matches||false;
+  let position=null,drag=null,lessonPresented=null;
+  function bounds(){const v=window.visualViewport;return {x:v?.offsetLeft||0,y:v?.offsetTop||0,width:v?.width||window.innerWidth||1024,height:v?.height||window.innerHeight||768};}
+  function place(){
+    if(dock.hidden)return;
+    const b=bounds(),r=dock.getBoundingClientRect();
+    const full=state.view==='expanded'&&mobile();
+    const wanted=full?{x:b.x+8,y:b.y+8}:position||{x:b.x+b.width-r.width-16,y:b.y+84};
+    const x=Math.max(b.x+8,Math.min(wanted.x,b.x+b.width-r.width-8));
+    const y=Math.max(b.y+8,Math.min(wanted.y,b.y+b.height-r.height-8));
+    dock.style.left=x+'px';dock.style.top=y+'px';
+    restore.style.top=Math.max(b.y+8,Math.min(y,b.y+b.height-52))+'px';
+    if(!full)position={x,y};
+  }
+  function setView(view){
+    if(!['expanded','mini','hidden'].includes(view))return;
+    state.view=view;dock.dataset.view=view;dock.inert=view==='hidden';
+    dock.setAttribute('aria-hidden',String(view==='hidden'));restore.hidden=dock.hidden||view!=='hidden';
+    const label=view==='expanded'?'Свернуть видео':'Развернуть видео';
+    size.setAttribute('aria-label',label);size.title=label;
+    place();
+  }
+  function lessonStarted(id){
+    if(!id||lessonPresented===id)return;
+    lessonPresented=id;setView('expanded');
+  }
+  size.addEventListener('click',()=>setView(state.view==='expanded'?'mini':'expanded'));
+  hide.addEventListener('click',()=>{setView('hidden');restore.focus();});
+  restore.addEventListener('click',()=>{setView('mini');size.focus();});
+  dock.addEventListener('keydown',event=>{if(event.key==='Escape'){setView('mini');size.focus();}});
+  move.addEventListener('pointerdown',event=>{
+    if(event.button!==0||state.view==='expanded'&&mobile())return;
+    const r=dock.getBoundingClientRect();drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top};
+    move.setPointerCapture(event.pointerId);event.preventDefault();
+  });
+  move.addEventListener('pointermove',event=>{
+    if(!drag||event.pointerId!==drag.id)return;
+    position={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};place();
+  });
+  const endDrag=()=>{drag=null;};
+  for(const type of ['pointerup','pointercancel','lostpointercapture'])move.addEventListener(type,endDrag);
+  move.addEventListener('keydown',event=>{
+    const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];
+    if(!delta||state.view==='expanded'&&mobile())return;
+    event.preventDefault();const r=dock.getBoundingClientRect();position={x:r.left+delta[0],y:r.top+delta[1]};place();
+  });
+  window.addEventListener('resize',place);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
+  if(window.ResizeObserver)new window.ResizeObserver(place).observe(dock);
+  function message(text,notice=false){status.textContent=text;status.hidden=!text||!notice;}
   const views=new Map();
   let context=null,generation=0,connecting=null,sdkLoading=null,request=null;
   const isClosed=s=>['ended','completed','closed','cancelled','canceled'].includes(s);
   function phase(value,message){
-    state.phase=value;dock.dataset.state=value;status.textContent=message;
+    state.phase=value;dock.dataset.state=value;status.textContent=message;status.hidden=value==='joined'||!message;
     camera.disabled=mic.disabled=value!=='joined';retry.hidden=value!=='error';
   }
-  function visibility(show){dock.hidden=!show;document.body.classList.toggle('workspace-with-video',show);}
+  function visibility(show){dock.hidden=!show;restore.hidden=!show||state.view!=='hidden';if(show)place();}
   function loadSdk(){
     if(window.DailyIframe)return Promise.resolve(window.DailyIframe);
     if(sdkLoading)return sdkLoading;
@@ -52,6 +106,7 @@
   function renderParticipants(){
     const call=state.call;if(!call)return;
     const participants=Object.values(call.participants()),keep=new Set();
+    dock.dataset.group=String(participants.length>2);
     participants.sort((a,b)=>Number(a.local)-Number(b.local));
     participants.forEach(participant=>{
       const id=participant.session_id || (participant.local?'local':'remote');keep.add(id);
@@ -64,6 +119,8 @@
       if(screenTrack){const key=id+':screen';keep.add(key);const screen=views.get(key)||makeTile(key,participant.local,true);screen.label.textContent='Экран · '+(participant.local?'Вы':participant.user_name||'Участник');bindMedia(screen.video,screenTrack);bindMedia(screen.audio,participant.local?null:track(participant,'screenAudio'),!participant.local);screen.placeholder.hidden=true;}
     });
     views.forEach((view,key)=>{if(!keep.has(key)){view.video.srcObject=view.audio.srcObject=null;view.root.remove();views.delete(key);}});
+    // Keep remote participants first even when they arrive after the local tile.
+    participants.forEach(p=>{const id=p.session_id||(p.local?'local':'remote');const view=views.get(id);if(view)tiles.append(view.root);const screen=views.get(id+':screen');if(screen)tiles.append(screen.root);});
     const local=participants.find(p=>p.local);
     for(const [button,kind] of [[camera,'video'],[mic,'audio']]){
       const on=Boolean(local?.[kind]);button.classList.toggle('on',on);button.classList.toggle('off',!on);button.setAttribute('aria-pressed',String(on));
@@ -104,8 +161,11 @@
     if(!next?.sessionId || (next.guest&&!next.guestToken) || !['teacher','student'].includes(next.role) || isClosed(next.status)){
       context=null;await stopMedia();return false;
     }
+    if(next.status==='live')lessonStarted(next.sessionId);
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
-    const closing=stopMedia();context={...next};state.sessionId=next.sessionId;const epoch=generation;
+    const previous=context?.sessionId;
+    const closing=stopMedia();if(previous!==next.sessionId){position=null;setView('expanded');}
+    context={...next};state.sessionId=next.sessionId;const epoch=generation;
     visibility(true);phase('connecting','Подключаем видеосвязь…');
     const work=(async()=>{
       let call=null;
@@ -118,7 +178,7 @@
         }
         request=new AbortController();const timeout=setTimeout(()=>request?.abort(),20000);
         let response;
-        try{response=await client.functions.invoke('daily-session',{body:next.guest?{guestToken:next.guestToken}:{sessionId:next.sessionId},signal:request.signal});}finally{clearTimeout(timeout);}
+        try{response=await client.functions.invoke('daily-session',{body:next.guest?{guestToken:next.guestToken,...(participantId?{participantId}:{})}:{sessionId:next.sessionId},signal:request.signal});}finally{clearTimeout(timeout);}
         if(epoch!==generation)return false;
         if(response.error)throw response.error;
         const data=response.data;
@@ -129,7 +189,7 @@
         call=daily.createCallObject({startVideoOff:true,startAudioOff:true});state.call=call;
         const refresh=()=>{if(state.call===call)renderParticipants();};
         for(const event of ['participant-joined','participant-updated','participant-left','track-started','track-stopped'])call.on(event,refresh);
-        call.on('camera-error',()=>{if(state.call===call){status.textContent='Нет доступа к камере или микрофону. Разрешите доступ в браузере и нажмите нужную кнопку ещё раз.';refresh();}});
+        call.on('camera-error',()=>{if(state.call===call){message('Нет доступа к камере или микрофону. Разрешите доступ в браузере и нажмите нужную кнопку ещё раз.',true);refresh();}});
         call.on('error',()=>{void failedCall(call,'Видеосвязь прервалась. Попробуйте подключиться снова.');});
         call.on('left-meeting',()=>{void failedCall(call,'Вы вышли из видеокомнаты.');});
         let joinTimeout;
@@ -153,8 +213,8 @@
   async function toggle(kind){
     const call=state.call;if(!call||state.phase!=='joined')return;
     const button=kind==='video'?camera:mic;button.disabled=true;
-    try{await (kind==='video'?call.setLocalVideo(!call.localVideo()):call.setLocalAudio(!call.localAudio()));renderParticipants();status.textContent='Видеосвязь подключена';}
-    catch(_){status.textContent='Не удалось включить устройство. Проверьте разрешения камеры и микрофона.';}
+    try{await (kind==='video'?call.setLocalVideo(!call.localVideo()):call.setLocalAudio(!call.localAudio()));renderParticipants();message('');}
+    catch(_){message('Не удалось включить устройство. Проверьте разрешения камеры и микрофона.',true);}
     finally{button.disabled=state.phase!=='joined';}
   }
   camera.addEventListener('click',()=>toggle('video'));mic.addEventListener('click',()=>toggle('audio'));
@@ -163,5 +223,5 @@
     let blocked=false;await Promise.all([...views.values()].map(async view=>{if(view.audio.srcObject)try{await view.audio.play();}catch(_){blocked=true;}}));playAudio.hidden=!blocked;
   });
   window.addEventListener('pagehide',()=>{void stopMedia();});
-  window.SpaceWhaleMedia={state,connect,stopMedia,createInvitation:()=>roomAction('rotate'),endSession:details=>roomAction('end',details),toggleCamera:()=>toggle('video'),toggleMic:()=>toggle('audio')};
+  window.SpaceWhaleMedia={state,connect,stopMedia,setView,lessonStarted,createInvitation:()=>roomAction('rotate'),endSession:details=>roomAction('end',details),toggleCamera:()=>toggle('video'),toggleMic:()=>toggle('audio')};
 })();
