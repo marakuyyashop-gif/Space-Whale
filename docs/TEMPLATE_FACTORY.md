@@ -1,6 +1,6 @@
 # Space Whale — shared template catalog
 
-Current implementation: 2026-09-23. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
+Catalog updated: 2026-09-26. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
 
 ## One source of truth
 
@@ -12,21 +12,38 @@ Current implementation: 2026-09-23. This document supersedes the older interacti
 
 Privacy is explicitly deferred after discussion with the owner. This preview is PUBLIC, not owner-only. It contains neutral placeholders and technical test tones only. Do not add confidential drafts, private content or admin tools here. Server-authorized Factory storage is a separate future task.
 
-## Catalog: 31 presets
+## Catalog: three layers, 21 cards
 
-| Family | Presets |
+The existing Workspace selectors expose three groups without new pages, CSS, button styles or image sizing changes.
+
+| Layer | Cards |
 |---|---|
-| Matching | Text halves; Word–Definition; Picture–Word |
-| Gaps | Typed; Typed + Word Bank; Inline Dropdown; Error Correction |
-| Choice | Text single; Image single; Text multiple; Image multiple |
-| Sort | Groups / speaker attribution |
-| Order | Sentence/chunks; Pictures/events |
-| Image | Labels dragged onto one image |
-| Open | Writing; Speaking; Speaking + Useful Language; Possible Answers |
-| Audio | Player; Player + transcript; Listen & Repeat |
-| Reference | Rule; Guided Discovery |
-| Composite | Reading + Choice; Reading + Gap; Listening + Choice; Listening + Gap; Listening + Sort; Listening + Order |
-| Stage | Progressive sequence of three exercises |
+| Materials / elements (6) | Audio; Text; Image; Rule; Useful phrases; Possible answers |
+| Response mechanics (9) | Matching; Single Choice; Multiple Select; Typed Input / Gap; Dropdown; Order; Sort; Image Label; Text / Writing field |
+| Composition examples (6) | Listen & Repeat; Audio + task; Text + task; Image + task; Speaking layout; Progressive sequence |
+
+A title/instruction, feedback/OK and progressive reveal remain shared behavior, not new material types. The catalog is not an exhaustive list of permitted combinations. Combine existing `kind` definitions in a `stage`, or text/image/disclosure blocks in a `presentation`. No Listening+Choice or Reading+Gap renderer kinds are added. Speaking is an ungraded composition, not a separate response engine.
+
+`SpaceWhaleTemplates` contains the 21 visible cards with `catalogGroup`, `description` and `legacyIds`. Alternate text/image/word-bank examples live inside the corresponding mechanic's progressive preview. `SpaceWhaleTemplateExamples` retains the former 31 fixtures for regression tests; it is not a second catalog. All 31 old preview links resolve to their canonical card. Existing course IDs, definitions and answer IDs are unchanged; demonstration attempts need not migrate to a different composite structure.
+
+| Former catalog entries | Destination |
+|---|---|
+| Match the Halves; Picture–Word; Word–Definition | Matching variants |
+| Text / Image Single Choice | Single Choice variants |
+| Text / Image Multiple Select | Multiple Select variants |
+| Typed Gap; Typed Gap + Word Bank; Error Correction | Typed Input / Gap variants |
+| Inline Dropdown | Dropdown |
+| Sentence / Chunk Order; Picture / Event Order | Order variants |
+| Sort into Groups; Image Label; Open Writing | Sort; Image Label; Text / Writing field |
+| Global Audio; Global Audio with transcript | Audio with optional transcript |
+| Rule / Language Reference; Possible Answers | Rule; Possible answers |
+| Speaking / Presentation; Speaking · Use phrases | Speaking layout |
+| Listen & Repeat | Listen & Repeat composition |
+| Four Listening + task presets | Audio + task composition |
+| Reading + Choice; Reading + Gap | Text + task composition |
+| Stage; Guided Discovery | Progressive sequence, including discovery example |
+
+A source and its first response must be visible together. Use a non-progressive grouped stage for a source plus one task; the existing renderer automatically reveals multiple response components progressively while retaining the leading source. Ordinary explicit progressive sequences start with the first task, not a source-only step. A single material/task or a composition without further steps has no continuation arrow. Audio stays mounted while later tasks open and close.
 
 Audio fixtures use a locally generated, three-second test tone. They test real playback, not pronunciation. Replace audio URLs with actual recordings when authoring a lesson.
 
@@ -49,7 +66,7 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | sort | `items[{id,text,correctId}]`, `groups[{id,text}]` | `{ itemId: groupId }` |
 | order | `tokens[{id,text,image?,alt?}]`, `correctOrder` | `{ order: [tokenIds] }` |
 | image-label | `image`, `alt`, `items[{id,x,y,prompt,correctId}]`, `options` | `{ targetId: optionId }` |
-| writing | `items[{id,prompt,possibleAnswers?}]` | `{ itemId: freeText }` |
+| writing | `items[{id,prompt,acceptedAnswers?,possibleAnswers?}]`, optional `responseMode:"accepted"/"open"` | `{ itemId: freeText }` |
 | presentation | `blocks` with text, image or disclosure | no automatic grade |
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
@@ -59,7 +76,7 @@ Typed gaps default to keyboard input. A bank is only a hint and may contain a ba
 
 Multiple Select uses checkboxes and exact set comparison; order of selected options does not matter. An omitted key requires teacher review.
 
-Useful Language disclosures open initially. Standalone Possible Answers disclosures and audio transcripts start closed. Writing has OK: authored `items[].possibleAnswers` appear in the feedback panel only after submission, never before it. Editing or resetting hides the examples again; synchronized checked state restores them. Examples are not accepted-answer keys, and open tasks never receive automatic correct/incorrect grades. Personal forms can set `responseMode:"personal"` for a neutral confirmation. Do not invent correct keys for personal data.
+Useful Language disclosures open initially. Standalone Possible Answers disclosures and audio transcripts start closed. Writing has OK: authored `items[].possibleAnswers` appear in the feedback panel only after submission, never before it. Editing or resetting hides the examples again; synchronized checked state restores them. Examples are not accepted-answer keys. Open tasks never receive automatic correct/incorrect grades. For keyed writing use `responseMode:"accepted"` and a non-empty `acceptedAnswers` list on every item; omissions are rejected. For free writing use `responseMode:"open"` (or omit mode and keys). Open/personal modes reject conflicting keys. Keys normalize case, Unicode NFKC and whitespace only; author punctuation and contraction alternatives explicitly. Accepted writing uses the shared feedback and Correct answers panel; arbitrary paraphrases are not semantically graded. Personal forms can set `responseMode:"personal"` for a neutral confirmation. Do not invent correct keys for personal data.
 
 ## Interaction/state guarantees
 
@@ -86,7 +103,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 - Use `kind:"stage", layout:"grouped"` for a source and its response component (audio/text plus one response component). Set the common title and instruction on the stage; child titles are hidden, optional child instructions remain available. Components keep their own answer state and local Check/Reset. Do not combine grouped layout with explicit progressive reveal. The renderer now automatically separates multiple independent response components into sequential steps, keeping leading source material with the first task and trailing support with the preceding task; answer IDs stay unchanged. Ordinary/progressive stages keep the large separation between independent exercises.
 - Grouped spacing: `--sw-component-gap`; independent exercise spacing: `--sw-stage-gap`.
 - The single `uiLabels.check` value in exercise-kit.js controls the validation button label for every shared exercise, including nested ones. Changing it to Done updates them on the next page load without changing validation behavior or lesson data. Exported as SpaceWhaleExerciseKit.uiLabels for configuration before mounting.
-- Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior remains in the separate Audio + script preview.
+- Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior is available in the Audio material preview.
 
 ## Approved monochrome direction
 

@@ -7,7 +7,7 @@ function fixture(guest=false,options={}){
  const {document,window:dom}=parseHTML(fs.readFileSync(require.resolve('../classroom.html'),'utf8'));
  const createNS=document.createElementNS.bind(document);document.createElementNS=(ns,tag)=>{const el=createNS(ns,tag);if(tag==='path'){el.getTotalLength=()=>500;el.getPointAtLength=n=>({x:n%200,y:n/2});}return el;};
  const create=document.createElement.bind(document);
- document.createElement=tag=>{const el=create(tag);if(tag==='dialog'){el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;};}return el;};
+ document.createElement=tag=>{const el=create(tag);if(tag==='audio'){el.pause=()=>{};}if(tag==='dialog'){el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;};}return el;};
  document.querySelector('#workspaceScroll').scrollTo=()=>{};
  const location={href:'https://example.test/classroom.html',pathname:'/classroom.html',search:'?level=A1.1&whale=1&lesson=a1-1-w1-l2'+(guest?'&guest=old-token':'')};location.href+=location.search;location.replace=url=>{location.href=url;};location.reload=()=>{};
  const history={replaceState(a,b,url){location.search=new URL(url,location.href).search;},pushState(a,b,url){location.search=new URL(url,location.href).search;}};
@@ -109,4 +109,22 @@ test('teacher prepares video before Start and does not navigate away before serv
  assert.equal(s.calls.find(c=>c.name==='media-connect').context.role,'teacher');
  s.click(s.document.querySelector('#newGuestLesson'));s.click([...s.document.querySelectorAll('.workspace-session-dialog button')].find(el=>el.textContent==='Закрыть текущую ссылку'));await settled();
  assert.equal(new URL(s.location.href).searchParams.get('guest'),'old-token');finish();await settled();assert.equal(new URL(s.location.href).searchParams.has('guest'),false);
+});
+
+
+test('template groups use the existing selectors and stay inside the same Workspace',async()=>{
+ const s=fixture();await settled();
+ const choose=(selector,label)=>{
+   s.click(s.document.querySelector(selector));
+   s.click([...s.document.querySelectorAll('.workspace-picker-option')].find(el=>el.textContent.includes(label)));
+ };
+ choose('.selector-level','Шаблоны упражнений');
+ assert.match(s.location.search,/view=templates/);
+ for(const [title,count] of [['Материалы / элементы',6],['Механики ответа',9],['Композиции / примеры',6]]){
+   choose('.selector-module',title);
+   assert.match(s.location.search,/view=templates/);
+   assert.equal(s.document.querySelector('.workspace-lesson-selector-title').textContent,title);
+   assert.equal(s.document.querySelectorAll('#workspaceLessonPath .workspace-path-point').length,count+1);
+   assert.ok(s.document.querySelector('#workspaceExercise h2'));
+ }
 });

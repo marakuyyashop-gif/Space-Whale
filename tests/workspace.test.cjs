@@ -14,9 +14,9 @@ function content() {
   return JSON.parse(JSON.stringify({ lessons: window.SpaceWhaleContent, templates: window.SpaceWhaleTemplates }));
 }
 
-test('existing lessons and 31 templates load as data without page-specific DOM', () => {
+test('existing lessons and 21 catalog entries load as data without page-specific DOM', () => {
   const { lessons, templates } = content();
-  assert.equal(templates.length, 31);
+  assert.equal(templates.length, 21);
   assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1', 'a1-2-w4-l2']);
   lessons.forEach(lesson => lesson.stages.forEach(stage => kit.validate(stage.exercise)));
   assert.equal(lessons.find(lesson => lesson.id === 'school-fair').stages[0].exercise.id, 'fair-reading');
@@ -90,7 +90,7 @@ test('stale or malformed deep links recover without selecting another course les
   const valid = catalog.normalize('?view=unassigned&lesson=school-fair&exercise=gone');
   assert.equal(valid.exercise, 'fair-reading');
   const gallery = catalog.normalize('?view=templates&exercise=bank-demo');
-  assert.equal(gallery.exercise, 'bank-demo');
+  assert.equal(gallery.exercise, 'typed-template');
   assert.throws(() => createCatalog([...lessons, lessons[0]], templates), /Duplicate/);
   assert.throws(() => createCatalog([{...lessons[0],level:'A1.1',whale:8}], templates), /placement/);
 });
@@ -249,7 +249,7 @@ test('compact stage links and Back/Forward restore selection in the same workspa
   state.location.search = before; state.events.popstate();
   assert.equal(state.mounts.at(-1).exercise.id, 'fair-reading');
   assert.ok(anchors(state).every(el => el.href.startsWith('classroom.html?')));
-  const key = 'space-whale:workspace:v1:templates:matching-demo';
+  const key = 'space-whale:workspace:v1:templates:matching-template';
   state.storage.set(key, JSON.stringify({signature:'old exercise', answers:{m1:'o1'}}));
   assert.equal(JSON.stringify(app('?view=templates', state.storage).mounts.at(-1).config.answers), '{}');
 });
@@ -496,4 +496,22 @@ test('Stage completion is explicit, reversible and restored independently from m
   const undo=buttons(restored).find(b=>b.attrs['aria-label']==='Снять отметку завершения: Первый день в новой школе');
   assert.equal(undo.attrs['aria-pressed'],'true');undo.click();
   assert.equal(new URLSearchParams(restored.location.search).get('completed_stages'),'');
+});
+
+
+test('templates form three groups and all legacy deep links reach their canonical card',()=>{
+  const {lessons,templates}=content(),catalog=createCatalog(lessons,templates);
+  const groups=catalog.topics({view:'templates'});
+  assert.deepEqual(groups.map(group=>group.stages.length),[6,9,6]);
+  assert.equal(groups.flatMap(group=>group.stages).length,21);
+  const aliases=templates.flatMap(def=>def.legacyIds);
+  assert.equal(aliases.length,31);assert.equal(new Set(aliases).size,31);
+  for(const template of templates){
+    for(const oldId of template.legacyIds){
+      const route=catalog.normalize('?view=templates&lesson=templates&exercise='+oldId);
+      assert.equal(route.exercise,template.id);
+      assert.ok(catalog.topics(route).find(group=>group.id===route.lesson).stages.some(stage=>stage.exercise.id===route.exercise));
+      assert.deepEqual(catalog.normalize(catalog.query(route)),route);
+    }
+  }
 });

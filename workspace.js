@@ -180,7 +180,7 @@
   }
 
   function lessonLocation(lesson) {
-    return lesson.id === 'templates'
+    return lesson.templateGroup || lesson.id === 'templates'
       ? {view:'templates'}
       : {view:lesson.level === null ? 'unassigned' : 'library',level:lesson.level || route.level,whale:lesson.whale || route.whale};
   }
@@ -265,7 +265,7 @@
     return control;
   }
   function renderTopic(lesson,parent,studentLocked,previouslyOpen,index=0) {
-    const current=route.lesson===lesson.id,isTemplate=lesson.id==='templates';
+    const current=route.lesson===lesson.id,isTemplate=Boolean(lesson.templateGroup);
     const card=node('section','',`workspace-topic${current?' is-current':''}`);card.setAttribute('data-tone',String(Math.min(index,7)));
     const heading=node('div','','workspace-topic-heading');
     const select=button(lesson.title,()=>{go({...route,...lessonLocation(lesson),lesson:lesson.id,exercise:current?route.exercise:'',section:current?route.section:'tasks'});},'workspace-topic-toggle');
@@ -483,11 +483,11 @@
       control.disabled=studentLocked;control.setAttribute('aria-label',title);control.setAttribute('data-tooltip',title);control.setAttribute('aria-haspopup','dialog');control.setAttribute('aria-expanded','false');controls.append(control);
     };
     selector(view==='library'?level?.id||'—':view==='templates'?'TPL':'Level','Level',levelOptions,'level');
-    selector(view==='library'&&whale?`M${whale.id}`:'M—','Module',moduleOptions,'module');
+    selector(view==='templates'?'TPL':view==='library'&&whale?`M${whale.id}`:'M—',view==='templates'?'Группа шаблонов':'Module',view==='templates'?lessonOptions:moduleOptions,'module');
     const overview=node('section','','workspace-lesson-overview');
-    const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,'Lesson',lessonOptions),'workspace-lesson-selector');
-    lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label','Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
-    lessonCard.append(node('span',stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
+    const lessonCard=button('',()=>openSidebarPicker?.(lessonCard,view==='templates'?'Группа шаблонов':'Lesson',lessonOptions),'workspace-lesson-selector');
+    lessonCard.disabled=studentLocked;lessonCard.setAttribute('aria-label',view==='templates'?'Выбрать группу шаблонов':'Выбрать Lesson');lessonCard.setAttribute('aria-haspopup','dialog');lessonCard.setAttribute('aria-expanded','false');
+    lessonCard.append(node('span',view==='templates'?'ШАБЛОНЫ':stageIndex>=0?`LESSON ${String(stageIndex+1).padStart(2,'0')}`:'LESSON','workspace-info-eyebrow'),node('strong',lesson?.title||'Выберите Lesson','workspace-lesson-selector-title'),node('small',lesson?tagsFor(lesson):'','workspace-lesson-selector-tags'),node('i','','workspace-selector-chevron'));
     if(lesson){lessonCard.append(lessonBadge(lesson));if(lessonStatus(lesson)==='Skipped')lessonCard.append(node('span','Skip','workspace-skip-badge'));}
     overview.append(lessonCard);
     if(lesson&&journeys[lesson.id]?.closed){tree.append(overview);return;}
