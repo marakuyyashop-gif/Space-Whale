@@ -721,6 +721,7 @@
     const handlers = {
       onLessonState:applyGuestLessonState,
       onEnded:()=>{
+        void window.SpaceWhaleMedia?.stopMedia();
         if(liveRole==='teacher'||window.SpaceWhaleIsTeacher===true){returnToTeacherWorkspace('closed');return;}
         liveReady=false;mounted?.destroy?.();host.replaceChildren();studentTimer.hidden=true;
         document.body.dataset.workspaceRole='connection-error';
@@ -776,6 +777,7 @@
     document.body.dataset.workspaceRole=liveRole;
     sidebar.inert=liveRole==='student';
     liveSession = result.session;
+    void window.SpaceWhaleMedia?.connect({sessionId:sessionId,role:liveRole,guest:Boolean(guestToken),status:liveSession?.status});
     if(guestToken)applyGuestLessonState(result.meta||{});
     tick();
     const inviteButton=document.getElementById('inviteStudent');
@@ -957,6 +959,7 @@
     return url.href;
   }
   function returnToTeacherWorkspace(reason){
+    void window.SpaceWhaleMedia?.stopMedia();
     timer={startedAt:null,readyAt:null,ended:false};saveTimer();
     if(ticker!==null){clearInterval(ticker);ticker=null;}
     location.replace(teacherWorkspaceURL(reason));
