@@ -10,14 +10,14 @@
 
   // Stable media slots: fill src once to update every use. Pending slots never request a URL.
   const lesson1Media = {
-    A1M4L1_IMAGE_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp',width:1122,height:1402,alt:'A coat',target:'coat'},
-    A1M4L1_IMAGE_02: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/sweater.webp',width:1254,height:1254,alt:'A sweater',target:'sweater'},
-    A1M4L1_IMAGE_03: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/blouse.webp',width:1254,height:1254,alt:'A blouse',target:'blouse'},
-    A1M4L1_IMAGE_04: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/skirt.webp',width:1122,height:1402,alt:'A skirt',target:'skirt'},
-    A1M4L1_IMAGE_05: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/suit.webp',width:1254,height:1254,alt:'A suit',target:'suit'},
-    A1M4L1_IMAGE_06: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp',width:1254,height:1254,alt:'A hat',target:'hat'},
-    A1M4L1_IMAGE_TWO_COATS: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp',width:1122,height:1402,copies:2,alt:'Two coats',target:'coats'},
-    A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
+    A1M4L1_IMAGE_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat-transparent.webp',width:1122,height:1402,alt:'A coat',target:'coat'},
+    A1M4L1_IMAGE_02: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/sweater-transparent.webp',width:1254,height:1254,alt:'A sweater',target:'sweater'},
+    A1M4L1_IMAGE_03: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/blouse-transparent.webp',width:1254,height:1254,alt:'A blouse',target:'blouse'},
+    A1M4L1_IMAGE_04: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/skirt-transparent.webp',width:1122,height:1402,alt:'A skirt',target:'skirt'},
+    A1M4L1_IMAGE_05: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/suit-transparent.webp',width:1254,height:1254,alt:'A suit',target:'suit'},
+    A1M4L1_IMAGE_06: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/hat-transparent.webp',width:1254,height:1254,alt:'A hat',target:'hat'},
+    A1M4L1_IMAGE_TWO_COATS: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat-transparent.webp',width:1122,height:1402,copies:2,alt:'Two coats',target:'coats'},
+    A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking-transparent.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
     A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes, it does. And this sweater?\nBen: It looks warm.\nAnna: I like it. How much is it?\nBen: Thirty euros.\nAnna: Okay, I want it. Can you hold it for me, please?\nBen: Of course."},
     A1M4L1_WORD_01: {type:'audio',src:null,word:'coat',sentence:'I need a coat for work.'},
     A1M4L1_WORD_02: {type:'audio',src:null,word:'sweater',sentence:'My sweater is in the wardrobe.'},
