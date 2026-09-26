@@ -50,7 +50,7 @@
     if (!client) return null;
 
     if (state.guestToken) {
-      const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: state.guestToken });
+      const { data, error } = await guestRPC("resolve_guest_lesson_link", { p_token: state.guestToken });
       if (error) throw error;
       if (!data) return null;
       return {
@@ -140,58 +140,110 @@
 
   async function resolveGuestLink(token) {
     if (!client || !token) return null;
-    const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: token });
+    const { data, error } = await guestRPC("resolve_guest_lesson_link", { p_token: token });
     if (error) throw error;
     return data || null;
   }
 
-  // Guest rooms use server-authorized snapshots instead of public broadcast topics.
-  // Every read/write checks token expiry and revocation, including an already-open tab.
+  // Live edits travel over private WebSocket channels; snapshots are only persistence.
+  // The separate control channel grants send permission only to the authenticated owner.
   let guestPollTimer=null,guestPoll=null,guestClosed=false;
+  let guestAnswers=null,guestControl=null,guestRealtimeReady=false,guestChannelsTopic=null;
+  let guestHandlers={},guestValidatedUntil=0,guestNavigationEpoch=0;
+  const guestUsable=()=>!guestClosed&&Date.now()<guestValidatedUntil;
+  async function closeGuestTransport(){
+    if(guestClosed)return;
+    guestClosed=true;guestRealtimeReady=false;clearTimeout(guestPollTimer);
+    draftTimers.forEach(clearTimeout);draftTimers.clear();state.channel=null;
+    const channels=[guestAnswers,guestControl].filter(Boolean);guestAnswers=guestControl=null;guestChannelsTopic=null;
+    channels.forEach(channel=>client.removeChannel(channel).catch(()=>{}));
+    guestHandlers.onEnded?.();
+  }
+  function connectGuestChannels(meta){
+    if(!meta.room_topic||guestClosed||guestChannelsTopic===meta.room_topic)return;
+    guestChannelsTopic=meta.room_topic;
+    const receive=handler=>({payload})=>{
+      if(!guestUsable()||payload?.source_id===state.clientId)return;
+      handler?.(payload);
+    };
+    guestAnswers=client.channel(meta.room_topic+':answers',{config:{private:true,broadcast:{self:false,ack:true},presence:{key:state.clientId}}});
+    guestControl=client.channel(meta.room_topic+':control',{config:{private:true,broadcast:{self:false,ack:true}}});
+    guestAnswers
+      .on('broadcast',{event:'exercise_draft'},receive(guestHandlers.onExerciseDraft))
+      .on('broadcast',{event:'exercise_response'},receive(guestHandlers.onExerciseResponse))
+      .on('broadcast',{event:'state_snapshot'},receive(guestHandlers.onStateSnapshot))
+      .on('broadcast',{event:'state_request'},receive(guestHandlers.onStateRequest))
+      .on('presence',{event:'sync'},()=>guestHandlers.onPresence?.(guestAnswers?.presenceState()||{}))
+      .subscribe(status=>{
+        guestRealtimeReady=status==='SUBSCRIBED';
+        if(guestRealtimeReady){
+          guestAnswers.track({role:state.role,client_id:state.clientId}).catch(()=>{});
+          // Replay the newest unsaved values after a socket reconnect; never wait for DB.
+          for(const [id,response] of pendingSnapshots)broadcast('exercise_draft',{exercise_id:id,response,source_id:state.clientId,seq:nextSequence(id),sent_at:Date.now()}).catch(()=>{});
+          broadcast('state_request',{exercise_id:state.currentExerciseId,source_id:state.clientId}).catch(()=>{});
+        }
+      });
+    guestControl
+      .on('broadcast',{event:'navigate'},receive(payload=>{guestNavigationEpoch++;guestHandlers.onNavigate?.(payload);}))
+      .on('broadcast',{event:'lesson_closed'},()=>closeGuestTransport())
+      .subscribe(()=>{});
+  }
   async function connectGuest(token, handlers = {}) {
-    if (!client) throw new Error("Supabase client is not ready.");
+    if (!client) throw new Error('Supabase client is not ready.');
     const meta=await resolveGuestLink(token);
-    if(!meta){const error=new Error("Ссылка закрыта или срок её действия истёк.");error.code="GUEST_LINK_CLOSED";throw error;}
+    if(!meta){const error=new Error('Ссылка закрыта или срок её действия истёк.');error.code='GUEST_LINK_CLOSED';throw error;}
     const user=await getCurrentUser();
     state.guestToken=token;state.role=meta.is_host?'teacher':'student';
     state.user=user||{id:`guest-${state.clientId}`};
     state.session={id:`guest:${token.slice(0,8)}`,room_topic:null,allowed_lesson_ids:meta.allowed_lesson_ids||[],expires_at:meta.expires_at,guest:true};
     if(state.channel&&!state.channel.polling)await client.removeChannel(state.channel);
-    state.channel={polling:true,presenceState:()=>({})};guestClosed=false;
+    guestHandlers=handlers;guestClosed=false;guestValidatedUntil=Date.now()+15000;state.currentExerciseId=meta.current_exercise_id||null;
+    state.channel={polling:true,presenceState:()=>guestAnswers?.presenceState()||{}};
+    connectGuestChannels(meta);
     let lastRoute='',lastResponse='',offline=false,busy=false;
     guestPoll=async()=>{
       if(guestClosed||busy)return;
-      busy=true;clearTimeout(guestPollTimer);
+      busy=true;clearTimeout(guestPollTimer);const navigationEpoch=guestNavigationEpoch;
       try{
-        const {data,error}=await client.rpc('read_guest_workspace',{p_token:token});
+        const {data,error}=await guestRPC('read_guest_workspace',{p_token:token});
         if(error)throw error;
         if(guestClosed)return;
-        if(!data){
-          guestClosed=true;state.channel=null;
-          draftTimers.forEach(clearTimeout);draftTimers.clear();
-          handlers.onEnded?.();return;
-        }
+        if(!data){await closeGuestTransport();return;}
+        guestValidatedUntil=Date.now()+15000;
+        connectGuestChannels(data);
         Object.assign(state.session,{started_at:data.started_at,status:data.status,duration_minutes:data.duration_minutes});
+        state.currentExerciseId=data.current_exercise_id;
         handlers.onLessonState?.(data);
-        if(offline){offline=false;await flushPendingSnapshots();await handlers.onReconnect?.();}
+        if(offline){offline=false;Promise.resolve(handlers.onReconnect?.()).catch(console.error);}
         handlers.onConnectionState?.(true);
         const route=JSON.stringify([data.current_page_id,data.current_exercise_id]);
-        if(route!==lastRoute){lastRoute=route;handlers.onNavigate?.(data);}
+        if(route!==lastRoute&&navigationEpoch===guestNavigationEpoch){lastRoute=route;handlers.onNavigate?.(data);}
         const snapshot=JSON.stringify([data.current_exercise_id,data.response]);
         if(snapshot!==lastResponse){lastResponse=snapshot;if(data.response)handlers.onExerciseDatabaseChange?.({exercise_id:data.current_exercise_id,response:data.response,is_draft:true});}
-      }catch(error){offline=true;handlers.onConnectionState?.(false);}
-      finally{busy=false;if(!guestClosed)guestPollTimer=setTimeout(guestPoll,offline?2000:900);}
+      }catch(error){offline=true;handlers.onConnectionState?.(guestRealtimeReady&&guestUsable());}
+      finally{busy=false;if(!guestClosed)guestPollTimer=setTimeout(guestPoll,offline?1000:guestRealtimeReady?4000:900);}
     };
     restorePendingSnapshots();guestPollTimer=setTimeout(guestPoll,0);
     return {session:state.session,role:state.role,meta};
   }
 
+  window.addEventListener?.('online',()=>guestPoll?.());
+  window.addEventListener?.('focus',()=>guestPoll?.());
+
+  // Bound slow HTTP reads/writes so retries cannot leave a transport permanently busy.
+  async function guestRPC(name,args){
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),7000);
+    try{const query=client.rpc(name,args);return await (query.abortSignal?query.abortSignal(controller.signal):query);}
+    finally{clearTimeout(timeout);}
+  }
+
   async function startGuestLesson() {
     if(state.role!=='teacher'||!state.guestToken)throw new Error('Only the teacher can start the lesson.');
-    const {data,error}=await client.rpc('start_guest_lesson',{p_token:state.guestToken});
+    const {data,error}=await guestRPC('start_guest_lesson',{p_token:state.guestToken});
     if(error)throw error;
     if(!data?.started_at)throw new Error('Не удалось начать занятие. Повторите попытку.');
     Object.assign(state.session,{started_at:data.started_at,status:data.status,duration_minutes:data.duration_minutes});
+    connectGuestChannels(data);
     return data;
   }
 
@@ -199,7 +251,13 @@
     if(state.guestToken){
       if(guestClosed||!state.channel)throw new Error('Занятие закрыто.');
       if(event==='audio')throw new Error('Совместное аудио ещё не подключено.');
-      return 'ok';
+      if(!guestUsable())throw new Error('Подтверждаем соединение с занятием.');
+      const channel=event==='navigate'?guestControl:guestAnswers;
+      if(!channel||channel.state!=='joined')return 'fallback';
+      const result=await channel.send({type:'broadcast',event,payload});
+      if(result!=='ok')guestPoll?.();
+      return result;
+
     }
     if (!state.channel) throw new Error("Lesson realtime channel is not connected.");
     const result = await state.channel.send({
@@ -246,7 +304,7 @@
     };
 
     if (state.guestToken) {
-      const { data, error } = await client.rpc("save_guest_lesson_navigation", {
+      const { data, error } = await guestRPC("save_guest_lesson_navigation", {
         p_token: state.guestToken,
         p_current_page_id: currentPageId,
         p_current_exercise_id: currentExerciseId
@@ -293,7 +351,7 @@
     if (!state.session || !state.user) return null;
 
     if (state.guestToken) {
-      const { data, error } = await client.rpc("resolve_guest_lesson_link", { p_token: state.guestToken });
+      const { data, error } = await guestRPC("resolve_guest_lesson_link", { p_token: state.guestToken });
       if (error) throw error;
       const response = data?.responses?.[exerciseId];
       return response ? { exercise_id: exerciseId, response, is_draft: true } : null;
@@ -325,9 +383,10 @@
     for(const id of pendingSnapshots.keys()) scheduleSnapshot(id,0);
   }
   const getPendingSnapshot = id => pendingSnapshots.get(id);
-  function scheduleSnapshot(id,delay=250){
+  function scheduleSnapshot(id,delay=guestRealtimeReady?1500:150){
     if(state.guestToken&&guestClosed)return;
-    clearTimeout(draftTimers.get(id));
+    // Fixed upper wait: continuous typing must never postpone saving indefinitely.
+    if(draftTimers.has(id))return;
     draftTimers.set(id,setTimeout(()=>{draftTimers.delete(id);return flushSnapshot(id);},delay));
   }
   async function flushSnapshot(id){
@@ -339,7 +398,7 @@
       let failed=false;
       try{await persistDraftSnapshot(id,response);if(pendingSnapshots.get(id)===response){pendingSnapshots.delete(id);storePendingSnapshots();}}
       catch(error){failed=true;console.error('[Space Whale] Snapshot pending; will retry',error);}
-      finally{savingSnapshots.delete(id);if(pendingSnapshots.has(id))scheduleSnapshot(id,failed?5000:0);}
+      finally{savingSnapshots.delete(id);if(pendingSnapshots.has(id))scheduleSnapshot(id,failed?1000:0);}
     })();
     savingSnapshots.set(id,work);return work;
   }
@@ -348,7 +407,7 @@
 
   async function persistDraftSnapshot(exerciseId, response) {
     if (state.guestToken) {
-      const { data, error } = await client.rpc(response?.__sw_collab === 1 ? "merge_guest_lesson_response" : "save_guest_lesson_response", {
+      const { data, error } = await guestRPC(response?.__sw_collab === 1 ? "merge_guest_lesson_response" : "save_guest_lesson_response", {
         p_token: state.guestToken,
         p_exercise_id: exerciseId,
         p_response: response
@@ -458,7 +517,11 @@
   }
 
   async function requestExerciseState(exerciseId) {
-    if(state.guestToken)return guestPoll?.();
+    if(state.guestToken){
+      state.currentExerciseId=exerciseId;
+      if(guestRealtimeReady)return broadcast('state_request',{exercise_id:exerciseId,source_id:state.clientId});
+      return guestPoll?.();
+    }
     if (!state.channel || !exerciseId) return;
     return broadcast("state_request", {
       exercise_id: exerciseId,
@@ -469,7 +532,7 @@
   }
 
   async function sendExerciseSnapshot(exerciseId, response) {
-    if(state.guestToken){queueGuestSnapshot(exerciseId,response);return;}
+    if(state.guestToken){queueGuestSnapshot(exerciseId,response);return broadcast('state_snapshot',{exercise_id:exerciseId,response,source_id:state.clientId,seq:nextSequence(exerciseId),sent_at:Date.now()});}
     if ((state.role !== "student" && !(state.guestToken && state.role === "teacher")) || !state.channel || !exerciseId) return;
     return broadcast("state_snapshot", {
       exercise_id: exerciseId,
@@ -484,7 +547,9 @@
 
   async function disconnect() {
     await flushPendingSnapshots();
-    guestClosed=true;clearTimeout(guestPollTimer);guestPollTimer=null;guestPoll=null;
+    guestClosed=true;guestRealtimeReady=false;clearTimeout(guestPollTimer);guestPollTimer=null;guestPoll=null;
+    await Promise.all([guestAnswers,guestControl].filter(Boolean).map(channel=>client.removeChannel(channel)));
+    guestAnswers=guestControl=null;guestChannelsTopic=null;
     draftTimers.forEach(timer => clearTimeout(timer));
     draftTimers.clear();
     if (!client || !state.channel) return;

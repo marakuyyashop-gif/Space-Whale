@@ -545,10 +545,10 @@
     let response = payload.response;
     if (collaborative()) {
       const r = replica(exerciseId);
-      if (response.__sw_collab === 1) r.merge(response);
+      if (response.__sw_collab === 1) {if(!r.merge(response))return false;}
       else if (!Object.keys(r.snapshot().entries).length) r.update(response);
       response = r.answers();
-      if (!options.database) classroom.queueGuestSnapshot?.(exerciseId, r.snapshot());
+      // The originating peer saves its draft; receivers do not echo writes to the DB.
     }
     liveAnswers.set(exerciseId, response);
 
@@ -564,6 +564,7 @@
   async function hydrateLiveExercise(exerciseId, localAnswers) {
     if (!liveMode || !liveReady || !exerciseId || liveHydrated.has(exerciseId)) return;
     liveHydrated.add(exerciseId);
+    if(collaborative())classroom.requestExerciseState(exerciseId).catch(error=>console.error('[Space Whale] Peer state request failed',error));
 
     if (liveRole === 'teacher' || collaborative()) {
       try {
@@ -805,7 +806,7 @@
     mountedKey = '';
     render();
 
-    const shared = await classroom.loadSharedState(sessionId);
+    const shared = guestToken ? result.meta : await classroom.loadSharedState(sessionId);
     if (shared?.current_page_id || shared?.current_exercise_id) {
       if (liveRole === 'student') applyRemoteNavigation(shared);
       else {

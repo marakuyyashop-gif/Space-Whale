@@ -449,3 +449,23 @@ test('rule disclosure belongs to teacher and scrolls the newly visible content o
   assert.equal(studentScroll,1);
   student.click('Свернуть следующий блок');assert.equal(student.host.querySelector('.ek-rule-block').hidden,false);
 });
+
+test('matching keeps the open picker attached while remote answers arrive; local pick paints immediately',()=>{
+ const s=setup('matching-demo');
+ const slot=s.host.querySelector('.ek-match-slot');s.fire(slot,'click');
+ s.mount.setAnswers({item2:'option2'});
+ assert.equal(s.host.querySelector('.ek-match-slot'),slot);
+ s.click('[Sentence ending 1]');
+ assert.equal(slot.textContent,'[Sentence ending 1]');
+ assert.equal(s.host.querySelectorAll('dialog').length,0);
+ assert.deepEqual(s.mount.getAnswers(),{item2:'option2',item1:'option1'});
+});
+test('inline picker stays open during remote hydration, without discarding the next local selection',()=>{
+ const s=setup('inline-demo');const opener=s.host.querySelector('.ek-choice-trigger');
+ s.fire(opener,'click');s.mount.setAnswers({gap2:'remote'});
+ assert.equal(s.host.querySelector('.ek-choice-trigger'),opener);
+ assert.equal(s.host.querySelector('.ek-inline-menu').hidden,false);
+ s.fire(s.host.querySelectorAll('.ek-inline-option')[1],'click');
+ assert.match(opener.textContent,/\[Form 1\]/);
+ assert.equal(s.mount.getAnswers().gap2,'remote');
+});

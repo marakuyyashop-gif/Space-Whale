@@ -16,7 +16,7 @@ test('guest peers synchronize through authorized state, recover and stop on revo
         room.responses[args.p_exercise_id]=args.p_response;return {data:true};
       }};
     const window={spaceWhaleSupabase:client};
-    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
+    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
     return {api:window.SpaceWhaleClassroom,timers,received,setOffline(v){offline=v;},get ended(){return ended;},get route(){return route;},get reconnects(){return reconnects;},handlers:{onNavigate(v){route=v;},onExerciseDatabaseChange(v){received.push(v);},onEnded(){ended=true;},onReconnect(){reconnects++;}}};
   };
   const teacher=make(true),student=make(false);
@@ -39,7 +39,7 @@ test('failed snapshots survive reload, retry, and retain the newest answer',asyn
       async rpc(name,args){if(name==='resolve_guest_lesson_link')return {data:{is_host:false,room_topic:'r',allowed_lesson_ids:['*']}};
         if(fail)return {error:new Error('offline')};saved.push(args.p_response);return {data:true};}};
     const window={spaceWhaleSupabase:client,sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}};
-    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console:{error(){}},setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
+    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,AbortController,console:{error(){}},setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
     return window.SpaceWhaleClassroom;
   };
   let api=make();await api.connectGuest('recovery-token');
@@ -58,7 +58,7 @@ test('authenticated session invokes recovery after resubscription',async()=>{
   const query={select(){return this;},eq(){return this;},async single(){return {data:{id:'s1',teacher_id:'t1',student_id:'u1',room_topic:'room'}};}};
   const client={auth:{async getUser(){return {data:{user:{id:'u1'}}};}},from(){return query;},channel(){return channel;},async removeChannel(){}};
   const window={spaceWhaleSupabase:client};
-  vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout,clearTimeout});
+  vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,setTimeout,clearTimeout});
   await window.SpaceWhaleClassroom.connect('s1',{onReconnect(){reconnected++;}});
   assert.equal(reconnected,0);await subscription('SUBSCRIBED');assert.equal(reconnected,1);
   await window.SpaceWhaleClassroom.disconnect();
@@ -66,7 +66,7 @@ test('authenticated session invokes recovery after resubscription',async()=>{
 
 test('waiting guest receives the start transition even when navigation has not changed',async()=>{
  let startedAt=null;const events=[],window={spaceWhaleSupabase:{auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>({data:name==='resolve_guest_lesson_link'?{is_host:false,allowed_lesson_ids:[],status:'waiting'}:{status:startedAt?'live':'waiting',started_at:startedAt,server_now:new Date().toISOString(),duration_minutes:60,current_page_id:startedAt?'?lesson=one':null,current_exercise_id:startedAt?'e1':null}})}};
- vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout:()=>1,clearTimeout(){}});
+ vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,setTimeout:()=>1,clearTimeout(){}});
  const api=window.SpaceWhaleClassroom;
  await api.connectGuest('waiting-test',{onLessonState:data=>events.push(['state',data.status]),onNavigate:()=>events.push(['navigate'])});
  await api.requestExerciseState('e1');assert.deepEqual(events[0],['state','waiting']);
@@ -74,4 +74,29 @@ test('waiting guest receives the start transition even when navigation has not c
  events.length=0;startedAt=new Date().toISOString();await api.requestExerciseState('e1');
  assert.deepEqual(events[0],['state','live']);assert.deepEqual(events[1],['navigate']);
  await api.disconnect();
+});
+
+test('private websocket drafts arrive before a stalled database save; snapshots have a bounded debounce',async()=>{
+ const peers=[],scheduled=[],received=[];let writes=0;
+ const make=()=>{
+  const channels=[];
+  const client={auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>{
+   if(name==='resolve_guest_lesson_link')return {data:{is_host:false,room_topic:'private-test',started_at:new Date().toISOString(),allowed_lesson_ids:['*']}};
+   if(name.includes('response')){writes++;return new Promise(()=>{});}
+   return {data:{started_at:new Date().toISOString()}};
+  },channel(topic,options){
+   assert.equal(options.config.private,true);const handlers={};
+   const ch={topic,state:'joined',on(type,filter,fn){handlers[type+':'+filter.event]=fn;return this;},subscribe(fn){queueMicrotask(()=>fn('SUBSCRIBED'));return this;},track:async()=>{},presenceState:()=>({}),send:async msg=>{for(const p of peers)if(p!==ch&&p.topic===topic)p.deliver(msg);return 'ok';},deliver(msg){handlers['broadcast:'+msg.event]?.({payload:msg.payload});}};
+   channels.push(ch);peers.push(ch);return ch;
+  },removeChannel:async()=>{}};
+  const window={spaceWhaleSupabase:client};let next=0;
+  vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,queueMicrotask,setTimeout(fn,delay){scheduled.push({id:++next,fn,delay});return next;},clearTimeout(){}});
+  return window.SpaceWhaleClassroom;
+ };
+ const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response)});await Promise.resolve();
+ await first.sendExerciseDraft('e1',{text:'a'});await first.sendExerciseDraft('e1',{text:'ab'});
+ assert.equal(received.at(-1).text,'ab');assert.equal(writes,0);
+ const saveJobs=scheduled.filter(t=>t.delay===1500);assert.equal(saveJobs.length,1,'continuous edits do not reset the persistence timer');
+ void saveJobs[0].fn();await Promise.resolve();assert.equal(writes,1);
+ await first.sendExerciseDraft('e1',{text:'abc'});assert.equal(received.at(-1).text,'abc','slow DB cannot block the socket');
 });

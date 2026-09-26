@@ -593,6 +593,7 @@
       }
       return el;
     }
+    const paintControls=new Map();
     function inlinePicker(id,label,options,number){
       const wrap = node('span', 'ek-inline-choice');
       const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
@@ -629,13 +630,13 @@
         }
       });
       wrap.addEventListener('focusout', event => { if (!wrap.contains(event.relatedTarget)) shut(); });
-      paint(); wrap.append(opener, menu); return {wrap,opener};
+      paintControls.set(id,paint);paint(); wrap.append(opener, menu); return {wrap,opener};
     }
     function render() {
       dismissInline();
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
       body.querySelectorAll('audio').forEach(audio => audio.pause());
-      body.replaceChildren(); controls.clear(); resultsBox.replaceChildren();
+      body.replaceChildren(); controls.clear(); paintControls.clear(); resultsBox.replaceChildren();
       if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
           if (block.type === 'image') body.append(illustration(block));
@@ -824,7 +825,7 @@
               answers[item.id],
               value => {
                 if (value) {
-                  const previousId = takenBy.get(value);
+                  const previousId = Object.keys(answers).find(id=>id!==item.id&&answers[id]===value);
                   if (previousId) {
                     delete answers[previousId];
                     const previousIndex = def.items.findIndex(candidate => candidate.id === previousId);
@@ -832,7 +833,7 @@
                   }
                 }
                 changed(item.id, value);
-                refreshSlot(item, index, plus);
+                refreshSlot(item, index, controls.get(item.id));
               },
               plus,
               new Set(takenBy.keys())
@@ -840,7 +841,7 @@
           }, pictureWord ? 'ek-match-slot ek-picture-word-slot' : 'ek-match-slot');
           plus.dataset.selected = String(Boolean(chosen()));
           plus.setAttribute('aria-label', `Choose a match for ${promptText.toLowerCase()}`); plus.setAttribute('aria-haspopup', 'dialog');
-          controls.set(item.id, plus); card.append(plus); grid.append(card);
+          controls.set(item.id, plus);paintControls.set(item.id,()=>refreshSlot(item,index,plus)); card.append(plus); grid.append(card);
         });
         body.append(grid);
       }
@@ -1077,6 +1078,7 @@
     }
 
     const setAnswersCore = next => {
+      if(JSON.stringify(answers)===JSON.stringify(next||{}))return;
       const priorView={revealed:answers.revealed,rule:answers.__sw_rule_visible};
       answers = clone(next || {});
       if(config.onViewChange||config.navigationReadOnly){if(priorView.revealed!==undefined)answers.revealed=priorView.revealed;else delete answers.revealed;answers.__sw_rule_visible=priorView.rule;}
@@ -1098,6 +1100,8 @@
         return;
       }
 
+      if(def.kind==='matching'){paintControls.forEach(paint=>paint());return;}
+
       if (def.kind === 'writing') {
         def.items.forEach(item => {
           const field = controls.get(item.id);
@@ -1112,7 +1116,7 @@
         let canPatchWithoutRender = true;
         for (const [id, control] of controls.entries()) {
           const isTypedGap = control?.classList?.contains?.('ek-typed-gap');
-          if (!isTypedGap) { canPatchWithoutRender = false; break; }
+          if (!isTypedGap) {const paint=paintControls.get(id);if(paint){paint();continue;}canPatchWithoutRender = false; break; }
           const value = answers[id] == null ? '' : String(answers[id]);
           if (control.value !== value) control.value = value;
           control.style.width = `${Math.max(5, Math.min(28, value.length + 2))}ch`;
