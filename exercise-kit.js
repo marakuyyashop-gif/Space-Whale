@@ -54,7 +54,8 @@
     const key = (item, valid) => { if (item.correctId != null && !valid.has(item.correctId)) fail(`Unknown answer ID: ${item.correctId}`); };
     if (!def || def.version !== 1 || !kinds.includes(def.kind)) fail('Expected version 1 and a supported kind');
     safeId(def.id, 'id'); text(def.title, 'title');
-    if (def.responseMode != null && !['open','personal'].includes(def.responseMode)) fail('Unsupported response mode');
+    if (def.responseMode != null && !['open','personal','accepted'].includes(def.responseMode)) fail('Unsupported response mode');
+    if (def.responseMode === 'accepted' && def.kind !== 'writing') fail('Accepted response mode requires writing');
     if (def.instruction != null && typeof def.instruction !== 'string') fail('instruction must be text');
     if (def.kind === 'stage') {
       ids(def.exercises, 'exercises');
@@ -200,7 +201,14 @@
       const valid = options(def.groups);
       def.items.forEach(item => { text(item.text, 'item text'); key(item, valid); });
     }
-    if (def.kind === 'writing') def.items.forEach(item => {text(item.prompt,'prompt');if(item.possibleAnswers!=null){if(!Array.isArray(item.possibleAnswers)||!item.possibleAnswers.length)fail('possibleAnswers must be a non-empty list');item.possibleAnswers.forEach(answer=>text(answer,'possible answer'));}});
+    if (def.kind === 'writing') def.items.forEach(item => {
+      text(item.prompt,'prompt');
+      for (const field of ['possibleAnswers','acceptedAnswers']) {
+        if (item[field] != null) { array(item[field],field); item[field].forEach(answer=>text(answer,field)); }
+      }
+      if (def.responseMode === 'accepted' && !item.acceptedAnswers) fail('Accepted writing needs acceptedAnswers for every item');
+      if (['open','personal'].includes(def.responseMode) && item.acceptedAnswers) fail('Open writing cannot have acceptedAnswers');
+    });
     if (def.kind === 'gaps') {
       if (def.layout != null && !['sentences', 'paragraph'].includes(def.layout)) fail('Unsupported gaps layout');
       if (def.inputMode != null && !['text', 'select'].includes(def.inputMode)) fail('Unsupported gaps inputMode');
@@ -248,7 +256,10 @@
           mark(item.id, selected.length > 0, item.correctIds ? selected.length === item.correctIds.length && new Set(selected).size === selected.length && item.correctIds.every(id => selected.includes(id)) : null);
           return;
         }
-        mark(item.id, value != null && String(value).trim() !== '', def.kind === 'writing' || item.correctId == null ? null : value === item.correctId);
+        const correct = def.kind === 'writing'
+          ? (item.acceptedAnswers ? item.acceptedAnswers.some(answer => normalize(answer) === normalize(value)) : null)
+          : (item.correctId == null ? null : value === item.correctId);
+        mark(item.id, value != null && String(value).trim() !== '', correct);
       });
     }
     return results;
@@ -1048,7 +1059,7 @@
       const attempted=Object.values(feedback).some(value=>value!=='empty');
       const examples=[];
       if(def.kind==='writing')def.items.forEach(item=>{
-        if(feedback[item.id]!=='empty' && item.possibleAnswers?.length) examples.push([item.prompt,item.possibleAnswers.join(' / ')]);
+        if(!item.acceptedAnswers && feedback[item.id]!=='empty' && item.possibleAnswers?.length) examples.push([item.prompt,item.possibleAnswers.join(' / ')]);
       });
       if(def.kind==='gaps')def.items.forEach(item=>item.segments.forEach(segment=>{
         if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
@@ -1062,7 +1073,8 @@
           const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
         else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' → '));
-        else if(def.kind!=='writing' && def.items)def.items.forEach(item=>{
+        else if(def.kind==='writing')def.items.forEach(item=>{if(needsSolution(item.id))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
+        else if(def.items)def.items.forEach(item=>{
           if(!needsSolution(item.id))return;
           const choices=item.options||def.options||def.groups||[];
           if(def.kind==='choice' && !def.multiple && choices.length===2)return;

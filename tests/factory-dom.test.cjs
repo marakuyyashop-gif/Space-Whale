@@ -6,7 +6,7 @@ const {parseHTML} = require('linkedom');
 const kit = require('../exercise-kit.js');
 const data = {SpaceWhaleExerciseKit:kit};
 vm.runInNewContext(fs.readFileSync(require.resolve('../template-gallery.js'),'utf8'), {window:data});
-const fixture = id => data.SpaceWhaleTemplates.find(def => def.id === id);
+const fixture = id => [...data.SpaceWhaleTemplates,...data.SpaceWhaleTemplateExamples].find(def => def.id === id);
 function setup(id, config = {}) {
   const {document, window} = parseHTML('<html><body><main></main></body></html>');
   const create = document.createElement.bind(document);
@@ -36,8 +36,8 @@ function setup(id, config = {}) {
   };
   return {document,window,host,mount,changes,fire,button,click,drag};
 }
-test('all 31 templates render with shared kit and no initial correctness feedback', () => {
-  for (const def of data.SpaceWhaleTemplates) {
+test('catalog entries and legacy fixtures render with shared kit and no initial correctness feedback', () => {
+  for (const def of [...data.SpaceWhaleTemplates,...data.SpaceWhaleTemplateExamples]) {
     const s = setup(def.id);
     assert.ok(s.host.querySelector('h2'),def.id);
     assert.equal(s.host.querySelectorAll('[data-feedback]').length,0,def.id);
@@ -521,4 +521,43 @@ test('two-option closed choice marks wrong answers without redundant solution te
   const s=setup(def,{syncChecks:true});s.mount.setAnswers({q:'a',__sw_checked:true});
   assert.equal(s.host.querySelector('fieldset').dataset.feedback,'retry');assert.equal(s.host.querySelector('.ek-correction'),null);
   s.mount.setAnswers({q:'b',__sw_checked:true});assert.equal(s.host.querySelector('fieldset').dataset.feedback,'correct');
+});
+
+
+test('accepted writing grades alternatives, reveals corrections and synchronizes checks', () => {
+  const def = fixture('writing-template').exercises[0].exercise;
+  const s = setup(def,{syncChecks:true});
+  const field=s.host.querySelector('.ek-writing-input');
+  assert.equal(s.host.querySelector('.ek-correction'),null);
+  field.value='I late';s.fire(field,'input');s.click('OK');
+  assert.equal(field.dataset.feedback,'retry');
+  assert.match(s.host.querySelector('.ek-correction').textContent,/Correct answers.*I am late/);
+  field.value='  I AM   LATE.  ';s.fire(field,'input');
+  assert.equal(s.host.querySelector('.ek-correction'),null);s.click('OK');
+  assert.equal(field.dataset.feedback,'correct');
+  const other=setup(def,{syncChecks:true});other.mount.setAnswers(s.mount.getAnswers());
+  assert.equal(other.host.querySelector('.ek-writing-input').dataset.feedback,'correct');
+  assert.equal(other.changes.length,0);
+  s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-correction'),null);
+  const free=setup(fixture('writing-template').exercises[1].exercise);
+  const input=free.host.querySelector('.ek-writing-input');input.value='Any personal response';free.fire(input,'input');free.click('OK');
+  assert.equal(input.dataset.feedback,'review');assert.match(free.host.querySelector('.ek-correction').textContent,/Possible answers/);
+});
+test('audio composition starts with first response, retains source and hidden answers', () => {
+  const s=setup('audio-task-template',{syncChecks:true});
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
+  const audio=s.host.querySelector('audio'),radio=s.host.querySelectorAll('input[type=radio]')[1];
+  assert.ok(audio);assert.ok(radio);assert.equal(s.host.querySelector('.ek-typed-gap'),null);
+  radio.checked=true;s.fire(radio,'change');s.click('Show next exercise');
+  const gap=s.host.querySelector('.ek-typed-gap');gap.value='Saved';s.fire(gap,'input');s.click('Свернуть задание');
+  assert.equal(s.host.querySelectorAll('.ek-stage-section:not([hidden])').length,2);
+  assert.equal(s.host.querySelector('audio'),audio);assert.equal(s.mount.getAnswers().block2.question1,'B');
+  assert.equal(s.mount.getAnswers().block3.gap1,'Saved');s.click('Show next exercise');assert.equal(gap.value,'Saved');
+});
+test('single compositions have no continuation; ordinary sequence starts with a task', () => {
+  for(const id of ['image-task-template','speaking-template','dropdown-template','audio-template']){
+    assert.equal(setup(id).button('Show next exercise'),undefined,id);
+  }
+  const sequence=setup('sequence-template');
+  assert.ok(sequence.host.querySelector('input[type=radio]'));assert.equal(sequence.host.querySelector('.ek-typed-gap'),null);
 });

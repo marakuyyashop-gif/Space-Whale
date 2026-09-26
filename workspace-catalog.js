@@ -112,10 +112,17 @@
       .map(outline => actualById.get(outline.id) || outline)
       .concat(lessons.filter(lesson => !outlineLessons.some(outline => outline.id === lesson.id)));
 
-    const templateLesson = { id: 'templates', title: 'Шаблоны упражнений', stages: templates.map(exercise => ({ menu: exercise.label, exercise })) };
+    const templateGroups = [
+      ['materials','templates-materials','Материалы / элементы','Audio, Text, Image, Rule, Useful phrases и Possible answers.'],
+      ['mechanics','templates','Механики ответа','Переиспользуемые действия ученика. Варианты одной механики находятся внутри её карточки.'],
+      ['compositions','templates-compositions','Композиции / примеры','Примеры сборки материалов и механик. Комбинации не ограничены этим списком.']
+    ].map(([group,id,title,summary]) => ({id,title,summary,templateGroup:true,stages:templates
+      .filter(exercise => (exercise.catalogGroup || 'mechanics') === group)
+      .map(exercise => ({menu:exercise.label,navigationTitle:exercise.title,navigationDescription:exercise.description,exercise}))})).filter(group => group.stages.length);
+    const templateLesson = templateGroups.find(group => group.id === 'templates') || templateGroups[0];
 
     function topics(route) {
-      if (route.view === 'templates') return [templateLesson];
+      if (route.view === 'templates') return templateGroups;
       return mergedLessons.filter(lesson =>
         route.view === 'unassigned'
           ? lesson.level === null
@@ -130,11 +137,14 @@
       let view = params.get('view');
       if (!['library', 'unassigned', 'templates'].includes(view)) view = params.has('level') || params.has('whale') ? 'library' : 'unassigned';
       const route = { view, level: level.id, whale: whale?.id || 0, lesson: '', exercise: '' };
-      const lesson = topics(route).find(lesson => lesson.id === params.get('lesson')) || (view === 'templates' ? templateLesson : null);
+      const requestedExercise = params.get('exercise');
+      const templateMatch = view === 'templates' && templateGroups.flatMap(group => group.stages.map(stage => ({group,stage})))
+        .find(({stage}) => stage.exercise.id === requestedExercise || stage.exercise.legacyIds?.includes(requestedExercise));
+      const lesson = templateMatch?.group || topics(route).find(lesson => lesson.id === params.get('lesson')) || (view === 'templates' ? templateLesson : null);
       if (lesson) {
         route.lesson = lesson.id;
         if (lesson.stages.length) {
-          route.exercise = (lesson.stages.find(stage => stage.exercise.id === params.get('exercise')) || lesson.stages[0]).exercise.id;
+          route.exercise = (templateMatch?.stage || lesson.stages.find(stage => stage.exercise.id === requestedExercise) || lesson.stages[0]).exercise.id;
         }
       }
       return route;

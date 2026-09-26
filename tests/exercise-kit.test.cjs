@@ -271,3 +271,14 @@ test('stage validates children, preserves content and has no fake aggregate grad
   def.exercises[1].id = 'one'; assert.throws(() => validate(def));
   def.exercises[1].id = 'revealed'; assert.throws(() => validate(def));
 });
+
+
+test('writing accepted-answer contract rejects conflicting modes and missing keys',()=>{
+  const def={version:1,id:'accepted',kind:'writing',title:'Write',responseMode:'accepted',items:[{id:'answer',prompt:'Translate',acceptedAnswers:['I am late',"I’m late"]}]};
+  assert.equal(grade(def,{answer:'  I AM   LATE  '}).answer,'correct');
+  assert.equal(grade(def,{answer:'I late'}).answer,'retry');
+  assert.equal(grade(def,{answer:''}).answer,'empty');
+  assert.throws(()=>validate({...def,items:[{id:'answer',prompt:'Translate'}]}),/acceptedAnswers/);
+  assert.throws(()=>validate({...def,responseMode:'open'}),/Open writing/);
+  assert.throws(()=>validate({...def,items:[{...def.items[0],acceptedAnswers:[]}]}),/non-empty/);
+});

@@ -12,7 +12,9 @@ function definitions(file, name, end) {
 test('factory fixtures and pilot stages remain valid', () => {
   const window = {SpaceWhaleExerciseKit:kit};
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../template-gallery.js'),'utf8'), {window});
-  const gallery = window.SpaceWhaleTemplates;
+  const gallery = window.SpaceWhaleTemplateExamples;
+  assert.equal(window.SpaceWhaleTemplates.length,21);
+  window.SpaceWhaleTemplates.forEach(def => kit.validate(def));
   assert.equal(gallery.length, 31);
   gallery.forEach(def => kit.validate(def));
   definitions('lesson-draft-first-day-school.js', 'stages', '  stages.forEach').forEach(stage => kit.validate(stage.exercise));

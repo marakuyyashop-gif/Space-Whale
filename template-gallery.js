@@ -65,5 +65,42 @@
   ];
   const kit = window.SpaceWhaleExerciseKit;
   examples.forEach((definition,index) => { definition.label = `${index+1} · ${definition.title}`; kit.validate(definition); });
-  window.SpaceWhaleTemplates = examples;
+  // Keep legacy fixtures available for regression coverage, not as catalog entries.
+  window.SpaceWhaleTemplateExamples = examples;
+  const byId = id => examples.find(example => example.id === id);
+  const preview = (id, title, group, definition, legacyIds = [], description = '') => ({
+    ...definition, id, title, label:title, catalogGroup:group, legacyIds, description
+  });
+  const variants = (id, title, ids) => stage(id, title, ids.map(byId), true);
+  const templates = [
+    preview('audio-template','Audio','materials',byId('audio-script-demo'),['audio-demo','audio-script-demo'],'Аудиоплеер с необязательным транскриптом.'),
+    preview('text-template','Text','materials',reading('text-source'),[],'Текст, диалог или примеры для любого задания.'),
+    preview('image-template','Image','materials',base('image-source','presentation','Image',{blocks:[{type:'image',...image(1)}]}),[],'Изображение как материал или опора.'),
+    preview('rule-template','Rule','materials',byId('reference-demo'),['reference-demo'],'Правило, формула и примеры.'),
+    preview('phrases-template','Useful phrases','materials',base('phrases-source','presentation','Useful phrases',{blocks:[{type:'disclosure',title:'Useful phrases',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),[],'Фразы для выполнения задания.'),
+    preview('answers-template','Possible answers','materials',base('answers-source','presentation','Possible answers',{blocks:[{type:'disclosure',title:'Possible answers',role:'possible-answers',text:'[Model response]'}]}),['possible-answers-demo'],'Примеры допустимых формулировок, без автоматической оценки.'),
+    preview('matching-template','Matching','mechanics',variants('matching-variants','Matching',['matching-demo','picture-word-demo','word-definition-demo']),['matching-demo','picture-word-demo','word-definition-demo'],'Соединение пар: фрагменты, картинки или определения.'),
+    preview('choice-template','Single Choice','mechanics',variants('choice-variants','Single Choice',['choice-demo','image-choice-demo']),['choice-demo','image-choice-demo'],'Один ответ: текстовые или графические варианты.'),
+    preview('multiple-template','Multiple Select','mechanics',variants('multiple-variants','Multiple Select',['multiple-choice-demo','image-multiple-demo']),['multiple-choice-demo','image-multiple-demo'],'Несколько ответов: текстовые или графические варианты.'),
+    preview('typed-template','Typed Input / Gap','mechanics',variants('typed-variants','Typed Input / Gap',['typed-demo','bank-demo','error-correction-demo']),['typed-demo','bank-demo','error-correction-demo'],'Ввод в пропуск, банк слов как опора и исправление фрагмента.'),
+    preview('dropdown-template','Dropdown','mechanics',byId('inline-demo'),['inline-demo'],'Выбор ответа из списка внутри поля.'),
+    preview('order-template','Order','mechanics',variants('order-variants','Order',['order-demo','picture-order-demo']),['order-demo','picture-order-demo'],'Порядок слов, фрагментов, картинок или событий.'),
+    preview('sort-template','Sort','mechanics',byId('sort-demo'),['sort-demo'],'Распределение элементов по группам.'),
+    preview('image-label-template','Image Label','mechanics',byId('image-label-demo'),['image-label-demo'],'Размещение подписей на изображении.'),
+    preview('writing-template','Text / Writing field','mechanics',stage('writing-modes','Text / Writing field',[
+      base('accepted-writing-demo','writing','Accepted answers',{responseMode:'accepted',instruction:'Переведите: «Я опоздал(а)». Допускаются полная и краткая формы.',items:[{id:'response',prompt:'[Your answer]',acceptedAnswers:['I am late.',"I’m late.",'I am late',"I’m late","I'm late.","I'm late"]}]}),
+      {...byId('writing-demo'),responseMode:'open'}
+    ],true),['writing-demo'],'Проверка по accepted answers или свободный ответ без автоматической оценки.'),
+    preview('repeat-template','Listen & Repeat','compositions',byId('listen-repeat-demo'),['listen-repeat-demo'],'Аудио и отдельные слова или фразы для повторения.'),
+    preview('audio-task-template','Audio + task','compositions',stage('audio-tasks','Audio + task',[audio('at-source',true),choice('at-choice'),gaps('at-gap'),sort('at-sort'),order('at-order')]),['listening-choice-demo','listening-gap-demo','listening-sort-demo','listening-order-demo'],'Аудио и первое задание доступны вместе; следующие задания раскрываются стрелкой.'),
+    preview('text-task-template','Text + task','compositions',stage('text-tasks','Text + task',[reading('tt-source'),choice('tt-choice'),gaps('tt-gap')]),['reading-choice-demo','reading-gap-demo'],'Текст и первое задание доступны вместе; следующие задания раскрываются стрелкой.'),
+    preview('image-task-template','Image + task','compositions',stage('image-task','Image + task',[
+      base('it-source','presentation','Image',{blocks:[{type:'image',...image(1)}]}),
+      base('it-speaking','presentation','Speaking',{blocks:[{type:'text',text:'[Describe the picture. What can you see?]'}]})
+    ]),[],'Пример Image + Speaking. Изображение также сочетается с механиками ответа.'),
+    preview('speaking-template','Speaking layout','compositions',byId('speaking-language-demo'),['presentation-demo','speaking-language-demo'],'Ситуация и вопрос с необязательными Useful phrases.'),
+    preview('sequence-template','Progressive sequence','compositions',stage('sequence','Progressive sequence',[choice('sequence-choice'),gaps('sequence-gap'),byId('rule-page-demo')],true),['progressive-stage-demo','rule-page-demo'],'Первое задание видно сразу. Следующие шаги открываются стрелкой; Guided Discovery — один из примеров.')
+  ];
+  templates.forEach(definition => kit.validate(definition));
+  window.SpaceWhaleTemplates = templates;
 })();
