@@ -630,3 +630,32 @@ test('reveal beginning stays clear of floating utilities on a full-height canvas
  let target;scroll.scrollTo=value=>{target=value.top;};const detail=s.host.querySelector('details');detail.getBoundingClientRect=()=>({top:300,bottom:1100,height:800});
  s.fire(detail.querySelector('summary'),'click');assert.equal(target,242);
 });
+
+test('student touch dropdown survives a null-relatedTarget blur and applies choice before OK',()=>{
+ const def={version:1,id:'touch-gap',kind:'gaps',title:'Choose.',inputMode:'select',items:[{id:'line',segments:['This ',{id:'word',answers:['skirt'],options:['blouse','skirt','hat']},' is new.']}]};
+ const student=setup(def,{navigationReadOnly:true,syncChecks:true}),teacher=setup(def,{syncChecks:true});
+ const trigger=student.host.querySelector('.ek-choice-trigger');student.fire(trigger,'click');
+ const menu=student.host.querySelector('.ek-inline-menu');assert.equal(menu.hidden,false);
+ student.fire(menu.querySelector('button'),'focusout',{relatedTarget:null});assert.equal(menu.hidden,false,'Safari touch blur must not hide the tapped option');
+ student.fire(menu.querySelector('[data-option-value="skirt"]'),'click');
+ assert.equal(student.mount.getAnswers().word,'skirt');assert.equal(menu.hidden,true);assert.equal(student.host.querySelector('.ek-check').hidden,false);
+ teacher.mount.setAnswers(student.mount.getAnswers());assert.match(teacher.host.querySelector('.ek-choice-trigger').textContent,/skirt/);
+ student.click('OK');teacher.mount.setAnswers(student.mount.getAnswers());assert.equal(teacher.host.querySelector('.ek-choice-trigger').getAttribute('data-feedback'),'correct');
+});
+test('inline dropdown flips above the trigger inside the phone visual viewport',()=>{
+ const s=setup({version:1,id:'viewport-gap',kind:'gaps',title:'Choose.',inputMode:'select',items:[{id:'line',segments:[{id:'word',answers:['hat'],options:['coat','hat']}]}]});
+ const trigger=s.host.querySelector('.ek-choice-trigger'),menu=s.host.querySelector('.ek-inline-menu');
+ s.window.visualViewport={offsetLeft:0,offsetTop:0,width:390,height:500,addEventListener(){},removeEventListener(){}};
+ trigger.getBoundingClientRect=()=>({left:300,top:410,bottom:450,width:80,height:40});
+ menu.getBoundingClientRect=()=>({width:150,height:160});
+ s.fire(trigger,'click');assert.equal(menu.style.top,'243px');assert.equal(menu.style.left,'228px');
+ s.mount.destroy();
+});
+test('wrong picture matches show image-answer cards with horizontal navigation',()=>{
+ const s=setup({version:1,id:'picture-feedback',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'p1',text:'Picture 1',image:'coat.webp',alt:'A coat',correctId:'coat'},{id:'p2',text:'Picture 2',image:'hat.webp',alt:'A hat',correctId:'hat'}],options:[{id:'hat',text:'hat'},{id:'coat',text:'coat'}]},{syncChecks:true});
+ s.mount.setAnswers({p1:'hat',p2:'coat',__sw_checked:true});
+ const cards=s.host.querySelectorAll('.ek-picture-correction-card');assert.equal(cards.length,2);assert.equal(cards[0].querySelector('img').src,'coat.webp');assert.equal(cards[0].querySelector('strong').textContent,'coat');
+ assert.ok(!s.host.querySelector('.ek-results').textContent.includes('Picture 1'));
+ const track=s.host.querySelector('.ek-picture-correction-track');let movement;track.scrollBy=args=>{movement=args.left;};cards[0].getBoundingClientRect=()=>({width:160});
+ s.click('Next correct pictures');assert.equal(movement,172);s.click('Previous correct pictures');assert.equal(movement,-172);
+});

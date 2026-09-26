@@ -10,7 +10,7 @@ For one sheet containing the six objects, give its URL to all six entries and ad
 
 ## Uploaded images connected on 2026-09-26
 
-The seven original GitHub attachment URLs in `assets/lesson-media/a1-2/module-4/lesson-1/images/README.md` are connected directly, without editing or cropping the artwork. Their README order is: speaking composition, hat, suit, blouse, sweater, coat, skirt. Runtime slot order remains coat, sweater, blouse, skirt, suit, hat; options remain independently shuffled. The shared composition is used in both Speaking steps. Object cards are reused in Matching and picture-led choice/writing practice.
+The seven original GitHub attachment URLs remain in `assets/lesson-media/a1-2/module-4/lesson-1/images/README.md` as sources. Runtime uses same-size WebP copies beside that README, with dimensions in the slot registry to reserve layout space before decoding. Total transfer size is approximately 1.3 MB instead of 14.7 MB. Artwork and its original backgrounds are preserved. Their README order is: speaking composition, hat, suit, blouse, sweater, coat, skirt. Runtime slot order remains coat, sweater, blouse, skirt, suit, hat; options remain independently shuffled. The shared composition is used in both Speaking steps. Object cards are reused in Matching and picture-led choice/writing practice.
 
 `A1M4L1_IMAGE_TWO_COATS` is still pending: none of the seven uploaded pictures depicts two coats. All audio slots remain pending. Connecting these images does not change Workspace styles, dimensions, answer keys or reveal behavior.
 
@@ -66,3 +66,9 @@ Listen & Repeat uses twelve separate files and reveal steps: one word, then its 
 ## Picture practice revision
 
 Steps 4 and 5 now group each existing picture slot with one sentence and reveal subsequent pairs with the shared arrow. Step 4 uses a real inline dropdown; step 5 keeps authored text entry. No additional images are required. The word bank belongs in lesson `words` metadata, not sidebar constructions.
+
+## Shared image layout
+
+Picture–Word cards use a portrait image area up to the answer control. Objects fit in full; there is no inner inset frame. Wrong matches show picture/answer cards in a horizontally scrollable correction strip with previous/next controls. Single picture cues are compact and left-aligned; shared speaking compositions remain larger and left-aligned.
+
+For future asset generation, use transparent backgrounds for isolated objects (especially across light/dark themes); use a consistent portrait 4:5 canvas for object cards and landscape 4:3 for shared speaking scenes. Runtime must contain the full artwork even when supplied ratios differ. These are canvas guidelines, not permission to crop an existing object.

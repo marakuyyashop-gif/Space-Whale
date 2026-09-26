@@ -171,3 +171,15 @@ test('user anchor and preferred width survive temporary viewport clamping',async
  s.window.innerWidth=390;s.events.resize();s.window.innerWidth=1280;s.events.resize();assert.equal(dock.style.left,moved);
  await s.api.stopMedia();
 });
+
+test('only an explicit teacher minimize signals peers; learner can expand locally afterwards',async()=>{
+ const teacher=fixture(),student=fixture({role:'student'});let sent=0;
+ await student.api.connect({...session,role:'student',onMinimize:()=>{throw Error('student must not control teacher');}});
+ await teacher.api.connect({...session,onMinimize:()=>{sent++;student.api.setView('mini');}});
+ teacher.api.setView('expanded');student.api.setView('expanded');assert.equal(sent,0);
+ teacher.click('mediaSize');assert.equal(sent,1);assert.equal(student.api.state.view,'mini');
+ student.click('mediaSize');assert.equal(student.api.state.view,'expanded');assert.equal(sent,1);
+ teacher.events.resize();assert.equal(student.api.state.view,'expanded');
+ teacher.click('mediaSize');assert.equal(sent,1);teacher.click('mediaHide');assert.equal(sent,2);assert.equal(student.api.state.view,'mini');
+ await teacher.api.stopMedia();await student.api.stopMedia();
+});

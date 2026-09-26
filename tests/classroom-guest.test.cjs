@@ -77,7 +77,7 @@ test('waiting guest receives the start transition even when navigation has not c
 });
 
 test('private websocket drafts arrive before a stalled database save; snapshots have a bounded debounce',async()=>{
- const peers=[],scheduled=[],received=[],focus=[],audio=[];let writes=0;
+ const peers=[],scheduled=[],received=[],focus=[],audio=[],video=[];let writes=0;
  const make=(owner=false)=>{
   const channels=[];
   const client={auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>{
@@ -93,9 +93,11 @@ test('private websocket drafts arrive before a stalled database save; snapshots 
   vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,AbortController,queueMicrotask,setTimeout(fn,delay){scheduled.push({id:++next,fn,delay});return next;},clearTimeout(){}});
   return window.SpaceWhaleClassroom;
  };
- const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response),onWordFocus:p=>focus.push(p),onAudio:p=>audio.push(p)});await Promise.resolve();
+ const first=make(),second=make();await first.connectGuest('one');await second.connectGuest('one',{onExerciseDraft:p=>received.push(p.response),onWordFocus:p=>focus.push(p),onAudio:p=>audio.push(p),onVideoView:p=>video.push(p)});await Promise.resolve();
  const teacher=make(true);await teacher.connectGuest('one');await Promise.resolve();
  await teacher.syncAudio({exercise_id:'e1',key:'phrase',action:'play',position:0,at:Date.now()+250});
+ await teacher.broadcast('video_view',{view:'mini',source_id:teacher.state.clientId});assert.equal(video.at(-1).view,'mini');
+ await assert.rejects(first.broadcast('video_view',{view:'mini'}),/Only the teacher/);
  assert.equal(audio.at(-1).action,'play');assert.equal(writes,0,'audio bypasses database writes');
  await assert.rejects(first.syncAudio({action:'play'}),/Only the teacher/);
  await assert.rejects(first.broadcast('audio',{action:'play'}),/Only the teacher/);
