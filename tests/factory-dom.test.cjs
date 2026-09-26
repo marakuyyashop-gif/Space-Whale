@@ -659,3 +659,32 @@ test('wrong picture matches show image-answer cards with horizontal navigation',
  const track=s.host.querySelector('.ek-picture-correction-track');let movement;track.scrollBy=args=>{movement=args.left;};cards[0].getBoundingClientRect=()=>({width:160});
  s.click('Next correct pictures');assert.equal(movement,172);s.click('Previous correct pictures');assert.equal(movement,-172);
 });
+
+test('learner audio controls stay locked after metadata while response controls remain usable',()=>{
+ const def={version:1,id:'listening-lock',kind:'stage',layout:'grouped',title:'Listen.',exercises:[{id:'audio',exercise:{version:1,id:'clip',kind:'audio',title:'Audio',audio:'dialogue.mp3'}},{id:'question',exercise:{version:1,id:'question',kind:'gaps',title:'Answer.',inputMode:'text',items:[{id:'row',segments:[{id:'word',answers:['coat']}]}]}}]};
+ const pupil=setup(def,{audioReadOnly:true,navigationReadOnly:true}),teacher=setup(def);
+ const play=pupil.host.querySelector('.ek-audio-play'),range=pupil.host.querySelector('.ek-audio-range'),audio=pupil.host.querySelector('audio');
+ assert.equal(play.disabled,true);audio.duration=20;pupil.fire(audio,'loadedmetadata');assert.equal(range.disabled,true);
+ pupil.fire(play,'click');assert.equal(audio.paused,true);range.value='75';pupil.fire(range,'input');assert.equal(audio.currentTime,0);
+ const answer=pupil.host.querySelector('.ek-typed-gap');assert.equal(Boolean(answer.disabled),false);answer.value='coat';pupil.fire(answer,'input');assert.equal(pupil.mount.getAnswers().question.word,'coat');
+ assert.equal(Boolean(teacher.host.querySelector('.ek-audio-play').disabled),false);
+ pupil.mount.destroy();teacher.mount.destroy();
+});
+test('picture dialog shrinks artwork to leave every answer row inside a short phone viewport',()=>{
+ const s=setup({version:1,id:'compact-picture',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'coat',text:'Picture 1',image:'coat.webp',imageWidth:800,imageHeight:1000,alt:'Coat',correctId:'coat'}],options:[{id:'coat',text:'coat'}]});
+ s.window.visualViewport={width:390,height:500,offsetLeft:0,offsetTop:0,addEventListener(){},removeEventListener(){}};
+ const create=s.document.createElement.bind(s.document);
+ s.document.createElement=tag=>{
+   const el=create(tag);
+   if(tag==='img')el.getBoundingClientRect=()=>({height:el.style.width==='100%'?320:(parseFloat(el.style.width)||256)/.8});
+   if(tag==='div')el.getBoundingClientRect=()=>({width:256});
+   if(tag==='dialog'){
+     Object.defineProperty(el,'scrollHeight',{get:()=>240+(el.querySelector('img')?.getBoundingClientRect().height||0)});
+     el.getBoundingClientRect=()=>({width:296,height:el.scrollHeight});
+   }
+   return el;
+ };
+ s.fire(s.host.querySelector('.ek-match-slot'),'click');
+ const dialog=s.host.querySelector('dialog');assert.equal(dialog.style.maxHeight,'476px');assert.ok(dialog.scrollHeight<=476);assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'187.20000000000002px');
+ s.mount.destroy();
+});

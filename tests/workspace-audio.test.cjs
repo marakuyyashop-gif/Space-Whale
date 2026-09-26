@@ -54,3 +54,18 @@ test('unfilled audio slots stay disabled and never send playback commands',async
    assert.equal(s.sent.length,0);assert.equal(s.notices.length,0);assert.equal(s.api.player.getAttribute('src'),null);s.api.destroy();
  }
 });
+
+test('disabled pupil player still follows teacher playback, waveform progress and pause',async()=>{
+ const t=fixture(true),p=fixture();
+ for(const s of [t,p]){
+   s.root.innerHTML='<div class="ek-audio-player"><audio data-ek-audio-key="phrase:word" src="word.wav"></audio><button class="ek-audio-play">▶</button><div class="ek-audio-track"><input class="ek-audio-range" type="range"></div><span class="ek-audio-time"></span></div>';
+   s.api.refresh();
+ }
+ assert.equal(p.root.querySelector('button').disabled,true);assert.equal(p.root.querySelector('input').disabled,true);
+ t.click();await flush();p.api.receive(t.sent[0]);t.setTime(1250);p.setTime(1250);t.run();p.run();await flush();
+ assert.equal(p.api.player.paused,false);p.api.player.currentTime=4;p.api.player.dispatchEvent(new p.window.Event('timeupdate'));
+ assert.equal(p.root.querySelector('input').value,'40');assert.equal(p.root.querySelector('.ek-audio-track').style.getPropertyValue('--audio-progress'),'40%');assert.equal(p.root.querySelector('button').disabled,true);
+ p.click();await flush();assert.equal(p.sent.length,0);assert.equal(p.api.player.paused,false);
+ t.click();await flush();p.api.receive(t.sent.at(-1));assert.equal(p.api.player.paused,true);
+ t.api.destroy();p.api.destroy();
+});

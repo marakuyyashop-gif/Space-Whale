@@ -941,3 +941,17 @@
 .exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-image{display:block;width:100%;height:auto;max-height:none;aspect-ratio:auto!important;object-fit:contain;margin:0}
 .exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-crop-image,
 .exercise-kit.ek-modern .ek-dialog.ek-image-dialog .ek-prompt>.ek-image-pending{aspect-ratio:var(--ek-dialog-image-ratio,0.8)!important}
+
+/* Fit selection content inside the visible phone window before using scrolling. */
+.exercise-kit.ek-modern .ek-dialog{position:fixed;inset:auto;margin:0;padding:20px;box-sizing:border-box}
+.exercise-kit.ek-modern .ek-dialog>.ek-close{position:absolute;top:8px;right:8px;float:none;width:30px;height:30px;min-height:30px;border-radius:50%;margin:0;padding:0}
+.exercise-kit.ek-modern .ek-dialog>.ek-close::before,.exercise-kit.ek-modern .ek-dialog>.ek-close::after{left:8px;top:14px;width:14px}
+.exercise-kit.ek-modern .ek-dialog>.ek-title{margin:0 26px 0 0;line-height:1.3}
+.exercise-kit.ek-modern .ek-dialog .ek-prompt{margin:14px 0}
+.exercise-kit.ek-modern .ek-dialog .ek-picture-prompt{width:fit-content;max-width:100%;background:transparent}
+.exercise-kit.ek-modern .ek-dialog .ek-options{margin-bottom:0}
+.exercise-kit.ek-modern .ek-dialog.ek-dialog-compact{padding:16px}
+.exercise-kit.ek-modern .ek-dialog.ek-dialog-compact>.ek-title{font-size:16px}
+.exercise-kit.ek-modern .ek-dialog.ek-dialog-compact .ek-prompt{margin:8px 0}
+.exercise-kit.ek-modern .ek-dialog.ek-dialog-compact .ek-options{gap:8px}
+.exercise-kit.ek-modern .ek-dialog.ek-dialog-compact .ek-option{padding:8px 12px;min-height:36px;font-size:14px}
