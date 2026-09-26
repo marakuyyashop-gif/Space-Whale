@@ -616,3 +616,17 @@ test('next task scrolling includes the next-step controls beneath the revealed c
  s.host.querySelector('.ek-stage-navigation').getBoundingClientRect=()=>({top:650,bottom:700,height:50});
  s.click('Show next exercise');assert.equal(target,116);
 });
+
+test('Order corrections are a plain sentence with singular heading and no arrows',()=>{
+ const s=setup({version:1,id:'order-plain',kind:'order',title:'Put the words in order.',tokens:[{id:'i',text:'I'},{id:'am',text:'am'},{id:'warm',text:'warm'},{id:'dot',text:'.'}],correctOrder:['i','am','warm','dot']},{syncChecks:true});
+ s.mount.setAnswers({order:['am','i','warm','dot'],__sw_checked:true});
+ assert.equal(s.host.querySelector('.ek-feedback-heading').textContent,'Correct Answer');
+ assert.equal(s.host.querySelector('.ek-answer-pairs strong').textContent,'I am warm.');
+});
+test('reveal beginning stays clear of floating utilities on a full-height canvas',()=>{
+ const s=setup({version:1,id:'canvas-clearance',kind:'presentation',title:'Rule',blocks:[{type:'disclosure',title:'Open rule',text:'Long content',open:false}]}),scroll=s.document.createElement('div'),utility=s.document.createElement('div');
+ utility.id='workspaceUtilityBar';s.document.body.append(utility);utility.getBoundingClientRect=()=>({top:12,bottom:44,height:32});
+ scroll.className='lesson-scroll';s.host.before(scroll);scroll.append(s.host);scroll.scrollTop=0;scroll.getBoundingClientRect=()=>({top:0,bottom:600,height:600});
+ let target;scroll.scrollTo=value=>{target=value.top;};const detail=s.host.querySelector('details');detail.getBoundingClientRect=()=>({top:300,bottom:1100,height:800});
+ s.fire(detail.querySelector('summary'),'click');assert.equal(target,242);
+});

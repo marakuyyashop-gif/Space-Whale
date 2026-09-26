@@ -23,3 +23,9 @@
 - Writing cues belong in `items[].hint`, below the response field in smaller muted text, linked with `aria-describedby`. Keep `prompt` as the question alone. Feedback repeats only question and answer, never the hint. Both correct answers and possible answer examples use bold emphasis. A thin divider separates the feedback message from its answer section.
 - The video dock retains preferred offsets from the nearest viewport/workspace edges. Only explicit user drag/resize or keyboard movement updates that preference. Temporary viewport, orientation, sidebar, or expanded/mini/hidden changes clamp the display without overwriting the saved preference or preferred width.
 - Keep the theme utility bar completely transparent, including pseudo-elements, border, shadow and backdrop. Retain its content clearance so controls cannot cover exercises. Do not change the approved Listen & Repeat sequence unless separately requested.
+
+## Canvas and selected text
+
+- The top utility area and lesson share one continuous dotted canvas. Paint the texture on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Reserve initial space with scroll-container padding, not a separate clipped top strip. Automatic reveal positioning must leave the floating controls clear.
+- Selected answer text uses an unpatterned surface. Do not apply the empty selector's tiled facet texture behind selected words.
+- Order feedback is headed `Correct Answer` and renders the completed sentence with spaces, without directional arrows between words.

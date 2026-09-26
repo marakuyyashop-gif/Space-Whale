@@ -907,3 +907,8 @@
 .exercise-kit .ek-writing-hint{display:block;margin-top:-4px;color:var(--ek-muted);font-size:var(--sw-exercise-small-size);font-weight:400;line-height:1.5}
 .exercise-kit.ek-modern .ek-status.ek-feedback-with-answers::after{content:'';display:block;height:1px;margin-top:16px;background:color-mix(in srgb,var(--ek-muted) 22%,transparent)}
 .exercise-kit.ek-modern .ek-answer-pairs strong{font-weight:700}
+
+/* Selected text keeps a quiet surface; facets belong only to empty controls. */
+.exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true],
+[data-theme=dark] .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true],
+.exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]:hover:not(:disabled){background-image:none;background-size:auto}

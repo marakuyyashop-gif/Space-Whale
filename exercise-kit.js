@@ -328,9 +328,11 @@
       const behavior=doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
       if(scroller?.scrollTo&&element.getBoundingClientRect){
         const first=element.getBoundingClientRect(),end=last.getBoundingClientRect(),viewport=scroller.getBoundingClientRect(),padding=16;
-        const top=first.top-viewport.top,bottom=end.bottom-viewport.top,available=viewport.height-padding*2;
+        const utility=doc.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
+        const startPadding=Math.max(padding,utility?.height?utility.bottom-viewport.top+14:0);
+        const top=first.top-viewport.top,bottom=end.bottom-viewport.top,available=viewport.height-startPadding-padding;
         let delta=0;
-        if(end.bottom-first.top>available||top<padding)delta=top-padding;
+        if(end.bottom-first.top>available||top<startPadding)delta=top-startPadding;
         else if(bottom>viewport.height-padding)delta=bottom-viewport.height+padding;
         if(delta)scroller.scrollTo({top:Math.max(0,scroller.scrollTop+delta),behavior});
       }else element.scrollIntoView?.({behavior,block:'start'});
@@ -1112,7 +1114,7 @@
           if(!Object.values(feedback).some(value=>value==='retry'||value==='empty'))return;
           const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
-        else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' → '));
+        else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1'));
         else if(def.kind==='writing')def.items.forEach(item=>{if(needsSolution(item.id))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
         else if(def.items)def.items.forEach(item=>{
           if(!needsSolution(item.id))return;
@@ -1121,7 +1123,7 @@
           pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));
         });
       }
-      if(list.children.length){solution.prepend(node('strong','ek-feedback-heading','Correct answers'));resultsBox.append(solution);}
+      if(list.children.length){solution.prepend(node('strong','ek-feedback-heading',def.kind==='order'?'Correct Answer':'Correct answers'));resultsBox.append(solution);}
       if(examples.length){
         const section=node('li','ek-correction ek-writing-answers');section.append(node('strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));
         const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});section.append(list);resultsBox.append(section);
@@ -1139,13 +1141,13 @@
         const line = node('li', '', `${index + 1}. ${labels[result]}`); line.setAttribute('data-feedback', result); resultsBox.append(line);
       });
       if (Object.values(feedback).some(result => result === 'retry' || result === 'empty')) {
-        const correction = node('li', 'ek-correction'); correction.append(node('strong', '', 'Correct solution'));
+        const correction = node('li', 'ek-correction'); correction.append(node('strong', '', def.kind==='order'?'Correct Answer':'Correct solution'));
         if (def.kind === 'gaps') def.items.forEach(item => {
           if (!item.segments.some(segment => typeof segment !== 'string' && ['retry','empty'].includes(feedback[segment.id]) && segment.answers)) return;
           const line = node('p', 'ek-correction-line');
           item.segments.forEach(segment => line.append(typeof segment === 'string' ? node('span','ek-muted',segment) : node('strong','',segment.answers?.[0] || '…'))); correction.append(line);
         });
-        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',def.correctOrder.map(id => def.tokens.find(token => token.id === id).text).join(' → ')));
+        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',def.correctOrder.map(id => def.tokens.find(token => token.id === id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1')));
         else if (def.kind !== 'order') def.items.forEach((item,index) => {
           if (!['retry','empty'].includes(feedback[item.id])) return;
           const choices = item.options || def.options || def.groups || [];
