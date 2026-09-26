@@ -404,7 +404,7 @@
       const audio = node('audio'); audio.preload = src ? 'auto' : 'none'; if(src)audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
       let completed = false;
       const play = button('▶', async () => {
-        if (!src) return;
+        if (!src || config.audioReadOnly) return;
         if (audio.paused || completed) {
           if (completed) { audio.currentTime = 0; completed = false; sync(); }
           doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
@@ -435,7 +435,7 @@
         const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
         const current = Number.isFinite(audio.currentTime) ? Math.max(0, audio.currentTime) : 0;
         const progress = completed ? 100 : duration ? Math.min(100, current / duration * 100) : 0;
-        range.value = String(progress); range.disabled = !duration;
+        range.value = String(progress); range.disabled = Boolean(config.audioReadOnly)||!duration;
         range.setAttribute('aria-valuetext', `${formatTime(current)} of ${formatTime(duration)}`);
         track.style.setProperty('--audio-progress', `${progress}%`);
         wrap.dataset.state = completed ? 'ended' : audio.paused ? 'paused' : 'playing';
@@ -451,10 +451,12 @@
       audio.addEventListener('timeupdate', sync);
       audio.addEventListener('error', () => { audio.pause(); announce('Audio could not be loaded.'); });
       range.addEventListener('input', () => {
+        if(config.audioReadOnly)return;
         if (Number.isFinite(audio.duration) && audio.duration > 0) {
           completed = false; audio.currentTime = (Number(range.value) / 100) * audio.duration; sync();
         }
       });
+      if(config.audioReadOnly){play.disabled=true;play.title='Воспроизведением управляет преподаватель';}
       if (!src) { play.disabled=true; play.setAttribute('aria-label','Audio pending'); play.title='Audio pending'; wrap.dataset.state='pending'; }
       track.append(range); wrap.append(audio, play, track, time);
       return wrap;
@@ -464,12 +466,13 @@
       if (!src) {
         const pending = button('▶', () => announce('Audio will be connected to this item when its file is added.'), 'ek-repeat-play ek-audio-pending');
         pending.setAttribute('aria-label', `Audio pending for ${label}`);
-        pending.title = 'Audio pending';
+        pending.title = 'Audio pending';pending.disabled=true;
         wrap.append(pending);
         return wrap;
       }
       const audio = node('audio'); audio.preload = 'auto'; audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
       const play = button('▶', async () => {
+        if(config.audioReadOnly)return;
         host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
         if (audio.paused) {
           doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
@@ -477,6 +480,7 @@
         } else audio.pause();
       }, 'ek-repeat-play');
       play.setAttribute('aria-label', `Play ${label}`);
+      if(config.audioReadOnly){play.disabled=true;play.title='Воспроизведением управляет преподаватель';}
       audio.addEventListener('play', () => { play.textContent = '❚❚'; });
       audio.addEventListener('pause', () => { play.textContent = '▶'; });
       audio.addEventListener('ended', () => { play.textContent = '▶'; });
@@ -604,6 +608,7 @@
     }
     function popover(item, available, selected, onPick, opener, used = new Set()) {
       trigger = opener;
+      let fitDialog=()=>{};
       dialog = node('dialog', 'ek-dialog');
       dialog.setAttribute('aria-label', def.title);
       const close=button(modern?'':'Close ×', () => closeDialog(), 'ek-close');close.setAttribute('aria-label','Close');
@@ -616,8 +621,9 @@
         pictureDialog.classList.add('ek-image-dialog');
         const fitPicture=(width,height)=>{
           const ratio=width>0&&height>0 ? width/height*(item.crop?item.crop.w/item.crop.h:1) : 4/5;
-          pictureDialog.style.setProperty('--ek-picture-dialog-width',Math.min(440,320*ratio+56)+'px');
+          pictureDialog.style.setProperty('--ek-picture-dialog-width',Math.min(440,320*ratio+40)+'px');
           pictureDialog.style.setProperty('--ek-dialog-image-ratio',String(ratio));
+          if(pictureDialog.open)fitDialog();
         };
         fitPicture(item.imageWidth,item.imageHeight);
         if(picture.tagName==='IMG'){
@@ -643,12 +649,35 @@
       if (selected) { const reset=button('', () => { onPick(''); closeDialog(); }, 'ek-button ek-reset ek-selection-reset'); const icon=actions.querySelector('.ek-reset svg');if(icon)reset.append(icon.cloneNode(true));reset.setAttribute('aria-label','Clear selection'); reset.title='Clear selection'; dialog.append(reset); }
       const currentDialog = dialog;
       const currentTrigger = trigger;
+      const view=doc.defaultView;
+      fitDialog=()=>{
+        if(!currentDialog.open)return;
+        const viewport=view?.visualViewport,w=viewport?.width||view?.innerWidth||1024,h=viewport?.height||view?.innerHeight||768;
+        const limit=Math.max(120,h-24);
+        currentDialog.style.maxHeight=limit+'px';currentDialog.style.maxWidth=Math.max(120,w-24)+'px';
+        currentDialog.classList.remove('ek-dialog-compact');
+        const picture=prompt.querySelector('.ek-image');
+        if(picture){
+          const ratio=Number(currentDialog.style.getPropertyValue('--ek-dialog-image-ratio'))||.8;
+          if(pictureOnly)prompt.style.width='100%';
+          picture.style.width='100%';
+          const budget=()=>limit-(currentDialog.scrollHeight-picture.getBoundingClientRect().height)-2;
+          if(budget()<100){currentDialog.classList.add('ek-dialog-compact');}
+          const room=budget(),width=prompt.getBoundingClientRect().width;
+          if(Number.isFinite(room)&&width>0){picture.style.width=Math.min(width,Math.max(24,room)*ratio)+'px';if(pictureOnly)prompt.style.width=picture.style.width;}
+        }
+        const box=currentDialog.getBoundingClientRect();
+        currentDialog.style.left=((viewport?.offsetLeft||0)+(w-box.width)/2)+'px';
+        currentDialog.style.top=((viewport?.offsetTop||0)+Math.max(12,(h-box.height)/2))+'px';
+      };
       dialog.addEventListener('close', () => {
+        view?.removeEventListener?.('resize',fitDialog);view?.visualViewport?.removeEventListener('resize',fitDialog);view?.visualViewport?.removeEventListener('scroll',fitDialog);
         currentDialog.remove();
         const replacement = [...body.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === currentTrigger.getAttribute('aria-label'));
         if (host.isConnected) (currentTrigger.isConnected ? currentTrigger : replacement)?.focus();
       }, { once: true });
-      host.append(dialog); dialog.showModal();
+      host.append(dialog); dialog.showModal();fitDialog();
+      view?.addEventListener?.('resize',fitDialog);view?.visualViewport?.addEventListener('resize',fitDialog);view?.visualViewport?.addEventListener('scroll',fitDialog);
     }
     function richText(value, highlights = []) {
       const el = node('p', 'ek-copy');
@@ -763,7 +792,7 @@
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -857,7 +886,7 @@
               navigationReadOnly:Boolean(config.navigationReadOnly),
               onViewChange:config.onViewChange?viewChanged:undefined,
               syncChecks: Boolean(config.syncChecks),
-              readOnly: Boolean(config.readOnly),
+              readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly),
               answers: answers[block.id] || {},
               onChange: value => {
                 answers[block.id] = value;
