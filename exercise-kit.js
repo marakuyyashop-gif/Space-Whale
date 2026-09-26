@@ -374,7 +374,7 @@
     };
     const illustration = item => {
       if (item.imagePending && !item.image) {
-        const blank = node('div', 'ek-image ek-image-pending');
+        const blank = node('div', 'ek-image ek-image-pending'+(['gaps','choice'].includes(def.kind)?' ek-task-image':''));
         blank.setAttribute('aria-label', 'Изображение');
         blank.setAttribute('role', 'img');
         return blank;
@@ -390,7 +390,10 @@
         crop.style.backgroundPosition = `${x}% ${y}%`;
         return crop;
       }
-      const image = node('img', 'ek-image'); image.src = item.image; image.alt = item.alt || item.text || ''; image.loading = 'lazy'; return image;
+      const image = node('img', 'ek-image'); image.src = item.image; image.alt = item.alt || item.text || ''; image.loading = 'eager'; image.decoding = 'async';
+      if(item.imageWidth && item.imageHeight){image.setAttribute('width',String(item.imageWidth));image.setAttribute('height',String(item.imageHeight));image.style.aspectRatio=item.imageWidth+' / '+item.imageHeight;}
+      if(['gaps','choice'].includes(def.kind))image.classList.add('ek-task-image');
+      return image;
     };
     const formatTime = value => {
       const seconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
@@ -656,12 +659,36 @@
         opener.dataset.selected = String(Boolean(answers[id]));
         menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[id])));
       };
-      const shut = () => { menu.hidden=true;opener.setAttribute('aria-expanded','false'); };
+      const view=doc.defaultView;
+      const placeMenu=()=>{
+        if(menu.hidden)return;
+        const rect=opener.getBoundingClientRect(),v=view?.visualViewport;
+        const x=v?.offsetLeft||0,y=v?.offsetTop||0,w=v?.width||view?.innerWidth||1024,h=v?.height||view?.innerHeight||768;
+        const utility=doc.getElementById('workspaceUtilityBar')?.getBoundingClientRect();
+        const top=Math.max(y+8,utility?.bottom?utility.bottom+8:y+8),bottom=y+h-12;
+        menu.style.maxWidth=Math.max(80,w-24)+'px';menu.style.maxHeight=Math.max(40,bottom-top)+'px';
+        const box=menu.getBoundingClientRect(),below=Math.max(0,bottom-rect.bottom-7),above=Math.max(0,rect.top-top-7);
+        const upward=box.height>below&&above>below,room=upward?above:below;
+        menu.style.maxHeight=Math.max(40,room)+'px';
+        menu.style.left=Math.max(x+12,Math.min(rect.left,x+w-box.width-12))+'px';
+        menu.style.top=Math.max(top,Math.min(upward?rect.top-Math.min(box.height,Math.max(40,room))-7:rect.bottom+7,bottom-Math.min(box.height,Math.max(40,room))))+'px';
+      };
+      const shut = () => {
+        if(!menu.hidden)menu.hidePopover?.();
+        menu.hidden=true;opener.setAttribute('aria-expanded','false');
+        view?.removeEventListener?.('resize',placeMenu);doc.removeEventListener('scroll',placeMenu,true);
+        view?.visualViewport?.removeEventListener('resize',placeMenu);view?.visualViewport?.removeEventListener('scroll',placeMenu);
+      };
+      menu.setAttribute('popover','manual');
+      menu.classList.add('ek-floating-menu');
       const opener = button('', () => {
         if (opener.getAttribute('aria-expanded')==='true') { dismissInline(); return; }
         dismissInline(); menu.hidden=false;opener.setAttribute('aria-expanded','true');
         closeInline = shut;
-        menu.querySelector('button')?.focus();
+        menu.showPopover?.();placeMenu();
+        view?.addEventListener?.('resize',placeMenu);doc.addEventListener('scroll',placeMenu,true);
+        view?.visualViewport?.addEventListener('resize',placeMenu);view?.visualViewport?.addEventListener('scroll',placeMenu);
+        menu.querySelector('button')?.focus({preventScroll:true});
       }, 'ek-gap ek-choice-trigger');
       opener.setAttribute('aria-expanded', 'false');
       options.forEach((entry, optionIndex) => {
@@ -680,7 +707,7 @@
           else { const buttons = [...menu.querySelectorAll('button')]; const i = buttons.indexOf(doc.activeElement); buttons[(i + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length].focus(); }
         }
       });
-      wrap.addEventListener('focusout', event => { if (!wrap.contains(event.relatedTarget)) shut(); });
+      wrap.addEventListener('focusout', event => { if (event.relatedTarget && !wrap.contains(event.relatedTarget)) dismissInline(); });
       paintControls.set(id,paint);paint(); wrap.append(opener, menu); return {wrap,opener};
     }
     function render() {
@@ -1115,6 +1142,19 @@
           const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
         else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1'));
+        else if(def.kind==='matching'&&def.layout==='picture-word'){
+          const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
+          track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
+          def.items.filter(item=>needsSolution(item.id)).forEach(item=>{
+            const card=node('article','ek-picture-correction-card');card.append(illustration(item),node('strong','',def.options.find(option=>option.id===item.correctId)?.text||''));track.append(card);
+          });
+          if(track.children.length){
+            const move=direction=>{const distance=(track.firstElementChild?.getBoundingClientRect().width||180)+12;track.scrollBy?.({left:direction*distance,behavior:'smooth'});};
+            const controls=node('div','ek-picture-correction-controls');
+            for(const [direction,label,arrow] of [[-1,'Previous correct pictures','‹'],[1,'Next correct pictures','›']]){const control=button(arrow,()=>move(direction),'ek-button');control.setAttribute('aria-label',label);controls.append(control);}
+            carousel.append(track,controls);const section=node('li','ek-correction');section.append(node('strong','ek-feedback-heading','Correct answers'),carousel);resultsBox.append(section);
+          }
+        }
         else if(def.kind==='writing')def.items.forEach(item=>{if(needsSolution(item.id))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
         else if(def.items)def.items.forEach(item=>{
           if(!needsSolution(item.id))return;

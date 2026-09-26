@@ -912,3 +912,26 @@
 .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true],
 [data-theme=dark] .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true],
 .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]:hover:not(:disabled){background-image:none;background-size:auto}
+
+/* Keep the forward target fixed; the optional back button occupies its own column. */
+.exercise-kit .ek-stage-navigation,.exercise-kit.ek-modern .ek-stage-navigation{display:grid;grid-template-columns:1fr 54px 1fr;column-gap:20px;align-items:center}
+.exercise-kit .ek-stage-navigation .ek-stage-down{grid-column:2;grid-row:1;justify-self:center}
+.exercise-kit .ek-stage-navigation .ek-stage-up{grid-column:3;grid-row:1;justify-self:start}
+/* Pictures occupy the card surface, above the answer, without clipping the object. */
+.exercise-kit.ek-modern .ek-picture-word-card{padding:0;gap:0;overflow:hidden;position:relative}
+.exercise-kit.ek-modern .ek-picture-word-card>.ek-image{height:auto;aspect-ratio:4/5!important;object-fit:contain;object-position:center;width:100%;border-radius:0;margin:0}
+.exercise-kit.ek-modern .ek-picture-word-card>.ek-number.ek-result-lamp{position:absolute;top:12px;left:12px;z-index:2}
+.exercise-kit.ek-modern .ek-picture-word-card>.ek-match-slot{width:calc(100% - 24px);margin:12px;align-self:center}
+.exercise-kit .ek-image{object-position:left top;height:auto;aspect-ratio:4/3}
+.exercise-kit .ek-body>.ek-image{max-width:560px;max-height:none;margin-right:auto;margin-left:0}
+.exercise-kit .ek-body>.ek-task-image{width:auto;max-width:100%;height:260px;max-height:260px;object-fit:contain;margin:0 auto 16px 0}
+.exercise-kit.ek-modern .ek-dialog .ek-picture-prompt>.ek-image{object-fit:contain;aspect-ratio:4/5!important;max-height:320px}
+.exercise-kit .ek-inline-menu.ek-floating-menu{position:fixed;inset:auto;margin:0;z-index:10000;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;border:0}
+.exercise-kit .ek-picture-correction-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.exercise-kit .ek-picture-correction-card{flex:0 0 160px;min-width:0;overflow:hidden;border-radius:20px;background:var(--sw-neu-surface);scroll-snap-align:start}
+.exercise-kit .ek-picture-correction-card>.ek-image{width:100%;height:180px;object-fit:contain;object-position:center;border-radius:0}
+.exercise-kit .ek-picture-correction-card>strong{display:block;padding:12px;font-weight:700}
+.exercise-kit .ek-picture-correction-controls{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+.exercise-kit .ek-picture-correction-controls .ek-button{width:36px;min-height:36px;padding:0;font-size:22px}
+/* Feedback dots belong on the card boundary/lamp, not behind the selected text. */
+.exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]::before{background-image:none}

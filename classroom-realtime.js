@@ -95,6 +95,7 @@
 
     channel
       .on("broadcast", { event: "navigate" }, ({ payload }) => handlers.onNavigate?.(payload))
+      .on("broadcast", { event: "video_view" }, ({ payload }) => {if(state.role==='student'&&payload?.view==='mini')handlers.onVideoView?.(payload);})
       .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
       .on("broadcast", { event: "audio_request" }, ({ payload }) => handlers.onAudioRequest?.(payload))
       .on("broadcast", { event: "word_focus" }, ({ payload }) => handlers.onWordFocus?.(payload))
@@ -190,6 +191,7 @@
       });
     guestControl
       .on('broadcast',{event:'navigate'},receive(payload=>{guestNavigationEpoch++;guestHandlers.onNavigate?.(payload);}))
+      .on('broadcast',{event:'video_view'},receive(payload=>{if(state.role==='student'&&payload?.view==='mini')guestHandlers.onVideoView?.(payload);}))
       .on('broadcast',{event:'audio'},receive(guestHandlers.onAudio))
       .on('broadcast',{event:'lesson_closed'},()=>closeGuestTransport())
       .subscribe(status=>{if(status==='SUBSCRIBED')guestHandlers.onAudioReady?.();});
@@ -254,11 +256,12 @@
   }
 
   async function broadcast(event, payload) {
+    if(event==='video_view'&&state.role!=='teacher')throw new Error('Only the teacher can minimize shared video.');
     if(state.guestToken){
       if(guestClosed||!state.channel)throw new Error('Занятие закрыто.');
       if(event==='audio'&&state.role!=='teacher')throw new Error('Only the teacher can control shared audio.');
       if(!guestUsable())throw new Error('Подтверждаем соединение с занятием.');
-      const channel=['navigate','audio'].includes(event)?guestControl:guestAnswers;
+      const channel=['navigate','audio','video_view'].includes(event)?guestControl:guestAnswers;
       if(!channel||channel.state!=='joined')return 'fallback';
       const result=await channel.send({type:'broadcast',event,payload});
       if(result!=='ok')guestPoll?.();

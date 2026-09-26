@@ -616,5 +616,7 @@ body.unified-workspace .app-sidebar,body.unified-workspace[data-theme=dark] .app
 .unified-workspace .workspace-utility-bar::before,.unified-workspace .workspace-utility-bar::after{content:none!important;display:none!important}
 
 /* One continuous textured canvas. Clearance is scroll padding, never a painted header. */
-body.unified-workspace .class-content,body.unified-workspace[data-workspace-role] .class-content{top:0!important;background:transparent!important}
-body.unified-workspace .lesson-scroll,body.unified-workspace[data-theme=dark] .lesson-scroll{background:transparent!important;background-image:none!important;padding-top:max(calc(66px + env(safe-area-inset-top)),calc(var(--workspace-controls-clearance,58px) + 8px))!important;scroll-padding-top:max(calc(66px + env(safe-area-inset-top)),calc(var(--workspace-controls-clearance,58px) + 8px))}
+
+/* A shared transparent canvas, with a scroll viewport below all utility controls. */
+body.unified-workspace .class-content,body.unified-workspace[data-workspace-role] .class-content{top:max(calc(58px + env(safe-area-inset-top)),var(--workspace-controls-clearance,58px))!important;background:transparent!important}
+body.unified-workspace .lesson-scroll,body.unified-workspace[data-theme=dark] .lesson-scroll{background:transparent!important;background-image:none!important;padding-top:16px!important;scroll-padding-top:16px;padding-bottom:max(60px,env(safe-area-inset-bottom))!important}

@@ -52,7 +52,7 @@
     views.forEach((view,key)=>{view.root.hidden=single&&(!preferred||key!==preferred.session_id);});
     dock.dataset.waiting=String(single&&!preferred);
   }
-  function setView(view){
+  function setView(view,share=false){
     if(!['expanded','mini','hidden'].includes(view))return;
     state.view=view;dock.dataset.view=view;dock.inert=view==='hidden';
     document.body.dataset.videoView=view;
@@ -60,11 +60,12 @@
     dock.setAttribute('aria-hidden',String(view==='hidden'));restore.hidden=dock.hidden||view!=='hidden';
     const label=view==='expanded'?'Свернуть видео':'Развернуть видео';size.setAttribute('aria-label',label);size.title=label;
     place();
+    if(share&&view!=='expanded'&&context?.role==='teacher')context.onMinimize?.();
   }
   function lessonStarted(id){if(!id||lessonPresented===id)return;lessonPresented=id;setView('expanded');}
-  size.addEventListener('click',()=>setView(state.view==='expanded'?'mini':'expanded'));
+  size.addEventListener('click',()=>setView(state.view==='expanded'?'mini':'expanded',true));
   continueLesson.addEventListener('click',()=>setView('mini'));
-  hide.addEventListener('click',()=>{setView('hidden');restore.focus();});
+  hide.addEventListener('click',()=>{setView('hidden',true);restore.focus();});
   restore.addEventListener('click',()=>{setView('mini');size.focus();});
   // Only an explicit move/resize changes the preferred edge offsets.
   // Viewport/sidebar/orientation changes merely clamp the rendered position.
@@ -92,7 +93,7 @@
   });
   for(const type of ['pointerup','pointercancel','lostpointercapture'])dock.addEventListener(type,()=>{if(drag?.moved)rememberPosition();dragPosition=null;drag=null;});
   dock.addEventListener('keydown',event=>{
-    if(event.key==='Escape'){setView('mini');size.focus();return;}
+    if(event.key==='Escape'){setView('mini',true);size.focus();return;}
     if(event.target!==dock&&event.target!==resize)return;
     const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];if(!delta)return;
     event.preventDefault();if(state.view==='expanded')setView('mini');

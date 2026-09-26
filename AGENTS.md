@@ -26,6 +26,15 @@
 
 ## Canvas and selected text
 
-- The top utility area and lesson share one continuous dotted canvas. Paint the texture on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Reserve initial space with scroll-container padding, not a separate clipped top strip. Automatic reveal positioning must leave the floating controls clear.
+- The top utility area and lesson share one continuous dotted canvas. Paint the texture on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Keep the scroll viewport below the actual utility controls for every role and viewport; retain a transparent, continuous canvas with no painted header strip. Automatic reveal positioning must leave the floating controls clear.
 - Selected answer text uses an unpatterned surface. Do not apply the empty selector's tiled facet texture behind selected words.
 - Order feedback is headed `Correct Answer` and renders the completed sentence with spaces, without directional arrows between words.
+
+## Touch, pictures and shared classroom controls
+
+- Inline dropdowns must remain open through touch focus changes with a null relatedTarget, commit the selected value, and expose OK for complete answers. Fit menus to visualViewport, flip upward near the bottom and scroll long menus; use the top layer where supported.
+- Keep the forward reveal arrow at the same center position when the previous arrow appears to its right.
+- Picture–Word objects must be fully visible in portrait cards, without a padded inner picture window. Place single task pictures at the left, at a compact size. Reserve image dimensions before load and serve optimized local assets. Do not silently remove or recolor supplied artwork backgrounds.
+- Picture matching corrections show each incorrect picture with its correct word; allow horizontal touch scroll and explicit previous/next buttons.
+- Explicit teacher video minimization sends a one-time minimize event. Learners can independently resize or expand afterwards; viewport changes must not resend it.
+- Invitation creation acknowledges the click immediately. Clipboard permission cannot indefinitely delay navigation into an already-created room; keep server room revocation before issuing a replacement invitation.

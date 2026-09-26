@@ -734,6 +734,7 @@
     }
 
     const handlers = {
+      onVideoView:payload=>{if(liveRole==='student'&&payload?.view==='mini')window.SpaceWhaleMedia?.setView('mini');},
       onAudio:payload=>lessonAudio?.receive(payload),
       onAudioRequest:()=>lessonAudio?.share(),
       onAudioReady:()=>lessonAudio?.reconnect(),
@@ -887,7 +888,7 @@
   }
   function connectLiveMedia(){
     if(pupilWaiting())return;
-    void window.SpaceWhaleMedia?.connect({sessionId:guestToken?'guest:'+guestToken.slice(0,8):sessionId,guestToken:guestToken||undefined,role:liveRole,guest:Boolean(guestToken),status:liveSession?.started_at?'live':liveSession?.status});
+    void window.SpaceWhaleMedia?.connect({sessionId:guestToken?'guest:'+guestToken.slice(0,8):sessionId,guestToken:guestToken||undefined,role:liveRole,guest:Boolean(guestToken),status:liveSession?.started_at?'live':liveSession?.status,onMinimize:()=>{if(liveReady&&liveRole==='teacher')classroom.broadcast('video_view',{view:'mini',source_id:classroom.state.clientId}).catch(()=>toast('Не удалось свернуть видео у ученика. Повторите после восстановления связи.'));}});
   }
   const saveTimer=()=>{try{sessionStorage.setItem(timerKey,JSON.stringify(timer));}catch(_){}};
   function timerState(){
@@ -934,14 +935,14 @@
     if(!liveMode){
       prepareDialog('Пригласить ученика');
       sessionDialog.append(node('p','Создадим отдельную ссылку и скопируем её. Ученик попадёт в ожидание. Материалы откроются только после вашего Start Lesson.'));
-      const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+      const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');error.setAttribute('role','status');
       const create=button('Создать и скопировать ссылку',async()=>{create.disabled=true;try{await createInvitation();}catch(e){error.textContent=e.message;create.disabled=false;}},'workspace-dialog-button is-brand');
       actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),create);sessionDialog.append(actions,error);sessionDialog.showModal();return;
     }
     if(locked()||!timerState().canStart)return;
     prepareDialog('Начать занятие?');
     sessionDialog.append(node('p','Откроем материалы ученику и запустим общий таймер на 60 минут.'));
-    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');error.setAttribute('role','status');
     const confirm=button('Start Lesson',async()=>{
       if(!timerState().canStart||confirm.disabled)return;confirm.disabled=true;
       try{
@@ -956,7 +957,7 @@
   stop.addEventListener('click',()=>{
     if(locked()||timer.ended)return;
     prepareDialog('Завершить занятие?');sessionDialog.append(node('p','Ссылка ученика закроется. Вы вернётесь в свой кабинет и сможете продолжить подготовку или пригласить следующего ученика.'));
-    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');error.setAttribute('role','status');
     const finish=button('Завершить',async()=>{
       finish.disabled=true;
       try{
@@ -1019,7 +1020,10 @@
     try{data=await window.SpaceWhaleMedia.createInvitation();}
     catch(error){managingInvitation=false;throw error;}
     if(!data?.token){managingInvitation=false;throw new Error('Не удалось создать приглашение.');}
-    const copied=await copyInvitation(invitationURL(data.token));
+    // Clipboard permission can stall on mobile. It must not hold the new room open.
+    let copyTimeout;
+    const copied=await Promise.race([copyInvitation(invitationURL(data.token)),new Promise(resolve=>{copyTimeout=setTimeout(()=>resolve(false),800);})]);
+    clearTimeout(copyTimeout);
     const nextRoute={...route,exercise:selectedLesson()?.stages[0]?.exercise.id||route.exercise};
     const joined=new URL('classroom.html'+query(nextRoute),location.href);
     joined.searchParams.set('room',data.token);joined.searchParams.delete('guest');joined.searchParams.delete('session');joined.searchParams.delete('notice');
@@ -1035,21 +1039,22 @@
     invite.hidden=false;
     invite.addEventListener('click',async()=>{
       if(locked())return;
-      invite.disabled=true;
+      invite.disabled=true;invite.setAttribute('aria-busy','true');
+      if(!guestToken&&!sessionId)toast('Создаём ссылку для нового ученика…');
       try{
         if(guestToken){await copyInvitation(invitationURL(guestToken));return;}
         if(sessionId){const url=new URL('classroom.html',location.href);url.searchParams.set('session',sessionId);await copyInvitation(url.href);return;}
         await createInvitation();
       }catch(error){toast(error.message||'Не удалось создать приглашение.');}
-      finally{invite.disabled=false;}
+      finally{invite.disabled=false;invite.removeAttribute('aria-busy');}
     });
   }
   document.getElementById('newGuestLesson')?.addEventListener('click',()=>{
     if(locked())return;
     prepareDialog('Приглашение на занятие');
     sessionDialog.append(node('p','Новый ученик получит отдельную ссылку и пустые ответы. Прежние ссылки закроются. Ссылка действует 24 часа; её можно закрыть раньше.'));
-    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
-    const create=button('Новый ученик',async()=>{create.disabled=true;close.disabled=true;try{await createInvitation();}catch(e){error.textContent=e.message;create.disabled=false;close.disabled=false;}},'workspace-dialog-button is-brand');
+    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');error.setAttribute('role','status');
+    const create=button('Новый ученик',async()=>{create.disabled=true;close.disabled=true;create.textContent='Создаём ссылку…';create.setAttribute('aria-busy','true');error.textContent='Закрываем прежнюю ссылку и готовим новую.';try{await createInvitation();}catch(e){error.textContent=e.message;create.textContent='Новый ученик';create.removeAttribute('aria-busy');create.disabled=false;close.disabled=!guestToken;}},'workspace-dialog-button is-brand');
     const close=button('Закрыть текущую ссылку',async()=>{close.disabled=true;create.disabled=true;try{await closeGuestRoom();}catch(e){error.textContent=e.message;close.disabled=false;create.disabled=false;}},'workspace-dialog-button');
     close.disabled=!guestToken;
     actions.append(create,close);sessionDialog.append(actions,error);sessionDialog.showModal();

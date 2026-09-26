@@ -10,14 +10,14 @@
 
   // Stable media slots: fill src once to update every use. Pending slots never request a URL.
   const lesson1Media = {
-    A1M4L1_IMAGE_01: {type:'image',src:'https://github.com/user-attachments/assets/19a25333-2d5c-4c4a-b383-8b95836d0b9f',alt:'A coat',target:'coat'},
-    A1M4L1_IMAGE_02: {type:'image',src:'https://github.com/user-attachments/assets/b4d5e77f-d78c-48de-a364-e0ddb6447cbe',alt:'A sweater',target:'sweater'},
-    A1M4L1_IMAGE_03: {type:'image',src:'https://github.com/user-attachments/assets/25b437a9-f4f6-4df7-a2db-ee775855f28f',alt:'A blouse',target:'blouse'},
-    A1M4L1_IMAGE_04: {type:'image',src:'https://github.com/user-attachments/assets/52f3ac91-48b5-4d51-8573-fe2a0ad9adb4',alt:'A skirt',target:'skirt'},
-    A1M4L1_IMAGE_05: {type:'image',src:'https://github.com/user-attachments/assets/e4229fef-801f-4654-a016-7b0962bf796b',alt:'A suit',target:'suit'},
-    A1M4L1_IMAGE_06: {type:'image',src:'https://github.com/user-attachments/assets/60de2994-be08-429d-9371-f216109b0318',alt:'A hat',target:'hat'},
+    A1M4L1_IMAGE_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp',width:1122,height:1402,alt:'A coat',target:'coat'},
+    A1M4L1_IMAGE_02: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/sweater.webp',width:1254,height:1254,alt:'A sweater',target:'sweater'},
+    A1M4L1_IMAGE_03: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/blouse.webp',width:1254,height:1254,alt:'A blouse',target:'blouse'},
+    A1M4L1_IMAGE_04: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/skirt.webp',width:1122,height:1402,alt:'A skirt',target:'skirt'},
+    A1M4L1_IMAGE_05: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/suit.webp',width:1254,height:1254,alt:'A suit',target:'suit'},
+    A1M4L1_IMAGE_06: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp',width:1254,height:1254,alt:'A hat',target:'hat'},
     A1M4L1_IMAGE_TWO_COATS: {type:'image',src:null,alt:'Two coats',target:'coats'},
-    A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'https://github.com/user-attachments/assets/7f500fd4-91eb-4e8c-bb19-5d4c0770f727',alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
+    A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
     A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes. And this sweater?\nBen: It looks warm.\nAnna: I like it. I need a sweater for the weekend.\nBen: The sweater looks good.\nAnna: Great. I want the sweater."},
     A1M4L1_WORD_01: {type:'audio',src:null,word:'coat',sentence:'I need a coat for work.'},
     A1M4L1_WORD_02: {type:'audio',src:null,word:'sweater',sentence:'My sweater is in the wardrobe.'},
@@ -32,7 +32,7 @@
     lesson1Media['A1M4L1_SENTENCE_'+suffix]={type:'audio',src:null,sentence:lesson1Media['A1M4L1_WORD_'+suffix].sentence};
   }
   window.SpaceWhaleLessonMedia = {...window.SpaceWhaleLessonMedia, 'a1-2-w4-l1':lesson1Media};
-  const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
+  const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,imageWidth:lesson1Media[assetId].width,imageHeight:lesson1Media[assetId].height,...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
   const audioSlot = audioId => ({audioId,...(lesson1Media[audioId].src ? {audio:lesson1Media[audioId].src} : {audioPending:true})});
   const wordList = ['coat','sweater','blouse','skirt','suit','hat'];
   const wordImage = word => imageSlot('A1M4L1_IMAGE_'+String(wordList.indexOf(word)+1).padStart(2,'0'));
