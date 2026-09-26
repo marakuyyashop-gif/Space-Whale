@@ -63,3 +63,15 @@ test('authenticated session invokes recovery after resubscription',async()=>{
   assert.equal(reconnected,0);await subscription('SUBSCRIBED');assert.equal(reconnected,1);
   await window.SpaceWhaleClassroom.disconnect();
 });
+
+test('waiting guest receives the start transition even when navigation has not changed',async()=>{
+ let startedAt=null;const events=[],window={spaceWhaleSupabase:{auth:{getUser:async()=>({data:{user:null}})},rpc:async(name)=>({data:name==='resolve_guest_lesson_link'?{is_host:false,allowed_lesson_ids:[],status:'waiting'}:{status:startedAt?'live':'waiting',started_at:startedAt,server_now:new Date().toISOString(),duration_minutes:60,current_page_id:startedAt?'?lesson=one':null,current_exercise_id:startedAt?'e1':null}})}};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout:()=>1,clearTimeout(){}});
+ const api=window.SpaceWhaleClassroom;
+ await api.connectGuest('waiting-test',{onLessonState:data=>events.push(['state',data.status]),onNavigate:()=>events.push(['navigate'])});
+ await api.requestExerciseState('e1');assert.deepEqual(events[0],['state','waiting']);
+ await assert.rejects(api.startGuestLesson(),/Only the teacher/);
+ events.length=0;startedAt=new Date().toISOString();await api.requestExerciseState('e1');
+ assert.deepEqual(events[0],['state','live']);assert.deepEqual(events[1],['navigate']);
+ await api.disconnect();
+});

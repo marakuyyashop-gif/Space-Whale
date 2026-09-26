@@ -864,13 +864,13 @@
 .exercise-kit.ek-modern .ek-match-slot[data-feedback=correct]{--ek-dot-color:var(--sw-answer-correct)}
 .exercise-kit.ek-modern .ek-match-slot[data-feedback=retry]{--ek-dot-color:var(--sw-answer-incorrect)}
 .exercise-kit.ek-modern .ek-match-slot:is([data-feedback=retry],[data-feedback=correct])::before{background-image:radial-gradient(circle,var(--ek-dot-color) 1px,transparent 1.5px);background-size:8px 8px;mask-image:linear-gradient(145deg,transparent 12%,#0003 45%,#000a 100%)}
-/* A lighter wash spans only the individual item card, never a whole mixed exercise. */
-.exercise-kit.ek-modern :is(.ek-card,.ek-question){isolation:isolate}
-.exercise-kit.ek-modern :is(.ek-card,.ek-question):has([data-feedback=correct]){--ek-card-dot:var(--sw-answer-correct)}
-.exercise-kit.ek-modern :is(.ek-card,.ek-question):has([data-feedback=retry]),.exercise-kit.ek-modern .ek-question[data-feedback=retry]{--ek-card-dot:var(--sw-answer-incorrect)}
-.exercise-kit.ek-modern .ek-question[data-feedback=correct]{--ek-card-dot:var(--sw-answer-correct)}
-.exercise-kit.ek-modern :is(.ek-card,.ek-question):has([data-feedback=correct],[data-feedback=retry])::before,
-.exercise-kit.ek-modern .ek-question:is([data-feedback=correct],[data-feedback=retry])::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;border:2px dotted color-mix(in srgb,var(--ek-card-dot) 65%,transparent);background:none;mask-image:none}
+/* Feedback follows the real rounded surface; never the option-group fieldset. */
+.exercise-kit.ek-modern .ek-card{isolation:isolate}
+.exercise-kit.ek-modern .ek-card:has([data-feedback=correct]),.exercise-kit.ek-modern .ek-question[data-feedback=correct]{--ek-card-dot:var(--sw-answer-correct)}
+.exercise-kit.ek-modern .ek-card:has([data-feedback=retry]),.exercise-kit.ek-modern .ek-question[data-feedback=retry]{--ek-card-dot:var(--sw-answer-incorrect)}
+.exercise-kit.ek-modern .ek-question .ek-radio{position:relative}
+.exercise-kit.ek-modern .ek-card:has([data-feedback=correct],[data-feedback=retry])::before,
+.exercise-kit.ek-modern .ek-question:is([data-feedback=correct],[data-feedback=retry]) .ek-radio:has(input:checked)::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:1;pointer-events:none;box-sizing:border-box;border:2px dotted color-mix(in srgb,var(--ek-card-dot) 78%,transparent);background:none;mask-image:none}
 [data-theme=dark] .exercise-kit.ek-modern .ek-match-slot{background-image:conic-gradient(from 45deg,#ffffff12 0 25%,#00000021 0 50%,#ffffff06 0 75%,#00000012 0)}
 .exercise-kit .ek-stage-navigation[hidden]{display:none!important}
 

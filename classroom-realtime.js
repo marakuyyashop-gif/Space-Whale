@@ -54,6 +54,7 @@
       if (error) throw error;
       if (!data) return null;
       return {
+        ...data,
         current_page_id: data.current_page_id || null,
         current_exercise_id: data.current_exercise_id || null
       };
@@ -170,6 +171,8 @@
           draftTimers.forEach(clearTimeout);draftTimers.clear();
           handlers.onEnded?.();return;
         }
+        Object.assign(state.session,{started_at:data.started_at,status:data.status,duration_minutes:data.duration_minutes});
+        handlers.onLessonState?.(data);
         if(offline){offline=false;await flushPendingSnapshots();await handlers.onReconnect?.();}
         handlers.onConnectionState?.(true);
         const route=JSON.stringify([data.current_page_id,data.current_exercise_id]);
@@ -181,6 +184,15 @@
     };
     restorePendingSnapshots();guestPollTimer=setTimeout(guestPoll,0);
     return {session:state.session,role:state.role,meta};
+  }
+
+  async function startGuestLesson() {
+    if(state.role!=='teacher'||!state.guestToken)throw new Error('Only the teacher can start the lesson.');
+    const {data,error}=await client.rpc('start_guest_lesson',{p_token:state.guestToken});
+    if(error)throw error;
+    if(!data?.started_at)throw new Error('Не удалось начать занятие. Повторите попытку.');
+    Object.assign(state.session,{started_at:data.started_at,status:data.status,duration_minutes:data.duration_minutes});
+    return data;
   }
 
   async function broadcast(event, payload) {
@@ -486,6 +498,7 @@
   window.SpaceWhaleClassroom = {
     connect,
     connectGuest,
+    startGuestLesson,
     resolveGuestLink,
     disconnect,
     getCurrentUser,

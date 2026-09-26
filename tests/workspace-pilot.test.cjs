@@ -13,7 +13,7 @@ function fixture(guest=false,options={}){
  const history={replaceState(a,b,url){location.search=new URL(url,location.href).search;},pushState(a,b,url){location.search=new URL(url,location.href).search;}};
  const copied=[],calls=[],storage=()=>{const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k)};};
  const channel={presenceState:()=>({})};
- const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:{guest:true,allowed_lesson_ids:['*']},role:options.student?'student':'teacher'};},loadSharedState:async()=>null,navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
+ const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:{guest:true,allowed_lesson_ids:['*']},role:options.student?'student':'teacher',meta:{started_at:options.startedAt||null,server_now:new Date().toISOString(),duration_minutes:60,allowed_lesson_ids:['*']}};},loadSharedState:async()=>null,startGuestLesson:async()=>{calls.push('start');if(options.startFails)throw new Error('offline');return {started_at:new Date().toISOString(),server_now:new Date().toISOString(),status:'live',duration_minutes:60,allowed_lesson_ids:['*']};},navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
  const window={SpaceWhaleIsTeacher:!options.student,SpaceWhaleExerciseKit:kit,SpaceWhaleCatalog:require('../workspace-catalog.js'),SpaceWhaleClassroom:classroom,addEventListener(){},setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,innerWidth:1200,innerHeight:800,spaceWhaleSupabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:name==='create_guest_workspace'?{token:'new-token'}:true};}}};
  const context={window,document,location,history,localStorage:storage(),sessionStorage:storage(),navigator:{clipboard:{writeText:async url=>copied.push(url)}},URL,URLSearchParams,console,setTimeout:()=>1,clearTimeout(){},clearInterval(){}};
  if(options.ended)context.sessionStorage.setItem('space-whale:clock:guest:old-token',JSON.stringify({startedAt:1,readyAt:1,ended:true}));
@@ -70,4 +70,30 @@ test('server closure returns the connected teacher to preparation but blocks the
 });
 test('network error offers teacher retry and a cabinet exit without cancelling the room',async()=>{
  const s=fixture(true,{invalid:true,offline:true});await settled();assert.match(s.document.querySelector('#workspaceConnectionState').textContent,/Повторить подключение/);assert.match(s.document.querySelector('#workspaceConnectionState').textContent,/Вернуться в кабинет/);assert.equal(s.calls.filter(c=>c.name==='revoke_guest_lesson_link').length,0);
+});
+
+test('invited learner waits without mounting exercises, then opens the teacher selection and shared countdown',async()=>{
+ const s=fixture(true,{student:true});await settled();
+ assert.match(s.document.querySelector('#workspaceExercise').textContent,/Ждём начала занятия/);
+ assert.equal(s.document.querySelector('#workspaceExercise .exercise-kit'),null);
+ assert.equal(s.document.querySelector('.workspace-student-timer').hidden,true);
+ s.handlers.onNavigate({current_page_id:'?level=A1.1&whale=1&lesson=a1-1-w1-l1'});
+ assert.match(s.document.querySelector('#workspaceExercise').textContent,/Ждём начала занятия/);
+ s.handlers.onLessonState({status:'live',started_at:'2026-09-26T10:00:00Z',server_now:'2026-09-26T10:15:00Z',duration_minutes:60,allowed_lesson_ids:['*'],current_page_id:'?level=A1.1&whale=1&lesson=a1-1-w1-l1'});
+ assert.equal(s.document.querySelector('.workspace-student-timer').hidden,false);
+ assert.equal(s.document.querySelector('.workspace-student-time').textContent,'45:00');
+ assert.equal(s.document.querySelector('#workspaceClockTime').textContent,'45:00');
+ assert.doesNotMatch(s.document.querySelector('#workspaceExercise').textContent,/Ждём начала занятия/);
+ s.handlers.onEnded();assert.equal(s.document.querySelector('.workspace-student-timer').hidden,true);
+});
+test('reload of a live lesson restores the server timer instead of starting over',async()=>{
+ const s=fixture(true,{student:true,startedAt:new Date(Date.now()-900000).toISOString()});await settled();
+ assert.equal(s.document.querySelector('.workspace-student-timer').hidden,false);
+ assert.match(s.document.querySelector('.workspace-student-time').textContent,/^(45:00|44:59)$/);
+});
+test('failed Start stays waiting and offers retry instead of starting a local-only timer',async()=>{
+ const s=fixture(true,{startFails:true});await settled();s.click(s.document.querySelector('#startLesson'));
+ s.click([...s.document.querySelectorAll('.workspace-session-dialog button')].find(b=>b.textContent==='Start Lesson'));await settled();
+ assert.equal(s.document.querySelector('#startLesson').hidden,false);
+ assert.match(s.document.querySelector('.workspace-device-status').textContent,/Не удалось начать/);
 });

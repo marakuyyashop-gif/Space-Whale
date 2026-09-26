@@ -551,3 +551,19 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:var(
 .unified-workspace[data-theme] :is(.workspace-console-selector,#startLesson,#workspaceStopLesson):is(:hover,:focus-visible){background-image:var(--control-facets);background-size:5px 5px}
 .unified-workspace .workspace-session-tools{position:fixed;bottom:22px;left:22px;max-width:min(300px,calc(100vw - 44px));z-index:1000;margin:0;padding:0}
 .unified-workspace .workspace-notice:not(:empty){padding:12px 16px;border-radius:16px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-small)}
+
+/* A reserved, non-scrolling learner header: the timer never covers exercise text. */
+.workspace-student-timer[hidden]{display:none!important}
+.workspace-student-timer{position:absolute;left:24px;top:18px;z-index:3;display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:14px;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small);color:var(--sw-neu-muted);font:400 12px/1.4 Onest,sans-serif;pointer-events:none}
+.workspace-student-time{font-size:15px;font-variant-numeric:tabular-nums;font-weight:500}
+.unified-workspace[data-workspace-role=student] .class-content{top:64px}
+.unified-workspace[data-workspace-role=student] .lesson-scroll{padding-top:24px!important}
+.workspace-waiting{max-width:440px;margin:12vh auto;text-align:center}
+.workspace-waiting h1{font-size:23px}
+@media(max-width:768px){
+.workspace-student-timer{left:12px;top:max(12px,env(safe-area-inset-top));gap:7px;padding:6px 9px;border-radius:11px}
+.workspace-student-time{font-size:13px}
+.workspace-student-timer-caption{display:none}
+.unified-workspace[data-workspace-role=student] .class-content{top:calc(52px + env(safe-area-inset-top))}
+.unified-workspace[data-workspace-role=student] .lesson-scroll{padding-top:16px!important}
+}
