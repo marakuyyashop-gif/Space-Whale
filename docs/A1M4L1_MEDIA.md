@@ -8,6 +8,12 @@ The sole runtime slot registry is `lesson1Media` in `course-content.js`, exposed
 
 For one sheet containing the six objects, give its URL to all six entries and add each entry's `crop: {x,y,w,h}` in percentages. Separate images require only `src`. Use `alt` for the finished asset. The existing engine handles cropping and pending placeholders; final image dimensions/layout will be reviewed after the actual assets arrive.
 
+## Uploaded images connected on 2026-09-26
+
+The seven original GitHub attachment URLs in `assets/lesson-media/a1-2/module-4/lesson-1/images/README.md` are connected directly, without editing or cropping the artwork. Their README order is: speaking composition, hat, suit, blouse, sweater, coat, skirt. Runtime slot order remains coat, sweater, blouse, skirt, suit, hat; options remain independently shuffled. The shared composition is used in both Speaking steps. Object cards are reused in Matching and picture-led choice/writing practice.
+
+`A1M4L1_IMAGE_TWO_COATS` is still pending: none of the seven uploaded pictures depicts two coats. All audio slots remain pending. Connecting these images does not change Workspace styles, dimensions, answer keys or reveal behavior.
+
 ## Image slots and visual scenarios
 
 Primary goal: recognize and use the six clothing nouns. In closed tasks the image must distinguish the intended item from every alternative. Object images share a consistent angle and scale, with a white background, no people, labels, letters, or incidental accessories. Reuse the same object in every task.

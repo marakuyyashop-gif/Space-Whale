@@ -27,19 +27,21 @@ test('image ordering is stable while all matching options occupy different posit
  assert.ok(def.items.every((item,i)=>item.correctId!==def.options[i].id));
  assert.ok(Object.values(kit.grade(def,Object.fromEntries(def.items.map(i=>[i.id,i.correctId])))).every(result=>result==='correct'));
 });
-test('all media slots start empty, sources reuse IDs and two coats has its own image',()=>{
+test('uploaded images reuse slots while missing two-coat and audio assets stay pending',()=>{
  assert.equal(Object.values(media).filter(s=>s.type==='image').length,8);
  assert.equal(Object.values(media).filter(s=>s.type==='audio').length,13);
- assert.ok(Object.values(media).every(s=>s.src===null));
+ assert.equal(Object.values(media).filter(s=>s.type==='image'&&s.src).length,7);
+ assert.equal(media.A1M4L1_IMAGE_TWO_COATS.src,null);
+ assert.ok(Object.values(media).filter(s=>s.type==='audio').every(s=>s.src===null));
  const match=stage('words'),choice=stage('word-choice'),gaps=stage('word-type');
  choice.exercises.map(b=>b.exercise.items[0]).forEach(i=>assert.equal(i.assetId,match.items.find(m=>m.correctId===i.id).assetId));
  assert.equal(gaps.exercises[2].exercise.items[0].assetId,'A1M4L1_IMAGE_TWO_COATS');
  assert.equal(stage('opening').blocks[0].assetId,stage('final-speaking').blocks[0].assetId);
  assert.equal(stage('listen-repeat').items.length,6);
- for(const item of lesson.stages){const s=setup(item.exercise);assert.equal(s.host.querySelector('img[src]'),null);assert.equal(s.host.querySelector('audio[src]'),null);s.handle.destroy();}
+ for(const item of lesson.stages){const s=setup(item.exercise);for(const img of s.host.querySelectorAll('img[src]'))assert.ok(Object.values(media).some(slot=>slot.src===img.getAttribute('src')));assert.equal(s.host.querySelector('audio[src]'),null);s.handle.destroy();}
 });
 test('setting a single image or audio URL later connects all uses without changing answer keys',()=>{
- const attached=load(source.replace("src:null,alt:'A coat'","src:'assets/coat.png',alt:'A coat'").replace("type:'audio',src:null,script:","type:'audio',src:'assets/dialogue.mp3',script:"));
+ const attached=load(source.replace(media.A1M4L1_IMAGE_01.src,"assets/coat.png").replace("type:'audio',src:null,script:","type:'audio',src:'assets/dialogue.mp3',script:"));
  const words=attached.lesson.stages[1].exercise,choice=attached.lesson.stages[3].exercise;
  assert.equal(words.items[0].image,'assets/coat.png');assert.equal(choice.exercises[0].exercise.items[0].image,'assets/coat.png');
  assert.equal(words.items[0].correctId,'coat');assert.equal(words.items[0].imagePending,undefined);
@@ -47,11 +49,11 @@ test('setting a single image or audio URL later connects all uses without changi
 });
 test('picture practice reveals one picture and inline answer at a time',()=>{
  for(const [id,count,mode] of [['word-choice',4,'select'],['word-type',3,'text']]){
-   const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('.ek-image-pending').length,1);
+   const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('img[src], .ek-image-pending').length,1);
    assert.equal(def.exercises.length,count);
    assert.ok(def.exercises.every(b=>b.exercise.kind==='gaps'&&b.exercise.inputMode===mode));
    for(let i=1;i<count;i++)s.click('Show next exercise');
-   assert.equal(s.host.querySelectorAll('.ek-image-pending').length,count);
+   assert.equal(s.host.querySelectorAll('img[src], .ek-image-pending').length,count);
    assert.ok(!s.host.textContent.includes('______'));
  }
  const def=stage('word-type').exercises[2].exercise;
