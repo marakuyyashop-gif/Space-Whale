@@ -15,7 +15,7 @@
   document.body.append(dock,restore);
   const participantId=window.crypto?.randomUUID?.();
   const mobile=()=>window.matchMedia?.('(max-width: 768px)').matches||false;
-  let position=null,customWidth=null,drag=null,lessonPresented=null,activeSpeaker=null,speakerTimer=null;
+  let position=null,dragPosition=null,customWidth=null,drag=null,lessonPresented=null,activeSpeaker=null,speakerTimer=null;
   function bounds(){
     const v=window.visualViewport,x=v?.offsetLeft||0,y=v?.offsetTop||0,w=v?.width||window.innerWidth||1024,h=v?.height||window.innerHeight||768;
     const area=document.querySelector('.class-area')?.getBoundingClientRect();
@@ -36,11 +36,11 @@
     const height=expanded?Math.max(100,b.height-16):Math.min(b.height-16,Math.max(110,rows*(width/cols*.75)+Math.max(0,rows-1)*4));
     dock.style.height=height+'px';
     const r=dock.getBoundingClientRect();
-    const wanted=expanded?{x:b.x+b.width-width-8,y:b.y+8}:position||{x:b.x+b.width-width-8,y:b.y+8};
+    const preferred=position?{x:position.horizontal==='right'?b.x+b.width-width-position.x:b.x+position.x,y:position.vertical==='bottom'?b.y+b.height-(r.height||height)-position.y:b.y+position.y}:null;
+    const wanted=expanded?{x:b.x+b.width-width-8,y:b.y+8}:dragPosition||preferred||{x:b.x+b.width-width-8,y:b.y+8};
     const x=Math.max(b.x+8,Math.min(wanted.x,b.x+b.width-width-8));
     const y=Math.max(b.y+8,Math.min(wanted.y,b.y+b.height-(r.height||height)-8));
     dock.style.left=x+'px';dock.style.top=y+'px';restore.style.top=y+'px';
-    if(!expanded)position={x,y};
     arrangeTiles();
   }
   function arrangeTiles(){
@@ -66,11 +66,18 @@
   continueLesson.addEventListener('click',()=>setView('mini'));
   hide.addEventListener('click',()=>{setView('hidden');restore.focus();});
   restore.addEventListener('click',()=>{setView('mini');size.focus();});
+  // Only an explicit move/resize changes the preferred edge offsets.
+  // Viewport/sidebar/orientation changes merely clamp the rendered position.
+  function rememberPosition(){
+    const b=bounds(),r=dock.getBoundingClientRect();
+    const left=r.left-b.x,right=b.x+b.width-r.left-r.width,top=r.top-b.y,bottom=b.y+b.height-r.top-r.height;
+    position={horizontal:left<right?'left':'right',vertical:top<=bottom?'top':'bottom',x:Math.max(8,Math.min(left,right)),y:Math.max(8,Math.min(top,bottom))};
+  }
   function startDrag(event,resizing){
     if(event.button!==0)return;
     if(!resizing&&event.target.closest?.('button,input,a'))return;
-    const r=dock.getBoundingClientRect();
-    if(state.view==='expanded'){customWidth=r.width;position={x:r.left,y:r.top};setView('mini');}
+    let r=dock.getBoundingClientRect();
+    if(state.view==='expanded'){customWidth=r.width;dragPosition={x:r.left,y:r.top};setView('mini');r=dock.getBoundingClientRect();}
     drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top,width:r.width,right:r.left+r.width,resizing};
     (resizing?resize:dock).setPointerCapture(event.pointerId);event.preventDefault();
   }
@@ -78,18 +85,19 @@
   resize.addEventListener('pointerdown',e=>{e.stopPropagation();startDrag(e,true);});
   dock.addEventListener('pointermove',event=>{
     if(!drag||event.pointerId!==drag.id)return;
-    if(drag.resizing){customWidth=Math.max(110,Math.min(bounds().width-16,drag.width-event.clientX+drag.x));position={x:drag.right-customWidth,y:drag.top};}
-    else position={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};
+    if(drag.resizing){customWidth=Math.max(110,Math.min(bounds().width-16,drag.width-event.clientX+drag.x));dragPosition={x:drag.right-customWidth,y:drag.top};}
+    else dragPosition={x:drag.left+event.clientX-drag.x,y:drag.top+event.clientY-drag.y};
+    drag.moved=true;
     place();
   });
-  for(const type of ['pointerup','pointercancel','lostpointercapture'])dock.addEventListener(type,()=>{drag=null;});
+  for(const type of ['pointerup','pointercancel','lostpointercapture'])dock.addEventListener(type,()=>{if(drag?.moved)rememberPosition();dragPosition=null;drag=null;});
   dock.addEventListener('keydown',event=>{
     if(event.key==='Escape'){setView('mini');size.focus();return;}
     if(event.target!==dock&&event.target!==resize)return;
     const delta={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[event.key];if(!delta)return;
     event.preventDefault();if(state.view==='expanded')setView('mini');
     const r=dock.getBoundingClientRect();
-    if(event.target===resize){customWidth=Math.max(110,Math.min(bounds().width-16,r.width-delta[0]+delta[1]));position={x:r.left+r.width-customWidth,y:r.top};}else position={x:r.left+delta[0],y:r.top+delta[1]};place();
+    if(event.target===resize){customWidth=Math.max(110,Math.min(bounds().width-16,r.width-delta[0]+delta[1]));dragPosition={x:r.left+r.width-customWidth,y:r.top};}else dragPosition={x:r.left+delta[0],y:r.top+delta[1]};place();rememberPosition();dragPosition=null;
   });
   window.addEventListener('resize',place);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
   if(window.ResizeObserver){const observer=new window.ResizeObserver(place);observer.observe(document.querySelector('.class-area'));observer.observe(document.getElementById('workspaceUtilityBar'));}
@@ -197,7 +205,7 @@
     if(state.sessionId===next.sessionId && (state.phase==='joined'||connecting))return connecting||true;
     const previous=context?.sessionId;
     const initialView=lessonPresented===next.sessionId?state.view:'mini';
-    const closing=stopMedia();if(previous!==next.sessionId){position=null;customWidth=null;setView(initialView);}
+    const closing=stopMedia();if(previous!==next.sessionId){position=null;dragPosition=null;customWidth=null;setView(initialView);}
     context={...next};state.sessionId=next.sessionId;const epoch=generation;
     if(next.status==='live')lessonStarted(next.sessionId);
     setView(state.view);

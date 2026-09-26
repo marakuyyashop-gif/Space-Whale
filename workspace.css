@@ -610,3 +610,7 @@ body.unified-workspace .app-sidebar,body.unified-workspace[data-theme=dark] .app
 .workspace-audio-notice #lessonAudioEnable{position:static;transform:none;box-shadow:none}
 .workspace-media-notice{display:flex;align-items:center}
 .workspace-media-notice:has(#mediaStatus[hidden]){display:none}
+
+/* Utility clearance remains; the strip itself never paints a separate surface. */
+.unified-workspace .workspace-utility-bar{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important}
+.unified-workspace .workspace-utility-bar::before,.unified-workspace .workspace-utility-bar::after{content:none!important;display:none!important}

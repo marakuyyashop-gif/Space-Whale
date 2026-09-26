@@ -133,3 +133,7 @@ Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px ins
 ## Authoring and Workspace conventions
 
 See root `AGENTS.md` for source-to-layout mapping, inline dropdowns, picture/task reveal steps, non-repeating headings, full-range reveal scrolling, dismissible notices, and the plain lesson overview without target-word lists. Explicit `constructions` is the metadata for lesson phrases; `words` and ambiguous imported `lexis` do not appear in the overview.
+
+## Writing cues and expansion feedback
+
+`writing.items[].hint` is optional non-empty supporting text. It renders beneath its field, in smaller muted type, and is associated through `aria-describedby`. Store only the question in `prompt`; submitted examples and corrections intentionally omit `hint`. All answer examples are bold, with a thin separator between the feedback status and the answer section. All inline disclosures and newly submitted feedback use the same full-range scroll behavior as progressive tasks and rules.

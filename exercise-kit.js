@@ -210,6 +210,7 @@
     }
     if (def.kind === 'writing') def.items.forEach(item => {
       text(item.prompt,'prompt');
+      if(item.hint!=null)text(item.hint,'hint');
       for (const field of ['possibleAnswers','acceptedAnswers']) {
         if (item[field] != null) { array(item[field],field); item[field].forEach(answer=>text(answer,field)); }
       }
@@ -754,7 +755,7 @@
             if(!open)section.querySelectorAll('audio,video').forEach(media=>media.pause());
             if(section.hidden===open||Boolean(section.inert)===open){
               const lastChanged=index===(count>previousCount?count-1:previousCount-1);
-              if(animate)expand(section,open,lastChanged?()=>centerSection(stack.children[focusIndex]):undefined);else{section.hidden=!open;section.inert=!open;}
+              if(animate)expand(section,open,lastChanged?()=>centerSection(stack.children[focusIndex],navigation.hidden?stack.children[count-1]:navigation):undefined);else{section.hidden=!open;section.inert=!open;}
             }
           });
           updateNavigation();return stack.children[count-1];
@@ -1054,7 +1055,9 @@
       }
       if (def.kind === 'writing') def.items.forEach((item, index) => {
         const label = node('label', 'ek-writing', `${index + 1}. ${item.prompt}`);
-        const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input); body.append(label); controls.set(item.id, input);
+        const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
+        if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
+        body.append(label); controls.set(item.id, input);
       });
     }
     const lamps=new Map();
@@ -1078,7 +1081,7 @@
         const summary=detail.querySelector('summary'),content=node('div','ek-disclosure-content');
         [...detail.childNodes].filter(child=>child!==summary).forEach(child=>content.append(child));detail.append(content);content.hidden=!detail.open;
         summary.setAttribute('aria-expanded',String(Boolean(detail.open)));
-        summary.addEventListener('click',event=>{event.preventDefault();const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));if(open)detail.open=true;expand(content,open,()=>{detail.open=open;});});
+        summary.addEventListener('click',event=>{event.preventDefault();const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));if(open)detail.open=true;expand(content,open,()=>{detail.open=open;if(open)centerSection(detail);});});
       });
     }
     function showFeedback(){
@@ -1121,7 +1124,7 @@
       if(list.children.length){solution.prepend(node('strong','ek-feedback-heading','Correct answers'));resultsBox.append(solution);}
       if(examples.length){
         const section=node('li','ek-correction ek-writing-answers');section.append(node('strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));
-        const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('span','',answer));list.append(row);});section.append(list);resultsBox.append(section);
+        const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});section.append(list);resultsBox.append(section);
       }
       if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
@@ -1163,6 +1166,7 @@
     }
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
       checkFeedback();
+      centerSection(status,resultsBox.hidden?status:resultsBox);
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
     if(['presentation','audio'].includes(def.kind)&&config.onSkip){
