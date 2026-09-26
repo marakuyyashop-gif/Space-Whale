@@ -8,13 +8,16 @@
   const classroom = window.SpaceWhaleClassroom || null;
   const sessionId = new URLSearchParams(location.search).get('session');
   const guestToken = new URLSearchParams(location.search).get('guest');
-  const showInviteOnJoin = new URLSearchParams(location.search).get('share')==='1';
+  const inviteCopyStatus = new URLSearchParams(location.search).get('share');
   const liveMode = Boolean(sessionId || guestToken);
 
   const host = document.getElementById('workspaceExercise');
   const tree = document.getElementById('workspaceTopics');
   const milestoneRail = document.getElementById('workspaceMilestones');
   const notice = document.getElementById('workspaceNotice');
+  let noticeTimer;
+  function toast(text){notice.textContent=text;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{notice.textContent='';},4500);}
+
   const scroll = document.getElementById('workspaceScroll');
   const start = document.getElementById('startLesson');
   const sessionHeading = document.querySelector('.workspace-session-heading a');
@@ -706,6 +709,17 @@
     }
 
     const handlers = {
+      onEnded:()=>{
+        liveReady=false;mounted?.destroy?.();host.replaceChildren();
+        document.body.dataset.workspaceRole='connection-error';
+        const status=document.getElementById('workspaceConnectionState');status.textContent='Занятие закрыто или срок ссылки истёк. Попросите преподавателя прислать новую ссылку.';
+        if(liveRole==='teacher'){const link=node('a',' Вернуться в кабинет');link.href='classroom.html';status.append(link);}
+      },
+      onConnectionState:online=>{
+        host.inert=!online;
+        if(!online)notice.textContent='Восстанавливаем соединение…';
+        else if(notice.textContent==='Восстанавливаем соединение…')toast('Соединение восстановлено');
+      },
       onReconnect: async () => {
         await classroom.flushPendingSnapshots?.();
         liveHydrated.clear();
@@ -800,7 +814,7 @@
     }
 
     if (route.exercise) hydrateLiveExercise(route.exercise, mounted?.getAnswers?.() || {});
-    if(showInviteOnJoin&&liveRole==='teacher') document.getElementById('inviteStudent')?.click();
+    if(inviteCopyStatus&&liveRole==='teacher')toast(inviteCopyStatus==='copied'?'Ссылка скопирована':'Нажмите «Ссылка для ученика», чтобы скопировать приглашение.');
   }
 
   panels.forEach(panel => document.getElementById(`${panel}Tab`).addEventListener('click', () => {
@@ -825,7 +839,7 @@
     }
     const active=timer.startedAt!==null,pre=!active&&scheduled!==null&&now<scheduled&&now>=scheduled-300000;
     const remaining=active?Math.max(0,timer.startedAt+duration-now):pre?scheduled-now:0;
-    return {duration:pre?300000:duration,remaining,active,pre,waiting:timer.readyAt!==null&&!active,canStart:scheduled!==null&&now>=scheduled-300000&&!active&&timer.readyAt===null&&!timer.ended};
+    return {duration:pre?300000:duration,remaining,active,pre,waiting:timer.readyAt!==null&&!active,canStart:(scheduled!==null&&now>=scheduled-300000||liveSession?.guest===true)&&!active&&timer.readyAt===null&&!timer.ended};
   }
   const clock=document.getElementById('workspaceClock'),stop=document.getElementById('workspaceStopLesson');
   const clockLabel=node('small','','workspace-clock-label');document.querySelector('.workspace-clock-face').append(clockLabel);
@@ -851,14 +865,14 @@
   start.addEventListener('click',()=>{
     if(locked()||!timerState().canStart)return;
     prepareDialog('Начать урок?');
-    const actions=node('div','','workspace-dialog-actions');actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),button('Start Lesson',()=>{if(!timerState().canStart)return;timer.readyAt=Date.now();timer.ended=false;saveTimer();dialogClose();tick();},'workspace-dialog-button is-brand'));
+    const actions=node('div','','workspace-dialog-actions');actions.append(button('Отмена',dialogClose,'workspace-dialog-button'),button('Start Lesson',()=>{if(!timerState().canStart)return;timer.readyAt=Date.now();if(liveSession?.guest)timer.startedAt=timer.readyAt;timer.ended=false;saveTimer();dialogClose();tick();},'workspace-dialog-button is-brand'));
     sessionDialog.append(actions);sessionDialog.showModal();
   });
   stop.addEventListener('click',()=>{
     if(locked()||timer.ended)return;
     prepareDialog('Завершить занятие?');sessionDialog.append(node('p','Соединение будет закрыто. Продолжить занятие из этого окна не получится.'));
     const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
-    const finish=button('Завершить',async()=>{finish.disabled=true;try{if(classroom?.state?.channel)await classroom.disconnect();liveReady=false;timer.ended=true;timer.startedAt=null;timer.readyAt=null;if(ticker!==null){clearInterval(ticker);ticker=null;}saveTimer();dialogClose();paintTimer();}catch(_){error.textContent='Не удалось завершить соединение. Попробуйте ещё раз.';finish.disabled=false;}},'workspace-dialog-button is-finish');
+    const finish=button('Завершить',async()=>{finish.disabled=true;try{if(guestToken)await revokeInvitation();if(classroom?.state?.channel)await classroom.disconnect();liveReady=false;timer.ended=true;timer.startedAt=null;timer.readyAt=null;if(ticker!==null){clearInterval(ticker);ticker=null;}saveTimer();dialogClose();paintTimer();}catch(_){error.textContent='Не удалось завершить соединение. Попробуйте ещё раз.';finish.disabled=false;}},'workspace-dialog-button is-finish');
     actions.append(button('Продолжить',dialogClose,'workspace-dialog-button is-brand'),finish);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
   tick();
@@ -879,26 +893,51 @@
   });
 
   const invite = document.getElementById('inviteStudent');
-  if (invite) {
-    invite.hidden = false;
-    invite.addEventListener('click', async () => {
+  const invitationURL=token=>{const url=new URL('classroom.html',location.href);url.searchParams.set('guest',token);return url.href;};
+  async function copyInvitation(url){
+    try{await navigator.clipboard.writeText(url);toast('Ссылка скопирована');return true;}
+    catch{toast('Браузер не разрешил копирование. Нажмите кнопку ссылки ещё раз.');return false;}
+  }
+  async function createInvitation(){
+    const result=await window.spaceWhaleSupabase.rpc('create_guest_workspace');
+    if(result.error)throw result.error;
+    if(!result.data?.token)throw new Error('Не удалось создать приглашение.');
+    const copied=await copyInvitation(invitationURL(result.data.token));
+    const nextRoute={...route,exercise:selectedLesson()?.stages[0]?.exercise.id||route.exercise};
+    const joined=new URL('classroom.html'+query(nextRoute),location.href);
+    joined.searchParams.set('guest',result.data.token);joined.searchParams.delete('session');
+    joined.searchParams.delete('completed_stages');joined.searchParams.delete('exercise_view');
+    joined.searchParams.set('share',copied?'copied':'1');
+    location.href=joined.href;
+  }
+  async function revokeInvitation(){
+    if(!guestToken)return;
+    const result=await window.spaceWhaleSupabase.rpc('revoke_guest_lesson_link',{p_token:guestToken});
+    if(result.error)throw result.error;
+  }
+  if(invite){
+    invite.hidden=false;
+    invite.addEventListener('click',async()=>{
+      if(locked())return;
       invite.disabled=true;
-      try {
-        if (!guestToken&&!sessionId) {
-          if (!await classroom.getCurrentUser()) { location.href='login.html?next='+encodeURIComponent('classroom.html'); return; }
-          const result=await window.spaceWhaleSupabase.rpc('create_guest_workspace');
-          if (result.error) throw result.error;
-          const joined=new URL('classroom.html'+query(route),location.href);joined.searchParams.set('guest',result.data.token);joined.searchParams.set('share','1');location.href=joined.href;
-          return;
-        }
-        const url=new URL('classroom.html',location.href);url.searchParams.set(guestToken?'guest':'session',guestToken||sessionId);
-        const field=document.getElementById('guestInviteLink');field.value=url.href;field.hidden=false;
-        try { await navigator.clipboard.writeText(url.href); notice.textContent=guestToken?'Ссылка скопирована. Откройте её в другом браузере без входа в аккаунт преподавателя.':'Ссылка скопирована. Ученик должен войти в свой аккаунт.'; }
-        catch { field.focus();field.select();notice.textContent='Скопируй ссылку из поля и отправь ученице.'; }
-      } catch(error) {notice.textContent=error.message || 'Не удалось создать занятие.';}
-      finally {invite.disabled=false;}
+      try{
+        if(guestToken){await copyInvitation(invitationURL(guestToken));return;}
+        if(sessionId){const url=new URL('classroom.html',location.href);url.searchParams.set('session',sessionId);await copyInvitation(url.href);return;}
+        await createInvitation();
+      }catch(error){toast(error.message||'Не удалось создать приглашение.');}
+      finally{invite.disabled=false;}
     });
   }
+  document.getElementById('newGuestLesson')?.addEventListener('click',()=>{
+    if(locked())return;
+    prepareDialog('Приглашение на занятие');
+    sessionDialog.append(node('p','Новый ученик получит отдельную ссылку и пустые ответы. Прежние ссылки закроются. Ссылка действует 24 часа; её можно закрыть раньше.'));
+    const actions=node('div','','workspace-dialog-actions'),error=node('p','','workspace-device-status');
+    const create=button('Новый ученик',async()=>{create.disabled=true;close.disabled=true;try{await createInvitation();}catch(e){error.textContent=e.message;create.disabled=false;close.disabled=false;}},'workspace-dialog-button is-brand');
+    const close=button('Закрыть текущую ссылку',async()=>{close.disabled=true;create.disabled=true;try{await revokeInvitation();await classroom.disconnect();location.href='classroom.html';}catch(e){error.textContent=e.message;close.disabled=false;create.disabled=false;}},'workspace-dialog-button');
+    close.disabled=!guestToken;
+    actions.append(create,close);sessionDialog.append(actions,error);sessionDialog.showModal();
+  });
   function setupSidebarOverlays(){
     if(!document.body?.append || !document.addEventListener)return;
     const tooltip=node('div','','workspace-floating workspace-control-tooltip');tooltip.id='workspaceControlTooltip';tooltip.setAttribute('role','tooltip');

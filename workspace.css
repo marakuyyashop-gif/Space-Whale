@@ -541,3 +541,11 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:var(--sw-brand-accent)}
 .workspace-skip-badge{position:absolute;right:12px;top:7px;padding:2px 5px;border-radius:5px;background:color-mix(in srgb,var(--sidebar-accent) 16%,var(--sw-neu-bg));color:var(--sidebar-accent);font:500 9px/1.2 Onest,sans-serif;letter-spacing:0;white-space:nowrap}
 .workspace-lesson-selector:has(.workspace-skip-badge),.workspace-picker-option:has(.workspace-skip-badge){padding-top:22px}
+
+/* The same fine raised facets as exercise selectors, in both themes. */
+.unified-workspace{--control-facets:conic-gradient(from 45deg,#ffffff32 0 25%,#0000000b 0 50%,#ffffff10 0 75%,#00000006 0)}
+[data-theme=dark].unified-workspace{--control-facets:conic-gradient(from 45deg,#ffffff12 0 25%,#00000021 0 50%,#ffffff06 0 75%,#00000012 0)}
+.unified-workspace[data-theme] :is(.workspace-console-selector,#startLesson,#workspaceStopLesson){background-color:var(--sw-neu-bg);background-image:var(--control-facets);background-size:5px 5px}
+.unified-workspace[data-theme] :is(.workspace-console-selector,#startLesson,#workspaceStopLesson):is(:hover,:focus-visible){background-image:var(--control-facets);background-size:5px 5px}
+.unified-workspace .workspace-session-tools{position:fixed;bottom:22px;left:22px;max-width:min(300px,calc(100vw - 44px));z-index:1000;margin:0;padding:0}
+.unified-workspace .workspace-notice:not(:empty){padding:12px 16px;border-radius:16px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-small)}

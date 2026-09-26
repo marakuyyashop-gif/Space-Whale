@@ -144,78 +144,51 @@
     return data || null;
   }
 
+  // Guest rooms use server-authorized snapshots instead of public broadcast topics.
+  // Every read/write checks token expiry and revocation, including an already-open tab.
+  let guestPollTimer=null,guestPoll=null,guestClosed=false;
   async function connectGuest(token, handlers = {}) {
     if (!client) throw new Error("Supabase client is not ready.");
-    const meta = await resolveGuestLink(token);
-    if (!meta) throw new Error("Guest lesson link is invalid or has expired.");
-
-    const signedInUser = await getCurrentUser();
-    state.guestToken = token;
-    state.role = meta.is_host ? "teacher" : "student";
-    state.user = signedInUser || { id: `guest-${state.clientId}` };
-    state.session = {
-      id: `guest:${token.slice(0, 8)}`,
-      room_topic: meta.room_topic,
-      allowed_lesson_ids: Array.isArray(meta.allowed_lesson_ids) ? meta.allowed_lesson_ids : [],
-      expires_at: meta.expires_at,
-      guest: true
+    const meta=await resolveGuestLink(token);
+    if(!meta)throw new Error("Ссылка закрыта или срок её действия истёк.");
+    const user=await getCurrentUser();
+    state.guestToken=token;state.role=meta.is_host?'teacher':'student';
+    state.user=user||{id:`guest-${state.clientId}`};
+    state.session={id:`guest:${token.slice(0,8)}`,room_topic:null,allowed_lesson_ids:meta.allowed_lesson_ids||[],expires_at:meta.expires_at,guest:true};
+    if(state.channel&&!state.channel.polling)await client.removeChannel(state.channel);
+    state.channel={polling:true,presenceState:()=>({})};guestClosed=false;
+    let lastRoute='',lastResponse='',offline=false,busy=false;
+    guestPoll=async()=>{
+      if(guestClosed||busy)return;
+      busy=true;clearTimeout(guestPollTimer);
+      try{
+        const {data,error}=await client.rpc('read_guest_workspace',{p_token:token});
+        if(error)throw error;
+        if(guestClosed)return;
+        if(!data){
+          guestClosed=true;state.channel=null;
+          draftTimers.forEach(clearTimeout);draftTimers.clear();
+          handlers.onEnded?.();return;
+        }
+        if(offline){offline=false;await flushPendingSnapshots();await handlers.onReconnect?.();}
+        handlers.onConnectionState?.(true);
+        const route=JSON.stringify([data.current_page_id,data.current_exercise_id]);
+        if(route!==lastRoute){lastRoute=route;handlers.onNavigate?.(data);}
+        const snapshot=JSON.stringify([data.current_exercise_id,data.response]);
+        if(snapshot!==lastResponse){lastResponse=snapshot;if(data.response)handlers.onExerciseDatabaseChange?.({exercise_id:data.current_exercise_id,response:data.response,is_draft:true});}
+      }catch(error){offline=true;handlers.onConnectionState?.(false);}
+      finally{busy=false;if(!guestClosed)guestPollTimer=setTimeout(guestPoll,offline?2000:900);}
     };
-
-    if (state.channel) {
-      await client.removeChannel(state.channel);
-      state.channel = null;
-    }
-
-    const channel = client.channel(meta.room_topic, {
-      config: {
-        private: false,
-        broadcast: { self: false, ack: true },
-        presence: { key: state.role === "teacher" ? `teacher-${state.clientId}` : `guest-${state.clientId}` }
-      }
-    });
-
-    channel
-      .on("broadcast", { event: "navigate" }, async () => {
-        try { const saved=await loadSharedState(); if(saved) handlers.onNavigate?.(saved); }
-        catch(error) { console.error("Navigation restore failed",error); }
-      })
-      .on("broadcast", { event: "audio" }, ({ payload }) => handlers.onAudio?.(payload))
-      .on("broadcast", { event: "exercise_response" }, ({ payload }) => handlers.onExerciseResponse?.(payload))
-      .on("broadcast", { event: "exercise_draft" }, ({ payload }) => handlers.onExerciseDraft?.(payload))
-      .on("broadcast", { event: "shared_state" }, ({ payload }) => handlers.onSharedState?.(payload))
-      .on("broadcast", { event: "state_request" }, ({ payload }) => handlers.onStateRequest?.(payload))
-      .on("broadcast", { event: "state_snapshot" }, ({ payload }) => handlers.onStateSnapshot?.(payload))
-      .on("presence", { event: "sync" }, () => handlers.onPresence?.(channel.presenceState()))
-      .on("presence", { event: "join" }, ({ newPresences }) => handlers.onJoin?.(newPresences))
-      .on("presence", { event: "leave" }, ({ leftPresences }) => handlers.onLeave?.(leftPresences));
-
-    let subscribedOnce = false;
-    await new Promise((resolve, reject) => {
-      channel.subscribe(async (status, error) => {
-        if (error) reject(error);
-        if (status === "SUBSCRIBED") {
-          await channel.track({
-            user_id: state.user.id,
-            role: state.role,
-            guest: true,
-            online_at: new Date().toISOString()
-          });
-          const reconnect = subscribedOnce; subscribedOnce = true;
-          resolve();
-          if (reconnect) Promise.resolve(handlers.onReconnect?.()).catch(console.error);
-        }
-        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-          reject(error || new Error(status));
-        }
-      });
-    });
-
-    state.channel = channel;
-    restorePendingSnapshots();
-    return { session: state.session, role: state.role, meta };
+    restorePendingSnapshots();guestPollTimer=setTimeout(guestPoll,0);
+    return {session:state.session,role:state.role,meta};
   }
 
   async function broadcast(event, payload) {
+    if(state.guestToken){
+      if(guestClosed||!state.channel)throw new Error('Занятие закрыто.');
+      if(event==='audio')throw new Error('Совместное аудио ещё не подключено.');
+      return 'ok';
+    }
     if (!state.channel) throw new Error("Lesson realtime channel is not connected.");
     const result = await state.channel.send({
       type: "broadcast",
@@ -340,11 +313,13 @@
     for(const id of pendingSnapshots.keys()) scheduleSnapshot(id,0);
   }
   const getPendingSnapshot = id => pendingSnapshots.get(id);
-  function scheduleSnapshot(id,delay=750){
+  function scheduleSnapshot(id,delay=250){
+    if(state.guestToken&&guestClosed)return;
     clearTimeout(draftTimers.get(id));
     draftTimers.set(id,setTimeout(()=>{draftTimers.delete(id);return flushSnapshot(id);},delay));
   }
   async function flushSnapshot(id){
+    if(state.guestToken&&guestClosed)return;
     if(savingSnapshots.has(id))return savingSnapshots.get(id);
     if(!pendingSnapshots.has(id))return;
     const response=pendingSnapshots.get(id);
@@ -389,6 +364,7 @@
   }
 
   function queueGuestSnapshot(exerciseId,response){
+    if(state.guestToken&&guestClosed)return;
     // Clone now so later UI edits cannot change a save already in flight.
     pendingSnapshots.set(exerciseId,JSON.parse(JSON.stringify(response)));
     storePendingSnapshots();scheduleSnapshot(exerciseId);
@@ -470,6 +446,7 @@
   }
 
   async function requestExerciseState(exerciseId) {
+    if(state.guestToken)return guestPoll?.();
     if (!state.channel || !exerciseId) return;
     return broadcast("state_request", {
       exercise_id: exerciseId,
@@ -480,6 +457,7 @@
   }
 
   async function sendExerciseSnapshot(exerciseId, response) {
+    if(state.guestToken){queueGuestSnapshot(exerciseId,response);return;}
     if ((state.role !== "student" && !(state.guestToken && state.role === "teacher")) || !state.channel || !exerciseId) return;
     return broadcast("state_snapshot", {
       exercise_id: exerciseId,
@@ -494,10 +472,11 @@
 
   async function disconnect() {
     await flushPendingSnapshots();
+    guestClosed=true;clearTimeout(guestPollTimer);guestPollTimer=null;guestPoll=null;
     draftTimers.forEach(timer => clearTimeout(timer));
     draftTimers.clear();
     if (!client || !state.channel) return;
-    await client.removeChannel(state.channel);
+    if(!state.channel.polling)await client.removeChannel(state.channel);
     state.channel = null;
     state.session = null;
     state.role = null;

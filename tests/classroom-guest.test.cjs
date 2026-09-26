@@ -2,36 +2,33 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-test('guest transport permits both editors, persists merged envelopes and verifies navigation',async()=>{
-  for(const host of [true,false]){
-    const calls=[],listeners={},timers=new Map();let subscription,reconnected=0,route,ack='ok';
-    const channel={
-      on(type,filter,fn){listeners[type+':'+filter.event]=fn;return this;},
-      subscribe(fn){subscription=fn;queueMicrotask(()=>fn('SUBSCRIBED'));return this;},
-      async track(){}, async send(data){calls.push(data);return ack;}, presenceState(){return {};}
-    };
-    const client={auth:{async getUser(){return {data:{user:host?{id:'teacher'}:null}};}},
-      channel(){return channel;},async removeChannel(){},
-      async rpc(name,args){calls.push({name,args});return {data:name==='resolve_guest_lesson_link'?{is_host:host,room_topic:'test',allowed_lesson_ids:['*'],current_page_id:'verified',current_exercise_id:'e1'}:true};}
-    };
-    const window={spaceWhaleSupabase:client};let counter=0;
-    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{
-      window,console,setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}
-    });
-    const api=window.SpaceWhaleClassroom;
-    await api.connectGuest('token',{onReconnect(){reconnected++;},onNavigate(value){route=value;}});
-    assert.equal(api.state.role,host?'teacher':'student');
-    await api.sendExerciseDraft('e1',{__sw_collab:1,entries:{}});
-    for(const [id,fn] of [...timers]) {timers.delete(id);await fn();}
-    assert.ok(calls.some(c=>c.name==='merge_guest_lesson_response'));
-    await listeners['broadcast:navigate']({payload:{current_page_id:'spoof'}});
-    assert.equal(route.current_page_id,'verified');
-    if(host) await api.navigate('e1','page');
-    else await assert.rejects(api.navigate('e1','page'),/Only the teacher/);
-    await subscription('SUBSCRIBED');assert.equal(reconnected,1);
-    ack='timed out';await assert.rejects(api.sendExerciseDraft('e1',{}),/not delivered/);
-    await api.disconnect();assert.equal(timers.size,0);
-  }
+test('guest peers synchronize through authorized state, recover and stop on revocation',async()=>{
+  const room={active:true,current_page_id:'?lesson=one',current_exercise_id:'e1',responses:{}};
+  const make=host=>{
+    const timers=new Map(),received=[];let counter=0,offline=false,ended=false,route,reconnects=0;
+    const client={auth:{async getUser(){return {data:{user:host?{id:'owner'}:null}};}},channel(){throw new Error('Guests must not join public channels');},
+      async rpc(name,args){
+        if(offline)return {error:new Error('offline')};
+        if(name==='resolve_guest_lesson_link')return {data:room.active?{is_host:host,allowed_lesson_ids:['*'],responses:room.responses}:null};
+        if(name==='read_guest_workspace')return {data:room.active?{...room,response:room.responses[room.current_exercise_id]}:null};
+        if(!room.active)return {data:false};
+        if(name==='save_guest_lesson_navigation'){if(!host)return {data:false};room.current_page_id=args.p_current_page_id;room.current_exercise_id=args.p_current_exercise_id;return {data:true};}
+        room.responses[args.p_exercise_id]=args.p_response;return {data:true};
+      }};
+    const window={spaceWhaleSupabase:client};
+    vm.runInNewContext(fs.readFileSync(require.resolve('../classroom-realtime.js'),'utf8'),{window,console,setTimeout(fn){timers.set(++counter,fn);return counter;},clearTimeout(id){timers.delete(id);}});
+    return {api:window.SpaceWhaleClassroom,timers,received,setOffline(v){offline=v;},get ended(){return ended;},get route(){return route;},get reconnects(){return reconnects;},handlers:{onNavigate(v){route=v;},onExerciseDatabaseChange(v){received.push(v);},onEnded(){ended=true;},onReconnect(){reconnects++;}}};
+  };
+  const teacher=make(true),student=make(false);
+  await teacher.api.connectGuest('same-room',teacher.handlers);await student.api.connectGuest('same-room',student.handlers);
+  await student.api.sendExerciseDraft('e1',{answer:'hello'});await student.api.flushPendingSnapshots();await teacher.api.requestExerciseState('e1');
+  assert.equal(teacher.received.at(-1).response.answer,'hello');
+  await teacher.api.navigate('e2','?lesson=two');await student.api.requestExerciseState('e2');assert.equal(student.route.current_exercise_id,'e2');
+  await assert.rejects(student.api.navigate('e3','spoof'),/Only the teacher/);
+  student.setOffline(true);await student.api.requestExerciseState('e2');student.setOffline(false);await student.api.requestExerciseState('e2');assert.equal(student.reconnects,1);
+  room.active=false;await student.api.requestExerciseState('e2');assert.equal(student.ended,true);
+  await assert.rejects(student.api.sendExerciseDraft('e2',{}),/закрыто/);
+  await teacher.api.disconnect();await student.api.disconnect();assert.equal(teacher.timers.size,0);assert.equal(student.timers.size,0);
 });
 
 test('failed snapshots survive reload, retry, and retain the newest answer',async()=>{

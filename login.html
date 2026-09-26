@@ -27,8 +27,8 @@
         </div>
         <button id="loginButton" class="sw-button" type="submit">Sign in</button>
         <a class="auth-link" href="forgot-password.html">Forgot password?</a>
-        <a class="sw-button secondary" href="teacher-signup.html">Create teacher account</a>
-        <a class="sw-button secondary" href="signup.html">Create student account</a>
+
+
         <div id="loginMessage" class="sw-message"></div>
       </form>
     </section>
@@ -41,7 +41,8 @@
     const button = document.getElementById("loginButton");
     const message = document.getElementById("loginMessage");
     const params = new URLSearchParams(location.search);
-    const next = params.get("next") || "app.html";
+    const requestedNext=params.get("next")||"app.html";
+    const next=/^[a-z0-9-]+\.html(?:\?[^#]*)?$/i.test(requestedNext)?requestedNext:"app.html";
 
     window.spaceWhaleSupabase.auth.getSession().then(({ data }) => {
       if (data.session) location.href = next;
