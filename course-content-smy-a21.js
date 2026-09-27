@@ -62,7 +62,7 @@ for(const prefix of Object.keys(lessonIds)){
    slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3?v=20260927-ready',script:sequenceChunks[i],workPhrase:phrase};
    slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
   }else{
-   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+(prefix==='A2_MOVE'&&['01','03','06'].includes(n)?'_r2':'')+'.mp3?v=20260927-l2-phrase-fixes',script:phrase,workPhrase:phrase};
+   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3?v=20260927-ready',script:phrase,workPhrase:phrase};
    slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3?v=20260927-ready',script:examples[prefix][i]};
   }
  });
