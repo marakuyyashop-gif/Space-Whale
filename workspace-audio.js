@@ -29,7 +29,10 @@
       if(unlocked)return;
       if(current){await playCurrent();return;}
       player.src=silence;
-      try{await player.play();player.pause();unlocked=true;enable.hidden=true;}catch(_){}
+      try{await player.play();player.pause();unlocked=true;enable.hidden=true;}
+      catch(error){
+        if(error?.name==='NotAllowedError'&&isLive()&&!canControl())enable.hidden=false;
+      }
     }
     function seekCurrent(){
       if(!current)return;
@@ -98,7 +101,7 @@
       paint();
     }
     function share(){if(canControl()&&current&&isLive())void send({...current,position:player.currentTime||0,action:player.paused?'pause':'play',at:now(),revision:Math.max(now(),revision),serial:++serial}).catch(()=>{});}
-    const reconnect=()=>{if(!isLive())return;if(canControl())share();else{void requestState?.();}refresh();};
+    const reconnect=()=>{if(!isLive())return;if(canControl())share();else{void prime();void requestState?.();}refresh();};
     // A normal tap on camera/minimize/Continue can grant playback permission.
     // No permission button is shown unless an actual recording is blocked.
     const unlockOnInteraction=()=>{if(isLive()&&!canControl()&&!unlocked){if(current?.action==='play')void playCurrent();else void prime();}};
