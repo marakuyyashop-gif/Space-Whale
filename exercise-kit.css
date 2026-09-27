@@ -934,12 +934,15 @@
 .exercise-kit .ek-picture-correction-controls{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 .exercise-kit .ek-picture-correction-controls .ek-button{width:36px;min-height:36px;padding:0;font-size:22px}
 /* Check each placed word, never the surrounding sentence tray. */
-.exercise-kit .ek-order-target>.ek-token[data-feedback]{position:relative;outline:none}
+.exercise-kit .ek-order-target>.ek-token[data-feedback]{position:relative;isolation:isolate;outline:none}
 .exercise-kit .ek-order-target>.ek-token[data-feedback=correct]{--ek-position-color:var(--sw-answer-correct,var(--ek-correct))}
 .exercise-kit .ek-order-target>.ek-token[data-feedback=retry]{--ek-position-color:var(--sw-answer-incorrect,var(--ek-incorrect))}
 .exercise-kit .ek-order-target>.ek-token:is([data-feedback=correct],[data-feedback=retry])::after{content:'';position:absolute;inset:0;border:2px dotted color-mix(in srgb,var(--ek-position-color) 78%,transparent);border-radius:inherit;box-sizing:border-box;pointer-events:none}
-/* Feedback dots belong on the card boundary/lamp, not behind the selected text. */
-.exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]::before{background-image:none}
+/* Checked answer surfaces retain the soft dot fill as well as their separate outline. */
+.exercise-kit.ek-modern .ek-order-target>.ek-token[data-feedback]{--ek-dot-color:var(--ek-position-color)}
+.exercise-kit.ek-modern .ek-question .ek-radio{isolation:isolate;--ek-dot-color:var(--ek-card-dot)}
+.exercise-kit.ek-modern .ek-order-target>.ek-token:is([data-feedback=correct],[data-feedback=retry])::before,
+.exercise-kit.ek-modern .ek-question:is([data-feedback=correct],[data-feedback=retry]) .ek-radio:has(input:checked)::after{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background-image:radial-gradient(circle,var(--ek-dot-color) 1px,transparent 1.5px);background-size:8px 8px;mask-image:linear-gradient(145deg,transparent 12%,#0003 45%,#000a 100%)}
 
 /* Image dialogs fit the artwork's own ratio; no empty fixed-width picture panel. */
 .exercise-kit .ek-dialog.ek-image-dialog{box-sizing:border-box;width:min(var(--ek-picture-dialog-width,312px),calc(100vw - 32px))}

@@ -29,6 +29,7 @@
 
 - The top utility area and lesson share one continuous dotted canvas. Paint the texture on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Keep the scroll viewport below the actual utility controls for every role and viewport; retain a transparent, continuous canvas with no painted header strip. Automatic reveal positioning must leave the floating controls clear.
 - Selected answer text uses an unpatterned surface. Do not apply the empty selector's tiled facet texture behind selected words.
+- After OK, checked word/sentence answer surfaces keep their colored dot fill with a soft gradient, alongside the rounded dotted outline. The fill belongs inside the answer, not across the whole exercise; it disappears with feedback on edit/reset. Do not confuse it with the empty selector's facet texture.
 - Order feedback is headed `Correct Answer` and renders the completed sentence with spaces, without directional arrows between words.
 
 ## Touch, pictures and shared classroom controls
