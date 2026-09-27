@@ -210,8 +210,8 @@ seq.push(step('Final Speaking',6,S('A2_SEQ_M07','Tell the story of her day.',[
 ],{progressive:true,instruction:'Use the pictures and add one problem you invent. Tell the story in the past.'})));
 
 const move=[];
-move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe what you see in all six pictures.',[
- I('A2_MOVE_SHEET')
+move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe what the people and the dog are doing.',[
+ I('A2_MOVE_SHEET'),T('Say where they are moving.')
 ])));
 move.push(step('Phrase Input',4,S('A2_MOVE_M02','Match the pictures with the phrases.',[
  E('A2_MOVE_M02-match','matching','Match the pictures with the phrases.',{
@@ -243,8 +243,8 @@ const gap=(id,before,options,answer,after)=>({id,segments:[before,{id:`A2_MOVE_M
 move.push(step('Controlled Practice',3,E('A2_MOVE_M05','gaps','Choose the correct preposition.',{
  inputMode:'select',items:[
   gap('1','The boy climbed ',['into','over','out of'],'over',' the fence and got to the other side.'),
-  gap('2','She stepped ',['onto','around','out of'],'onto',' the platform and looked down at the water.'),
-  gap('3','I was waiting outside the tunnel. The dog came ',['onto','up','out of'],'out of',' it and ran towards me.'),
+  gap('2','She was on the ground. She stepped ',['onto','around','out of'],'onto',' the low platform. Now she was standing on it.'),
+  gap('3','The dog was inside the tunnel. I was waiting by the entrance. It came ',['onto','into','out of'],'out of',' the tunnel and ran towards me.'),
   gap('4','We climbed ',['into','out of','up'],'up',' the hill until we reached the top.'),
   gap('5','We were outside the house. It started to rain, so we moved ',['into','over','around'],'into',' the kitchen.'),
   gap('6','The dog ran ',['around','into','over'],'around',' the tree in a circle.'),
