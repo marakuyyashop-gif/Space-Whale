@@ -77,8 +77,10 @@ test('Order fixes punctuation outside tokens and casing only in answer; independ
  teacher.handle.setAnswers({[first.id]:{...correct(first),__sw_checked:true}});
  assert.equal(teacher.host.querySelector('.ek-order-target .ek-token').textContent,'Would');
  assert.equal(teacher.host.querySelector('.ek-order-suffix').textContent,'?');
+ teacher.click('Show next exercise');assert.equal(student.host.querySelectorAll('.ek-order-target').length,1);
+ assert.ok(student.host.textContent.includes('Ask your partner the question you have built.'));
  teacher.click('Show next exercise');assert.equal(student.host.querySelectorAll('.ek-order-target').length,2);
- for(const [i,c] of d.exercises.entries()){
+ for(const [i,c] of d.exercises.filter(c=>c.exercise.kind==='order').entries()){
   const v=setup(c.exercise);assert.ok([...v.host.querySelectorAll('.ek-bank .ek-token')].every(t=>t.textContent===t.textContent.toLowerCase()));
   v.handle.setAnswers({order:[...c.exercise.correctOrder].reverse(),__sw_checked:true});
   assert.equal(v.host.querySelector('.ek-answer-pairs strong').textContent,i===0?'Would you rent an apartment if you earned more?':'What would you do if your partner wanted to move in together?');
@@ -100,8 +102,8 @@ test('open writing uses a multiline field, preserves shared drafts and never gra
  const detail=v.host.querySelector('details');assert.ok(detail&&!detail.open);assert.equal(detail.querySelector('summary').textContent,'Possible answers');
  assert.ok(detail.querySelector('strong'));v.click('Possible answers');assert.equal(detail.open,true);
 });
-test('lexical support and short oral followups stay hidden before attempt; text is source-complete without images',()=>{
- for(const id of ['B1D1-M02','B1D2-M02','B1D1-M04','B1D1-M08','B1D2-M07']){
+test('lexical explanations stay in feedback; final speaking details require an arrow',()=>{
+ for(const id of ['B1D1-M02','B1D2-M02']){
   const d=find(id),v=setup(d);assert.ok(d.afterCheck);assert.ok(!v.host.textContent.includes(d.afterCheck.text));
   v.handle.setAnswers({...correct(d),__sw_checked:true});assert.ok(v.host.textContent.includes(d.afterCheck.text));
   v.click('Reset exercise');assert.ok(!v.host.textContent.includes(d.afterCheck.text));
@@ -110,4 +112,41 @@ test('lexical support and short oral followups stay hidden before attempt; text 
   const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details').open,true);assert.ok(!v.host.textContent.includes('Extra information'));
   v.click('Show next exercise');assert.ok(v.host.textContent.includes('Extra information'));
  }
+});
+
+test('new oral tasks require a separate teacher arrow, retain flat saved answers and synchronize',()=>{
+ for(const id of ['B1D1-M04','B1D1-M08','B1D2-M07']){
+  const d=find(id),text=d.followUp.blocks[0].text,student=setup(d,{navigationReadOnly:true});
+  const teacher=setup(d,{onViewChange:view=>student.handle.setViewState(view,false),onChange:a=>student.handle.setAnswers(a)});
+  assert.equal(d.afterCheck,undefined);assert.ok(!teacher.host.textContent.includes(text));
+  const a={...correct(d),__sw_checked:true};teacher.handle.setAnswers(a);
+  assert.ok(!teacher.host.textContent.includes(text),'OK does not expose the next task');
+  assert.ok(!teacher.host.querySelector('.ek-results').textContent.includes(text));
+  teacher.click('Show next exercise');assert.ok(teacher.host.textContent.includes(text));assert.ok(student.host.textContent.includes(text));
+  assert.equal(teacher.host.querySelectorAll('.ek-check').length,1,'no OK on oral instructions');
+  const saved=teacher.handle.getAnswers();for(const [key,value] of Object.entries(a))assert.deepEqual(saved[key],value);
+  assert.equal(saved.__sw_followup_revealed,2);const restored=setup(d,{answers:saved});assert.ok(restored.host.textContent.includes(text));
+  teacher.click('Свернуть задание');assert.ok(teacher.host.querySelector('.ek-stage-section[hidden]'));
+ }
+ assert.match(find('B1D1-M08').followUp.blocks[0].text,/Choose any three situations/);
+ for(const id of ['B1D1-M05','B1D2-M05','B1D1-M09'])walk(find(id),d=>assert.equal(d.afterCheck,undefined));
+});
+
+test('dropdown banks are not duplicated; typed banks remain visible and options stay shuffled',()=>{
+ for(const id of ['B1D1-M04','B1D2-M04']){
+  const d=find(id),v=setup(d);assert.equal(v.host.querySelector('.ek-word-list'),null);
+  assert.notDeepEqual(Array.from(d.bank),d.items.map(i=>i.segments.find(s=>typeof s!=='string').answers[0]));
+  const typed=setup({...d,followUp:undefined,inputMode:'text'});assert.equal(typed.host.querySelector('.ek-word-list').textContent,d.bank.join(', '));
+ }
+});
+
+test('opening supplies concrete choices and compatible speaking support; old unscramble banks do not signal the first word',()=>{
+ const opening=find('B1D1-M01'),body=opening.blocks[1].text,phrases=opening.blocks[2].text;
+ assert.match(body,/rent an apartment/);assert.match(body,/need to decide whether to move/);assert.match(body,/don’t have regular clients yet/);assert.match(body,/need to decide where to live/);
+ assert.match(phrases,/I’d be worried about/);assert.match(phrases,/because/);
+ let count=0;
+ for(const l of app.SpaceWhaleContent.filter(l=>['a1-2-w4-l2','a1-2-w4-l3'].includes(l.id)))for(const s of l.stages)walk(s.exercise,d=>{
+  if(d.kind!=='order')return;count++;assert.ok(d.sentenceCase);
+  assert.ok(d.tokens.every(t=>t.text===t.text.toLowerCase()),d.id);
+ });assert.equal(count,7);
 });

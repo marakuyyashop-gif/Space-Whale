@@ -361,6 +361,18 @@
   }
   function mount(host, definition, config = {}) {
     validate(definition);
+    // A new speaking task uses the existing teacher-controlled sequence, while
+    // preserving the original flat response IDs and saved checks.
+    if(definition.followUp){
+      const taskId=definition.id+'-practice',followId=definition.id+'-followup';
+      const task={...definition,id:taskId,instruction:''};delete task.followUp;
+      const unpack=value=>{const response=clone(value||{}),revealed=response.__sw_followup_revealed||1;delete response.__sw_followup_revealed;return {revealed,[taskId]:response};};
+      const pack=value=>({...clone(value[taskId]||{}),__sw_followup_revealed:value.revealed||1});
+      const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:definition.instruction,
+        progressive:true,requireCheckBeforeNext:true,exercises:[{id:taskId,exercise:task},{id:followId,exercise:{version:1,id:followId,kind:'presentation',...definition.followUp}}]};
+      const handle=mount(host,stage,{...config,syncChecks:true,answers:unpack(config.answers),onChange:value=>config.onChange?.(pack(value))});
+      return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>handle.setAnswers(unpack(value))};
+    }
     if(config.sequentialListening&&definition.kind==='choice'&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
     const def = clone(definition);
     // Independent tasks reveal in sequence; a reading/audio source stays with its task.
@@ -1099,7 +1111,7 @@
         body.append(grid);
       }
       if (def.kind === 'gaps') {
-        if (def.bank) {
+        if (def.bank && def.inputMode !== 'select' && (def.inputMode === 'text' || def.items.some(item=>item.segments.some(segment=>typeof segment!=='string'&&!segment.options)))) {
           const bank = node('p', 'ek-word-list', def.bank.join(', '));
           bank.setAttribute('aria-label', 'Words to use'); body.append(bank);
         }

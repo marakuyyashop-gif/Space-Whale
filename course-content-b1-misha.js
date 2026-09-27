@@ -197,13 +197,13 @@ const lessons=[
             },
             {
               "type": "text",
-              "text": "A. An apartment near your work costs more than your current home.\nB. You can work for yourself, but you don’t know how much work you will get.\nC. Your partner wants to share a home, but you prefer different areas of the city.\n\nWhat is attractive about this choice?\nWhat would worry you?\nWhat would you do?"
+              "text": "A. You spend an hour travelling to work each morning. You could rent an apartment ten minutes from work, but the rent would be higher. You need to decide whether to move.\n\nB. You have a full-time job, but you’d like to work for yourself. You could go freelance, but you don’t have regular clients yet. You need to decide whether to leave your job now.\n\nC. You and your partner live in separate homes and would like to move in together. Your partner wants to live near their work, but you prefer a different area. You need to decide where to live.\n\nWhat would be good about this change?\nWhat would worry you?\nWhat would you do? Why?\nWhat else would you need to know before deciding?"
             },
             {
               "type": "disclosure",
               "title": "Useful phrases",
               "open": true,
-              "text": "I’d …\nI wouldn’t …\nFor me, … is important.\nI’d need to know …"
+              "text": "I’d …\nI wouldn’t …\nFor me, … is important.\nI’d be worried about …\nI’d need to know …\n… because …"
             }
           ],
           "instruction": "Choose one situation. You can answer for an imaginary person."
@@ -494,9 +494,14 @@ const lessons=[
           ],
           "preserveLines": true,
           "instruction": "Use each phrase once.",
-          "afterCheck": {
-            "text": "Choose one conversation and give a different reply.",
-            "highlights": []
+          "followUp": {
+            "title": "Give a different reply.",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "Choose one conversation. How else could B reply? Give your own reply."
+              }
+            ]
           }
         }
       },
@@ -597,11 +602,22 @@ const lessons=[
                     ],
                     "correctId": "A"
                   }
-                ],
-                "afterCheck": {
-                  "text": "What is the main risk for Dana?",
-                  "highlights": []
-                }
+                ]
+              }
+            },
+            {
+              "id": "B1D1-M05-discuss",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-discuss",
+                "kind": "presentation",
+                "title": "Discuss Dana’s decision.",
+                "blocks": [
+                  {
+                    "type": "text",
+                    "text": "What is the main risk for Dana? Explain your answer."
+                  }
+                ]
               }
             }
           ],
@@ -609,7 +625,8 @@ const lessons=[
           "requireCheckBeforeNext": true,
           "revealStops": [
             3,
-            4
+            4,
+            5
           ],
           "instruction": "Dana and Chris are talking after work."
         }
@@ -1026,9 +1043,14 @@ const lessons=[
           ],
           "preserveLines": true,
           "instruction": "Use the second conditional and the verbs in brackets.",
-          "afterCheck": {
-            "text": "Choose one sentence. Is that what you would do?",
-            "highlights": []
+          "followUp": {
+            "title": "What would you do?",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "Choose any three situations from the sentences above. Say what you would do in each situation and explain why. You can speak for an imaginary person."
+              }
+            ]
           }
         }
       },
@@ -1093,11 +1115,22 @@ const lessons=[
                   "6"
                 ],
                 "sentenceCase": true,
-                "sentenceSuffix": "?",
-                "afterCheck": {
-                  "text": "Ask your partner this question. You can answer for an imaginary person.",
-                  "highlights": []
-                }
+                "sentenceSuffix": "?"
+              }
+            },
+            {
+              "id": "B1D1-M09-Q1-discuss",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M09-Q1-discuss",
+                "kind": "presentation",
+                "title": "Ask your partner.",
+                "blocks": [
+                  {
+                    "type": "text",
+                    "text": "Ask your partner the question you have built. Answer your partner’s question and explain your choice. You can answer for an imaginary person."
+                  }
+                ]
               }
             },
             {
@@ -1147,11 +1180,22 @@ const lessons=[
                   "4"
                 ],
                 "sentenceCase": true,
-                "sentenceSuffix": "?",
-                "afterCheck": {
-                  "text": "Ask your partner this question. You can answer for an imaginary person.",
-                  "highlights": []
-                }
+                "sentenceSuffix": "?"
+              }
+            },
+            {
+              "id": "B1D1-M09-Q2-discuss",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M09-Q2-discuss",
+                "kind": "presentation",
+                "title": "Ask your partner.",
+                "blocks": [
+                  {
+                    "type": "text",
+                    "text": "Ask your partner the question you have built. Answer your partner’s question and explain your choice. You can answer for an imaginary person."
+                  }
+                ]
               }
             }
           ],
@@ -1566,7 +1610,6 @@ const lessons=[
           "id": "B1D2-M05",
           "kind": "stage",
           "title": "Read the message and the replies.",
-          "layout": "grouped",
           "exercises": [
             {
               "id": "B1D2-M05-source",
@@ -1625,15 +1668,32 @@ const lessons=[
                     ],
                     "correctId": "A"
                   }
-                ],
-                "afterCheck": {
-                  "text": "What does Reply B assume that Jamie’s message does not support?",
-                  "highlights": []
-                }
+                ]
+              }
+            },
+            {
+              "id": "B1D2-M05-discuss",
+              "exercise": {
+                "version": 1,
+                "id": "B1D2-M05-discuss",
+                "kind": "presentation",
+                "title": "Discuss the advice.",
+                "blocks": [
+                  {
+                    "type": "text",
+                    "text": "What does Reply B assume that Jamie’s message does not support? Use the message to explain your answer."
+                  }
+                ]
               }
             }
           ],
-          "instruction": "Choose the reply that uses Jamie’s available study time."
+          "instruction": "Choose the reply that uses Jamie’s available study time.",
+          "progressive": true,
+          "requireCheckBeforeNext": true,
+          "revealStops": [
+            2,
+            3
+          ]
         }
       },
       {
@@ -1891,9 +1951,14 @@ const lessons=[
           ],
           "preserveLines": true,
           "instruction": "Use the verbs in brackets. In sentence 3, add the missing preposition too.",
-          "afterCheck": {
-            "text": "Finish this suggestion in your own way: “If I were you, I’d consider …”",
-            "highlights": []
+          "followUp": {
+            "title": "Give your own advice.",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "Finish this suggestion in your own way: “If I were you, I’d consider …”\nExplain why your advice would help."
+              }
+            ]
           }
         }
       },
