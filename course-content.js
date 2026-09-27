@@ -542,10 +542,6 @@
           instruction: 'Use the prompts.',
           blocks: [
             {
-              type: 'text',
-              text: '1. blouse → nice\nblouse → shirt\n\n2. hat → strange\nhat → flower\n\n3. sweater → good\nsweater → coat'
-            },
-            {
               type: 'exercise',
               id: 'production',
               exercise: {
@@ -555,9 +551,9 @@
                 title: 'Write two sentences for each set.',
                 instruction: '',
                 items: [
-                  { id: 'w1', prompt: '1. The blouse ... / It ...' },
-                  { id: 'w2', prompt: '2. The hat ... / It ...' },
-                  { id: 'w3', prompt: '3. The sweater ... / It ...' }
+                  { id: 'w1', prompt: 'blouse / look / nice\nblouse / look like / shirt' },
+                  { id: 'w2', prompt: 'hat / look / strange\nhat / look like / flower' },
+                  { id: 'w3', prompt: 'sweater / look / good\nsweater / look like / coat' }
                 ]
               }
             }
