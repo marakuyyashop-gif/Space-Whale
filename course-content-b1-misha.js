@@ -1233,7 +1233,7 @@ const lessons=[
                   },
                   {
                     "type": "text",
-                    "text": "A. A quiet apartment is close to your work, but it costs €150 more per month than your current home.\nWould you rent it? What would make you change your mind?\n\nB. A company offers you one three-month freelance project. You already have a full-time job.\nWould you take a chance or turn the project down? What would you need to know first?\n\nC. Your partner wants to move in together. You prefer different parts of the city.\nWhat would you do? What would make the decision easier?\n\nTake turns. Give your first answer, explain why, and ask your partner a question. Then discuss the extra information for your situations."
+                    "text": "A. A quiet apartment is close to your work, but it costs €150 more per month than your current home.\nWould you rent it? What would make you change your mind?\n\nB. A company offers you one three-month freelance project. You already have a full-time job.\nWould you take a chance or turn the project down? What would you need to know first?\n\nC. You and your partner want to move in together, but you each prefer a different part of the city. You are comparing two apartments.\nWhat would you do? What would make the decision easier?\n\nTake turns. Give your first answer, explain why, and ask your partner a question. Then discuss the extra information for your situations."
                   },
                   {
                     "type": "disclosure",
