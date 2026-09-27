@@ -1,0 +1,554 @@
+# B1 · WHAT WOULD YOU CHOOSE? / IF I WERE YOU …
+# СЦЕНАРИЙ ДЛЯ СБОРКИ — LESSONS 1–2
+Редакция 1.1. Основа: те же две карточки автора. Повторная текстовая проверка; темы, Words и Final Goals сохранены.
+Связанный файл: B1_DECISIONS_MEDIA_v1.1.txt.
+
+## Изменения редакции 1.1 — служебное
+
+В Lesson 1 обновлены контексты закрепления Words и отвлекающие варианты первого Listening. Повторное Listening перенесено перед разбором правила, чтобы правило не раскрывало ответы заранее. Порядок этапов 6–9 обновлён; Lesson ID и все ID медиа сохранены.
+В Lesson 2 локальная практика теперь требует самостоятельно восстановить were и would/wouldn’t, а не только форму глагола после готовой конструкции. Одна реплика диалога уточнена в обоих файлах: how many weekends they need you to work.
+В медиасценарии совместное жильё показано как обсуждаемый выбор, а не уже состоявшийся переезд. Не смешивать части редакций 1.0 и 1.1 при сборке. Исходные файлы и сайт этой редакцией не изменены.
+
+## Для WORK — служебное, не показывать ученику
+
+Подготовить два новых урока B1 в указанном ниже порядке. A1 и действующие уроки не заменять. ID ниже — авторские идентификаторы контента, не заявление о формате API. Номер существующего B1-модуля не задан: место размещения подтвердить у автора, не подставлять Module 4 от A1.
+
+Использовать существующие механики и дизайн. Title — основное задание; Subtitle — только дополнительная инструкция; Body — реальные вопросы, предложения и источники. При Subtitle: — не оставлять пустую строку. ID, Key, критерии, время и комментарии преподавателю не выводить в ученический текст.
+
+Useful phrases видны сразу. Possible answers и Transcript изначально свёрнуты, раскрываются вручную; образцы не показывать до попытки. После каждого плеера диалога предусмотреть кнопку Transcript с полным точным текстом из раздела TRANSCRIPTS в конце этого файла (в MEDIA тот же текст для озвучки), даже если тот же диалог используется повторно. Не прятать её до другого Milestone. Учитель может открыть её после попытки; при раннем открытии это уже чтение с аудио, а не независимое аудирование.
+
+Аудио и первая задача к нему видны вместе. Следующая связанная задача — по стрелке; источник остаётся доступным. Внутри короткого Matching, набора пропусков или блока вопросов все пункты показывать компактно вместе. Правило раскрывать после подводящего упражнения; следующее закрепление — после правила. Не превращать каждый абзац правила в отдельную карточку.
+
+Words вводятся всем набором. В определениях и произносительных примерах нет новой грамматики текущего урока. Картинки не использовать как однозначный перевод абстрактных глаголов. Описание изображений — только в MEDIA; здесь указаны ID и размещение. Пока картинки отсутствуют, текст ситуаций остаётся полноценным: нет неразрешимых вопросов о невидимых деталях.
+
+Key — скрытые ответы для закрытых задач. Регистр, крайние пробелы, вид апострофа и необязательная конечная точка не должны превращать правильный ответ в ошибку. В указанных полях принимать полные и сокращённые формы. Свободное Writing сохранять без автоматического «верно/неверно»; после попытки — образец и проверка преподавателем.
+
+Содержание обоих диалогов и цены/сроки — вымышленные учебные ситуации. Не менять их при озвучке и сборке. В Lesson 1 два плеера используют один и тот же диалог по одному ID. В Lesson 2 тот же диалог можно прослушать повторно перед вопросами о деталях; отдельная запись для повторения не нужна.
+
+## Основа для преподавателя
+
+Оба урока рассчитаны примерно на 30 минут индивидуального занятия. Lesson 2 опирается на Lesson 1. Основная база: Present/Past Simple, вопросы и отрицания с do/did, can, want/need, простые причины с because. В связных текстах также встречаются Present Continuous, be going to, Present Perfect и знакомые сочетания с -ing/to. Их понимание нельзя считать проверенным по одному обозначению B1: полный маршрут конкретного ученика не предоставлен. Отдельно преподавать First Conditional, Third Conditional, Passive или Reported Speech в этих уроках не планируется. В начальной беседе проверить, нужна ли краткая поддержка Past Simple; при существенном пробеле реальное время увеличится. Если времени не хватает, сократить дополнительное обсуждение после короткой практики и разобрать одну финальную ситуацию с уточнением вместо двух; сохранить самостоятельный итоговый ответ.
+
+Все 12 единиц из карточек сохранены. Prepare в данном уроке — подготовка к событию, revise — повторение изученного к экзамену (британское употребление). Не заменять revise словом review. In your place / in your position / in your situation сохраняются как альтернативы совета, не как три искусственно противопоставленные по значению конструкции.
+
+# LESSON 1 · WHAT WOULD YOU CHOOSE?
+Lesson ID: B1_DECISIONS_L1
+Words: rent an apartment; move in together; go freelance; turn something down; change your mind; take a chance.
+Grammar: If + Past Simple, would / wouldn’t + verb; What would you do if …?; Would you … if …?
+Final Goal: обсудить жизненный выбор в воображаемой ситуации, задать вопрос, объяснить своё решение и отреагировать на изменение условия.
+Время: 28,5 минуты основных этапов + 1,5 минуты резерва. План, не фактический хронометраж.
+
+## B1D1-M01 · Opening discussion · 2 минуты
+Компоненты: Image + Text + Useful phrases; устный ответ.
+Title: How would you decide?
+Subtitle: Choose one situation. You can answer for an imaginary person.
+Body:
+[Image: B1D1_SCENES — целый лист; ниже три короткие ситуации.]
+A. An apartment near your work costs more than your current home.
+B. You can work for yourself, but you don’t know how much work you will get.
+C. Your partner wants to share a home, but you prefer different areas of the city.
+
+What is attractive about this choice?
+What would worry you?
+What would you do?
+Useful phrases:
+I’d …
+I wouldn’t …
+For me, … is important.
+I’d need to know …
+Проверка: нет автоматического ключа. Диагностика, не требование уже владеть всей конструкцией. При затруднении принять знакомый язык, уточнить причину и вернуться к выбранной ситуации в финале.
+
+## B1D1-M02 · Words · 2,5 минуты
+Механика: Matching — текст ↔ определение.
+Title: Match the phrases with their meanings.
+Subtitle: —
+Body:
+Левый набор:
+1. rent an apartment
+2. move in together
+3. go freelance
+4. turn something down
+5. change your mind
+6. take a chance
+Правый набор, сохранить этот перемешанный порядок:
+A. decide something different from what you decided before
+B. say no to an offer or request
+C. pay to live in a home that belongs to someone else
+D. try something although you do not know if it will succeed
+E. start living in the same home as your partner
+F. start doing paid work for clients instead of being an employee of one company
+Key: 1–C; 2–E; 3–F; 4–B; 5–A; 6–D.
+После попытки, одним небольшим текстовым блоком:
+You can **turn down an offer** or **turn an offer down**.
+With **it**, say **turn it down**.
+The possessive changes: **change my mind / your mind / her mind**.
+Преподавателю: freelance не означает автоматически «работать дома» или «всегда выбирать любое расписание»; это способ работы с клиентами. Не добавлять эти ложные признаки к определению.
+
+## B1D1-M03 · Pronunciation · 2 минуты
+Компоненты: текст + Play у каждой единицы; примеры отдельными кнопками.
+Title: Listen and repeat.
+Subtitle: Pay attention to the whole phrase, not just the main verb.
+Body:
+1. rent an apartment [B1D1_W01]
+We want to rent an apartment near the station. [B1D1_E01]
+⠀
+2. move in together [B1D1_W02]
+They’re planning to move in together next month. [B1D1_E02]
+⠀
+3. go freelance [B1D1_W03]
+My cousin wants to go freelance, but she needs more clients. [B1D1_E03]
+⠀
+4. turn down an offer [B1D1_W04]
+The hours were too long, so I turned the offer down. [B1D1_E04]
+⠀
+5. change your mind [B1D1_W05]
+You can change your mind before Friday. [B1D1_E05]
+⠀
+6. take a chance [B1D1_W06]
+I don’t know anyone there, but I’m ready to take a chance. [B1D1_E06]
+Проверка: произношение, без автоматической оценки. В четвёртой строке переменная something заменена конкретным offer, целевая единица не изменена.
+
+## B1D1-M04 · Words in context · 2,5 минуты
+Механика: Typed Gap с видимым банком фраз; шесть строк вместе.
+Title: Complete the conversations.
+Subtitle: Use each phrase once.
+Word bank: change your mind · rent an apartment · take a chance · go freelance · turn it down · move in together
+Body:
+1. A: What about that job in another city?
+B: I’m going to [1]. I don’t want to move away from my family.
+2. A: Are you and Robin going to keep two apartments?
+B: No. We’re planning to [2] and share the bills.
+3. A: That restaurant only opened this week. Do you want to try it?
+B: The menu looks good. Let’s [3].
+4. A: Are you buying a place in the new city?
+B: Not yet. We’re going to [4] while we decide where to live.
+5. A: I don’t want to join the course.
+B: That’s okay. You can [5] any time before it starts.
+6. A: Are you looking for another job with a company?
+B: No, I want to [6]. I already have two clients.
+Key: 1 turn it down; 2 move in together; 3 take a chance; 4 rent an apartment; 5 change your mind; 6 go freelance.
+После проверки — устно, без нового экрана: Choose one conversation and give a different reply.
+Преподавателю: одна короткая персональная реплика, не обсуждение всех шести пунктов. Новая условная конструкция пока не требуется. Контексты отличаются от произносительных примеров; все шесть фраз служат ответами, а не только вариантами в банке.
+
+## B1D1-M05 · Listening: the decision · 3 минуты
+Компоненты: Audio + Choice → второй Choice. Один диалог.
+Title: Listen and find out what Dana is considering.
+Subtitle: Dana and Chris are talking after work.
+Audio: B1D1_DIALOGUE
+Transcript: B1D1_TRANSCRIPT — кнопка под плеером, свёрнута.
+Body:
+Первый вопрос виден с плеером:
+1. Which statement best describes Dana’s situation?
+A. She is ready to leave as soon as she gets one project.
+B. She is interested in freelance work but wants regular work first.
+C. She will leave only after she moves into her own apartment.
+Key: B.
+После первой попытки → следующий вопрос, плеер остаётся:
+2. Why is working from home a problem for her?
+A. Her apartment is small and her flatmate makes calls during the day.
+B. She cannot afford to keep renting her current apartment.
+C. Her employer will not let her work from home.
+Key: A.
+После ответа, устно: What is the main risk for Dana?
+Критерий: недостаточно постоянной работы/дохода, а не просто «не нравится квартира». Готовый ответ не показывать заранее.
+
+## B1D1-M06 · Listen again: conditions and choices · 2 минуты
+Компоненты: тот же Audio + Matching; все три пары вместе.
+Title: Listen again and match the situations with Dana’s choices.
+Subtitle: One ending is extra.
+Audio: B1D1_DIALOGUE
+Transcript: B1D1_TRANSCRIPT — кнопка рядом с этим плеером, свёрнута.
+Body:
+Начала:
+1. If she had regular work for six months, …
+2. If she earned more, …
+3. If a company offered better working hours, …
+Окончания — в этом порядке:
+A. she would immediately reject the offer.
+B. she would ask questions before deciding.
+C. she would be willing to try freelance work.
+D. she would rent an apartment on her own.
+Key: 1 C; 2 D; 3 B. A — лишнее.
+Служебно: этот этап идёт сразу после первого Listening, до Rule. Ученик связывает услышанное условие с решением; самостоятельно строить ещё не объяснённую конструкцию не требуется. Все окончания грамматически совместимы с началами. Transcript не открывается автоматически. Если преподаватель раскрыл его для помощи, результат не считать независимой проверкой слухового понимания.
+
+## B1D1-M07 · Discover the pattern → Rule · 3,5 минуты
+Компоненты: Text + Choice → одно окно Rule.
+Title: What do these sentences mean?
+Subtitle: Look at the examples from Dana’s conversation.
+Body:
+**If I had enough work for six months, I’d take a chance.**
+**I wouldn’t leave just for one project.**
+**If I earned more, I would.**
+
+1. Is Dana describing the past or imagining a different situation?
+A. Describing what she did last year.
+B. Confirming a definite plan for next week.
+C. Imagining a different situation now or in the future.
+2. In “I’d take a chance”, what does ’d mean?
+A. would
+B. had
+3. Which part introduces the imagined condition?
+A. I’d take a chance.
+B. If I had enough work for six months.
+Key: 1 C; 2 A; 3 B.
+После OK → Rule; сохранить один связный блок с абзацами.
+Rule title: Imagining a different situation
+Rule body:
+Use the **second conditional** to explore a situation you are imagining now or in the future. You are not presenting it as a fact or a definite plan. For example, **If I earned more, I’d rent an apartment on my own** imagines having a higher income and a different home.
+
+The pattern is **if + Past Simple, would + verb**. The past form shows an imagined condition; it does not put this conversation in the past. **I’d** means **I would**, and **wouldn’t** means **would not**.
+
+**If we found a suitable apartment, we’d move in together.**
+**I wouldn’t take the job if it included every weekend.**
+
+The two parts can change places. A comma normally separates them when the if-part comes first. In this pattern, put **would** in the result, not in the if-part. After **would/wouldn’t**, use the basic verb, without **to** or **-s**.
+
+To ask about a choice, use **Would you + verb … if + Past Simple?** To ask for an idea, use **What would you do if …?**
+**Would you go freelance if you had regular clients?**
+**What would you do if the company changed the hours?**
+
+For imagined ability, **can** becomes **could**: **If I could choose my hours, I’d start early.** With **be**, **were** is a standard form for an imagined situation: **If the apartment were cheaper, I’d rent it.** You may also hear **was** with I/he/she/it in conversation.
+Преподавателю: не вводить всю систему conditionals. Не объяснять Second Conditional как «только невозможное»: здесь обсуждается воображаемый вариант, а не обязательно невозможное событие.
+
+## B1D1-M08 · Build the meaning and form · 3 минуты
+Механика: Typed Gap; пять строк вместе.
+Title: Complete the sentences.
+Subtitle: Use the second conditional and the verbs in brackets.
+Body:
+1. If we [1a] (find) an apartment near our jobs, we [1b] (move) in together.
+2. I [2a] (not / take) the job if I [2b] (have) to work every Sunday.
+3. If she [3a] (go) freelance, she [3b] (need) a quiet place to work.
+4. Would you [4a] (change) your mind if the company [4b] (offer) better hours?
+5. What [5a] you [5b] (do) if you [5c] (not / like) the apartment after seeing it?
+Key:
+1a found; 1b would move / ’d move.
+2a wouldn’t take / would not take; 2b had.
+3a went; 3b would need / ’d need.
+4a change; 4b offered.
+5a would; 5b do; 5c didn’t like / did not like.
+Поля 1b/3b располагаются сразу после напечатанного we/she с пробелом; при принятии ’d итог показывать как we’d / she’d, не we ’d. Можно выводить полную форму в Correct answers.
+После проверки, устно: Choose one sentence. Is that what you would do?
+Преподавателю: коротко проверить смысл отрицания во втором пункте; не только правильную форму had.
+
+## B1D1-M09 · Questions you can use · 2 минуты
+Механика: Order; два независимых ряда в одном компактном блоке.
+Title: Put the words in order. Then ask your partner.
+Subtitle: Start with the question word or would.
+Body:
+Перемешанные элементы; знак вопроса вне ряда, не отдельная подсказка:
+1. an apartment / if you / would / rent / you / more / earned
+2. if your partner / you / what / to move in together / would / wanted / do
+Key:
+1. Would you rent an apartment if you earned more?
+2. What would you do if your partner wanted to move in together?
+Служебно: предложения разбиты на указанные слова/смысловые отрезки; каждый используется один раз. Токены строчные; регистр первого слова добавляет отображение после сборки. Не объединять весь правильный вопрос одним токеном.
+После проверки каждый партнёр задаёт один вопрос и получает собственный ответ. Допустим вымышленный ответ, личные отношения обсуждать не обязательно.
+
+## B1D1-M10 · Final speaking · 6 минут
+Компоненты: Image + Text + Useful phrases; один лист, ситуации ниже.
+Title: What would you choose?
+Subtitle: Discuss two situations. Explain your choices and ask follow-up questions.
+Image: B1D1_SCENES — тот же лист, что в M01, целиком.
+Body:
+A. A quiet apartment is close to your work, but it costs €150 more per month than your current home.
+Would you rent it? What would make you change your mind?
+
+B. A company offers you one three-month freelance project. You already have a full-time job.
+Would you take a chance or turn the project down? What would you need to know first?
+
+C. Your partner wants to move in together. You prefer different parts of the city.
+What would you do? What would make the decision easier?
+
+Take turns. Give your first answer, explain why, and ask your partner a question. Then discuss the extra information for your situations.
+Useful phrases:
+If …, I’d …
+I wouldn’t … if …
+Would you … if …?
+What would you do if …?
+I’d change my mind if …
+По стрелке после первых ответов — Extra information:
+A. Imagine the extra rent was only €50. Would that change your answer?
+B. Imagine the company offered regular work for a year. What would you do?
+C. Imagine you found an apartment near both your jobs. Would you move in together?
+Проверка преподавателем: ученик формулирует минимум одно собственное условие с if, использует would/wouldn’t для решения, задаёт условный вопрос и реагирует на изменившееся условие. Личное решение не оценивается как правильное или неправильное. Не требовать все шесть Words в каждой реплике.
+Possible answers: не добавлять готовый разговор. При необходимости учитель помогает одним началом фразы.
+
+# LESSON 2 · IF I WERE YOU …
+Lesson ID: B1_DECISIONS_L2
+Words: prepare; revise; concentrate; avoid; consider; refuse.
+Grammar: If I were you, I’d + verb; If I were you, I wouldn’t + verb.
+Lexis: in your place; in your position; in your situation.
+Final Goal: понять проблему и ограничения собеседника, дать конкретный совет и скорректировать его после уточнения.
+Время: 29 минут основных этапов + 1 минута резерва. План, не фактический хронометраж.
+
+## B1D2-M01 · Opening discussion · 1,5 минуты
+Компоненты: Text + Useful phrases; устный ответ.
+Title: What would you say to a friend?
+Subtitle: Give one suggestion and explain why.
+Body:
+A friend has an important interview tomorrow. They keep changing their answers and checking their phone instead of getting ready.
+What is the main problem?
+What would you do in this situation?
+Useful phrases:
+I’d …
+I wouldn’t …
+… because …
+Проверка: быстрая активация Lesson 1 и диагностика совета. Новые шесть Words пока не обязательны.
+
+## B1D2-M02 · Words and useful combinations · 2,5 минуты
+Механика: Matching — слово ↔ определение.
+Title: Match the verbs with their meanings.
+Subtitle: —
+Body:
+Слова:
+1. prepare
+2. revise
+3. concentrate
+4. avoid
+5. consider
+6. refuse
+Определения — перемешанный порядок:
+A. keep your attention on one activity
+B. think carefully about an idea before deciding
+C. get ready for something
+D. say that you will not accept or do something
+E. study something again, especially before a test
+F. keep away from something or try not to do it
+Key: 1 C; 2 E; 3 A; 4 F; 5 B; 6 D.
+После попытки показать компактную опору, не отдельные шесть правил:
+**prepare for** an interview
+**revise** a topic / **revise for** an exam
+**concentrate on** one task
+**avoid checking** your phone
+**consider joining** a group
+**refuse to do** something
+
+Here, **revise** means study again before an exam. It is common in British English; American English often uses **review**.
+Преподавателю: concentrate здесь внимание, не «сосредоточиться географически»; consider — обдумать, не принять решение; refuse — явный отказ. Prepare шире revise, поэтому в заданиях не объявлять их взаимоисключающими там, где подходят оба. Эти сочетания вводятся здесь для дальнейших советов, а не как отдельная большая тема gerund/infinitive.
+
+## B1D2-M03 · Pronunciation · 2 минуты
+Компоненты: текст + отдельные Play слова и примера.
+Title: Listen and repeat.
+Subtitle: Notice the words that follow each verb.
+Body:
+1. prepare [B1D2_W01]
+I need to prepare for my interview tomorrow. [B1D2_E01]
+⠀
+2. revise [B1D2_W02]
+I’m going to revise the difficult topics before the exam. [B1D2_E02]
+⠀
+3. concentrate [B1D2_W03]
+It’s hard to concentrate on my work with all this noise. [B1D2_E03]
+⠀
+4. avoid [B1D2_W04]
+I try to avoid checking my phone during meetings. [B1D2_E04]
+⠀
+5. consider [B1D2_W05]
+We’re going to consider moving to a smaller apartment. [B1D2_E05]
+⠀
+6. refuse [B1D2_W06]
+She refused to work another weekend. [B1D2_E06]
+Проверка: произношение; это не замена следующей практики.
+
+## B1D2-M04 · Words in situations · 2,5 минуты
+Механика: Typed Gap; банк слов; все шесть строк вместе.
+Title: Complete the sentences.
+Subtitle: Use each verb once. Keep the form in the word bank.
+Word bank: refuse · concentrate · prepare · avoid · revise · consider
+Body:
+1. Before the interview, I need to [1] by reading about the company and planning some questions.
+2. We learnt these topics last month. I’m going to [2] them before Friday’s test.
+3. Could you turn the music down? I need to [3] on these instructions.
+4. I leave my phone in my bag to [4] checking it during meetings.
+5. We haven’t decided yet. We need to [5] both options carefully.
+6. They want me to work all weekend again. I need a break, so this time I’m going to [6].
+Key: 1 prepare; 2 revise; 3 concentrate; 4 avoid; 5 consider; 6 refuse.
+Преподавателю: проверять смысл целого высказывания; в №5 обдумываются оба варианта, а не отвергаются оба. В №6 человек не хочет снова работать все выходные; нужен отказ, а не нейтральное обдумывание.
+
+## B1D2-M05 · Reading: useful advice · 2,5 минуты
+Компоненты: Text + Choice; источник и вопросы видны вместе.
+Title: Read the message and the replies.
+Subtitle: Choose the reply that uses Jamie’s available study time.
+Body:
+Jamie:
+“My exam is on Friday. I look after my son all morning and work from two until nine in the evening. I have one free hour after lunch, while his grandparents look after him. I try to revise after work too, but I’m tired and keep checking messages. What would you suggest?”
+
+Reply A:
+“If I were you, I’d use that free hour to revise one topic. I’d avoid checking messages during that time.”
+
+Reply B:
+“In your place, I’d use your free mornings to revise for three hours.”
+
+1. Why can’t Jamie study in the morning?
+A. He starts work very early.
+B. He looks after his son.
+C. He does not want to study before lunch.
+2. Which reply uses the time Jamie actually has?
+A. Reply A.
+B. Reply B.
+Key: 1 B; 2 A.
+После проверки, устно: What does Reply B assume that Jamie’s message does not support?
+Критерий: свободные утра/три свободных часа у него не заявлены. Оценка совета привязана к данным сообщения, не к универсальному мнению автора о режиме учёбы.
+
+## B1D2-M06 · Notice the advice → Rule · 3,5 минуты
+Компоненты: Text + Choice → одно окно Rule.
+Title: How does the writer give advice?
+Subtitle: Read the examples and choose the answers.
+Body:
+**If I were you, I’d use that free hour to revise one topic.**
+**In your place, I’d use your free mornings to revise for three hours.**
+
+1. What does “If I were you” do here?
+A. It describes the writer’s past life.
+B. It imagines being in Jamie’s situation to give advice.
+C. It promises to do Jamie’s studying for him.
+2. Which beginning can introduce the same kind of advice?
+A. In your position, I’d …
+B. Yesterday, I …
+3. Which sentence uses the negative form of would?
+A. If I were you, I wouldn’t agree immediately.
+B. If I were you, I’d refuse.
+Key: 1 B; 2 A; 3 A.
+Преподавателю: №3 проверяет форму would/wouldn’t, а не оценку того, хорошо ли отказываться. После выбора попросить назвать отрицательную форму.
+После попытки → Rule.
+Rule title: Giving advice from someone else’s point of view
+Rule body:
+When someone explains a problem, **If I were you, I’d …** helps you say what you recommend. You imagine being in that person’s situation and suggest an action. It is advice about now or the future, not a story about the past.
+
+**If I were you, I’d prepare a few questions.**
+To recommend not doing something, use **If I were you, I wouldn’t …**:
+**If I were you, I wouldn’t accept immediately.**
+
+Use **were** in this advice pattern. **I’d = I would**, followed by the basic verb: **I’d prepare**, not **I’d to prepare**.
+
+You can also say **In your place, I’d …**, **In your position, I’d …** or **In your situation, I’d …**. These are alternatives; you do not need to use all three in one conversation. The full form is also possible: **If I were in your situation, I’d …**.
+
+Remember the combinations from the Words section: **concentrate on** a task; **avoid studying** all night; **consider asking** for more time; **refuse to share** answers. Would does not change the pattern after the next verb.
+
+Make your advice specific. **I’d prepare** is very general. **I’d prepare three questions about the working hours** tells the other person what to do. Explain why it fits their situation, and respond when they give you new information.
+
+## B1D2-M07 · Advice forms · 2,5 минуты
+Механика: Typed Gap; четыре строки вместе.
+Title: Complete the advice.
+Subtitle: Use the verbs in brackets. In sentence 3, add the missing preposition too.
+Body:
+1. If I [1a] (be) you, I [1b] (prepare) a few questions about the working hours.
+2. In your position, I [2] (not / agree) without more information.
+3. If I were you, I’d concentrate [3a] one topic and avoid [3b] (check) messages.
+4. If I were in your situation, I’d refuse [4] (share) my exam answers.
+Key:
+1a were; 1b would prepare / ’d prepare.
+2 wouldn’t agree / would not agree.
+3a on; 3b checking.
+4 to share.
+Служебно: в 3a проверяется введённое сочетание concentrate on. Во всём блоке используется формула совета из Rule. Не принимать одинокое prepare в 1b: здесь восстанавливается would + verb. При принятии ’d отображать I’d, без пробела между I и апострофом.
+После проверки — один короткий устный пункт:
+Finish this suggestion in your own way: “If I were you, I’d consider …”
+Критерий: осмысленное существительное или -ing после consider, например joining a study group. Другие подходящие варианты не исправлять под образец. В №1 отрабатывается стандартная модель If I were you из правила.
+
+## B1D2-M08 · Listening: advice with a condition · 3 минуты
+Компоненты: Audio + Choice → Multiple Select + Choice.
+Title: Listen to Leah and Owen.
+Subtitle: Find out what Owen advises and why.
+Audio: B1D2_DIALOGUE
+Transcript: B1D2_TRANSCRIPT — кнопка под плеером, свёрнута.
+Body:
+Первый вопрос виден сразу:
+1. What is Leah’s problem?
+A. She has decided not to take the exam.
+B. She wants a job, but the hours may leave too little time to revise.
+C. She does not want to go to the interview because she dislikes the café.
+Key: B.
+После попытки → следующий компактный блок, плеер остаётся. Replay при необходимости:
+2. Which TWO things does Owen suggest doing before making a final decision?
+☐ A. Cancel the interview.
+☐ B. Prepare questions about the job.
+☐ C. Ask about starting after the exam.
+☐ D. Agree to work every weekend before the exam.
+Key: B + C; порядок выбора не важен.
+3. In which situation would Owen refuse the job for now?
+A. The café needs someone to start straight away.
+B. The café agrees that Leah can start after the exam.
+C. The interview is tomorrow.
+Key: A.
+Преподавателю: важно понять условие отказа: совет не «всегда отказываться от работы перед экзаменом». Диалог готовит адаптацию совета к обстоятельствам в финале.
+
+## B1D2-M09 · A short reply · 3 минуты
+Компоненты: Text + Writing; одно поле на ответ.
+Title: Write a reply to your friend.
+Subtitle: Write three or four sentences. Give advice, a reason, and one thing not to do.
+Body:
+“I said I’d help organise a party on Saturday, but I have an exam on Monday and I haven’t revised enough. I don’t want to disappoint everyone. What should I do?”
+
+Use **If I were you …** or **In your place/position/situation …**.
+Choose at least two useful verbs: **prepare · revise · concentrate · avoid · consider · refuse**.
+[Одно многострочное поле]
+Possible answer — после попытки по кнопке:
+“If I were you, I’d explain the problem to your friends today. I’d consider helping for an hour, but I wouldn’t stay all day. You need time to revise.”
+Проверка преподавателем: совет отвечает проблеме, конкретен и учитывает экзамен/обещание; есть советуемое действие и то, чего не стоит делать, понятная причина и корректная условная формула. Другие решения допустимы. Не требовать совпадения с образцом или именно глаголов из образца; принимать другие уместные сочетания минимум с двумя единицами из банка. При слишком общем “I’d prepare” уточнить “How?”.
+
+## B1D2-M10 · Final speaking: make the advice useful · 6 минут
+Компоненты: Image + Text + Useful phrases; роли и уточнения — в тексте.
+Title: Give advice that fits the situation.
+Subtitle: Choose two situations. Take turns asking for and giving advice.
+Image: B1D2_SCENES — целый лист из трёх сцен; подписи и условия ниже.
+Body:
+A. Maya has an exam in three days. She knows the theory, but finds the practice questions difficult. She has two free hours this evening and keeps checking her phone.
+
+B. Daniel has an interesting job offer, but the evening and weekend hours are not clear. He needs to be home by six on two evenings a week. The company wants an answer today.
+
+C. Rory’s classmate wants him to do their part of a group project as well as his own. Rory’s own work is due on Friday. He wants to help, but he does not have time to do both parts.
+
+The person with the problem: explain it and ask for advice.
+The adviser: suggest a specific action, say what you wouldn’t do, and explain why.
+Then open the extra information. Adapt the advice and agree on a first step.
+Useful phrases:
+What would you do in my situation?
+If I were you, I’d …
+If I were you, I wouldn’t …
+In your place / position / situation, I’d …
+I’d consider …
+That could help, but …
+По стрелке — Extra information:
+A. “I need my phone because all my notes are on it.”
+B. “They can give me one more day to decide.”
+C. “My classmate says they don’t understand their part.”
+Проверка преподавателем: студент даёт конкретный совет с изучаемой формулой, учитывает факты, объясняет причину, задаёт/понимает уточнение и корректирует предложение. Не определять одну «правильную» рекомендацию. Поддержку Useful phrases не прятать автоматически.
+
+# TRANSCRIPTS — скрытый текст для интерфейса
+
+## B1D1_TRANSCRIPT
+Связан с B1D1_DIALOGUE; используется у обоих его плееров.
+
+Dana: I like my job, but I’d love to choose my own hours.
+Chris: Would you go freelance if you had a few regular clients?
+Dana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.
+Chris: Fair enough. What about working from home?
+Dana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.
+Chris: Would you rent an apartment on your own?
+Dana: If I earned more, I would. For now, it’s too expensive.
+Chris: What would you do if a company offered you a full-time job with better hours?
+Dana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind.
+
+## B1D2_TRANSCRIPT
+Связан с B1D2_DIALOGUE.
+
+Leah: I have an interview for a weekend job at a café. My exam’s in three weeks, but the money would help.
+Owen: If I were you, I’d ask how many weekends they need you to work.
+Leah: I checked. Every weekend for the next month.
+Owen: In your position, I wouldn’t agree to that. You need time to revise.
+Leah: The interview’s tomorrow. I don’t want to cancel it.
+Owen: You don’t have to. I’d prepare a few questions and ask about starting after the exam.
+Leah: And if they need someone straight away?
+Owen: I’d refuse the job for now. In your situation, the exam would come first.
+Leah: That sounds fair. I’ll go to the interview and explain.
+
+# Заметки по проверке и источникам — не загружать в ученические экраны
+
+Карточки автора сохранены по целям и наборам. Новых обязательных лексических списков нет. Связка: сначала личный гипотетический выбор, затем совет с учётом чужой проблемы. Самостоятельная тренировка формы не подменяет общение; в конце меняется условие, а не только прячется подсказка.
+
+Оформление и функции сверены по предоставленным B1 PDF: «В1 ЦЕЛИКОМ 1 модуль(2).pdf», с. 1–10 (ввод, аудио с общей/детальной задачей, вывод формы, произношение, самостоятельная достройка); «В1 ЦЕЛИКОМ 2 модуль(3).pdf», с. 1–11 (контекстная практика, первое/повторное слушание, упражнение до правила, единое объяснение, персонализация). Эти страницы не содержат нашу готовую тему Second Conditional; из них взят способ организации, не их рассказы, персонажи, задания или нормы длительности.
+
+Грамматика и сочетаемость проверены по British Council LearnEnglish «Conditionals: zero, first and second», Cambridge English Grammar Today «Conditionals: if» и «Verb patterns: verb + infinitive or verb + -ing?», Cambridge Dictionary (revise, concentrate, freelance, turn down), Collins (place: position/situation). Объяснения переформулированы, конкретные диалоги и задачи написаны для этих карточек.
+
+В повторной проверке сопоставлены обе авторские карточки, единая инструкция v0.9.1, актуальные уточнения переписки и страницы 1–8 первого B1-PDF / 1–11 второго. Проверены все задания этой пары: цели, ответы, подсказки, раскрытие, доступность источников, связь с медиа и сумма времени. Это проверка двух уроков, не всего будущего B1-модуля и не независимый прогон модели без контекста. Аудиофайлы и изображения пока не созданы. Фактический хронометраж и браузерный показ этой сборки не проверены. Не объявлять готовые файлы MEDIA реальными URL и не подставлять случайные изображения в их слоты.

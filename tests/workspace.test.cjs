@@ -23,7 +23,7 @@ test('existing lessons and 21 catalog entries load as data without page-specific
 });
 
 test('Whales are isolated by level; publishing a topic only needs content metadata', () => {
-  assert.deepEqual(levels.map(level => [level.id, level.whales.length]), [['A1.1',7],['A1.2',7],['A2.1',8],['A2.2',8]]);
+  assert.deepEqual(levels.map(level => [level.id, level.whales.length]), [['A1.1',7],['A1.2',7],['A2.1',8],['A2.2',8],['B1.1',1]]);
   const { lessons, templates } = content();
   lessons[0].level = 'A2.1'; lessons[0].whale = 5;
   const catalog = createCatalog(lessons, templates);

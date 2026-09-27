@@ -3,6 +3,12 @@
   const uiLabels = { check: 'OK' }; // Shared button copy for every exercise.
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
+  const normalizeEnglish = value => normalize(value).replace(/[‘’ʼ]/g, "'").replace(/\.$/, '').trim();
+  const orderSentence = (def, order) => {
+    let text = (order || []).map(id => def.tokens.find(token => token.id === id).text).join(' ').replace(/\s+([,.!?;:])/g, '$1');
+    if (def.sentenceCase) text = text.charAt(0).toUpperCase() + text.slice(1);
+    return text + (def.sentenceSuffix || '');
+  };
   const clone = value => JSON.parse(JSON.stringify(value));
   const POSSIBLE_ANSWERS_TITLE = 'Possible answers';
   const possibleAnswerAliases = new Set([
@@ -259,7 +265,7 @@
     } else if (def.kind === 'gaps') {
       def.items.forEach(item => item.segments.forEach(segment => {
         if (typeof segment === 'string') return;
-        const normalized = value => segment.normalization === 'phone' ? normalize(value).replace(/[\s()–—-]/g, '') : normalize(value);
+        const normalized = value => segment.normalization === 'phone' ? normalize(value).replace(/[\s()–—-]/g, '') : segment.normalization === 'english' ? normalizeEnglish(value) : normalize(value);
         const value = normalized(answers[segment.id]);
         mark(segment.id, !!value, segment.answers ? segment.answers.some(answer => normalized(answer) === value) : null);
       }));
@@ -1098,6 +1104,7 @@
           if(compact)container.append(node('span','ek-picture-response-number',`${index+1}.`));
           if(!compact&&(item.image || item.imagePending))body.append(illustration(item));
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
+          if (def.preserveLines) row.style.whiteSpace = 'pre-wrap';
           if (!modern && !compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
             if (typeof segment === 'string') { row.append(doc.createTextNode(segment)); return; }
@@ -1195,6 +1202,7 @@
         picked.forEach((id, index) => {
           const token = def.tokens.find(item => item.id === id);
           const control = tokenButton(token, () => { changed('order', picked.filter(value => value !== id)); render(); }, index);
+          if (!imageMode && def.sentenceCase && index === 0) control.textContent = token.text.charAt(0).toUpperCase() + token.text.slice(1);
           draggable(control, id); dropzone(control, moved => move(moved, id));
           control.title = 'Click to return; drag to reorder; Alt + arrow to move';
           control.addEventListener('keydown', event => {
@@ -1207,6 +1215,7 @@
           });
           ordered.append(control);
         });
+        if (!imageMode && def.sentenceSuffix) ordered.append(node('span', 'ek-order-suffix', def.sentenceSuffix));
         ordered.tabIndex = 0; dropzone(ordered, (id,before) => move(id,before));
         const bank = node('div', imageMode ? 'ek-bank ek-order-image-bank' : 'ek-bank');
         def.tokens.filter(token => !picked.includes(token.id)).forEach((token, index) => {
@@ -1322,9 +1331,11 @@
       if(attempted){
         if(def.kind==='gaps')def.items.forEach(item=>{
           if(!Object.values(feedback).some(value=>value==='retry'||value==='empty'))return;
-          const row=node('li');item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
+          const row=node('li');
+          if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
+          else item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
-        else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1'));
+        else if(def.kind==='order' && needsSolution('order'))pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
         else if(def.kind==='matching'&&def.layout==='picture-word'){
           pictureCorrections(def.items.filter(item=>needsSolution(item.id)),item=>def.options.find(option=>option.id===item.correctId)?.text||'');
         }
@@ -1347,6 +1358,7 @@
         const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});container.append(list);resultsBox.append(section);decorateDisclosures();
       }
       if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
+      if(attempted && def.afterCheck){const note=node('li','ek-correction');note.append(richText(def.afterCheck.text,def.afterCheck.highlights||[]));resultsBox.append(note);}
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
     }
     const checkFeedback = () => {
@@ -1366,7 +1378,7 @@
           const line = node('p', 'ek-correction-line');
           item.segments.forEach(segment => line.append(typeof segment === 'string' ? node('span','ek-muted',segment) : node('strong','',segment.answers?.[0] || '…'))); correction.append(line);
         });
-        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',def.correctOrder.map(id => def.tokens.find(token => token.id === id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1')));
+        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',orderSentence(def,def.correctOrder)));
         else if (def.kind !== 'order') def.items.forEach((item,index) => {
           if (!['retry','empty'].includes(feedback[item.id])) return;
           const choices = item.options || def.options || def.groups || [];
