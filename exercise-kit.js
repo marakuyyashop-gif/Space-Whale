@@ -211,6 +211,7 @@
       if (def.multiple && def.layout === 'dropdown') fail('Multiple choice needs visible checkboxes');
       def.items.forEach(item => {
         media(item); text(item.prompt, 'prompt'); const valid = options(item.options); key(item, valid);
+        if (item.promptHighlights != null) { array(item.promptHighlights, 'promptHighlights'); item.promptHighlights.forEach(part => { text(part, 'prompt highlight'); if (!item.prompt.includes(part)) fail('Highlight missing from prompt'); }); }
         if (def.multiple) {
           if (item.correctId != null) fail('Multiple choice uses correctIds');
           if (item.correctIds != null) {
@@ -1141,7 +1142,11 @@
           const {wrap,opener}=inlinePicker(item.id,item.prompt,item.options,index+1);
           row.append(wrap);body.append(row);controls.set(item.id,opener);return;
         }
-        const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question'); group.append(node('legend', '', `${index + 1}. ${item.prompt}`));
+        const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question');
+        const legend=node('legend');
+        if(item.promptHighlights?.length){legend.append(...richText(`${index + 1}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
+        else legend.textContent=`${index + 1}. ${item.prompt}`;
+        group.append(legend);
         item.options.forEach(option => {
           const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = def.multiple ? 'checkbox' : 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = def.multiple ? (Array.isArray(answers[item.id]) && answers[item.id].includes(option.id)) : answers[item.id] === option.id;
           input.addEventListener('change', () => {
