@@ -432,12 +432,13 @@
                 version: 1,
                 id: 'a12w4l2-unscramble-1',
                 kind: 'order',
+                sentenceCase: true,
                 title: '1. Put the words in order.',
                 instruction: 'Build the question.',
                 tokens: [
                   { id: 'u1a', text: 'does' },
                   { id: 'u1b', text: 'the coat' },
-                  { id: 'u1c', text: 'How' },
+                  { id: 'u1c', text: 'how' },
                   { id: 'u1d', text: 'look' },
                   { id: 'u1e', text: '?' }
                 ],
@@ -451,11 +452,12 @@
                 version: 1,
                 id: 'a12w4l2-unscramble-2',
                 kind: 'order',
+                sentenceCase: true,
                 title: '2. Put the words in order.',
                 instruction: 'Build the question.',
                 tokens: [
                   { id: 'u2a', text: 'look' },
-                  { id: 'u2b', text: 'What' },
+                  { id: 'u2b', text: 'what' },
                   { id: 'u2c', text: 'the blouse' },
                   { id: 'u2d', text: 'does' },
                   { id: 'u2e', text: 'like' },
@@ -471,11 +473,12 @@
                 version: 1,
                 id: 'a12w4l2-unscramble-3',
                 kind: 'order',
+                sentenceCase: true,
                 title: '3. Put the words in order.',
                 instruction: 'Build the question.',
                 tokens: [
                   { id: 'u3a', text: 'the hats' },
-                  { id: 'u3b', text: 'How' },
+                  { id: 'u3b', text: 'how' },
                   { id: 'u3c', text: 'do' },
                   { id: 'u3d', text: 'look' },
                   { id: 'u3e', text: '?' }
@@ -490,12 +493,13 @@
                 version: 1,
                 id: 'a12w4l2-unscramble-4',
                 kind: 'order',
+                sentenceCase: true,
                 title: '4. Put the words in order.',
                 instruction: 'Build the question.',
                 tokens: [
                   { id: 'u4a', text: 'do' },
                   { id: 'u4b', text: 'the suits' },
-                  { id: 'u4c', text: 'What' },
+                  { id: 'u4c', text: 'what' },
                   { id: 'u4d', text: 'look' },
                   { id: 'u4e', text: 'like' },
                   { id: 'u4f', text: '?' }

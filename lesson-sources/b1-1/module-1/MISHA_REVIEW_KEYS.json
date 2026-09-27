@@ -1,0 +1,266 @@
+{
+  "B1D1-M01": {
+    "teacherNotes": "нет автоматического ключа. Диагностика, не требование уже владеть всей конструкцией. При затруднении принять знакомый язык, уточнить причину и вернуться к выбранной ситуации в финале."
+  },
+  "B1D1-M02": {
+    "kind": "matching",
+    "answers": {
+      "1": "C",
+      "2": "E",
+      "3": "F",
+      "4": "B",
+      "5": "A",
+      "6": "D"
+    },
+    "explanationAfterAttempt": "You can turn down an offer or turn an offer down.\nWith it, say turn it down.\nThe possessive changes: change my mind / your mind / her mind.",
+    "teacherNotes": "freelance не означает автоматически «работать дома» или «всегда выбирать любое расписание»; это способ работы с клиентами. Не добавлять эти ложные признаки к определению."
+  },
+  "B1D1-M03": {
+    "teacherNotes": "произношение, без автоматической оценки. В четвёртой строке переменная something заменена конкретным offer, целевая единица не изменена."
+  },
+  "B1D1-M04": {
+    "kind": "gaps",
+    "inputMode": "select",
+    "answers": {
+      "1": [
+        "turn it down"
+      ],
+      "2": [
+        "move in together"
+      ],
+      "3": [
+        "take a chance"
+      ],
+      "4": [
+        "rent an apartment"
+      ],
+      "5": [
+        "change your mind"
+      ],
+      "6": [
+        "go freelance"
+      ]
+    },
+    "teacherNotes": "одна короткая персональная реплика, не обсуждение всех шести пунктов. Новая условная конструкция пока не требуется. Контексты отличаются от произносительных примеров; все шесть фраз служат ответами, а не только вариантами в банке."
+  },
+  "B1D1-M05-Q1": {
+    "kind": "choice",
+    "answers": {
+      "1": "B"
+    }
+  },
+  "B1D1-M05-Q2": {
+    "kind": "choice",
+    "answers": {
+      "2": "A"
+    }
+  },
+  "B1D1-M05": {
+    "teacherNotes": "недостаточно постоянной работы/дохода, а не просто «не нравится квартира». Готовый ответ не показывать заранее."
+  },
+  "B1D1-M06-pairs": {
+    "kind": "matching",
+    "answers": {
+      "1": "C",
+      "2": "D",
+      "3": "B"
+    }
+  },
+  "B1D1-M07-discover": {
+    "kind": "choice",
+    "answers": {
+      "1": "C",
+      "2": "A",
+      "3": "B"
+    }
+  },
+  "B1D1-M07": {
+    "teacherNotes": "не вводить всю систему conditionals. Не объяснять Second Conditional как «только невозможное»: здесь обсуждается воображаемый вариант, а не обязательно невозможное событие."
+  },
+  "B1D1-M08": {
+    "kind": "gaps",
+    "inputMode": "text",
+    "answers": {
+      "1a": [
+        "found"
+      ],
+      "1b": [
+        "would move",
+        "’d move"
+      ],
+      "2a": [
+        "wouldn’t take",
+        "would not take"
+      ],
+      "2b": [
+        "had"
+      ],
+      "3a": [
+        "went"
+      ],
+      "3b": [
+        "would need",
+        "’d need"
+      ],
+      "4a": [
+        "change"
+      ],
+      "4b": [
+        "offered"
+      ],
+      "5a": [
+        "would"
+      ],
+      "5b": [
+        "do"
+      ],
+      "5c": [
+        "didn’t like",
+        "did not like"
+      ]
+    },
+    "teacherNotes": "коротко проверить смысл отрицания во втором пункте; не только правильную форму had."
+  },
+  "B1D1-M09-Q1": {
+    "kind": "order",
+    "answer": "would you rent an apartment if you earned more?"
+  },
+  "B1D1-M09-Q2": {
+    "kind": "order",
+    "answer": "what would you do if your partner wanted to move in together?"
+  },
+  "B1D1-M10": {
+    "teacherNotes": "ученик формулирует минимум одно собственное условие с if, использует would/wouldn’t для решения, задаёт условный вопрос и реагирует на изменившееся условие. Личное решение не оценивается как правильное или неправильное. Не требовать все шесть Words в каждой реплике."
+  },
+  "B1D2-M01": {
+    "teacherNotes": "быстрая активация Lesson 1 и диагностика совета. Новые шесть Words пока не обязательны."
+  },
+  "B1D2-M02": {
+    "kind": "matching",
+    "answers": {
+      "1": "C",
+      "2": "E",
+      "3": "A",
+      "4": "F",
+      "5": "B",
+      "6": "D"
+    },
+    "explanationAfterAttempt": "prepare for an interview\nrevise a topic / revise for an exam\nconcentrate on one task\navoid checking your phone\nconsider joining a group\nrefuse to do something\n\nHere, revise means study again before an exam. It is common in British English; American English often uses review.",
+    "teacherNotes": "concentrate здесь внимание, не «сосредоточиться географически»; consider — обдумать, не принять решение; refuse — явный отказ. Prepare шире revise, поэтому в заданиях не объявлять их взаимоисключающими там, где подходят оба. Эти сочетания вводятся здесь для дальнейших советов, а не как отдельная большая тема gerund/infinitive."
+  },
+  "B1D2-M03": {
+    "teacherNotes": "произношение; это не замена следующей практики."
+  },
+  "B1D2-M04": {
+    "kind": "gaps",
+    "inputMode": "select",
+    "answers": {
+      "1": [
+        "prepare"
+      ],
+      "2": [
+        "revise"
+      ],
+      "3": [
+        "concentrate"
+      ],
+      "4": [
+        "avoid"
+      ],
+      "5": [
+        "consider"
+      ],
+      "6": [
+        "refuse"
+      ]
+    },
+    "teacherNotes": "проверять смысл целого высказывания; в №5 обдумываются оба варианта, а не отвергаются оба. В №6 человек не хочет снова работать все выходные; нужен отказ, а не нейтральное обдумывание."
+  },
+  "B1D2-M05-questions": {
+    "kind": "choice",
+    "answers": {
+      "1": "B",
+      "2": "A"
+    }
+  },
+  "B1D2-M05": {
+    "teacherNotes": "свободные утра/три свободных часа у него не заявлены. Оценка совета привязана к данным сообщения, не к универсальному мнению автора о режиме учёбы."
+  },
+  "B1D2-M06-discover": {
+    "kind": "choice",
+    "answers": {
+      "1": "B",
+      "2": "A",
+      "3": "A"
+    }
+  },
+  "B1D2-M06": {
+    "teacherNotes": "№3 проверяет форму would/wouldn’t, а не оценку того, хорошо ли отказываться. После выбора попросить назвать отрицательную форму."
+  },
+  "B1D2-M07": {
+    "kind": "gaps",
+    "inputMode": "text",
+    "answers": {
+      "1a": [
+        "were"
+      ],
+      "1b": [
+        "would prepare",
+        "’d prepare"
+      ],
+      "2": [
+        "wouldn’t agree",
+        "would not agree"
+      ],
+      "3a": [
+        "on"
+      ],
+      "3b": [
+        "checking"
+      ],
+      "4": [
+        "to share"
+      ]
+    },
+    "teacherNotes": "осмысленное существительное или -ing после consider, например joining a study group. Другие подходящие варианты не исправлять под образец. В №1 отрабатывается стандартная модель If I were you из правила."
+  },
+  "B1D2-M08-Q1": {
+    "kind": "choice",
+    "answers": {
+      "1": "B"
+    }
+  },
+  "B1D2-M08-Q2": {
+    "kind": "multiple-select",
+    "answers": {
+      "2": [
+        "B",
+        "C"
+      ]
+    }
+  },
+  "B1D2-M08-Q3": {
+    "kind": "choice",
+    "answers": {
+      "3": "A"
+    }
+  },
+  "B1D2-M08": {
+    "teacherNotes": "важно понять условие отказа: совет не «всегда отказываться от работы перед экзаменом». Диалог готовит адаптацию совета к обстоятельствам в финале."
+  },
+  "B1D2-M09-reply": {
+    "kind": "writing",
+    "responseMode": "open",
+    "samples": {
+      "reply": [
+        "If I were you, I’d explain the problem to your friends today. I’d consider helping for an hour, but I wouldn’t stay all day. You need time to revise."
+      ]
+    }
+  },
+  "B1D2-M09": {
+    "teacherNotes": "совет отвечает проблеме, конкретен и учитывает экзамен/обещание; есть советуемое действие и то, чего не стоит делать, понятная причина и корректная условная формула. Другие решения допустимы. Не требовать совпадения с образцом или именно глаголов из образца; принимать другие уместные сочетания минимум с двумя единицами из банка. При слишком общем “I’d prepare” уточнить “How?”."
+  },
+  "B1D2-M10": {
+    "teacherNotes": "студент даёт конкретный совет с изучаемой формулой, учитывает факты, объясняет причину, задаёт/понимает уточнение и корректирует предложение. Не определять одну «правильную» рекомендацию. Поддержку Useful phrases не прятать автоматически."
+  }
+}

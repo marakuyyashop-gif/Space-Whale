@@ -43,7 +43,7 @@ const gap=(id,before,options,answer,after='',mediaRef)=>({id,...(mediaRef?{media
 const G=(id,title,items,extra={})=>E(id,'gaps',title,{inputMode:'select',items,...extra});
 const W=(id,title,items,extra={})=>E(id,'writing',title,{responseMode:'open',revealPossibleAnswers:true,items,...extra});
 const R=(id,title,body,highlights)=>E(id,'rule-page',title,{blocks:[{type:'rule',title,text:body,highlights}]});
-const O=(id,title,tokens,correct)=>E(id,'order',title,{tokens:tokens.map((text,i)=>({id:String(i+1),text})),correctOrder:correct.map(t=>String(tokens.indexOf(t)+1))});
+const O=(id,title,tokens,correct)=>E(id,'order',title,{sentenceCase:true,tokens:tokens.map((text,i)=>({id:String(i+1),text})),correctOrder:correct.map(t=>String(tokens.indexOf(t)+1))});
 const step=(menu,minutes,exercise)=>({menu,navigationTitle:menu,section:'tasks',guide:{time:minutes+' min'},exercise});
 const repeat=(n,words,examples)=>E('L'+n+'-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,items:words.map((word,i)=>{const k=String(i+1).padStart(2,'0');return {id:'L'+n+'_W'+k,text:word,mediaRef:'L'+n+'_W'+k,example:examples[i],exampleMediaRef:'L'+n+'_E'+k};})});
 const transcript3=id=>E(id,'presentation','Transcript',{blocks:[{type:'disclosure',title:'Transcript',text:media[3].L3_DIALOGUE_TEXT.text}]});
@@ -76,9 +76,9 @@ s3.push(step('Questions',4,S('L3-M08',title,[C('L3-M08-question-meaning',title,[
  item('3','“I think it looks good.”',['How much is it?','What do you think?'],'B')
 ]),R('L3-M08-explanation','Как спросить о выборе и причине',"Когда перед вами несколько вариантов, which помогает спросить, какой из них выбирает человек: Which cap do you like? Если уже понятно, о какой вещи речь, можно сказать Which one do you like? Здесь one заменяет название одного предмета; после one повторять cap не нужно.\n\nО причине спрашиваем с why: Why do you like it? — «Почему вам это нравится?» Ответ объясняет причину: Because it looks good.\n\nПорядок вопроса знаком по Present Simple: Which/Why + do/does + подлежащее + глагол. Название предмета после which относится к вопросительной части: Which cap do you want? С he/she/it используем does, а основной глагол остаётся без -s: Why does she like it?\n\nЕсли говорим о нескольких предметах, называем их прямо: Which gloves do you like? В дальнейшем заменяем их на they/them: They look warm. Why do you like them?",
 ['which','Which cap do you like?','Which one do you like?','one','cap','why','Why do you like it?','Because it looks good.','Which/Why + do/does + подлежащее + глагол','Which cap do you want?','he/she/it','does','-s','Why does she like it?','Which gloves do you like?','they/them','They look warm. Why do you like them?']),
- O('L3-M08-Q1','Put the words in order.',['want','he','Which cap','does','?'],['Which cap','does','he','want','?']),
- O('L3-M08-Q2','Put the words in order.',['these gloves','you','Why','like','do','?'],['Why','do','you','like','these gloves','?']),
- O('L3-M08-scarf-question','Put the words in order.',['need','she','a scarf','Why','does','?'],['Why','does','she','need','a scarf','?'])
+ O('L3-M08-Q1','Put the words in order.',['want','he','which cap','does','?'],['which cap','does','he','want','?']),
+ O('L3-M08-Q2','Put the words in order.',['these gloves','you','why','like','do','?'],['why','do','you','like','these gloves','?']),
+ O('L3-M08-scarf-question','Put the words in order.',['need','she','a scarf','why','does','?'],['why','does','she','need','a scarf','?'])
 ],{progressive:true,requireCheckBeforeNext:true})));
 title='Listen again and choose the correct answers.';
 s3.push(step('Listen again',2,S('L3-M09',title,[A('L3-M09-audio','L3_DIALOGUE',title),{...transcript3('L3-M09-transcript'),title},C('L3-M09-questions',title,[item('1','Why does Nina like the scarf?',['Because her sister likes it.','Because Leo wants it.','Because it looks warm.'],'C','Nina likes the scarf because it looks warm.',['because it looks warm']),item('2','Does Nina’s sister need gloves too?',['No. She has some.','Yes. She doesn’t have any.','Yes. Her gloves are old.'],'A','No. She has some.',['She has some.'])])],{layout:'grouped'})));
