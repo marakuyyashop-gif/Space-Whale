@@ -1299,26 +1299,26 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "1.5 min",
-          "teacherNotes": "быстрая активация Lesson 1 и диагностика совета. Новые шесть Words пока не обязательны."
+          "teacherNotes": "Короткая вводная диагностика: по одному совету и причине для каждой из двух бытовых ситуаций. Понять текущий способ дать совет; не требовать ещё не изученных конструкций или нового набора prepare, revise, concentrate, avoid, consider, refuse. Useful phrases — добровольная опора, а не обязательный список. При затруднении принять ответ знакомыми средствами. Устная работа без автоматической проверки и единственного правильного решения. Ориентир — около 45 секунд на ситуацию."
         },
         "exercise": {
           "version": 1,
           "id": "B1D2-M01",
           "kind": "presentation",
-          "title": "What would you say to a friend?",
+          "title": "Give your friend some advice.",
           "blocks": [
             {
               "type": "text",
-              "text": "A friend has an important interview tomorrow. They keep changing their answers and checking their phone instead of getting ready.\nWhat is the main problem?\nWhat would you do in this situation?"
+              "text": "1. Your friend Sam says:\n“It’s 10 p.m. My job interview is tomorrow morning, but I’m not ready. I’m tired and don’t know what to do first.”\n\n2. Your friend Alex says:\n“My boss needs my report tomorrow morning. I left my laptop at the office, and all my notes are on it. I’m at home now.”"
             },
             {
               "type": "disclosure",
               "title": "Useful phrases",
               "open": true,
-              "text": "I’d …\nI wouldn’t …\n… because …"
+              "text": "If I were you, I’d …\nIn your place, I’d …\nI would … / I wouldn’t …\n… because …"
             }
           ],
-          "instruction": "Give one suggestion and explain why."
+          "instruction": "For each situation, say what you would do and explain why. You can use the phrases below."
         }
       },
       {
