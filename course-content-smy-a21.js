@@ -131,11 +131,11 @@ const teacherNotes={
  "A2_SEQ_M08": "отметить один удачный переход, предложить исправить один реально возникший сбой. Попросить ещё раз сформулировать начало и окончание рассказа. Завершить занятие на 30-й минуте; объём обратной связи подстроить под фактический темп, не объявлять неосвоенный материал усвоенным.",
  "A2_MOVE_M01": "первая попытка описать все шесть картинок своими словами, без готовых Useful phrases. Отметить, как ученица самостоятельно описывает действия и направления; не требовать новых сочетаний до обучения. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.",
  "A2_MOVE_M02": "пояснить при необходимости по-русски: «перелез через стену на другую сторону». Не подставлять сюда картинку climb up и не называть подъём по лестнице примером climb over. Отдельная новая иллюстрация для этого короткого дополнения не нужна.",
- "A2_MOVE_M04": "это объяснение выбранных сочетаний, а не полный запрет in/on при движении. В некоторых сочетаниях in/into и on/onto возможны оба; не использовать такие допустимые варианты как ложные дистракторы. Come в примере — движение из палатки к наблюдателю снаружи; отдельную новую тему come/go не добавлять.",
+ "A2_MOVE_M04": "Сначала семь контекстных примеров: по одному на каждое сочетание. Проверить выбор значений; затем преподаватель открывает единое правило стрелкой. Само правило — объяснение выбранных сочетаний, а не полный запрет in/on при движении. В некоторых сочетаниях in/into и on/onto возможны оба; не использовать такие допустимые варианты как ложные дистракторы. Come в примере — движение из палатки к наблюдателю снаружи; отдельную новую тему come/go не добавлять.",
  "A2_MOVE_M05": "предложения 1–4 переработаны из выбора предлогов PDF; 5–7 добавлены для явной практики оставшихся сочетаний. Не добавлять второй подходящий предлог в варианты, например on как заведомо неправильный ответ к onto.",
  "A2_MOVE_M06": "первое прослушивание — общий смысл, второе — действия и направления, а не только имя собаки. Не показывать старые картинки как точную раскадровку: в PDF через бревно прыгает девушка, а в записи — собака. Здесь достаточно аудио и текстовых вариантов. Не выводить слова с ключами в заголовке или заранее раскрытом транскрипте.",
  "A2_MOVE_M07": "ситуации задают направление, а не готовый ответ. Ученица выбирает нужный предлог и строит предложение; не нужно использовать каждое слово подсказки буквально. В №3 допустимы because и два коротких предложения вместо so. В №1 Mark climbed the ladder грамматически возможно: предложить добавить up для явного направления, не объявлять предложение неверным. Проверять целевое сочетание и смысл, а не точное совпадение с образцом.",
- "A2_MOVE_M08": "цель — объяснить действия и путь, не расшифровать условные записи «not on it → on it». Ситуации вымышленные, не трактовка отсутствующего изображения. Попросить несколько связанных предложений, а не список предлогов. Две истории суммарно позволяют использовать семь сочетаний; если на самостоятельном этапе нужна опора, это отмечается, а не маскируется чтением образца.\nСлова then/when/and могут естественно связывать речь, но здесь не нужно сдавать дополнительный тест на sequencers или считать обязательным предварительное прохождение A2_SEQ. Не требовать ритуально все варианты из банка. Около минуты на подготовку, затем рассказы и короткие вопросы; при быстром выполнении попросить добавить один собственный эпизод движения, а не новый грамматический материал.",
+ "A2_MOVE_M08": "Две короткие истории по заметкам, без обязательной картинки: прогулка по холмам и прогулка с собакой. Первая переносит climb over / climb up / step onto в понятную последовательность пути; вторая — come out of / run around / jump over / move into в историю прогулки и возвращения из-за дождя. Заметки задают факты, но не готовые предложения: ученица выбирает формы глаголов, предлоги и связки, добавляет свою деталь. Допустимы разные естественные рассказы; не требовать буквального совпадения с образцом. Ориентир — 3–4 предложения на ситуацию и короткий обмен вопросами. Useful phrases открыты, образец доступен только после попытки через стрелку преподавателя и отдельное раскрытие. Дать около 30 секунд на подготовку; весь этап занимает примерно 4 минуты. Если позже будет предоставлена картинка, сначала сверить её сюжет с этой редакцией.",
  "A2_MOVE_M09": "проверить одно возникшее смешение направлений и попросить ученицу исправить своё предложение. Итог — не только название действий, но и понятный путь: вверх, через, на поверхность, внутрь, наружу, вокруг. Завершить занятие на 30-й минуте."
 };
 const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
@@ -224,9 +224,20 @@ move.push(step('Phrase Input',4,S('A2_MOVE_M02','Match the pictures with the phr
  }])
 ],{progressive:true,requireCheckBeforeNext:true})));
 move.push(step('Pronunciation',3,repeat('A2_MOVE')));
-move.push(step('Rule and Check',3,S('A2_MOVE_M04','Как описать направление движения',[
- R('A2_MOVE_M04-rule','Как описать направление движения','movement'),
- C('A2_MOVE_M04-check','Choose the correct answer.',[Q('1','“He climbed over the wall.” Where was he after that?',['On the other side of the wall.','At the bottom of the wall, on the same side.','On a ladder inside a room.'],'A','He was on the other side of the wall.',['on the other side of the wall'])])
+const movementMeaning=(id,sentence,target,options,key,answer)=>({
+ ...Q(id,sentence+'\nWhat does the highlighted phrase mean?',options,key,answer),promptHighlights:[target]
+});
+move.push(step('Rule and Check',4,S('A2_MOVE_M04','Read the examples and choose the meaning.',[
+ C('A2_MOVE_M04-discovery','Read the examples and choose the meaning.',[
+  movementMeaning('climb-up','The cat climbed up the tree to reach a branch.','climbed up',['It came down towards the ground.','It went higher into the tree.','It went round the tree.'],'B','The cat went higher into the tree.'),
+  movementMeaning('climb-over','The gate was locked, so Sam climbed over the low wall.','climbed over',['He reached the top and stayed there.','He went through an opening in it.','He crossed the top to the other side.'],'C','Sam crossed the top of the wall to reach the other side.'),
+  movementMeaning('jump-over','Lena jumped over the puddle and landed on dry ground.','jumped over',['She crossed it in one jump.','She jumped into the water.','She walked round its edge.'],'A','Lena crossed the puddle in one jump.'),
+  movementMeaning('step-onto','To see better, Alex stepped onto a low rock.','stepped onto',['He walked past the rock.','He stepped down from the rock.','He went from the ground onto its surface.'],'C','Alex stepped from the ground onto the surface of the rock.'),
+  movementMeaning('move-into','It started to rain, so we moved into the café.','moved into',['We went from inside to outside.','We went from outside to inside.','We walked past it and stayed outside.'],'B','We went from outside to inside the café.'),
+  movementMeaning('come-out-of','I was waiting outside when Nina came out of the shop.','came out of',['She left the inside and joined me outside.','She entered the shop from the street.','She stayed inside near the door.'],'A','Nina left the shop and joined me outside.'),
+  movementMeaning('run-around','The dog ran around the tree in a circle.','ran around',['It ran straight towards the tree.','It ran in a circle round the tree.','It ran past the tree in a straight line.'],'B','The dog ran in a circle round the tree.')
+ ]),
+ R('A2_MOVE_M04-rule','Как описать направление движения','movement')
 ],{progressive:true,requireCheckBeforeNext:true})));
 const gap=(id,before,options,answer,after)=>({id,segments:[before,{id:`A2_MOVE_M05-${id}`,options,answers:[answer]},after]});
 move.push(step('Controlled Practice',3,E('A2_MOVE_M05','gaps','Choose the correct preposition.',{
@@ -254,18 +265,18 @@ move.push(step('Guided Writing',3,W('A2_MOVE_M07','Describe what happened.',[
  {id:'2',prompt:'Anna / jump / puddle / the other side / one jump',possibleAnswers:['Anna jumped over the puddle.']},
  {id:'3',prompt:'outside the house / rain / move / inside the kitchen',possibleAnswers:['It started to rain, so we moved into the kitchen.']}
 ],{instruction:'Use the prompts and phrases from this lesson. Write complete sentences in the past.'})));
-move.push(step('Final Speaking',5,S('A2_MOVE_M08','Tell your partner what happened.',[
- P('A2_MOVE_M08-story1','Story 1 — At an activity centre',[
-  T('Mark used a ladder to reach a low platform. A wall was the next part of the activity. He couldn’t jump over it.\nExplain how he got to the platform and then to the other side of the wall.\nUse: climb / step\n\nAsk your partner one question about the story. You can add your own details.'),
-  D('Useful phrases','He climbed …\nHe stepped …\nHow did …?\nWhere did …?',true)
+move.push(step('Final Speaking',4,S('A2_MOVE_M08','Tell your partner what happened.',[
+ P('A2_MOVE_M08-story1','Story 1 — A walk in the hills',[
+  T('You and a friend went for a walk in the hills. Tell your partner how you reached a place with a great view.\n\nNotes:\nlow wall across the path / other side\nsteep hill / top\nflat rock / a better view\n\nUse: climb / step\nAdd one detail of your own. Your partner asks one question.'),
+  D('Useful phrases','On the way, …\nAt the top, …\nWe wanted to …\nHow did …?',true)
  ]),
- sample('A2_MOVE_M08-sample1','Tell your partner what happened.','Mark climbed up the ladder and stepped onto the platform. Then he climbed over the wall to get to the other side.'),
- P('A2_MOVE_M08-story2','Story 2 — At the campsite',[
-  T('You were outside a tent. Your dog was inside.\nThe dog left the tent, went round a tree and crossed a log in one jump. Then it started to rain.\nExplain what the dog did and where you all went.\nUse: come / run / jump / move\n\nAsk your partner one question about the story. You can add your own details.'),
-  D('Useful phrases','Our dog came …\nIt ran …\nIt jumped …\nWe moved …\nHow did …?\nWhere did …?',true)
+ sample('A2_MOVE_M08-sample1','Tell your partner what happened.','A low wall crossed the path, so we climbed over it. Then we climbed up a steep hill. At the top, we stepped onto a flat rock to get a better view. We could see the sea from there.'),
+ P('A2_MOVE_M08-story2','Story 2 — A walk with your dog',[
+  T('You and your dog were in a café near the park. Tell your partner what happened when you went outside and why you went back.\n\nNotes:\ncafé / outside\ndog / tree / circle\npuddle / other side / one jump\nrain / café / inside\n\nUse: come / run / jump / move\nDecide who jumped over the puddle. Add one detail of your own. Then change roles.'),
+  D('Useful phrases','At first, …\nMy dog …\nI decided to …\nWhen it started to rain, …\nWhat happened next?',true)
  ]),
- sample('A2_MOVE_M08-sample2','Tell your partner what happened.','Our dog came out of the tent. It ran around a tree and jumped over a log. When it started to rain, we all moved into the tent.')
-],{progressive:true,instruction:'Use the situations and verbs to tell two short stories in the past.'})));
+ sample('A2_MOVE_M08-sample2','Tell your partner what happened.','We came out of the café and went to the park. My dog ran around a tree, and I jumped over a puddle to follow him. Then it started to rain, so we moved back into the café. We waited there until the rain stopped.')
+],{progressive:true,instruction:'Use the notes and verbs. Tell each story in three or four sentences in the past.'})));
 
 function attach(value,slots){
  if(!value||typeof value!=='object')return;

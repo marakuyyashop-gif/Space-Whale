@@ -28,3 +28,11 @@ Each crop is 352 × 420 pixels, with top-left coordinates in source pixels:
 | IMG06 | step onto | 850 | 653 |
 
 Only outer card frames and empty writing boxes were excluded. Characters, actions, direction arrows and numbers remain. The combined sheet arranges these unscaled crops in 3 × 2 order with 16-pixel white spacing, resulting in 1120 × 888 pixels. WebP copies are optimized for delivery; source pixels are not regenerated or stretched.
+
+## Latest content revision: movement discovery and speaking
+
+A2_MOVE_M04 now starts with seven contextual meaning questions (climb up / climb over / jump over / step onto / move into / come out of / run around). A single rule follows only after checking or skipping and the teacher arrow. The old isolated wall question was removed. The stage ID and rule ID stay unchanged; the new response ID is A2_MOVE_M04-discovery so old answers do not apply to different questions.
+
+A2_MOVE_M08 retains two sequential speaking situations and closed samples, now based on short notes: a walk in the hills and a walk with a dog near a café. No new image is required. If the user supplies an illustration later, check it against these scenarios before connecting it. This revision supersedes WORK for these two stages.
+
+Timing: Rule and Check 4 min; Final Speaking 4 min. Total remains 28 min of activities plus 2 min feedback. All other stages and media are unchanged.
