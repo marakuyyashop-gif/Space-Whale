@@ -4,11 +4,12 @@
 // Empty media slots are intentional; scripts and text tasks are usable now.
 const kit=window.SpaceWhaleExerciseKit;
 const registry=window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
+const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
 const media={
   "b1-1-w1-misha-1": {
     "B1D1_DIALOGUE": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/dialogues/b1-1-w1-misha-1-dialogue-s090.mp3",
       "script": "Dana: I like my job, but I’d love to choose my own hours.\nChris: Would you go freelance if you had a few regular clients?\nDana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.\nChris: Fair enough. What about working from home?\nDana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.\nChris: Would you rent an apartment on your own?\nDana: If I earned more, I would. For now, it’s too expensive.\nChris: What would you do if a company offered you a full-time job with better hours?\nDana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind.",
       "transcriptId": "B1D1_TRANSCRIPT"
     },
@@ -25,69 +26,69 @@ const media={
     },
     "B1D1_W01": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W01.mp3",
       "script": "rent an apartment"
     },
     "B1D1_E01": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E01.mp3",
       "script": "We want to rent an apartment near the station."
     },
     "B1D1_W02": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W02.mp3",
       "script": "move in together"
     },
     "B1D1_E02": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E02.mp3",
       "script": "They’re planning to move in together next month."
     },
     "B1D1_W03": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W03.mp3",
       "script": "go freelance"
     },
     "B1D1_E03": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E03.mp3",
       "script": "My cousin wants to go freelance, but she needs more clients."
     },
     "B1D1_W04": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W04.mp3",
       "script": "turn down an offer"
     },
     "B1D1_E04": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E04.mp3",
       "script": "The hours were too long, so I turned the offer down."
     },
     "B1D1_W05": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W05.mp3",
       "script": "change your mind"
     },
     "B1D1_E05": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E05.mp3",
       "script": "You can change your mind before Friday."
     },
     "B1D1_W06": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_W06.mp3",
       "script": "take a chance"
     },
     "B1D1_E06": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l1/listen-repeat/B1D1_E06.mp3",
       "script": "I don’t know anyone there, but I’m ready to take a chance."
     }
   },
   "b1-1-w1-misha-2": {
     "B1D2_DIALOGUE": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/dialogues/b1-1-w1-misha-2-dialogue-s090.mp3",
       "script": "Leah: I have an interview for a weekend job at a café. My exam’s in three weeks, but the money would help.\nOwen: If I were you, I’d ask how many weekends they need you to work.\nLeah: I checked. Every weekend for the next month.\nOwen: In your position, I wouldn’t agree to that. You need time to revise.\nLeah: The interview’s tomorrow. I don’t want to cancel it.\nOwen: You don’t have to. I’d prepare a few questions and ask about starting after the exam.\nLeah: And if they need someone straight away?\nOwen: I’d refuse the job for now. In your situation, the exam would come first.\nLeah: That sounds fair. I’ll go to the interview and explain.",
       "transcriptId": "B1D2_TRANSCRIPT"
     },
@@ -104,62 +105,62 @@ const media={
     },
     "B1D2_W01": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W01.mp3",
       "script": "prepare"
     },
     "B1D2_E01": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E01.mp3",
       "script": "I need to prepare for my interview tomorrow."
     },
     "B1D2_W02": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W02.mp3",
       "script": "revise"
     },
     "B1D2_E02": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E02.mp3",
       "script": "I’m going to revise the difficult topics before the exam."
     },
     "B1D2_W03": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W03.mp3",
       "script": "concentrate"
     },
     "B1D2_E03": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E03.mp3",
       "script": "It’s hard to concentrate on my work with all this noise."
     },
     "B1D2_W04": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W04.mp3",
       "script": "avoid"
     },
     "B1D2_E04": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E04.mp3",
       "script": "I try to avoid checking my phone during meetings."
     },
     "B1D2_W05": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W05.mp3",
       "script": "consider"
     },
     "B1D2_E05": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E05.mp3",
       "script": "We’re going to consider moving to a smaller apartment."
     },
     "B1D2_W06": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_W06.mp3",
       "script": "refuse"
     },
     "B1D2_E06": {
       "type": "audio",
-      "src": null,
+      "src": courseAudioBase+"/b1-1/m1/l2/listen-repeat/B1D2_E06.mp3",
       "script": "She refused to work another weekend."
     }
   }
