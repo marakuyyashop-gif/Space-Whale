@@ -982,6 +982,7 @@
 .exercise-kit.ek-stage-compact>.ek-body>.ek-stage-stack>.ek-stage-section+.ek-stage-section{padding-top:20px}
 .exercise-kit .ek-picture-sentence>.ek-writing{min-width:0;max-width:420px}
 .exercise-kit .ek-writing{white-space:pre-line}
+.exercise-kit.ek-modern textarea.ek-writing-input{height:auto;min-height:152px;border-radius:20px;line-height:1.5;resize:vertical}
 /* A reveal step may include source materials; separators belong between steps. */
 .exercise-kit.ek-stage-sequence>.ek-body>.ek-stage-stack{gap:0}
 .exercise-kit.ek-stage-sequence>.ek-body>.ek-stage-stack>.ek-stage-section+.ek-stage-section{margin-top:var(--sw-stage-gap,48px)}

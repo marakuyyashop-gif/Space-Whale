@@ -1,0 +1,245 @@
+(() => {
+'use strict';
+const kit=window.SpaceWhaleExerciseKit;
+const registry=window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
+const lessonIds={A2_SEQ:'a2-1-w1-smy-1',A2_MOVE:'a2-1-w1-smy-2'};
+const phrases={
+ A2_SEQ:['first','to begin with','then','next','after that','afterwards','later','eventually','finally','in the end'],
+ A2_MOVE:['climb up','climb over','jump over','step onto','move into','come out of','run around']
+};
+const media={};
+for(const prefix of Object.keys(lessonIds)){
+ const slots={};
+ phrases[prefix].forEach((phrase,i)=>{
+  const n=String(i+1).padStart(2,'0');
+  // WORK supplies the phrase list. Exact recording scripts and examples await MEDIA.
+  slots[`${prefix}_P${n}`]={type:'audio',src:null,script:null,workPhrase:phrase};
+  slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
+ });
+ slots[`${prefix}_STORY`]={type:'audio',src:null,script:null,transcriptId:`${prefix}_STORY_TEXT`};
+ slots[`${prefix}_STORY_TEXT`]={type:'text',text:null};
+ if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:null,alt:'Pictures of her day'};
+ else{
+  slots.A2_MOVE_SHEET={type:'image',src:null,alt:'Six scenes showing movement'};
+  for(let i=1;i<=6;i++)slots[`A2_MOVE_IMG0${i}`]={type:'image',src:null,alt:`Picture ${i}`};
+ }
+ for(const [id,value] of Object.entries(registry[lessonIds[prefix]]||{}))slots[id]={...slots[id],...value};
+ media[prefix]=slots;registry[lessonIds[prefix]]=slots;
+}
+const ruleTexts={
+ "sequence": {
+  "text": "Чтобы собеседник понял порядок событий, используйте слова-связки. First вводит первое действие: First, we checked the address. To begin with означает «для начала» и помогает обозначить исходную ситуацию или первый этап.\n\nДля перехода к следующему событию подходят then, next, after that и afterwards: We had lunch. Afterwards, we went for a walk. Здесь вместо afterwards можно сказать after that или then. Later означает «позже», без указания точного промежутка: Later, we met some friends.\n\nFinally может вводить последнее действие: Finally, we went home. Оно также может означать «наконец-то». Eventually подчёркивает результат спустя время, часто после поисков, ожидания или трудностей: We looked for an hour. Eventually, we found the hotel. В этом примере возможно и finally. Eventually не выбирают просто потому, что действие стоит последним в списке.\n\nIn the end показывает, чем закончилась ситуация: We wanted to walk, but it rained. In the end, we took a taxi. Значения in the end, finally и eventually могут пересекаться; выбирайте выражение по смыслу рассказа.\n\nСвязка может стоять в начале предложения, как в примерах, а eventually и finally также часто стоят перед основным глаголом: We eventually found the hotel.",
+  "highlights": [
+   "First",
+   "First, we checked the address.",
+   "To begin with",
+   "then",
+   "next",
+   "after that",
+   "afterwards",
+   "We had lunch. Afterwards, we went for a walk.",
+   "Later",
+   "Later, we met some friends.",
+   "Finally",
+   "Finally, we went home.",
+   "Eventually",
+   "We looked for an hour. Eventually, we found the hotel.",
+   "In the end",
+   "We wanted to walk, but it rained. In the end, we took a taxi.",
+   "We eventually found the hotel."
+  ]
+ },
+ "movement": {
+  "text": "Глагол показывает способ движения, а предлог — путь. Climb up the ladder — подняться по лестнице вверх. Climb over the wall — перелезть через стену на другую сторону. Если препятствие преодолевают прыжком, используйте jump over: She jumped over the log.\n\nOnto показывает переход на поверхность: She stepped onto the rock. Сравните: She is on the rock описывает положение, а не переход.\n\nInto показывает перемещение внутрь: It started to rain, so we moved into the tent. Здесь move into означает «переместиться внутрь», не «переехать жить». Out of показывает обратное направление: I was outside when she came out of the tent. Перед названием места сохраняйте обе части: out of the tent.\n\nAround описывает путь вокруг предмета: The dog ran around the tree. Предлог не меняется из-за времени; форму времени получает глагол: run → ran, come → came.",
+  "highlights": [
+   "Climb up the ladder",
+   "Climb over the wall",
+   "jump over",
+   "She jumped over the log.",
+   "Onto",
+   "She stepped onto the rock.",
+   "She is on the rock",
+   "Into",
+   "It started to rain, so we moved into the tent.",
+   "Out of",
+   "I was outside when she came out of the tent.",
+   "out of the tent",
+   "Around",
+   "The dog ran around the tree.",
+   "run → ran",
+   "come → came"
+  ]
+ }
+};
+const teacherNotes={
+ "A2_SEQ_M01": "попросить коротко рассказать об одном событии или выходе из дома, а не перечислять весь распорядок. При затруднении с содержанием предложить знакомый пример: встреча с другом или поездка. Проверяется уже текущий навык — понятная последовательность. Не разворачивать отдельную практику I was / I went или прошедшего времени. Не требовать новых связок без опоры до их объяснения.",
+ "A2_SEQ_M04": "оценивается значение в данном контексте, не якобы единственно возможная английская связка. Обсуждение других естественных формулировок допустимо.",
+ "A2_SEQ_M05": "порядок определяется записью, а не произвольной «правильной» расстановкой синонимов. После проверки спросить, какие слова помогли проследить историю.",
+ "A2_SEQ_M06": "проверять порядок, связность, формы знакомых глаголов и уместность выбранных связок. Новая языковая работа — самой построить и соединить предложения; готовый текст для замены then на afterwards не давать. Несколько естественных вариантов допустимы. Не требовать именно eventually: оно уместно при двадцатиминутном ожидании, но finally тоже возможно. Дополнительную деталь ученица может придумать, если она не противоречит заметкам. Мелкая пунктуация и несовпадение с образцом не означают неверный ответ.",
+ "A2_SEQ_M07": "задача — одна история, а не полный рассказ дважды. Действия на рисунке дают основу; проблему и её решение ученица придумывает, а не угадывает по изображению. При затруднении с идеей предложить «не могла найти тетрадь», не диктуя предложения.\nНа подготовку около минуты. Ожидаются примерно 5–7 предложений, несколько естественных переходов, понятный результат и короткий обмен вопросами. Можно объединить события; точное число предложений не является критерием правильности. Не требовать все десять связок и не поощрять связку перед каждым предложением ради количества. Сравнить самостоятельность и понятность рассказа с первой попыткой в M01, не скорость речи.",
+ "A2_SEQ_M08": "отметить один удачный переход, предложить исправить один реально возникший сбой. Попросить ещё раз сформулировать начало и окончание рассказа. Завершить занятие на 30-й минуте; объём обратной связи подстроить под фактический темп, не объявлять неосвоенный материал усвоенным.",
+ "A2_MOVE_M01": "первая попытка описать именно способ и направление движения. Опоры с новым target здесь допустимы; отметить, что ученица сказала самостоятельно, а что с подсказкой. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.",
+ "A2_MOVE_M02": "пояснить при необходимости по-русски: «перелез через стену на другую сторону». Не подставлять сюда картинку climb up и не называть подъём по лестнице примером climb over. Отдельная новая иллюстрация для этого короткого дополнения не нужна.",
+ "A2_MOVE_M04": "это объяснение выбранных сочетаний, а не полный запрет in/on при движении. В некоторых сочетаниях in/into и on/onto возможны оба; не использовать такие допустимые варианты как ложные дистракторы. Come в примере — движение из палатки к наблюдателю снаружи; отдельную новую тему come/go не добавлять.",
+ "A2_MOVE_M05": "предложения 1–4 переработаны из выбора предлогов PDF; 5–7 добавлены для явной практики оставшихся сочетаний. Не добавлять второй подходящий предлог в варианты, например on как заведомо неправильный ответ к onto.",
+ "A2_MOVE_M06": "первое прослушивание — общий смысл, второе — действия и направления, а не только имя собаки. Не показывать старые картинки как точную раскадровку: в PDF через бревно прыгает девушка, а в записи — собака. Здесь достаточно аудио и текстовых вариантов. Не выводить слова с ключами в заголовке или заранее раскрытом транскрипте.",
+ "A2_MOVE_M07": "ситуации задают направление, а не готовый ответ. Ученица выбирает нужный предлог и строит предложение; не нужно использовать каждое слово подсказки буквально. В №3 допустимы because и два коротких предложения вместо so. В №1 Mark climbed the ladder грамматически возможно: предложить добавить up для явного направления, не объявлять предложение неверным. Проверять целевое сочетание и смысл, а не точное совпадение с образцом.",
+ "A2_MOVE_M08": "цель — объяснить действия и путь, не расшифровать условные записи «not on it → on it». Ситуации вымышленные, не трактовка отсутствующего изображения. Попросить несколько связанных предложений, а не список предлогов. Две истории суммарно позволяют использовать семь сочетаний; если на самостоятельном этапе нужна опора, это отмечается, а не маскируется чтением образца.\nСлова then/when/and могут естественно связывать речь, но здесь не нужно сдавать дополнительный тест на sequencers или считать обязательным предварительное прохождение A2_SEQ. Не требовать ритуально все варианты из банка. Около минуты на подготовку, затем рассказы и короткие вопросы; при быстром выполнении попросить добавить один собственный эпизод движения, а не новый грамматический материал.",
+ "A2_MOVE_M09": "проверить одно возникшее смешение направлений и попросить ученицу исправить своё предложение. Итог — не только название действий, но и понятный путь: вверх, через, на поверхность, внутрь, наружу, вокруг. Завершить занятие на 30-й минуте."
+};
+const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
+const T=text=>({type:'text',text});
+const D=(title,text,open=false)=>({type:'disclosure',title,text,open});
+const I=mediaRef=>({type:'image',mediaRef});
+const P=(id,title,blocks,instruction)=>E(id,'presentation',title,{blocks,...(instruction?{instruction}:{})});
+const S=(id,title,children,extra={})=>E(id,'stage',title,{exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
+const C=(id,title,items)=>E(id,'choice',title,{items});
+const Q=(id,prompt,options,correctId,feedbackText,feedbackHighlights=[])=>({id,prompt,options:options.map((text,i)=>({id:String.fromCharCode(65+i),text})),correctId,feedbackText,feedbackHighlights});
+const W=(id,title,items,extra={})=>E(id,'writing',title,{responseMode:'open',revealPossibleAnswers:true,items,...extra});
+const A=(id,title,mediaRef)=>E(id,'audio',title,{mediaRef});
+const R=(id,title,key)=>E(id,'rule-page',title,{blocks:[{type:'rule',title,text:ruleTexts[key].text,highlights:ruleTexts[key].highlights}]});
+const step=(menu,minutes,exercise)=>({menu,navigationTitle:menu,section:'tasks',guide:{time:`${minutes} min`,teacherNotes:teacherNotes[exercise.id]||''},exercise});
+const sample=(id,title,text)=>P(id,title,[D('Possible answers',text)]);
+const sequencers='First, … / To begin with, …\nThen, … / Next, …\nAfter that, … / Afterwards, …\nLater, …\nEventually, … / Finally, …\nIn the end, …';
+function repeat(prefix){
+ return E(`${prefix}_M03`,'audio','Listen and repeat.',{
+  instruction:'Repeat the phrases and sentences aloud.',layout:'listen-repeat',audioPending:true,
+  items:phrases[prefix].map((phrase,i)=>{
+   const n=String(i+1).padStart(2,'0'),mediaRef=`${prefix}_P${n}`,exampleMediaRef=`${prefix}_E${n}`;
+   const example=media[prefix][exampleMediaRef].script;
+   return {id:mediaRef,mediaRef,text:media[prefix][mediaRef].script||phrase,exampleMediaRef,...(example?{example}:{})};
+  })
+ });
+}
+const seq=[];
+seq.push(step('Opening Speaking',2,P('A2_SEQ_M01','Tell the events in order.',[
+ T('What did you do first?\nWhat happened after that?\nHow did it end?'),
+ D('Useful phrases','First, …\nThen, … / After that, …\nFinally, …',true)
+],'Tell your partner about something you did yesterday.')));
+seq.push(step('Language Input',4.5,S('A2_SEQ_M02','Read the short story.',[
+ P('A2_SEQ_M02-story','Read the short story.',[T('First, we went to the park. Then, we found a place near the lake. After that, we had a picnic. Later, it started to rain. Finally, we went to a café and had some tea.')]),
+ C('A2_SEQ_M02-check','Read the short story.',[Q('1','What happened before the picnic?',['It started to rain.','They found a place near the lake.','They had some tea.'],'B','They found a place near the lake.',['found a place near the lake'])]),
+ R('A2_SEQ_M02-rule','Как связать события в рассказ','sequence')
+],{progressive:true,revealStops:[2,3],requireCheckBeforeNext:true})));
+seq.push(step('Pronunciation',3,repeat('A2_SEQ')));
+seq.push(step('Meaning Practice',3,C('A2_SEQ_M04','Choose the meaning.',[
+ Q('1','“To begin with, we checked the address.”\nWhen did they check it?',['At the end of the trip.','Before the other steps.','After a long search.'],'B','They checked the address before the other steps.',['before the other steps']),
+ Q('2','“We had lunch. Afterwards, we went for a walk.”\nWhich sentence keeps the same order?',['We had lunch. After that, we went for a walk.','We went for a walk. Then we had lunch.','We went for a walk before lunch.'],'A','We had lunch. After that, we went for a walk.',['After that']),
+ Q('3','“We looked for the hotel for an hour. Eventually, we found it.”',['They found it immediately.','They didn’t find it.','They found it after a long search.'],'C','They found it after a long search.',['after a long search']),
+ Q('4','“Finally, we went home. That was the last part of our day.”',['Going home was the first event.','Going home was the last event.','They stayed at home all day.'],'B','Going home was the last event.',['the last event']),
+ Q('5','“We wanted to take a bus. There were no more buses. In the end, we took a taxi.”',['Taking a taxi was their first plan.','They took a taxi before looking for a bus.','Taking a taxi was how the situation ended.'],'C','Taking a taxi was how the situation ended.',['how the situation ended'])
+])));
+seq.push(step('Listening',5,S('A2_SEQ_M05','Listen to the story.',[
+ A('A2_SEQ_M05-audio','Listen to the story.','A2_SEQ_STORY'),
+ C('A2_SEQ_M05-main','Listen to the story.',[Q('1','What problem did the speaker have?',['She couldn’t find her phone after lunch.','She couldn’t find the café.','She lost her bag on a bus.'],'A','She couldn’t find her phone after lunch.',['couldn’t find her phone'])]),
+ E('A2_SEQ_M05-order','order','Put the events in the order you hear them.',{
+  instruction:'Listen again.',tokens:[
+   {id:'C',text:'She asked the waiter for help.'},{id:'D',text:'The waiter found the phone.'},
+   {id:'B',text:'She checked her bag.'},{id:'A',text:'She called her friend.'},{id:'E',text:'She looked in her jacket pockets.'}
+  ],correctOrder:['B','E','C','D','A']
+ })
+],{progressive:true,revealStops:[2,3],requireCheckBeforeNext:true,transcriptRef:'A2_SEQ_STORY_TEXT',transcriptAfterRefs:['A2_SEQ_M05-order']})));
+seq.push(step('Guided Writing',4.5,S('A2_SEQ_M06','Write a message to a friend.',[
+ P('A2_SEQ_M06-notes','Write a message to a friend.',[
+  T('You are at a café now. Tell your friend about your journey and what happened next.\n\nNotes:\ngo to the bus stop / wait for twenty minutes\nbus arrive\nmeet your sister at the café\nhave lunch together\n\nUse three different phrases from this lesson.'),
+  D('Useful phrases',sequencers,true)
+ ]),
+ W('A2_SEQ_M06-writing','Write a message to a friend.',[{id:'message',prompt:'Your message',multiline:true,possibleAnswers:['First, I went to the bus stop and waited for twenty minutes. Eventually, the bus arrived. After that, I met my sister at the café. In the end, we had a nice lunch together.']}])
+],{layout:'grouped',instruction:'Use the notes. Write four or five sentences and link the events.'})));
+seq.push(step('Final Speaking',6,S('A2_SEQ_M07','Tell the story of her day.',[
+ P('A2_SEQ_M07-speaking','Tell the story of her day.',[
+  I('A2_SEQ_DAY'),T('What happened first and next?\nWhat problem did she have?\nWhat did she do about it?\nHow did her day end?\n\nTell one connected story. Then ask your partner one question about it.'),
+  D('Useful phrases','First, … / To begin with, …\nThen, … / Next, …\nAfter that, … / Afterwards, …\nLater, …\nFinally, …\nEventually, …\nIn the end, …',true),
+  D('Optional help','wake up → woke up\nhave breakfast → had breakfast\npack a bag → packed a bag\ngo to class → went to class\nwrite → wrote\nread → read')
+ ]),
+ sample('A2_SEQ_M07-sample','Tell the story of her day.','First, she woke up and had breakfast. Next, she packed her bag, but she couldn’t find her notebook. She looked for it for ten minutes. Eventually, she found it under her bag. After that, she went to class and took some notes. Later, she came home and read a book. In the end, she was happy with her day.')
+],{progressive:true,instruction:'Use the pictures and add one problem you invent. Tell the story in the past.'})));
+
+const move=[];
+move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe how they move.',[
+ I('A2_MOVE_SHEET'),T('How does the boy get to the top?\nHow does the girl get to the other side of the log?'),
+ D('Useful phrases','He is climbing …\nShe is jumping …\nup … / over …',true)
+],'Look at pictures 4 and 2. Describe the action and direction.')));
+move.push(step('Phrase Input',4,S('A2_MOVE_M02','Match the pictures with the phrases.',[
+ E('A2_MOVE_M02-match','matching','Match the pictures with the phrases.',{
+  layout:'picture-word',items:['move into','jump over','run around','climb up','come out of','step onto'].map((phrase,i)=>({id:`A2_MOVE_IMG0${i+1}`,mediaRef:`A2_MOVE_IMG0${i+1}`,text:`Picture ${i+1}`,correctId:phrase.replaceAll(' ','-')})),
+  options:['step onto','run around','jump over','climb up','move into','come out of'].map(text=>({id:text.replaceAll(' ','-'),text}))
+ }),
+ P('A2_MOVE_M02-extra','Read one more phrase.',[T('climb over a wall — get to the other side of a wall by climbing\nHe climbed over the low wall because the gate was closed.')])
+],{progressive:true,requireCheckBeforeNext:true})));
+move.push(step('Pronunciation',3,repeat('A2_MOVE')));
+move.push(step('Rule and Check',3,S('A2_MOVE_M04','Как описать направление движения',[
+ R('A2_MOVE_M04-rule','Как описать направление движения','movement'),
+ C('A2_MOVE_M04-check','Choose the correct answer.',[Q('1','“He climbed over the wall.” Where was he after that?',['On the other side of the wall.','At the bottom of the wall, on the same side.','On a ladder inside a room.'],'A','He was on the other side of the wall.',['on the other side of the wall'])])
+],{progressive:true,requireCheckBeforeNext:true})));
+const gap=(id,before,options,answer,after)=>({id,segments:[before,{id:`A2_MOVE_M05-${id}`,options,answers:[answer]},after]});
+move.push(step('Controlled Practice',3,E('A2_MOVE_M05','gaps','Choose the correct preposition.',{
+ inputMode:'select',items:[
+  gap('1','The boy climbed ',['into','over','out of'],'over',' the fence and got to the other side.'),
+  gap('2','She stepped ',['onto','around','out of'],'onto',' the platform and looked down at the water.'),
+  gap('3','I was waiting outside the tunnel. The dog came ',['onto','up','out of'],'out of',' it and ran towards me.'),
+  gap('4','We climbed ',['into','out of','up'],'up',' the hill until we reached the top.'),
+  gap('5','We were outside the house. It started to rain, so we moved ',['into','over','around'],'into',' the kitchen.'),
+  gap('6','The dog ran ',['around','into','over'],'around',' the tree in a circle.'),
+  gap('7','She jumped ',['around','over','out of'],'over',' the puddle and landed on the other side.')
+ ]
+})));
+move.push(step('Listening',5,S('A2_MOVE_M06','Listen to the story.',[
+ A('A2_MOVE_M06-audio','Listen to the story.','A2_MOVE_STORY'),
+ C('A2_MOVE_M06-main','Listen to the story.',[Q('1','What is the story about?',['Learning to climb a tree.','A camping day when it started to rain.','Looking for a lost dog.'],'B','It is about a camping day when it started to rain.',['a camping day'])]),
+ C('A2_MOVE_M06-details','Listen again and choose the correct answers.',[
+  Q('1','What did Max do after he came out of the tent?',['He ran around a tree and jumped over a log.','He jumped onto a rock and ran into the tent.','He climbed over a wall and ran around the lake.'],'A','He ran around a tree and jumped over a log.',['ran around a tree','jumped over a log']),
+  Q('2','What did Sara do to take a photo of Max?',['She climbed up a tree.','She stepped over a log.','She stepped onto a rock.'],'C','She stepped onto a rock.',['stepped onto a rock']),
+  Q('3','What did everyone do when it started to rain?',['They ran around a tree.','They moved into the tent.','They climbed over a wall.'],'B','They moved into the tent.',['moved into the tent'])
+ ])
+],{progressive:true,revealStops:[2,3],requireCheckBeforeNext:true,transcriptRef:'A2_MOVE_STORY_TEXT',transcriptAfterRefs:['A2_MOVE_M06-main','A2_MOVE_M06-details']})));
+move.push(step('Guided Writing',3,W('A2_MOVE_M07','Describe what happened.',[
+ {id:'1',prompt:'Mark / climb / ladder / reach the top',possibleAnswers:['Mark climbed up the ladder to reach the top.']},
+ {id:'2',prompt:'Anna / jump / puddle / the other side / one jump',possibleAnswers:['Anna jumped over the puddle.']},
+ {id:'3',prompt:'outside the house / rain / move / inside the kitchen',possibleAnswers:['It started to rain, so we moved into the kitchen.']}
+],{instruction:'Use the prompts and phrases from this lesson. Write complete sentences in the past.'})));
+move.push(step('Final Speaking',5,S('A2_MOVE_M08','Tell your partner what happened.',[
+ P('A2_MOVE_M08-story1','Story 1 — At an activity centre',[
+  T('Mark used a ladder to reach a low platform. A wall was the next part of the activity. He couldn’t jump over it.\nExplain how he got to the platform and then to the other side of the wall.\nUse: climb / step\n\nAsk your partner one question about the story. You can add your own details.'),
+  D('Useful phrases','He climbed …\nHe stepped …\nHow did …?\nWhere did …?',true)
+ ]),
+ sample('A2_MOVE_M08-sample1','Story 1 — At an activity centre','Mark climbed up the ladder and stepped onto the platform. Then he climbed over the wall to get to the other side.'),
+ P('A2_MOVE_M08-story2','Story 2 — At the campsite',[
+  T('You were outside a tent. Your dog was inside.\nThe dog left the tent, went round a tree and crossed a log in one jump. Then it started to rain.\nExplain what the dog did and where you all went.\nUse: come / run / jump / move\n\nAsk your partner one question about the story. You can add your own details.'),
+  D('Useful phrases','Our dog came …\nIt ran …\nIt jumped …\nWe moved …\nHow did …?\nWhere did …?',true)
+ ]),
+ sample('A2_MOVE_M08-sample2','Story 2 — At the campsite','Our dog came out of the tent. It ran around a tree and jumped over a log. When it started to rain, we all moved into the tent.')
+],{progressive:true,instruction:'Use the situations and verbs to tell two short stories in the past.'})));
+
+function attach(value,slots){
+ if(!value||typeof value!=='object')return;
+ if(value.mediaRef){
+  const slot=slots[value.mediaRef];if(!slot)throw Error('Unknown Smy media slot: '+value.mediaRef);
+  if(slot.type==='image')Object.assign(value,{assetId:value.mediaRef,alt:slot.alt},slot.src?{image:slot.src,imageWidth:slot.width,imageHeight:slot.height}:{imagePending:true});
+  if(slot.type==='audio'){
+   Object.assign(value,{audioId:value.mediaRef},slot.src?{audio:slot.src}:{audioPending:true});
+   if(value.kind==='audio'&&!slot.src)value.instruction='Аудио пока не добавлено.';
+  }
+ }
+ if(value.exampleMediaRef){value.exampleAudioId=value.exampleMediaRef;const slot=slots[value.exampleMediaRef];if(slot.src)value.exampleAudio=slot.src;}
+ if(value.transcriptRef){
+  const transcript=slots[value.transcriptRef]?.text;
+  if(typeof transcript==='string'&&transcript.trim())Object.assign(value,{transcript,transcriptTitle:'Transcript',transcriptAfter:value.transcriptAfterRefs});
+  else value.transcriptPending=true;
+ }
+ Object.values(value).forEach(child=>{if(Array.isArray(child))child.forEach(item=>attach(item,slots));else if(child&&typeof child==='object')attach(child,slots);});
+}
+const lessons=[
+ {id:lessonIds.A2_SEQ,title:'Уроки для Smy 1',topic:'Рассказываем события по порядку',level:'A2.1',whale:1,summary:'Связываем события в понятный рассказ и объясняем, чем закончилась история.',grammar:phrases.A2_SEQ.join('; '),stages:seq,feedback:{id:'A2_SEQ_M08',minutes:2,teacherNotes:teacherNotes.A2_SEQ_M08}},
+ {id:lessonIds.A2_MOVE,title:'Уроки для Smy 2',topic:'Взбираемся на высоту',level:'A2.1',whale:1,summary:'Описываем способ и направление движения в коротких рассказах.',grammar:phrases.A2_MOVE.join('; '),stages:move,feedback:{id:'A2_MOVE_M09',minutes:2,teacherNotes:teacherNotes.A2_MOVE_M09}}
+];
+for(const [i,lesson] of lessons.entries()){
+ lesson.durationMinutes=30;lesson.plannedTeachingMinutes=28;lesson.feedbackMinutes=2;
+ lesson.source='docs/lessons/smy-a21-work-v2.txt';
+ const final=lesson.stages[lesson.stages.length-1];final.guide.teacherNotes+='\n\nПоследние 2 минуты — обратная связь: '+lesson.feedback.teacherNotes;
+ attach(lesson,media[i===0?'A2_SEQ':'A2_MOVE']);
+ lesson.stages.forEach(stage=>kit.validate(stage.exercise));
+}
+window.SpaceWhaleContent=window.SpaceWhaleContent||[];
+window.SpaceWhaleContent.push(...lessons);
+})();

@@ -1,0 +1,412 @@
+ДВА УРОКА ПО PDF «КАТАЛОГ УРОКОВ»
+Сценарий для WORK · редакция 2 · 27.09.2026
+Заменяет редакцию 1 этих двух сценариев. Это не два дополнительных урока.
+
+ОБЛАСТЬ РАБОТЫ
+Это адаптация содержания, а не перенос оформления PDF. Использовать существующие компоненты сайта; дизайн, шрифты, цвета, кнопки и общую навигацию не менять.
+Две темы оформлены как два самостоятельных занятия по 30 минут. Сценарные ID A2_SEQ и A2_MOVE не являются подтверждёнными ID уроков в репозитории. При размещении сопоставить их с нужными темами второй ученицы; другие уроки не заменять.
+Профиль ученицы по последнему уточнению пользователя: переход A2.1 → A2.2, середина A2; пройден A1 и материал A2.1. Полного поурочного журнала освоения нет: не считать автоматически освоенными все темы A2 или A2.2. Past Simple и отдельные формы Past Continuous уже есть в предоставленном PDF и используются здесь как рабочая база, не как новый предмет обучения. При конкретной трудности дать локальную опору, а не превращать занятие в повторение начального A1.
+Фокус каждого этапа, включая Opening Speaking, — текущая тема. В A2_SEQ это связь событий и результат истории; в A2_MOVE — способ и направление движения. Знакомые слова и времена служат этой задаче. Отдельных упражнений на прошлые темы, проверки названий одежды или отвлечённого small talk здесь нет.
+Opening Speaking — первая попытка выполнить задачу текущего урока до объяснения. Целевые выражения могут быть в открытых опорах; их самостоятельное уверенное употребление ещё не является условием допуска к уроку. Преподаватель различает ответ с опорой и без неё.
+Все интервалы ниже включают инструкцию, выполнение, переключения и короткую проверку. Последние 2 минуты — обратная связь. Бюджет каждого урока ровно 30 минут; это не обещание одинакового темпа любой ученицы. При задержке сократить повторные попытки уже выполненных однотипных пунктов, а не убирать всю продуктивную часть. К 22-й минуте в A2_SEQ и к 23-й в A2_MOVE перейти к итоговому Speaking; в 28:00 начать обратную связь. Незавершённые пункты отметить, не объявлять освоенными.
+
+ОБЩИЙ ФОРМАТ
+Title — основное действие. Subtitle показывать только там, где он указан: не дописывать дубль заголовка.
+Body — текст, вопросы и задания. Вопросы под изображением, каждый с новой строки. Несколько коротких пунктов одного упражнения показывать компактно вместе.
+Useful phrases доступны сразу. Possible answers закрыты по умолчанию; после попытки ученик может раскрыть их отдельно. Они не означают единственный допустимый ответ.
+KEY и TEACHER — служебные поля, не текст ученического экрана. Открытые задания проверяются по смыслу и целевому материалу, а не точным совпадением с образцом.
+В закрытых заданиях использовать указанные ключи и порядок вариантов. Банк Matching/Order не должен повторять порядок ответов.
+Примеры и правило не требуют OK. При последовательном раскрытии после информационного блока доступна обычная стрелка; OK используется у проверяемого упражнения. Не прятать практику за условием проверки несуществующего ответа.
+Медиа подключаются по ID из отдельного файла MEDIA. Тексты аудио брать оттуда без дописывания. Пока записи нет, не выдавать пустой плеер за готовое аудио. Для проведения до озвучки преподаватель может прочитать точный сценарий, не показывая его ученице.
+
+============================================================
+УРОК A2_SEQ — РАССКАЗЫВАЕМ СОБЫТИЯ ПО ПОРЯДКУ
+============================================================
+
+Результат: ученица связывает 5–6 событий в понятный рассказ в прошедшем времени, обозначает начало, дальнейшие события и завершение; понимает оттенок ожидания/поиска у eventually и значение итога у in the end.
+Материал карточки сохранён: first; to begin with; then; next; after that; afterwards; later; eventually; finally; in the end.
+Новых предметных слов не добавляем. Все десять единиц остаются в знакомстве, объяснении и произношении; они не равны десяти совершенно разным функциям. Then / next / after that / afterwards рассматриваются как близкие варианты в подходящем контексте.
+Ожидаемый самостоятельный результат — короткая связная история с несколькими уместными связками, понятным порядком и итогом, а не десять обязательных слов. To begin with и eventually — расширение внутри присланной карточки, а не предполагаемое ранее освоенное знание; давать понятный контекст и опору. Eventually также встречается в смысловой практике и аудировании. Не удалять эти единицы из карточки и не требовать всех их оттенков на уровне середины A2.
+
+ПЛАН: 2 + 4,5 + 3 + 3 + 5 + 4,5 + 6 + 2 = 30 минут.
+
+1. OPENING SPEAKING · A2_SEQ_M01 · 2 минуты
+Механика: Speaking. Изображение не требуется.
+Title: Tell the events in order.
+Subtitle: Tell your partner about something you did yesterday.
+Body:
+What did you do first?
+What happened after that?
+How did it end?
+Useful phrases — открыты:
+First, …
+Then, … / After that, …
+Finally, …
+TEACHER: попросить коротко рассказать об одном событии или выходе из дома, а не перечислять весь распорядок. При затруднении с содержанием предложить знакомый пример: встреча с другом или поездка. Проверяется уже текущий навык — понятная последовательность. Не разворачивать отдельную практику I was / I went или прошедшего времени. Не требовать новых связок без опоры до их объяснения.
+
+2. LANGUAGE INPUT · A2_SEQ_M02 · 4,5 минуты
+Механика: Text → Single Choice → раскрытие Rule.
+Title первой части: Read the short story.
+Body:
+First, we went to the park. Then, we found a place near the lake. After that, we had a picnic. Later, it started to rain. Finally, we went to a café and had some tea.
+
+Вопрос под текстом, виден сразу:
+What happened before the picnic?
+A. It started to rain.
+B. They found a place near the lake.
+C. They had some tea.
+KEY: B.
+
+После попытки по стрелке — ОДНО окно правила.
+Rule title: Как связать события в рассказ
+Rule body:
+Чтобы собеседник понял порядок событий, используйте слова-связки. **First** вводит первое действие: **First, we checked the address.** **To begin with** означает «для начала» и помогает обозначить исходную ситуацию или первый этап.
+
+Для перехода к следующему событию подходят **then**, **next**, **after that** и **afterwards**: **We had lunch. Afterwards, we went for a walk.** Здесь вместо afterwards можно сказать after that или then. **Later** означает «позже», без указания точного промежутка: **Later, we met some friends.**
+
+**Finally** может вводить последнее действие: **Finally, we went home.** Оно также может означать «наконец-то». **Eventually** подчёркивает результат спустя время, часто после поисков, ожидания или трудностей: **We looked for an hour. Eventually, we found the hotel.** В этом примере возможно и finally. Eventually не выбирают просто потому, что действие стоит последним в списке.
+
+**In the end** показывает, чем закончилась ситуация: **We wanted to walk, but it rained. In the end, we took a taxi.** Значения in the end, finally и eventually могут пересекаться; выбирайте выражение по смыслу рассказа.
+
+Связка может стоять в начале предложения, как в примерах, а eventually и finally также часто стоят перед основным глаголом: **We eventually found the hotel.**
+
+3. PRONUNCIATION · A2_SEQ_M03 · 3 минуты
+Механика: Listen & Repeat — текст и Play у слова/фразы; отдельный Play у примера.
+Title: Listen and repeat.
+Subtitle: Repeat the phrases and sentences aloud.
+10 элементов с точными текстами из MEDIA: A2_SEQ_P01–P10 и A2_SEQ_E01–E10.
+Не считать повторение заменой следующей смысловой практики.
+
+4. MEANING PRACTICE · A2_SEQ_M04 · 3 минуты
+Механика: Single Choice. Пять пунктов вместе.
+Title: Choose the meaning.
+
+1. “To begin with, we checked the address.”
+When did they check it?
+A. At the end of the trip.
+B. Before the other steps.
+C. After a long search.
+KEY: B.
+
+2. “We had lunch. Afterwards, we went for a walk.”
+Which sentence keeps the same order?
+A. We had lunch. After that, we went for a walk.
+B. We went for a walk. Then we had lunch.
+C. We went for a walk before lunch.
+KEY: A.
+
+3. “We looked for the hotel for an hour. Eventually, we found it.”
+A. They found it immediately.
+B. They didn’t find it.
+C. They found it after a long search.
+KEY: C.
+
+4. “Finally, we went home. That was the last part of our day.”
+A. Going home was the first event.
+B. Going home was the last event.
+C. They stayed at home all day.
+KEY: B.
+
+5. “We wanted to take a bus. There were no more buses. In the end, we took a taxi.”
+A. Taking a taxi was their first plan.
+B. They took a taxi before looking for a bus.
+C. Taking a taxi was how the situation ended.
+KEY: C.
+TEACHER: оценивается значение в данном контексте, не якобы единственно возможная английская связка. Обсуждение других естественных формулировок допустимо.
+
+5. LISTENING · A2_SEQ_M05 · 5 минут
+Механика: Audio + Single Choice → Audio + Order.
+Audio: A2_SEQ_STORY. Один и тот же плеер доступен в обеих частях.
+Title первой части: Listen to the story.
+Body:
+What problem did the speaker have?
+A. She couldn’t find her phone after lunch.
+B. She couldn’t find the café.
+C. She lost her bag on a bus.
+KEY: A.
+
+После попытки по стрелке — второе задание; аудио остаётся доступным.
+Title второй части: Put the events in the order you hear them.
+Subtitle: Listen again.
+Карточки в начальном порядке:
+C — She asked the waiter for help.
+D — The waiter found the phone.
+B — She checked her bag.
+A — She called her friend.
+E — She looked in her jacket pockets.
+KEY ORDER: B → E → C → D → A.
+Все пять карточек — одно упражнение с общей проверкой, не пять отдельных экранов.
+Транскрипт A2_SEQ_STORY_TEXT доступен для отдельного раскрытия только после этой попытки. До неё текст не подставлять под аудио.
+TEACHER: порядок определяется записью, а не произвольной «правильной» расстановкой синонимов. После проверки спросить, какие слова помогли проследить историю.
+
+6. GUIDED WRITING · A2_SEQ_M06 · 4,5 минуты
+Механика: Writing с проверкой преподавателем. Одно поле для короткого сообщения.
+Title: Write a message to a friend.
+Subtitle: Use the notes. Write four or five sentences and link the events.
+Body:
+You are at a café now. Tell your friend about your journey and what happened next.
+
+Notes:
+go to the bus stop / wait for twenty minutes
+bus arrive
+meet your sister at the café
+have lunch together
+
+Use three different phrases from this lesson.
+[Одно многострочное поле ответа]
+
+Useful phrases — открыты:
+First, … / To begin with, …
+Then, … / Next, …
+After that, … / Afterwards, …
+Later, …
+Eventually, … / Finally, …
+In the end, …
+
+Possible answer — закрыт:
+First, I went to the bus stop and waited for twenty minutes. Eventually, the bus arrived. After that, I met my sister at the café. In the end, we had a nice lunch together.
+
+TEACHER: проверять порядок, связность, формы знакомых глаголов и уместность выбранных связок. Новая языковая работа — самой построить и соединить предложения; готовый текст для замены then на afterwards не давать. Несколько естественных вариантов допустимы. Не требовать именно eventually: оно уместно при двадцатиминутном ожидании, но finally тоже возможно. Дополнительную деталь ученица может придумать, если она не противоречит заметкам. Мелкая пунктуация и несовпадение с образцом не означают неверный ответ.
+
+7. FINAL SPEAKING · A2_SEQ_M07 · 6 минут
+Механика: Speaking + общая картинка из PDF, стр. 14.
+Image: A2_SEQ_DAY.
+Title: Tell the story of her day.
+Subtitle: Use the pictures and add one problem you invent. Tell the story in the past.
+Body под изображением:
+What happened first and next?
+What problem did she have?
+What did she do about it?
+How did her day end?
+
+Tell one connected story. Then ask your partner one question about it.
+
+Useful phrases — открыты:
+First, … / To begin with, …
+Then, … / Next, …
+After that, … / Afterwards, …
+Later, …
+Finally, …
+Eventually, …
+In the end, …
+
+Optional help — по нажатию, не готовые предложения:
+wake up → woke up
+have breakfast → had breakfast
+pack a bag → packed a bag
+go to class → went to class
+write → wrote
+read → read
+
+Possible answer — закрыт; содержит намеренно придуманный эпизод:
+First, she woke up and had breakfast. Next, she packed her bag, but she couldn’t find her notebook. She looked for it for ten minutes. Eventually, she found it under her bag. After that, she went to class and took some notes. Later, she came home and read a book. In the end, she was happy with her day.
+
+TEACHER: задача — одна история, а не полный рассказ дважды. Действия на рисунке дают основу; проблему и её решение ученица придумывает, а не угадывает по изображению. При затруднении с идеей предложить «не могла найти тетрадь», не диктуя предложения.
+На подготовку около минуты. Ожидаются примерно 5–7 предложений, несколько естественных переходов, понятный результат и короткий обмен вопросами. Можно объединить события; точное число предложений не является критерием правильности. Не требовать все десять связок и не поощрять связку перед каждым предложением ради количества. Сравнить самостоятельность и понятность рассказа с первой попыткой в M01, не скорость речи.
+
+8. FEEDBACK · A2_SEQ_M08 · 2 минуты
+Механика: короткое устное завершение; нового проверяемого экрана не требуется.
+TEACHER: отметить один удачный переход, предложить исправить один реально возникший сбой. Попросить ещё раз сформулировать начало и окончание рассказа. Завершить занятие на 30-й минуте; объём обратной связи подстроить под фактический темп, не объявлять неосвоенный материал усвоенным.
+
+============================================================
+УРОК A2_MOVE — ВЗБИРАЕМСЯ НА ВЫСОТУ
+============================================================
+
+Результат: ученица различает способ и направление движения, понимает короткий рассказ с этими сочетаниями и описывает действия с up, over, onto, into, out of, around.
+Целевые сочетания: climb up; climb over; jump over; step onto; move into; come out of; run around.
+Climb over добавлено в явный перечень не как посторонняя тема, а потому что оно уже есть в упражнениях и Listen & Repeat PDF. Базовые climb, jump, step, move, come, run повторяются внутри сочетаний, не выдаются за шесть новых слов.
+
+ПЛАН: 2 + 4 + 3 + 3 + 3 + 5 + 3 + 5 + 2 = 30 минут.
+
+1. OPENING SPEAKING · A2_MOVE_M01 · 2 минуты
+Механика: Speaking.
+Image: A2_MOVE_SHEET — существующие шесть сцен из PDF, стр. 11, без банка ответов.
+Title: Describe how they move.
+Subtitle: Look at pictures 4 and 2. Describe the action and direction.
+Body под изображением:
+How does the boy get to the top?
+How does the girl get to the other side of the log?
+
+Useful phrases — открыты:
+He is climbing …
+She is jumping …
+up … / over …
+
+TEACHER: первая попытка описать именно способ и направление движения. Опоры с новым target здесь допустимы; отметить, что ученица сказала самостоятельно, а что с подсказкой. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.
+
+2. PHRASE INPUT · A2_MOVE_M02 · 4 минуты
+Механика: Matching · picture–phrase, затем короткий Text.
+Title: Match the pictures with the phrases.
+Шесть отдельных сцен из того же исходника:
+1 — девушка перемещается в дом: A2_MOVE_IMG01.
+2 — девушка перепрыгивает бревно: A2_MOVE_IMG02.
+3 — собака бежит вокруг дерева: A2_MOVE_IMG03.
+4 — мальчик поднимается по лестнице: A2_MOVE_IMG04.
+5 — девушка выходит из палатки: A2_MOVE_IMG05.
+6 — девушка шагает на камень: A2_MOVE_IMG06.
+
+Варианты в начальном порядке:
+step onto
+run around
+jump over
+climb up
+move into
+come out of
+KEY: 1 move into; 2 jump over; 3 run around; 4 climb up; 5 come out of; 6 step onto.
+
+После проверки, в том же этапе:
+Title: Read one more phrase.
+Body:
+climb over a wall — get to the other side of a wall by climbing
+He climbed over the low wall because the gate was closed.
+TEACHER: пояснить при необходимости по-русски: «перелез через стену на другую сторону». Не подставлять сюда картинку climb up и не называть подъём по лестнице примером climb over. Отдельная новая иллюстрация для этого короткого дополнения не нужна.
+
+3. PRONUNCIATION · A2_MOVE_M03 · 3 минуты
+Механика: Listen & Repeat, семь сочетаний и семь примеров.
+Title: Listen and repeat.
+Subtitle: Repeat the phrases and sentences aloud.
+Тексты и аудиослоты: A2_MOVE_P01–P07, A2_MOVE_E01–E07 — строго по MEDIA.
+Составное out of сохранять целиком. Не повторять ещё раз отдельный шестисловный блок со стр. 6: он остаётся резервом для незнакомых базовых глаголов.
+
+4. RULE AND CHECK · A2_MOVE_M04 · 3 минуты
+Механика: единый Rule → Single Choice.
+Rule title: Как описать направление движения
+Rule body:
+Глагол показывает способ движения, а предлог — путь. **Climb up the ladder** — подняться по лестнице вверх. **Climb over the wall** — перелезть через стену на другую сторону. Если препятствие преодолевают прыжком, используйте **jump over**: **She jumped over the log.**
+
+**Onto** показывает переход на поверхность: **She stepped onto the rock.** Сравните: **She is on the rock** описывает положение, а не переход.
+
+**Into** показывает перемещение внутрь: **It started to rain, so we moved into the tent.** Здесь move into означает «переместиться внутрь», не «переехать жить». **Out of** показывает обратное направление: **I was outside when she came out of the tent.** Перед названием места сохраняйте обе части: **out of the tent**.
+
+**Around** описывает путь вокруг предмета: **The dog ran around the tree.** Предлог не меняется из-за времени; форму времени получает глагол: **run → ran**, **come → came**.
+
+Короткая проверка под правилом, по стрелке:
+Title: Choose the correct answer.
+Body:
+“He climbed over the wall.” Where was he after that?
+A. On the other side of the wall.
+B. At the bottom of the wall, on the same side.
+C. On a ladder inside a room.
+KEY: A.
+TEACHER: это объяснение выбранных сочетаний, а не полный запрет in/on при движении. В некоторых сочетаниях in/into и on/onto возможны оба; не использовать такие допустимые варианты как ложные дистракторы. Come в примере — движение из палатки к наблюдателю снаружи; отдельную новую тему come/go не добавлять.
+
+5. CONTROLLED PRACTICE · A2_MOVE_M05 · 3 минуты
+Механика: Dropdown, семь коротких строк вместе. Картинки здесь не нужны: опору даёт текст.
+Title: Choose the correct preposition.
+
+1. The boy climbed [into / over / out of] the fence and got to the other side.
+2. She stepped [onto / around / out of] the platform and looked down at the water.
+3. I was waiting outside the tunnel. The dog came [onto / up / out of] it and ran towards me.
+4. We climbed [into / out of / up] the hill until we reached the top.
+5. We were outside the house. It started to rain, so we moved [into / over / around] the kitchen.
+6. The dog ran [around / into / over] the tree in a circle.
+7. She jumped [around / over / out of] the puddle and landed on the other side.
+KEY: 1 over; 2 onto; 3 out of; 4 up; 5 into; 6 around; 7 over.
+TEACHER: предложения 1–4 переработаны из выбора предлогов PDF; 5–7 добавлены для явной практики оставшихся сочетаний. Не добавлять второй подходящий предлог в варианты, например on как заведомо неправильный ответ к onto.
+
+6. LISTENING · A2_MOVE_M06 · 5 минут
+Механика: Audio + Single Choice → повторное Audio + Single Choice, три пункта вместе.
+Audio: A2_MOVE_STORY.
+Title первой части: Listen to the story.
+Body:
+What is the story about?
+A. Learning to climb a tree.
+B. A camping day when it started to rain.
+C. Looking for a lost dog.
+KEY: B.
+
+После попытки по стрелке:
+Title: Listen again and choose the correct answers.
+
+1. What did Max do after he came out of the tent?
+A. He ran around a tree and jumped over a log.
+B. He jumped onto a rock and ran into the tent.
+C. He climbed over a wall and ran around the lake.
+KEY: A.
+
+2. What did Sara do to take a photo of Max?
+A. She climbed up a tree.
+B. She stepped over a log.
+C. She stepped onto a rock.
+KEY: C.
+
+3. What did everyone do when it started to rain?
+A. They ran around a tree.
+B. They moved into the tent.
+C. They climbed over a wall.
+KEY: B.
+
+Плеер остаётся доступным. Транскрипт A2_MOVE_STORY_TEXT закрыт до попытки ответить на три вопроса, затем доступен по нажатию.
+TEACHER: первое прослушивание — общий смысл, второе — действия и направления, а не только имя собаки. Не показывать старые картинки как точную раскадровку: в PDF через бревно прыгает девушка, а в записи — собака. Здесь достаточно аудио и текстовых вариантов. Не выводить слова с ключами в заголовке или заранее раскрытом транскрипте.
+
+7. GUIDED WRITING · A2_MOVE_M07 · 3 минуты
+Механика: Writing, три поля с проверкой преподавателем.
+Title: Describe what happened.
+Subtitle: Use the prompts and phrases from this lesson. Write complete sentences in the past.
+
+1. Mark / ladder / reach the top
+Use: climb
+[Поле ответа]
+
+2. Anna / puddle / the other side / one jump
+Use: jump
+[Поле ответа]
+
+3. we / outside the house / rain / inside the kitchen
+Use: move
+[Поле ответа]
+
+Possible answers — закрыты:
+1. Mark climbed up the ladder to reach the top.
+2. Anna jumped over the puddle.
+3. It started to rain, so we moved into the kitchen.
+
+TEACHER: ситуации задают направление, а не готовый ответ. Ученица выбирает нужный предлог и строит предложение; не нужно использовать каждое слово подсказки буквально. В №3 допустимы because и два коротких предложения вместо so. В №1 Mark climbed the ladder грамматически возможно: предложить добавить up для явного направления, не объявлять предложение неверным. Проверять целевое сочетание и смысл, а не точное совпадение с образцом.
+
+8. FINAL SPEAKING · A2_MOVE_M08 · 5 минут
+Механика: Speaking по двум коротким ситуациям. Новой картинки не требуется.
+Title: Tell your partner what happened.
+Subtitle: Use the situations and verbs to tell two short stories in the past.
+Body:
+Story 1 — At an activity centre
+Mark used a ladder to reach a low platform. A wall was the next part of the activity. He couldn’t jump over it.
+Explain how he got to the platform and then to the other side of the wall.
+Use: climb / step
+
+Story 2 — At the campsite
+You were outside a tent. Your dog was inside.
+The dog left the tent, went round a tree and crossed a log in one jump. Then it started to rain.
+Explain what the dog did and where you all went.
+Use: come / run / jump / move
+
+Ask your partner one question about each story. You can add your own details.
+
+Useful phrases — открыты:
+He climbed …
+He stepped …
+Our dog came …
+It ran …
+It jumped …
+We moved …
+How did …?
+Where did …?
+
+Possible answers — закрыты:
+Story 1: Mark climbed up the ladder and stepped onto the platform. Then he climbed over the wall to get to the other side.
+Story 2: Our dog came out of the tent. It ran around a tree and jumped over a log. When it started to rain, we all moved into the tent.
+
+TEACHER: цель — объяснить действия и путь, не расшифровать условные записи «not on it → on it». Ситуации вымышленные, не трактовка отсутствующего изображения. Попросить несколько связанных предложений, а не список предлогов. Две истории суммарно позволяют использовать семь сочетаний; если на самостоятельном этапе нужна опора, это отмечается, а не маскируется чтением образца.
+Слова then/when/and могут естественно связывать речь, но здесь не нужно сдавать дополнительный тест на sequencers или считать обязательным предварительное прохождение A2_SEQ. Не требовать ритуально все варианты из банка. Около минуты на подготовку, затем рассказы и короткие вопросы; при быстром выполнении попросить добавить один собственный эпизод движения, а не новый грамматический материал.
+
+9. FEEDBACK · A2_MOVE_M09 · 2 минуты
+Механика: устное завершение.
+TEACHER: проверить одно возникшее смешение направлений и попросить ученицу исправить своё предложение. Итог — не только название действий, но и понятный путь: вверх, через, на поверхность, внутрь, наружу, вокруг. Завершить занятие на 30-й минуте.
+
+============================================================
+ПРОВЕРКА ПРИ СБОРКЕ
+============================================================
+Не переносить из PDF элементы интерфейса, готовые поля, шрифты, рамки и раскладку страницы. Сохранить только выбранные иллюстрации и содержание.
+Проверить наличие всех текстов, вариантов и ключей; работоспособность стрелок после информационных частей; доступ к плееру при повторной работе; закрытость транскриптов и Possible answers до попытки; открытость Useful phrases.
+Не делать большое изображение для каждой текстовой строки. В Matching использовать компактные картинки, в рассказе — цельную композицию.
+В исходнике нет проверенного полноценного аудирования с этими вопросами. Новые две записи требуют озвучки точных сценариев MEDIA либо живого чтения преподавателем. Старый Listen & Repeat автоматически к ним не привязывать.
+В отчёте о размещении отличать проверку данных от проверки в браузере. Этот документ не является подтверждением того, что уроки уже размещены или протестированы на сайте.
