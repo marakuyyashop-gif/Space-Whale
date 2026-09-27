@@ -22,7 +22,7 @@
     A1M4L1_AUDIO_01: {type:'audio',src:courseAudioBase+'/dialogues/a1-2-w4-l1-listening-s090-test.mp3',script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes, it does. And this sweater?\nBen: It looks warm.\nAnna: I like it. How much is it?\nBen: Thirty euros.\nAnna: Okay, I want it. Can you hold it for me, please?\nBen: Of course."},
     A1M4L1_WORD_01: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_01_r3.mp3',word:'coat',sentence:'I need a coat for work.'},
     A1M4L1_WORD_02: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_02.mp3',word:'sweater',sentence:'My sweater is in the wardrobe.'},
-    A1M4L1_WORD_03: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_03_r2.mp3',word:'blouse',sentence:'My sister wants this blouse.'},
+    A1M4L1_WORD_03: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_03_cut1.wav',word:'blouse',sentence:'My sister wants this blouse.'},
     A1M4L1_WORD_04: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_04.mp3',word:'skirt',sentence:'I like this skirt.'},
     A1M4L1_WORD_05: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_05.mp3',word:'suit',sentence:'My father has a suit for work.'},
     A1M4L1_WORD_06: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_06_r2.mp3',word:'hat',sentence:'I like your hat.'}
