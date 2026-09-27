@@ -16,7 +16,7 @@ for(const [n,words,examples] of [[3,words3,examples3],[4,words4,examples4]]){
   media[n]['L'+n+'_W'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_W'+k+'.mp3':null,script:words[i]};
   media[n]['L'+n+'_E'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_E'+k+'.mp3':null,script:examples[i]};
  }
- media[n]['L'+n+'_DIALOGUE']={type:'audio',src:n===3?courseAudioBase+'/dialogues/a1-2-w4-l3-listening-s090.mp3':null,script:null,transcriptId:'L'+n+'_DIALOGUE_TEXT'};
+ media[n]['L'+n+'_DIALOGUE']={type:'audio',src:n===3?courseAudioBase+'/dialogues/a1-2-w4-l3-listening-s090.mp3?v=20260927-100310':null,script:null,transcriptId:'L'+n+'_DIALOGUE_TEXT'};
  media[n]['L'+n+'_DIALOGUE_TEXT']={type:'text',text:null};
 }
 media[3].L3_DIALOGUE.script="Nina: I need a scarf for my sister.\nLeo: Which one do you like?\nNina: This one. What do you think?\nLeo: I think it looks good. How much is it?\nNina: Twenty euros.\nLeo: Why do you like it?\nNina: Because it looks warm. My sister walks to work, and it’s cold in the morning.\nLeo: Does she need gloves too?\nNina: No, she has some.";
