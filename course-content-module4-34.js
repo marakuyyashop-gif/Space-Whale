@@ -13,7 +13,7 @@ const media={3:{},4:{}};
 for(const [n,words,examples] of [[3,words3,examples3],[4,words4,examples4]]){
  for(let i=0;i<6;i++){
   const k=String(i+1).padStart(2,'0');
-  media[n]['L'+n+'_W'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_W'+k+'.mp3':null,script:words[i]};
+  media[n]['L'+n+'_W'+k]={type:'audio',src:n===3?(k==='05'?lesson3Audio+'/L3_W05_tie-from-sentence-v2.wav':lesson3Audio+'/L3_W'+k+'.mp3'):null,script:words[i]};
   media[n]['L'+n+'_E'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_E'+k+'.mp3':null,script:examples[i]};
  }
  media[n]['L'+n+'_DIALOGUE']={type:'audio',src:n===3?courseAudioBase+'/dialogues/a1-2-w4-l3-listening-s090.mp3?v=20260927-100310':null,script:null,transcriptId:'L'+n+'_DIALOGUE_TEXT'};
