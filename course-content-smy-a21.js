@@ -39,13 +39,32 @@ const audioRoots={
  A2_SEQ:courseAudioBase+'/a2-1/m1/l1',
  A2_MOVE:courseAudioBase+'/a2-1/m1/l2'
 };
+// Current author-approved direction: contextual chunks, with visible recording text.
+const sequenceChunks=[
+ 'First, we checked the address before leaving home.',
+ 'To begin with, we made a short plan for our day in the city.',
+ 'Then, we took a bus to the city centre and met Anna.',
+ 'Next, we bought two tickets for the afternoon tour.',
+ 'After that, we had lunch at a small café near the river.',
+ 'We finished lunch. Afterwards, we walked along the river.',
+ 'Later, we stopped at a bookshop and bought a present.',
+ 'We looked for the hotel for an hour. Eventually, we found it near the station.',
+ 'Finally, we went back to the hotel. That was the last part of our day.',
+ 'We wanted to take a bus, but there were no more buses. In the end, we took a taxi.'
+];
 const media={};
 for(const prefix of Object.keys(lessonIds)){
  const slots={};
  phrases[prefix].forEach((phrase,i)=>{
   const n=String(i+1).padStart(2,'0'),root=audioRoots[prefix];
-  slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/P'+n+'.mp3',script:phrase,workPhrase:phrase};
-  slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3',script:examples[prefix][i]};
+  if(prefix==='A2_SEQ'){
+   // Revised text needs its own recording; never play the older phrase under it.
+   slots[`${prefix}_P${n}`]={type:'audio',src:null,script:sequenceChunks[i],workPhrase:phrase};
+   slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
+  }else{
+   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/P'+n+'.mp3',script:phrase,workPhrase:phrase};
+   slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3',script:examples[prefix][i]};
+  }
  });
  slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
@@ -154,12 +173,15 @@ seq.push(step('Language Input',4.5,S('A2_SEQ_M02','Read the short story.',[
  R('A2_SEQ_M02-rule','Как связать события в рассказ','sequence')
 ],{progressive:true,revealStops:[2,3],requireCheckBeforeNext:true})));
 seq.push(step('Pronunciation',3,repeat('A2_SEQ')));
+const meaning=(id,chunkIndex,target,question,options,key,feedbackText,feedbackHighlights)=>({
+ ...Q(id,sequenceChunks[chunkIndex]+'\n'+question,options,key,feedbackText,feedbackHighlights),promptHighlights:[target]
+});
 seq.push(step('Meaning Practice',3,C('A2_SEQ_M04','Choose the meaning.',[
- Q('1','“To begin with, we checked the address.”\nWhen did they check it?',['At the end of the trip.','Before the other steps.','After a long search.'],'B','They checked the address before the other steps.',['before the other steps']),
- Q('2','“We had lunch. Afterwards, we went for a walk.”\nWhich sentence keeps the same order?',['We had lunch. After that, we went for a walk.','We went for a walk. Then we had lunch.','We went for a walk before lunch.'],'A','We had lunch. After that, we went for a walk.',['After that']),
- Q('3','“We looked for the hotel for an hour. Eventually, we found it.”',['They found it immediately.','They didn’t find it.','They found it after a long search.'],'C','They found it after a long search.',['after a long search']),
- Q('4','“Finally, we went home. That was the last part of our day.”',['Going home was the first event.','Going home was the last event.','They stayed at home all day.'],'B','Going home was the last event.',['the last event']),
- Q('5','“We wanted to take a bus. There were no more buses. In the end, we took a taxi.”',['Taking a taxi was their first plan.','They took a taxi before looking for a bus.','Taking a taxi was how the situation ended.'],'C','Taking a taxi was how the situation ended.',['how the situation ended'])
+ meaning('1',1,'To begin with','When did they make the plan?',['After their day in the city.','Before the other activities.','After a long search.'],'B','They made the plan before the other activities.',['before the other activities']),
+ meaning('2',5,'Afterwards','Which event happened second?',['They walked along the river.','They finished lunch.','They did both at the same time.'],'A','They finished lunch first. Afterwards, they walked along the river.',['Afterwards']),
+ meaning('3',7,'Eventually','What does this tell us about finding the hotel?',['They found it immediately.','They didn’t find it.','They found it after a long search.'],'C','They found it after a long search.',['after a long search']),
+ meaning('4',8,'Finally','When did they go back to the hotel?',['At the start of their day.','After all their other activities.','They stayed there all day.'],'B','Going back to the hotel was the last activity of their day.',['the last activity']),
+ meaning('5',9,'In the end','What does this tell us about taking a taxi?',['It was their original plan.','It happened before they checked the buses.','It was the result after their plan changed.'],'C','They could not take a bus. In the end, they took a taxi instead.',['In the end'])
 ])));
 seq.push(step('Listening',5,S('A2_SEQ_M05','Listen to the story.',[
  A('A2_SEQ_M05-audio','Listen to the story.','A2_SEQ_STORY'),

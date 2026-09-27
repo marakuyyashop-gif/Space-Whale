@@ -36,13 +36,15 @@ test('every stage mounts with no teacher notes, keys or fabricated media request
  for(const lesson of lessons)for(const stage of lesson.stages){
   kit.validate(stage.exercise);const s=setup(stage.exercise);
   assert.ok(!/TEACHER:|KEY:|KEY ORDER:|Проверять целевое|При затруднении/.test(s.host.textContent));
-  assert.equal(s.host.querySelector('audio[src]'),null);
+  const approved=new Set(Object.values(app.SpaceWhaleLessonMedia).flatMap(slots=>Object.values(slots).filter(s=>s.type==='audio'&&s.src).map(s=>s.src)));
+  for(const audio of s.host.querySelectorAll('audio[src]'))assert.ok(approved.has(audio.getAttribute('src')),'Recording comes from the current media registry');
+  if(stage.exercise.id==='A2_SEQ_M03')assert.equal(s.host.querySelector('audio[src]'),null);
   for(const image of s.host.querySelectorAll('img[src]'))assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',image.getAttribute('src'))),'Selected lesson image exists');
   for(const d of s.host.querySelectorAll('details'))if(d.querySelector('summary').textContent==='Useful phrases')assert.equal(d.open,true);
   s.handle.destroy();
  }
  const slots=app.SpaceWhaleLessonMedia['a2-1-w1-smy-1'];
- assert.equal(slots.A2_SEQ_STORY.script,null);assert.equal(slots.A2_SEQ_E10.script,null);
+ assert.match(slots.A2_SEQ_STORY.script,/My friend was waiting for me at the cinema/);assert.equal(slots.A2_SEQ_E10.script,null);
  assert.equal(find('A2_SEQ_M03').items.length,10);assert.equal(find('A2_MOVE_M03').items.length,7);
 });
 test('closed tasks preserve authored keys and full-sentence feedback',()=>{
@@ -58,7 +60,7 @@ test('closed tasks preserve authored keys and full-sentence feedback',()=>{
   if(Object.keys(a).length)assert.ok(Object.values(kit.grade(d,a)).every(g=>g==='correct'),d.id);
  });
  const s=setup(find('A2_SEQ_M04'));s.handle.setAnswers({'1':'A','2':'A','3':'A','4':'A','5':'A',__sw_checked:true});
- assert.match(s.host.querySelector('.ek-answer-pairs').textContent,/They checked the address before the other steps/);
+ assert.match(s.host.querySelector('.ek-answer-pairs').textContent,/They made the plan before the other activities/);
 });
 test('story and question appear together, then one teacher-revealed multiline rule',()=>{
  const def=find('A2_SEQ_M02'),student=setup(def,{navigationReadOnly:true});
@@ -72,7 +74,7 @@ test('story and question appear together, then one teacher-revealed multiline ru
  assert.equal(info.host.querySelector('.ek-stage-down').disabled,false);info.click('Show next exercise');assert.ok(info.host.querySelector('.ek-check'));
 });
 test('Listening keeps the source and requires the Order attempt before revealing its transcript',()=>{
- const supplied=load({'a2-1-w1-smy-1':{A2_SEQ_STORY_TEXT:{type:'text',text:'Author supplied transcript.'}}});
+ const supplied=load({'a2-1-w1-smy-1':{A2_SEQ_STORY:{src:null},A2_SEQ_STORY_TEXT:{type:'text',text:'Author supplied transcript.'}}});
  const s=setup(find('A2_SEQ_M05',supplied)),player=s.host.querySelector('.ek-audio-player');
  assert.ok(player);assert.equal(player.dataset.state,'pending');assert.match(s.host.textContent,/Аудио пока не добавлено/);
  assert.equal(s.host.querySelector('.ek-order-target'),null);assert.equal(s.host.querySelector('details').hidden,true);
