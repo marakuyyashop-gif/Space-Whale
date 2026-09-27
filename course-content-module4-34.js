@@ -18,8 +18,7 @@ media[3].L3_DIALOGUE_TEXT.text=media[3].L3_DIALOGUE.script;
 const mediaRoot='assets/lesson-media/a1-2/module-4/';
 const accessorySizes=[[482,486],[494,275],[416,480],[501,371],[311,488],[522,249]];
 words3.forEach((word,i)=>{media[3]['L3_IMG_'+String(i+1).padStart(2,'0')]={type:'image',src:mediaRoot+'lesson-3/media/'+word+'-cutout.webp',width:accessorySizes[i][0],height:accessorySizes[i][1],alt:'Picture '+(i+1),target:word};});
-media[3].L1_SPEAKING_REUSE={...registry['a1-2-w4-l1']?.A1M4L1_IMAGE_SPEAKING_01,reuseAsset:'A1M4L1_IMAGE_SPEAKING_01'};
-media[3].L3_SPEAKING={type:'image',src:mediaRoot+'lesson-3/media/speaking-cutout.webp',width:1536,height:1024,alt:'A scarf, belt, gloves, cap, tie and sunglasses'};
+media[3].L3_SPEAKING={type:'image',src:mediaRoot+'lesson-3/media/speaking-accessories.webp',width:1448,height:1086,alt:'A scarf, belt, gloves, cap, tie and sunglasses'};
 media[4].L4_PEOPLE={type:'image',src:mediaRoot+'lesson-4/media/people-abc.webp',width:1020,height:388,alt:'Person A, Person B and Person C',sourceSheet:mediaRoot+'lesson-4-people.png',notes:'A: Rosa, original person 1; B: Ella, original person 3; C: Nora, original person 2, long curly hair and green eyes. No personality inferred from appearance.'};
 media[4].L4_SPEAKING={type:'image',src:mediaRoot+'lesson-4/media/speaking-ab.webp',width:680,height:388,alt:'Person A and Person B',sourceSheet:mediaRoot+'lesson-4-people.png'};
 // Authoring constraint for the pending recording/transcript, never student text.
@@ -43,7 +42,9 @@ const step=(menu,minutes,exercise)=>({menu,navigationTitle:menu,section:'tasks',
 const repeat=(n,words,examples)=>E('L'+n+'-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,items:words.map((word,i)=>{const k=String(i+1).padStart(2,'0');return {id:'L'+n+'_W'+k,text:word,mediaRef:'L'+n+'_W'+k,example:examples[i],exampleMediaRef:'L'+n+'_E'+k};})});
 const transcript3=id=>E(id,'presentation','Transcript',{blocks:[{type:'disclosure',title:'Transcript',text:media[3].L3_DIALOGUE_TEXT.text}]});
 const s3=[];
-s3.push(step('Opening Speaking',1,P('L3-M01','Choose an item and talk about it.','Which item do you like?\nWhy do you like it?\nWhat do you think?','L1_SPEAKING_REUSE','I like …\nIt looks …\nI think …\n… because …','Use the phrases below to help you.')));
+const opening3=P('L3-M01','Choose an item and talk about it.','Which item do you like?\nWhy do you like it?\nWhat do you think?','L3_SPEAKING','I like …\nIt looks … / They look …\nI think …\n… because …','Use the phrases below to help you.');
+opening3.blocks.push(text('Теперь спросите преподавателя, какие предметы ему нравятся и почему.'),{type:'disclosure',title:'Useful phrases',open:true,text:'Which items do you like?\nWhy do you like them?'});
+s3.push(step('Opening Speaking',1,opening3));
 s3.push(step('Words',2.5,E('L3-M02','matching','Match the pictures with the words.',{layout:'picture-word',items:words3.map((word,i)=>({id:'L3_IMG_'+String(i+1).padStart(2,'0'),mediaRef:'L3_IMG_'+String(i+1).padStart(2,'0'),text:'Picture '+(i+1),correctId:word})),options:['sunglasses','tie','scarf','cap','gloves','belt'].map(text=>({id:text,text}))})));
 s3.push(step('Pronunciation',2,repeat(3,words3,examples3)));
 s3.push(step('Word practice',2,G('L3-M04','Choose the correct word.',[
