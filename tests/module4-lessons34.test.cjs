@@ -29,6 +29,8 @@ test('question building reveals examples, rule and each checked task only on tea
    const child=teacher.host.querySelectorAll('.ek-stage-host')[i+2],task=def.exercises[i+2].exercise;
    for(const id of task.correctOrder){const text=task.tokens.find(t=>t.id===id).text;fire([...child.querySelectorAll('.ek-bank button')].find(b=>b.textContent===text));}
    fire(child.querySelector('.ek-check'));
+   assert.equal(child.querySelectorAll('.ek-order-target>.ek-token[data-feedback=correct]').length,task.tokens.length,'parent answer save preserves each token mark');
+   assert.equal(pupil.host.querySelectorAll('.ek-stage-host')[i+2].querySelectorAll('.ek-order-target>.ek-token[data-feedback=correct]').length,task.tokens.length,'learner receives the same token marks');
    assert.equal(teacher.host.querySelectorAll('.ek-order-target').length,i+1,'OK must not navigate');
    if(i<2){assert.equal(teacher.host.querySelector('.ek-stage-down').disabled,false);teacher.click('Show next exercise');}
  }

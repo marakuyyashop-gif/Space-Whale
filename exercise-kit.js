@@ -564,8 +564,10 @@
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
-      body.querySelectorAll('.ek-order-target [data-feedback]').forEach(token=>{token.removeAttribute('data-feedback');token.removeAttribute('aria-description');});
-      body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
+      if(def.kind==='order'){
+        body.querySelectorAll('.ek-order-target [data-feedback]').forEach(token=>{token.removeAttribute('data-feedback');token.removeAttribute('aria-description');});
+        body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
+      }
       resultsBox.replaceChildren(); announce('');
       if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');});}
     };
