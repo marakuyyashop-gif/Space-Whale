@@ -36,7 +36,8 @@ test('every stage mounts with no teacher notes, keys or fabricated media request
  for(const lesson of lessons)for(const stage of lesson.stages){
   kit.validate(stage.exercise);const s=setup(stage.exercise);
   assert.ok(!/TEACHER:|KEY:|KEY ORDER:|Проверять целевое|При затруднении/.test(s.host.textContent));
-  assert.equal(s.host.querySelector('audio[src],img[src]'),null);
+  assert.equal(s.host.querySelector('audio[src]'),null);
+  for(const image of s.host.querySelectorAll('img[src]'))assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',image.getAttribute('src'))),'Selected lesson image exists');
   for(const d of s.host.querySelectorAll('details'))if(d.querySelector('summary').textContent==='Useful phrases')assert.equal(d.open,true);
   s.handle.destroy();
  }

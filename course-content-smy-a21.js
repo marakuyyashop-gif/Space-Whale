@@ -18,10 +18,11 @@ for(const prefix of Object.keys(lessonIds)){
  });
  slots[`${prefix}_STORY`]={type:'audio',src:null,script:null,transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:null};
- if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:null,alt:'Pictures of her day'};
+ if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Pictures of her day'};
  else{
-  slots.A2_MOVE_SHEET={type:'image',src:null,alt:'Six scenes showing movement'};
-  for(let i=1;i<=6;i++)slots[`A2_MOVE_IMG0${i}`]={type:'image',src:null,alt:`Picture ${i}`};
+  const imageRoot='assets/lesson-media/a2-1/module-1/smy-2/images/';
+  slots.A2_MOVE_SHEET={type:'image',src:imageRoot+'movement-sheet.webp',width:1120,height:888,alt:'Six numbered scenes showing movement'};
+  for(let i=1;i<=6;i++)slots[`A2_MOVE_IMG0${i}`]={type:'image',src:imageRoot+`movement-0${i}.webp`,width:352,height:420,alt:`Picture ${i}`};
  }
  for(const [id,value] of Object.entries(registry[lessonIds[prefix]]||{}))slots[id]={...slots[id],...value};
  media[prefix]=slots;registry[lessonIds[prefix]]=slots;
