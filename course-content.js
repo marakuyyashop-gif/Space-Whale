@@ -20,17 +20,17 @@
     A1M4L1_IMAGE_TWO_COATS: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/coat-cutout.webp',width:1122,height:1402,copies:2,alt:'Two coats',target:'coats'},
     A1M4L1_IMAGE_SPEAKING_01: {type:'image',src:'assets/lesson-media/a1-2/module-4/lesson-1/images/speaking-cutout.webp',width:1448,height:1086,alt:'A composition with a coat, sweater, blouse, skirt, suit and hat'},
     A1M4L1_AUDIO_01: {type:'audio',src:null,script:"Anna: Do you like this coat?\nBen: Yes. It looks good, but it looks like your old coat.\nAnna: Yes, it does. And this sweater?\nBen: It looks warm.\nAnna: I like it. How much is it?\nBen: Thirty euros.\nAnna: Okay, I want it. Can you hold it for me, please?\nBen: Of course."},
-    A1M4L1_WORD_01: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_01.mp3',word:'coat',sentence:'I need a coat for work.'},
+    A1M4L1_WORD_01: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_01_r2.mp3',word:'coat',sentence:'I need a coat for work.'},
     A1M4L1_WORD_02: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_02.mp3',word:'sweater',sentence:'My sweater is in the wardrobe.'},
-    A1M4L1_WORD_03: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_03.mp3',word:'blouse',sentence:'My sister wants this blouse.'},
+    A1M4L1_WORD_03: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_03_r2.mp3',word:'blouse',sentence:'My sister wants this blouse.'},
     A1M4L1_WORD_04: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_04.mp3',word:'skirt',sentence:'I like this skirt.'},
     A1M4L1_WORD_05: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_05.mp3',word:'suit',sentence:'My father has a suit for work.'},
-    A1M4L1_WORD_06: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_06.mp3',word:'hat',sentence:'I like your hat.'}
+    A1M4L1_WORD_06: {type:'audio',src:lesson1Audio+'/A1M4L1_WORD_06_r2.mp3',word:'hat',sentence:'I like your hat.'}
   };
   // A word and its example are distinct clips and distinct reveal steps.
   for(let i=1;i<=6;i++){
     const suffix=String(i).padStart(2,'0');
-    lesson1Media['A1M4L1_SENTENCE_'+suffix]={type:'audio',src:lesson1Audio+'/A1M4L1_SENTENCE_'+suffix+'.mp3',sentence:lesson1Media['A1M4L1_WORD_'+suffix].sentence};
+    lesson1Media['A1M4L1_SENTENCE_'+suffix]={type:'audio',src:lesson1Audio+'/A1M4L1_SENTENCE_'+suffix+(suffix==='01'?'_r2':'')+'.mp3',sentence:lesson1Media['A1M4L1_WORD_'+suffix].sentence};
   }
   window.SpaceWhaleLessonMedia = {...window.SpaceWhaleLessonMedia, 'a1-2-w4-l1':lesson1Media};
   const imageSlot = assetId => ({assetId,alt:lesson1Media[assetId].alt,...(lesson1Media[assetId].src ? {image:lesson1Media[assetId].src,imageWidth:lesson1Media[assetId].width,imageHeight:lesson1Media[assetId].height,...(lesson1Media[assetId].copies?{imageCopies:lesson1Media[assetId].copies}:{}),...(lesson1Media[assetId].crop ? {crop:lesson1Media[assetId].crop} : {})} : {imagePending:true})});
