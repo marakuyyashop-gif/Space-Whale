@@ -14,30 +14,28 @@ What would you choose? Обсуждаем воображаемый выбор, �
 
 ### №1 · Opening Speaking · B1D1-M01
 
-**How would you decide?**
+**Talk about these choices.**
 
 Choose one situation. You can answer for an imaginary person.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
 
-A. You spend an hour travelling to work each morning. You could rent an apartment ten minutes from work, but the rent would be higher. You need to decide whether to move.
+A. You spend an hour travelling to work each morning. You can rent an apartment ten minutes from work, but it costs more. You need to decide whether to move.
 
-B. You have a full-time job, but you’d like to work for yourself. You could go freelance, but you don’t have regular clients yet. You need to decide whether to leave your job now.
+B. You have a full-time job, but you want to work for yourself. You don’t have regular clients yet. You need to decide whether to leave your job now.
 
-C. You and your partner live in separate homes and would like to move in together. Your partner wants to live near their work, but you prefer a different area. You need to decide where to live.
+C. You and your partner live in separate homes and want to move in together. Your partner wants to live near their work, but you prefer a different area. You need to decide where to live.
 
-What would be good about this change?
-What would worry you?
-What would you do? Why?
-What else would you need to know before deciding?
+Which option do you prefer? Why?
+What is important to you?
+What do you need to know before deciding?
 
 **Useful phrases**
 
-I’d …
-I wouldn’t …
+I prefer …
+I want to …
 For me, … is important.
-I’d be worried about …
-I’d need to know …
+I need to know …
 … because …
 
 ### №2 · Words · B1D1-M02
@@ -67,6 +65,18 @@ D. try something although you do not know if it will succeed
 E. start living in the same home as your partner
 
 F. start doing paid work for clients instead of being an employee of one company
+
+↓ Отдельное правило после проверки, по стрелке преподавателя
+
+**Как использовать фразы из задания**
+
+Вы сопоставили фразы с их значениями. Теперь уточним, как две из них употребляются в предложении: turn something down — отказаться от предложения, а change your mind — изменить своё решение.
+
+Turn something down
+Вместо something называем то, от чего отказываемся, например an offer — предложение. С существительным возможны два порядка: turn down an offer и turn an offer down. Смысл одинаковый. Если заменяем предложение местоимением it, ставим его между turn и down: turn it down. Например: I don’t want that job. I’m going to turn it down.
+
+Change your mind
+В этой фразе указываем, кто меняет своё решение: I → my, you → your, he → his, she → her. Поэтому говорим I can change my mind; You can change your mind; She can change her mind. Например: I wanted to rent the apartment, but I changed my mind — «Я хотел снять квартиру, но передумал».
 
 ### №3 · Listen & Repeat · B1D1-M03
 
@@ -118,26 +128,74 @@ B: That’s okay. You can [пропуск 5] any time before it starts.
 6. A: Are you looking for another job with a company?
 B: No, I want to [пропуск 6]. I already have two clients.
 
-↓ Отдельный устный шаг после проверки, по стрелке преподавателя
+### №5 · Language focus · B1D1-M07
 
-**What would you do?**
+**What do these sentences mean?**
 
-Choose one situation and explain your choice.
+Read the situation and the examples. Choose the answers, then open the rule.
 
-1. You get a job offer in another city, but you don’t want to move away from your family. Would you take the job or turn it down? Why?
+Dana has a full-time job. She is thinking about working for herself, but one project is not enough. She is imagining a steadier income and a different home.
 
-2. You’re moving to a new city and don’t know the neighbourhoods yet. Would you rent an apartment first or buy a home straight away? Why?
+If I had enough work for six months, I’d take a chance.
+I wouldn’t leave just for one project.
+If I earned more, I’d rent an apartment on my own.
 
-3. You want to go freelance. You have two clients, but they cannot promise regular work. Would you start now or wait? Why?
+1. Is Dana describing the past or imagining a different situation?
 
-**Useful phrases**
+A. Describing what she did last year.
 
-I’d …
-I wouldn’t …
-… because …
-I’d need to know …
+B. Confirming a definite plan for next week.
 
-### №5 · Listening · B1D1-M05
+C. Imagining a different situation now or in the future.
+
+2. In “I’d take a chance”, what does ’d mean?
+
+A. would
+
+B. had
+
+3. Which part introduces the imagined condition?
+
+A. I’d take a chance.
+
+B. If I had enough work for six months.
+
+↓ Следующий шаг по стрелке преподавателя
+
+**Imagining a different situation**
+
+Use the second conditional to explore a situation you are imagining now or in the future. You are not presenting it as a fact or a definite plan. For example, If I earned more, I’d rent an apartment on my own imagines having a higher income and a different home.
+
+The pattern is if + Past Simple, would + verb. The past form shows an imagined condition; it does not put this conversation in the past. I’d means I would, and wouldn’t means would not.
+
+If we found a suitable apartment, we’d move in together.
+I wouldn’t take the job if it included every weekend.
+
+The two parts can change places. A comma normally separates them when the if-part comes first. In this pattern, put would in the result, not in the if-part. After would/wouldn’t, use the basic verb, without to or -s.
+
+To ask about a choice, use Would you + verb … if + Past Simple? To ask for an idea, use What would you do if …?
+Would you go freelance if you had regular clients?
+What would you do if the company changed the hours?
+
+For imagined ability, can becomes could: If I could choose my hours, I’d start early. With be, were is a standard form for an imagined situation: If the apartment were cheaper, I’d rent it. You may also hear was with I/he/she/it in conversation.
+
+### №6 · Language practice · B1D1-M08
+
+**Complete the sentences.**
+
+Use the second conditional and the verbs in brackets.
+
+1. If we [пропуск 1a] (find) an apartment near our jobs, we [пропуск 1b] (move) in together.
+
+2. I [пропуск 2a] (not / take) the job if I [пропуск 2b] (have) to work every Sunday.
+
+3. If she [пропуск 3a] (go) freelance, she [пропуск 3b] (need) a quiet place to work.
+
+4. Would you [пропуск 4a] (change) your mind if the company [пропуск 4b] (offer) better hours?
+
+5. What [пропуск 5a] you [пропуск 5b] (do) if you [пропуск 5c] (not / like) the apartment after seeing it?
+
+### №7 · Listening · B1D1-M05
 
 **Listen and find out what Dana is considering.**
 
@@ -179,7 +237,7 @@ C. Her employer will not let her work from home.
 
 **Discuss Dana’s decision.**
 
-Explain your answers. You can speak for an imaginary person.
+Choose one question and explain your answer. You can speak for an imaginary person.
 
 1. What could go wrong if Dana left her job with only one freelance project?
 
@@ -187,7 +245,7 @@ Explain your answers. You can speak for an imaginary person.
 
 3. Would you leave a job you liked for more flexible working hours? Why or why not?
 
-### №6 · Listen again · B1D1-M06
+### №8 · Listen again · B1D1-M06
 
 **Listen again and match the situations with Dana’s choices.**
 
@@ -220,77 +278,6 @@ B. she would ask questions before deciding.
 C. she would be willing to try freelance work.
 
 D. she would rent an apartment on her own.
-
-### №7 · Language focus · B1D1-M07
-
-**What do these sentences mean?**
-
-Look at the examples from Dana’s conversation.
-
-If I had enough work for six months, I’d take a chance.
-I wouldn’t leave just for one project.
-If I earned more, I would.
-
-1. Is Dana describing the past or imagining a different situation?
-
-A. Describing what she did last year.
-
-B. Confirming a definite plan for next week.
-
-C. Imagining a different situation now or in the future.
-
-2. In “I’d take a chance”, what does ’d mean?
-
-A. would
-
-B. had
-
-3. Which part introduces the imagined condition?
-
-A. I’d take a chance.
-
-B. If I had enough work for six months.
-
-↓ Следующий шаг по стрелке преподавателя
-
-**Imagining a different situation**
-
-Use the second conditional to explore a situation you are imagining now or in the future. You are not presenting it as a fact or a definite plan. For example, If I earned more, I’d rent an apartment on my own imagines having a higher income and a different home.
-
-The pattern is if + Past Simple, would + verb. The past form shows an imagined condition; it does not put this conversation in the past. I’d means I would, and wouldn’t means would not.
-
-If we found a suitable apartment, we’d move in together.
-I wouldn’t take the job if it included every weekend.
-
-The two parts can change places. A comma normally separates them when the if-part comes first. In this pattern, put would in the result, not in the if-part. After would/wouldn’t, use the basic verb, without to or -s.
-
-To ask about a choice, use Would you + verb … if + Past Simple? To ask for an idea, use What would you do if …?
-Would you go freelance if you had regular clients?
-What would you do if the company changed the hours?
-
-For imagined ability, can becomes could: If I could choose my hours, I’d start early. With be, were is a standard form for an imagined situation: If the apartment were cheaper, I’d rent it. You may also hear was with I/he/she/it in conversation.
-
-### №8 · Language practice · B1D1-M08
-
-**Complete the sentences.**
-
-Use the second conditional and the verbs in brackets.
-
-1. If we [пропуск 1a] (find) an apartment near our jobs, we [пропуск 1b] (move) in together.
-
-2. I [пропуск 2a] (not / take) the job if I [пропуск 2b] (have) to work every Sunday.
-
-3. If she [пропуск 3a] (go) freelance, she [пропуск 3b] (need) a quiet place to work.
-
-4. Would you [пропуск 4a] (change) your mind if the company [пропуск 4b] (offer) better hours?
-
-5. What [пропуск 5a] you [пропуск 5b] (do) if you [пропуск 5c] (not / like) the apartment after seeing it?
-
-↓ Отдельный устный шаг после проверки, по стрелке преподавателя
-
-**What would you do?**
-
-Choose any three situations from the sentences above. Say what you would do in each situation and explain why. You can speak for an imaginary person.
 
 ### №9 · Questions · B1D1-M09
 
@@ -326,7 +313,7 @@ Ask your partner the question you have built. Answer your partner’s question a
 
 Discuss two situations. Explain your choices and ask follow-up questions.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
 
 A. A quiet apartment is close to your work, but it costs €150 more per month than your current home.
 Would you rent it? What would make you change your mind?
@@ -404,6 +391,20 @@ D. say that you will not accept or do something
 E. study something again, especially before a test
 
 F. keep away from something or try not to do it
+
+↓ Отдельное правило после проверки, по стрелке преподавателя
+
+**Какие слова следуют за этими глаголами**
+
+Вы сопоставили шесть глаголов с их значениями. Чтобы использовать их в следующем задании и в советах, обратите внимание на слова после глагола.
+
+Для подготовки к событию используем prepare for: prepare for an interview. Для повторения материала — revise a topic или revise for an exam. Здесь revise означает «повторять изученное перед экзаменом»; в американском английском часто используют review.
+
+Concentrate соединяется с on: concentrate on one task — сосредоточиться на одной задаче.
+
+После avoid и consider можно поставить существительное или глагол с -ing: avoid distractions / avoid checking your phone; consider both options / consider joining a group.
+
+После refuse перед действием ставим to: refuse to do something — отказаться что-либо делать. Например: I refuse to work every weekend.
 
 ### №3 · Listen & Repeat · B1D2-M03
 
@@ -623,7 +624,7 @@ Your reply
 
 Choose two situations. Take turns asking for and giving advice.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc)
 
 A. Maya has an exam in three days. She knows the theory, but finds the practice questions difficult. She has two free hours this evening and keeps checking her phone.
 

@@ -183,14 +183,14 @@ const lessons=[
         "navigationTitle": "Opening Speaking",
         "section": "tasks",
         "guide": {
-          "time": "2 min",
-          "teacherNotes": "нет автоматического ключа. Диагностика, не требование уже владеть всей конструкцией. При затруднении принять знакомый язык, уточнить причину и вернуться к выбранной ситуации в финале."
+          "time": "1.5 min",
+          "teacherNotes": "Короткая активация темы выбора знакомыми средствами. Обсудить одну ситуацию; не требовать Second Conditional или новые фразы до их введения. К выбранной ситуации можно вернуться в финале."
         },
         "exercise": {
           "version": 1,
           "id": "B1D1-M01",
           "kind": "presentation",
-          "title": "How would you decide?",
+          "title": "Talk about these choices.",
           "blocks": [
             {
               "type": "image",
@@ -198,13 +198,13 @@ const lessons=[
             },
             {
               "type": "text",
-              "text": "A. You spend an hour travelling to work each morning. You could rent an apartment ten minutes from work, but the rent would be higher. You need to decide whether to move.\n\nB. You have a full-time job, but you’d like to work for yourself. You could go freelance, but you don’t have regular clients yet. You need to decide whether to leave your job now.\n\nC. You and your partner live in separate homes and would like to move in together. Your partner wants to live near their work, but you prefer a different area. You need to decide where to live.\n\nWhat would be good about this change?\nWhat would worry you?\nWhat would you do? Why?\nWhat else would you need to know before deciding?"
+              "text": "A. You spend an hour travelling to work each morning. You can rent an apartment ten minutes from work, but it costs more. You need to decide whether to move.\n\nB. You have a full-time job, but you want to work for yourself. You don’t have regular clients yet. You need to decide whether to leave your job now.\n\nC. You and your partner live in separate homes and want to move in together. Your partner wants to live near their work, but you prefer a different area. You need to decide where to live.\n\nWhich option do you prefer? Why?\nWhat is important to you?\nWhat do you need to know before deciding?"
             },
             {
               "type": "disclosure",
               "title": "Useful phrases",
               "open": true,
-              "text": "I’d …\nI wouldn’t …\nFor me, … is important.\nI’d be worried about …\nI’d need to know …\n… because …"
+              "text": "I prefer …\nI want to …\nFor me, … is important.\nI need to know …\n… because …"
             }
           ],
           "instruction": "Choose one situation. You can answer for an imaginary person."
@@ -215,8 +215,8 @@ const lessons=[
         "navigationTitle": "Words",
         "section": "tasks",
         "guide": {
-          "time": "2.5 min",
-          "teacherNotes": "freelance не означает автоматически «работать дома» или «всегда выбирать любое расписание»; это способ работы с клиентами. Не добавлять эти ложные признаки к определению."
+          "time": "3.5 min",
+          "teacherNotes": "freelance не означает автоматически «работать дома» или «всегда выбирать любое расписание»; это способ работы с клиентами. Не добавлять эти ложные признаки к определению. После сопоставления раскрыть отдельное правило по стрелке; значения → порядок слов с turn down → местоимение в change your mind. Это подготовка к Listen & Repeat и Words in context. Правило не входит в поле ответов."
         },
         "exercise": {
           "version": 1,
@@ -281,14 +281,36 @@ const lessons=[
               "text": "start doing paid work for clients instead of being an employee of one company"
             }
           ],
-          "afterCheck": {
-            "text": "You can turn down an offer or turn an offer down.\nWith it, say turn it down.\nThe possessive changes: change my mind / your mind / her mind.",
-            "highlights": [
-              "turn down an offer",
-              "turn an offer down",
-              "it",
-              "turn it down",
-              "change my mind / your mind / her mind"
+          "followUp": {
+            "kind": "rule-page",
+            "title": "Match the phrases with their meanings.",
+            "blocks": [
+              {
+                "type": "rule",
+                "title": "Как использовать фразы из задания",
+                "text": "Вы сопоставили фразы с их значениями. Теперь уточним, как две из них употребляются в предложении: turn something down — отказаться от предложения, а change your mind — изменить своё решение.\n\nTurn something down\nВместо something называем то, от чего отказываемся, например an offer — предложение. С существительным возможны два порядка: turn down an offer и turn an offer down. Смысл одинаковый. Если заменяем предложение местоимением it, ставим его между turn и down: turn it down. Например: I don’t want that job. I’m going to turn it down.\n\nChange your mind\nВ этой фразе указываем, кто меняет своё решение: I → my, you → your, he → his, she → her. Поэтому говорим I can change my mind; You can change your mind; She can change her mind. Например: I wanted to rent the apartment, but I changed my mind — «Я хотел снять квартиру, но передумал».",
+                "highlights": [
+                  "turn something down",
+                  "change your mind",
+                  "Turn something down",
+                  "something",
+                  "an offer",
+                  "turn down an offer",
+                  "turn an offer down",
+                  "it",
+                  "turn it down",
+                  "I don’t want that job. I’m going to turn it down.",
+                  "Change your mind",
+                  "I → my",
+                  "you → your",
+                  "he → his",
+                  "she → her",
+                  "I can change my mind",
+                  "You can change your mind",
+                  "She can change her mind",
+                  "I wanted to rent the apartment, but I changed my mind"
+                ]
+              }
             ]
           }
         }
@@ -361,7 +383,7 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "2.5 min",
-          "teacherNotes": "одна короткая персональная реплика, не обсуждение всех шести пунктов. Новая условная конструкция пока не требуется. Контексты отличаются от произносительных примеров; все шесть фраз служат ответами, а не только вариантами в банке."
+          "teacherNotes": "Отработка только шести изученных фраз в понятных контекстах. Second Conditional и самостоятельные гипотетические ответы здесь не требуются. Все шесть фраз служат ответами, а не только вариантами в банке."
         },
         "exercise": {
           "version": 1,
@@ -494,255 +516,7 @@ const lessons=[
             "move in together"
           ],
           "preserveLines": true,
-          "instruction": "Use each phrase once.",
-          "followUp": {
-            "title": "What would you do?",
-            "blocks": [
-              {
-                "type": "text",
-                "text": "1. You get a job offer in another city, but you don’t want to move away from your family. Would you take the job or turn it down? Why?"
-              },
-              {
-                "type": "text",
-                "text": "2. You’re moving to a new city and don’t know the neighbourhoods yet. Would you rent an apartment first or buy a home straight away? Why?"
-              },
-              {
-                "type": "text",
-                "text": "3. You want to go freelance. You have two clients, but they cannot promise regular work. Would you start now or wait? Why?"
-              },
-              {
-                "type": "disclosure",
-                "title": "Useful phrases",
-                "open": true,
-                "text": "I’d …\nI wouldn’t …\n… because …\nI’d need to know …"
-              }
-            ],
-            "instruction": "Choose one situation and explain your choice."
-          }
-        }
-      },
-      {
-        "menu": "Listening",
-        "navigationTitle": "Listening",
-        "section": "tasks",
-        "guide": {
-          "time": "3 min",
-          "teacherNotes": "недостаточно постоянной работы/дохода, а не просто «не нравится квартира». Готовый ответ не показывать заранее."
-        },
-        "exercise": {
-          "version": 1,
-          "id": "B1D1-M05",
-          "kind": "stage",
-          "title": "Listen and find out what Dana is considering.",
-          "exercises": [
-            {
-              "id": "B1D1-M05-audio",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M05-audio",
-                "kind": "audio",
-                "title": "Listen and find out what Dana is considering.",
-                "mediaRef": "B1D1_DIALOGUE"
-              }
-            },
-            {
-              "id": "B1D1-M05-transcript",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M05-transcript",
-                "kind": "presentation",
-                "title": "Listen and find out what Dana is considering.",
-                "blocks": [
-                  {
-                    "type": "disclosure",
-                    "title": "Transcript",
-                    "text": "Dana: I like my job, but I’d love to choose my own hours.\nChris: Would you go freelance if you had a few regular clients?\nDana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.\nChris: Fair enough. What about working from home?\nDana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.\nChris: Would you rent an apartment on your own?\nDana: If I earned more, I would. For now, it’s too expensive.\nChris: What would you do if a company offered you a full-time job with better hours?\nDana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind."
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D1-M05-Q1",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M05-Q1",
-                "kind": "choice",
-                "title": "Listen and find out what Dana is considering.",
-                "items": [
-                  {
-                    "id": "1",
-                    "prompt": "Which statement best describes Dana’s situation?",
-                    "options": [
-                      {
-                        "id": "A",
-                        "text": "She is ready to leave as soon as she gets one project."
-                      },
-                      {
-                        "id": "B",
-                        "text": "She is interested in freelance work but wants regular work first."
-                      },
-                      {
-                        "id": "C",
-                        "text": "She will leave only after she moves into her own apartment."
-                      }
-                    ],
-                    "correctId": "B"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D1-M05-Q2",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M05-Q2",
-                "kind": "choice",
-                "title": "Listen and find out what Dana is considering.",
-                "items": [
-                  {
-                    "id": "2",
-                    "prompt": "Why is working from home a problem for her?",
-                    "options": [
-                      {
-                        "id": "A",
-                        "text": "Her apartment is small and her flatmate makes calls during the day."
-                      },
-                      {
-                        "id": "B",
-                        "text": "She cannot afford to keep renting her current apartment."
-                      },
-                      {
-                        "id": "C",
-                        "text": "Her employer will not let her work from home."
-                      }
-                    ],
-                    "correctId": "A"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D1-M05-discuss",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M05-discuss",
-                "kind": "presentation",
-                "title": "Discuss Dana’s decision.",
-                "blocks": [
-                  {
-                    "type": "text",
-                    "text": "1. What could go wrong if Dana left her job with only one freelance project?"
-                  },
-                  {
-                    "type": "text",
-                    "text": "2. A company offers you a full-time job with better hours. What else would you ask about before accepting it?"
-                  },
-                  {
-                    "type": "text",
-                    "text": "3. Would you leave a job you liked for more flexible working hours? Why or why not?"
-                  }
-                ],
-                "instruction": "Explain your answers. You can speak for an imaginary person."
-              }
-            }
-          ],
-          "progressive": true,
-          "requireCheckBeforeNext": true,
-          "revealStops": [
-            3,
-            4,
-            5
-          ],
-          "instruction": "Dana and Chris are talking after work."
-        }
-      },
-      {
-        "menu": "Listen again",
-        "navigationTitle": "Listen again",
-        "section": "tasks",
-        "guide": {
-          "time": "2 min",
-          "teacherNotes": ""
-        },
-        "exercise": {
-          "version": 1,
-          "id": "B1D1-M06",
-          "kind": "stage",
-          "title": "Listen again and match the situations with Dana’s choices.",
-          "layout": "grouped",
-          "exercises": [
-            {
-              "id": "B1D1-M06-audio",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M06-audio",
-                "kind": "audio",
-                "title": "Listen again and match the situations with Dana’s choices.",
-                "mediaRef": "B1D1_DIALOGUE"
-              }
-            },
-            {
-              "id": "B1D1-M06-transcript",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M06-transcript",
-                "kind": "presentation",
-                "title": "Listen again and match the situations with Dana’s choices.",
-                "blocks": [
-                  {
-                    "type": "disclosure",
-                    "title": "Transcript",
-                    "text": "Dana: I like my job, but I’d love to choose my own hours.\nChris: Would you go freelance if you had a few regular clients?\nDana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.\nChris: Fair enough. What about working from home?\nDana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.\nChris: Would you rent an apartment on your own?\nDana: If I earned more, I would. For now, it’s too expensive.\nChris: What would you do if a company offered you a full-time job with better hours?\nDana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind."
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D1-M06-pairs",
-              "exercise": {
-                "version": 1,
-                "id": "B1D1-M06-pairs",
-                "kind": "matching",
-                "title": "Listen again and match the situations with Dana’s choices.",
-                "items": [
-                  {
-                    "id": "1",
-                    "text": "If she had regular work for six months, …",
-                    "correctId": "C"
-                  },
-                  {
-                    "id": "2",
-                    "text": "If she earned more, …",
-                    "correctId": "D"
-                  },
-                  {
-                    "id": "3",
-                    "text": "If a company offered better working hours, …",
-                    "correctId": "B"
-                  }
-                ],
-                "options": [
-                  {
-                    "id": "A",
-                    "text": "she would immediately reject the offer."
-                  },
-                  {
-                    "id": "B",
-                    "text": "she would ask questions before deciding."
-                  },
-                  {
-                    "id": "C",
-                    "text": "she would be willing to try freelance work."
-                  },
-                  {
-                    "id": "D",
-                    "text": "she would rent an apartment on her own."
-                  }
-                ]
-              }
-            }
-          ],
-          "instruction": "One ending is extra."
+          "instruction": "Use each phrase once."
         }
       },
       {
@@ -750,8 +524,8 @@ const lessons=[
         "navigationTitle": "Language focus",
         "section": "tasks",
         "guide": {
-          "time": "3.5 min",
-          "teacherNotes": "не вводить всю систему conditionals. Не объяснять Second Conditional как «только невозможное»: здесь обсуждается воображаемый вариант, а не обязательно невозможное событие."
+          "time": "4 min",
+          "teacherNotes": "не вводить всю систему conditionals. Не объяснять Second Conditional как «только невозможное»: здесь обсуждается воображаемый вариант, а не обязательно невозможное событие. Подводка самодостаточна: слушание ещё впереди. Сначала понять ситуацию и выбрать смысл примеров; затем по стрелке открыть полное правило. Самостоятельно строить условные предложения до правила не требуется."
         },
         "exercise": {
           "version": 1,
@@ -769,11 +543,17 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "If I had enough work for six months, I’d take a chance.\nI wouldn’t leave just for one project.\nIf I earned more, I would.",
+                    "text": "Dana has a full-time job. She is thinking about working for herself, but one project is not enough. She is imagining a steadier income and a different home."
+                  },
+                  {
+                    "type": "text",
+                    "text": "If I had enough work for six months, I’d take a chance.\nI wouldn’t leave just for one project.\nIf I earned more, I’d rent an apartment on my own.",
                     "highlights": [
-                      "If I had enough work for six months, I’d take a chance.",
-                      "I wouldn’t leave just for one project.",
-                      "If I earned more, I would."
+                      "If I had enough work for six months",
+                      "I’d take a chance",
+                      "I wouldn’t leave",
+                      "If I earned more",
+                      "I’d rent an apartment on my own"
                     ]
                   }
                 ]
@@ -888,7 +668,7 @@ const lessons=[
             2,
             3
           ],
-          "instruction": "Look at the examples from Dana’s conversation."
+          "instruction": "Read the situation and the examples. Choose the answers, then open the rule."
         }
       },
       {
@@ -897,7 +677,7 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "3 min",
-          "teacherNotes": "коротко проверить смысл отрицания во втором пункте; не только правильную форму had."
+          "teacherNotes": "коротко проверить смысл отрицания во втором пункте; не только правильную форму had. Это первая управляемая практика сразу после правила. Отдельное повторное обсуждение трёх ситуаций исключено из обязательного плана: личные ответы есть в последующем обсуждении аудио, Questions и Final Speaking."
         },
         "exercise": {
           "version": 1,
@@ -1067,16 +847,231 @@ const lessons=[
             }
           ],
           "preserveLines": true,
-          "instruction": "Use the second conditional and the verbs in brackets.",
-          "followUp": {
-            "title": "What would you do?",
-            "blocks": [
-              {
-                "type": "text",
-                "text": "Choose any three situations from the sentences above. Say what you would do in each situation and explain why. You can speak for an imaginary person."
+          "instruction": "Use the second conditional and the verbs in brackets."
+        }
+      },
+      {
+        "menu": "Listening",
+        "navigationTitle": "Listening",
+        "section": "tasks",
+        "guide": {
+          "time": "3 min",
+          "teacherNotes": "недостаточно постоянной работы/дохода, а не просто «не нравится квартира». Готовый ответ не показывать заранее. Second Conditional уже разобран и отработан. После двух вопросов на понимание выбрать один вопрос для короткого обсуждения; остальные доступны при наличии времени."
+        },
+        "exercise": {
+          "version": 1,
+          "id": "B1D1-M05",
+          "kind": "stage",
+          "title": "Listen and find out what Dana is considering.",
+          "exercises": [
+            {
+              "id": "B1D1-M05-audio",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-audio",
+                "kind": "audio",
+                "title": "Listen and find out what Dana is considering.",
+                "mediaRef": "B1D1_DIALOGUE"
               }
-            ]
-          }
+            },
+            {
+              "id": "B1D1-M05-transcript",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-transcript",
+                "kind": "presentation",
+                "title": "Listen and find out what Dana is considering.",
+                "blocks": [
+                  {
+                    "type": "disclosure",
+                    "title": "Transcript",
+                    "text": "Dana: I like my job, but I’d love to choose my own hours.\nChris: Would you go freelance if you had a few regular clients?\nDana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.\nChris: Fair enough. What about working from home?\nDana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.\nChris: Would you rent an apartment on your own?\nDana: If I earned more, I would. For now, it’s too expensive.\nChris: What would you do if a company offered you a full-time job with better hours?\nDana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind."
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B1D1-M05-Q1",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-Q1",
+                "kind": "choice",
+                "title": "Listen and find out what Dana is considering.",
+                "items": [
+                  {
+                    "id": "1",
+                    "prompt": "Which statement best describes Dana’s situation?",
+                    "options": [
+                      {
+                        "id": "A",
+                        "text": "She is ready to leave as soon as she gets one project."
+                      },
+                      {
+                        "id": "B",
+                        "text": "She is interested in freelance work but wants regular work first."
+                      },
+                      {
+                        "id": "C",
+                        "text": "She will leave only after she moves into her own apartment."
+                      }
+                    ],
+                    "correctId": "B"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B1D1-M05-Q2",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-Q2",
+                "kind": "choice",
+                "title": "Listen and find out what Dana is considering.",
+                "items": [
+                  {
+                    "id": "2",
+                    "prompt": "Why is working from home a problem for her?",
+                    "options": [
+                      {
+                        "id": "A",
+                        "text": "Her apartment is small and her flatmate makes calls during the day."
+                      },
+                      {
+                        "id": "B",
+                        "text": "She cannot afford to keep renting her current apartment."
+                      },
+                      {
+                        "id": "C",
+                        "text": "Her employer will not let her work from home."
+                      }
+                    ],
+                    "correctId": "A"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B1D1-M05-discuss",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M05-discuss",
+                "kind": "presentation",
+                "title": "Discuss Dana’s decision.",
+                "blocks": [
+                  {
+                    "type": "text",
+                    "text": "1. What could go wrong if Dana left her job with only one freelance project?"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2. A company offers you a full-time job with better hours. What else would you ask about before accepting it?"
+                  },
+                  {
+                    "type": "text",
+                    "text": "3. Would you leave a job you liked for more flexible working hours? Why or why not?"
+                  }
+                ],
+                "instruction": "Choose one question and explain your answer. You can speak for an imaginary person."
+              }
+            }
+          ],
+          "progressive": true,
+          "requireCheckBeforeNext": true,
+          "revealStops": [
+            3,
+            4,
+            5
+          ],
+          "instruction": "Dana and Chris are talking after work."
+        }
+      },
+      {
+        "menu": "Listen again",
+        "navigationTitle": "Listen again",
+        "section": "tasks",
+        "guide": {
+          "time": "2 min",
+          "teacherNotes": ""
+        },
+        "exercise": {
+          "version": 1,
+          "id": "B1D1-M06",
+          "kind": "stage",
+          "title": "Listen again and match the situations with Dana’s choices.",
+          "layout": "grouped",
+          "exercises": [
+            {
+              "id": "B1D1-M06-audio",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M06-audio",
+                "kind": "audio",
+                "title": "Listen again and match the situations with Dana’s choices.",
+                "mediaRef": "B1D1_DIALOGUE"
+              }
+            },
+            {
+              "id": "B1D1-M06-transcript",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M06-transcript",
+                "kind": "presentation",
+                "title": "Listen again and match the situations with Dana’s choices.",
+                "blocks": [
+                  {
+                    "type": "disclosure",
+                    "title": "Transcript",
+                    "text": "Dana: I like my job, but I’d love to choose my own hours.\nChris: Would you go freelance if you had a few regular clients?\nDana: Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.\nChris: Fair enough. What about working from home?\nDana: I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.\nChris: Would you rent an apartment on your own?\nDana: If I earned more, I would. For now, it’s too expensive.\nChris: What would you do if a company offered you a full-time job with better hours?\nDana: I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind."
+                  }
+                ]
+              }
+            },
+            {
+              "id": "B1D1-M06-pairs",
+              "exercise": {
+                "version": 1,
+                "id": "B1D1-M06-pairs",
+                "kind": "matching",
+                "title": "Listen again and match the situations with Dana’s choices.",
+                "items": [
+                  {
+                    "id": "1",
+                    "text": "If she had regular work for six months, …",
+                    "correctId": "C"
+                  },
+                  {
+                    "id": "2",
+                    "text": "If she earned more, …",
+                    "correctId": "D"
+                  },
+                  {
+                    "id": "3",
+                    "text": "If a company offered better working hours, …",
+                    "correctId": "B"
+                  }
+                ],
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "she would immediately reject the offer."
+                  },
+                  {
+                    "id": "B",
+                    "text": "she would ask questions before deciding."
+                  },
+                  {
+                    "id": "C",
+                    "text": "she would be willing to try freelance work."
+                  },
+                  {
+                    "id": "D",
+                    "text": "she would rent an apartment on her own."
+                  }
+                ]
+              }
+            }
+          ],
+          "instruction": "One ending is extra."
         }
       },
       {
@@ -1234,7 +1229,7 @@ const lessons=[
         "navigationTitle": "Final Speaking",
         "section": "tasks",
         "guide": {
-          "time": "6 min",
+          "time": "5 min",
           "teacherNotes": "ученик формулирует минимум одно собственное условие с if, использует would/wouldn’t для решения, задаёт условный вопрос и реагирует на изменившееся условие. Личное решение не оценивается как правильное или неправильное. Не требовать все шесть Words в каждой реплике."
         },
         "exercise": {
@@ -1337,7 +1332,7 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "2.5 min",
-          "teacherNotes": "concentrate здесь внимание, не «сосредоточиться географически»; consider — обдумать, не принять решение; refuse — явный отказ. Prepare шире revise, поэтому в заданиях не объявлять их взаимоисключающими там, где подходят оба. Эти сочетания вводятся здесь для дальнейших советов, а не как отдельная большая тема gerund/infinitive."
+          "teacherNotes": "concentrate здесь внимание, не «сосредоточиться географически»; consider — обдумать, не принять решение; refuse — явный отказ. Prepare шире revise, поэтому в заданиях не объявлять их взаимоисключающими там, где подходят оба. Эти сочетания вводятся здесь для дальнейших советов, а не как отдельная большая тема gerund/infinitive. Сочетания раскрываются отдельным правилом по стрелке после Matching, до произношения и практики слов; в feedback остаются только ответы."
         },
         "exercise": {
           "version": 1,
@@ -1402,18 +1397,37 @@ const lessons=[
               "text": "keep away from something or try not to do it"
             }
           ],
-          "afterCheck": {
-            "text": "prepare for an interview\nrevise a topic / revise for an exam\nconcentrate on one task\navoid checking your phone\nconsider joining a group\nrefuse to do something\n\nHere, revise means study again before an exam. It is common in British English; American English often uses review.",
-            "highlights": [
-              "prepare for",
-              "revise",
-              "revise for",
-              "concentrate on",
-              "avoid checking",
-              "consider joining",
-              "refuse to do",
-              "revise",
-              "review"
+          "followUp": {
+            "kind": "rule-page",
+            "title": "Match the verbs with their meanings.",
+            "blocks": [
+              {
+                "type": "rule",
+                "title": "Какие слова следуют за этими глаголами",
+                "text": "Вы сопоставили шесть глаголов с их значениями. Чтобы использовать их в следующем задании и в советах, обратите внимание на слова после глагола.\n\nДля подготовки к событию используем prepare for: prepare for an interview. Для повторения материала — revise a topic или revise for an exam. Здесь revise означает «повторять изученное перед экзаменом»; в американском английском часто используют review.\n\nConcentrate соединяется с on: concentrate on one task — сосредоточиться на одной задаче.\n\nПосле avoid и consider можно поставить существительное или глагол с -ing: avoid distractions / avoid checking your phone; consider both options / consider joining a group.\n\nПосле refuse перед действием ставим to: refuse to do something — отказаться что-либо делать. Например: I refuse to work every weekend.",
+                "highlights": [
+                  "prepare for",
+                  "prepare for an interview",
+                  "revise a topic",
+                  "revise for an exam",
+                  "revise",
+                  "review",
+                  "Concentrate",
+                  "on",
+                  "concentrate on one task",
+                  "avoid",
+                  "consider",
+                  "-ing",
+                  "avoid distractions",
+                  "avoid checking your phone",
+                  "consider both options",
+                  "consider joining a group",
+                  "refuse",
+                  "to",
+                  "refuse to do something",
+                  "I refuse to work every weekend"
+                ]
+              }
             ]
           }
         }
