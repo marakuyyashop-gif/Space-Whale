@@ -59,14 +59,14 @@ for(const prefix of Object.keys(lessonIds)){
   const n=String(i+1).padStart(2,'0'),root=audioRoots[prefix];
   if(prefix==='A2_SEQ'){
    // Revised text needs its own recording; never play the older phrase under it.
-   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3',script:sequenceChunks[i],workPhrase:phrase};
+   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3?v=20260927-ready',script:sequenceChunks[i],workPhrase:phrase};
    slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
   }else{
    slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3',script:phrase,workPhrase:phrase};
-   slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3',script:examples[prefix][i]};
+   slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3?v=20260927-ready',script:examples[prefix][i]};
   }
  });
- slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
+ slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3?v=20260927-ready',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
  if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Pictures of her day'};
  else{
