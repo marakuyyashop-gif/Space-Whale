@@ -17,7 +17,7 @@ media[3].L3_DIALOGUE.script="Nina: I need a scarf for my sister.\nLeo: Which one
 media[3].L3_DIALOGUE_TEXT.text=media[3].L3_DIALOGUE.script;
 const mediaRoot='assets/lesson-media/a1-2/module-4/';
 const accessorySizes=[[482,486],[494,275],[416,480],[501,371],[311,488],[522,249]];
-words3.forEach((word,i)=>{media[3]['L3_IMG_'+String(i+1).padStart(2,'0')]={type:'image',src:mediaRoot+'lesson-3/media/'+word+'.webp',width:accessorySizes[i][0],height:accessorySizes[i][1],alt:'Picture '+(i+1),target:word};});
+words3.forEach((word,i)=>{media[3]['L3_IMG_'+String(i+1).padStart(2,'0')]={type:'image',src:mediaRoot+'lesson-3/media/'+word+'-cutout.webp',width:accessorySizes[i][0],height:accessorySizes[i][1],alt:'Picture '+(i+1),target:word};});
 media[3].L1_SPEAKING_REUSE={...registry['a1-2-w4-l1']?.A1M4L1_IMAGE_SPEAKING_01,reuseAsset:'A1M4L1_IMAGE_SPEAKING_01'};
 media[3].L3_SPEAKING={type:'image',src:mediaRoot+'lesson-3/media/speaking-cutout.webp',width:1536,height:1024,alt:'A scarf, belt, gloves, cap, tie and sunglasses'};
 media[4].L4_PEOPLE={type:'image',src:mediaRoot+'lesson-4/media/people-abc.webp',width:1020,height:388,alt:'Person A, Person B and Person C',sourceSheet:mediaRoot+'lesson-4-people.png',notes:'A: Rosa, original person 1; B: Ella, original person 3; C: Nora, original person 2, long curly hair and green eyes. No personality inferred from appearance.'};
