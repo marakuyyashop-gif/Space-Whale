@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — A1.2 M4 L1 Two Word Fixes</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:860px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:10px}
+audio{width:100%;margin:8px 0 20px}
+.small{color:#666;font-size:14px}
+.card{padding:16px;border:1px solid #ddd;border-radius:12px;margin:16px 0}
+</style>
+</head>
+<body>
+<h1>A1.2 · Module 4 · Lesson 1 · Two word fixes</h1>
+<p>Fix only <b>coat</b> and <b>blouse</b>.</p>
+<p class="small">Coat: Jessica, speed 0.90, plus a short natural break after the word. Blouse: extracted from the approved sentence “My sister wants this blouse.” — no new TTS pronunciation.</p>
+<button id="run">Create the 2 corrected clips</button>
+<pre id="status">Ready.</pre>
+
+<div class="card" id="coatCard" hidden>
+<b>coat — new take</b>
+<audio id="coatAudio" controls></audio>
+</div>
+
+<div class="card" id="blouseCard" hidden>
+<b>blouse — cut from the good sentence</b>
+<audio id="blouseAudio" controls></audio>
+<div class="small" id="cutInfo"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async () => {
+  const client = window.spaceWhaleSupabase;
+  const run = document.getElementById('run');
+  const status = document.getElementById('status');
+  const coatCard = document.getElementById('coatCard');
+  const blouseCard = document.getElementById('blouseCard');
+  const coatAudio = document.getElementById('coatAudio');
+  const blouseAudio = document.getElementById('blouseAudio');
+  const cutInfo = document.getElementById('cutInfo');
+
+  const BASE = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/';
+  const SOURCE_SENTENCE = BASE + 'a1-2/w4/l1/listen-repeat/A1M4L1_SENTENCE_03.mp3';
+  const COAT_PATH = 'a1-2/w4/l1/listen-repeat/A1M4L1_WORD_01_r3.mp3';
+  const BLOUSE_PATH = 'a1-2/w4/l1/listen-repeat/A1M4L1_WORD_03_cut1.wav';
+
+  const { data: { session } } = await client.auth.getSession();
+  if (!session) {
+    run.disabled = true;
+    status.textContent = 'No active Space Whale session. Sign in as owner on the main site, then reopen this page.';
+    return;
+  }
+
+  function encodeWav(mono, sampleRate, leadSeconds=0.04, tailSeconds=0.18) {
+    const lead = Math.round(sampleRate * leadSeconds);
+    const tail = Math.round(sampleRate * tailSeconds);
+    const total = lead + mono.length + tail;
+    const buffer = new ArrayBuffer(44 + total * 2);
+    const view = new DataView(buffer);
+    const writeStr = (o,s) => { for (let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); };
+    writeStr(0,'RIFF');
+    view.setUint32(4,36 + total*2,true);
+    writeStr(8,'WAVE');
+    writeStr(12,'fmt ');
+    view.setUint32(16,16,true);
+    view.setUint16(20,1,true);
+    view.setUint16(22,1,true);
+    view.setUint32(24,sampleRate,true);
+    view.setUint32(28,sampleRate*2,true);
+    view.setUint16(32,2,true);
+    view.setUint16(34,16,true);
+    writeStr(36,'data');
+    view.setUint32(40,total*2,true);
+    let off = 44;
+    for (let i=0;i<lead;i++,off+=2) view.setInt16(off,0,true);
+    for (let i=0;i<mono.length;i++,off+=2) {
+      const s = Math.max(-1,Math.min(1,mono[i]));
+      view.setInt16(off,s<0?s*0x8000:s*0x7fff,true);
+    }
+    for (let i=0;i<tail;i++,off+=2) view.setInt16(off,0,true);
+    return new Blob([buffer],{type:'audio/wav'});
+  }
+
+  async function extractLastWord() {
+    const res = await fetch(SOURCE_SENTENCE, {cache:'no-store'});
+    if (!res.ok) throw new Error('Could not load the approved blouse sentence.');
+    const bytes = await res.arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await ctx.decodeAudioData(bytes.slice(0));
+
+    const sr = buf.sampleRate;
+    const n = buf.length;
+    const mono = new Float32Array(n);
+    for (let ch=0; ch<buf.numberOfChannels; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i=0;i<n;i++) mono[i] += d[i] / buf.numberOfChannels;
+    }
+
+    const frameSec = 0.005;
+    const frame = Math.max(1, Math.round(sr*frameSec));
+    const count = Math.ceil(n/frame);
+    const rms = new Float32Array(count);
+    let maxRms = 0;
+
+    for (let f=0; f<count; f++) {
+      const a=f*frame, b=Math.min(n,a+frame);
+      let sum=0;
+      for (let i=a;i<b;i++) sum += mono[i]*mono[i];
+      const v=Math.sqrt(sum/Math.max(1,b-a));
+      rms[f]=v;
+      if (v>maxRms) maxRms=v;
+    }
+
+    const smooth = new Float32Array(count);
+    for (let f=0;f<count;f++) {
+      let s=0,k=0;
+      for (let j=Math.max(0,f-2);j<=Math.min(count-1,f+2);j++){s+=rms[j];k++;}
+      smooth[f]=s/k;
+    }
+
+    const sorted=Array.from(smooth).sort((a,b)=>a-b);
+    const floor=sorted[Math.floor(sorted.length*0.15)] || 0;
+    const activeThreshold = floor + (maxRms-floor)*0.09;
+    const quietThreshold = floor + (maxRms-floor)*0.055;
+
+    let endFrame=count-1;
+    while(endFrame>0 && smooth[endFrame] < activeThreshold) endFrame--;
+
+    const minSearch = Math.max(0, endFrame - Math.round(1.15/frameSec));
+    const maxSearch = Math.max(minSearch, endFrame - Math.round(0.20/frameSec));
+    const minQuietRun = Math.max(2,Math.round(0.020/frameSec));
+
+    let boundary = -1;
+    let runEnd=-1, runLen=0;
+    for (let f=maxSearch; f>=minSearch; f--) {
+      if (smooth[f] < quietThreshold) {
+        if (runEnd<0) runEnd=f;
+        runLen++;
+      } else {
+        if (runLen>=minQuietRun) {
+          boundary = runEnd + 1;
+          break;
+        }
+        runEnd=-1; runLen=0;
+      }
+    }
+
+    if (boundary < 0) {
+      let best=minSearch, bestVal=Infinity;
+      for (let f=minSearch; f<=maxSearch; f++) {
+        if (smooth[f] < bestVal) { bestVal=smooth[f]; best=f; }
+      }
+      boundary=best;
+    }
+
+    let startSec = boundary*frameSec - 0.025;
+    let endSec = (endFrame+1)*frameSec + 0.035;
+
+    const duration = endSec-startSec;
+    if (duration < 0.38) startSec=endSec-0.48;
+    if (duration > 1.10) startSec=endSec-1.00;
+    startSec=Math.max(0,startSec);
+    endSec=Math.min(buf.duration,endSec);
+
+    const start=Math.max(0,Math.floor(startSec*sr));
+    const end=Math.min(n,Math.ceil(endSec*sr));
+    const cut=mono.slice(start,end);
+    const wav=encodeWav(cut,sr,0.045,0.20);
+
+    await ctx.close();
+    return {wav,startSec,endSec,duration:endSec-startSec};
+  }
+
+  run.addEventListener('click', async () => {
+    run.disabled=true;
+    coatCard.hidden=true;
+    blouseCard.hidden=true;
+    status.textContent='1/2 Generating coat at 0.90...';
+
+    try {
+      const { data: coatData, error: coatError } = await client.functions.invoke('generate-course-tts', {
+        body:{
+          voice_id:'cgSgspJ2msm6clMCkdW9',
+          clips:[
+            {
+              path:COAT_PATH,
+              text:'Coat. <break time="0.25s" />',
+              speed:0.90
+            }
+          ]
+        }
+      });
+
+      if (coatError) {
+        let details='';
+        try { if (coatError.context?.clone) details=await coatError.context.clone().text(); } catch {}
+        throw new Error((coatError.message||String(coatError)) + (details?'\n'+details:''));
+      }
+
+      const coatUrl = (coatData?.clips?.[0]?.url || (BASE+COAT_PATH)) + '?v=' + Date.now();
+      coatAudio.src=coatUrl;
+      coatCard.hidden=false;
+
+      status.textContent='2/2 Cutting blouse from the approved sentence...';
+      const cut = await extractLastWord();
+
+      const { error: uploadError } = await client.storage
+        .from('course-audio')
+        .upload(BLOUSE_PATH, cut.wav, {
+          contentType:'audio/wav',
+          cacheControl:'31536000',
+          upsert:true
+        });
+
+      if (uploadError) throw uploadError;
+
+      blouseAudio.src=BASE+BLOUSE_PATH+'?v='+Date.now();
+      blouseCard.hidden=false;
+      cutInfo.textContent='Automatic cut: '+cut.startSec.toFixed(3)+'s–'+cut.endSec.toFixed(3)+'s; short silence added before and after the word.';
+      status.textContent='SUCCESS\ncoat → '+COAT_PATH+'\nblouse → '+BLOUSE_PATH+'\n\nListen to both players below.';
+    } catch (e) {
+      status.textContent='FAILED\n'+(e?.message||String(e));
+      run.disabled=false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
