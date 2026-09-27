@@ -77,8 +77,6 @@ For future asset generation, use transparent backgrounds for isolated objects (e
 
 The recording script and displayed transcript both read the same `A1M4L1_AUDIO_01.script` value in the runtime registry. The revised eight-line dialogue includes the thirty-euro price and request to hold the sweater. Do not generate a new recording yet. The existing three questions and reveal logic are unchanged.
 
-## Transparent artwork — 2026-09-26
+## Original artwork cutouts — 2026-09-27
 
-At the owner’s request, all seven lesson illustrations (six objects and the shared speaking composition) now use `*-transparent.webp` siblings. Beige/pink paper backgrounds were extracted with the built-in image editor; garment shading and subtle edge shadows remain. Alpha is retained losslessly during WebP encoding. Original opaque WebP files and source links are retained for rollback. All eight registry slots, including the repeated coat, use the new files and their actual dimensions.
-
-Editing prompt: Remove only the beige/pink paper background to true alpha transparency, including gaps between objects. Preserve the original clothing, colors, sketch outlines, textures, shading, arrangement and framing. Retain minimal soft semi-transparent neutral shadows; no colored matte, paper patch, white background, redesign or additional objects.
+The generative background-removal variants were rejected and deleted. All seven lesson images now use `*-cutout.webp`, made from the original uploaded PNGs linked in the images README. Only an alpha mask changes: visible RGB pixels match the original PNG exactly, verified again after lossless WebP encoding. No generation, recoloring, resizing or synthesized texture. Original garment shading remains. Background segmentation follows connected paper regions, protects enclosed pale fabric, then refines and antialiases silhouette edges. Proofs were inspected on light grey and dark grey backgrounds. Original opaque WebP files remain available.
