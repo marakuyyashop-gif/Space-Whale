@@ -61,6 +61,10 @@
     {
       id: 'A2.2',
       whales: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Whale ${i + 1}`, topics: [] }))
+    },
+    {
+      id: 'B1.1',
+      whales: [{ id: 1, title: 'Whale 1', topics: [] }]
     }
   ];
 
