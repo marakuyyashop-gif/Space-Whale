@@ -19,7 +19,7 @@ const media={
     },
     "B1D1_SCENES": {
       "type": "image",
-      "src": "assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg",
+      "src": "assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc",
       "alt": "Three situations to discuss",
       "width": 1440,
       "height": 420
@@ -98,7 +98,7 @@ const media={
     },
     "B1D2_SCENES": {
       "type": "image",
-      "src": "assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg",
+      "src": "assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc",
       "alt": "Three situations to discuss",
       "width": 1440,
       "height": 420
