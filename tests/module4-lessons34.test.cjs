@@ -11,10 +11,80 @@ test('closed keys, matching IDs and option order match WORK',()=>{assert.deepEqu
 test('word recall uses separate fields, accepts articles and case, rejects a sunglasses',()=>{const d=find('L3-M05'),v=setup(d);assert.equal(v.host.querySelectorAll('input.ek-writing-input').length,3);assert.equal(v.host.querySelectorAll('.ek-picture-sentence').length,3);assert.equal(v.host.querySelector('.ek-typed-gap'),null);assert.equal(kit.grade(d,{'1':'A CAP','2':'a pair of sunglasses','3':'a belt'})['1'],'correct');assert.equal(kit.grade(d,{'2':'a sunglasses'})['2'],'retry');assert.equal(kit.grade(find('L4-M05'),{'1':'lazy','2':'quiet','3':'helpful'})['3'],'correct');});
 test('source and first listening question start together; next question waits for a check',()=>{for(const [id,initial,qid,correct] of [['L3-M06',2,'L3-M06-Q1','B'],['L4-M06',3,'L4-M06-Q1','C']]){const v=setup(find(id));assert.equal(v.host.querySelectorAll('.ek-stage-stack>.ek-stage-section').length,initial);assert.ok(v.host.querySelector('.ek-audio-player'));assert.ok(v.host.querySelector('.ek-stage-down').disabled);v.handle.setAnswers({[qid]:{'1':correct,__sw_checked:true}});assert.equal(v.host.querySelector('.ek-stage-down').disabled,false);v.click('Show next exercise');assert.equal(v.host.querySelectorAll('.ek-stage-stack>.ek-stage-section:not([hidden])').length,initial+1);assert.ok(v.host.querySelector('.ek-audio-player'));v.handle.destroy();}});
 test('examples, single rule and compact practice reveal in order and synchronize via view state',()=>{for(const id of ['L3-M07','L4-M07']){const v=setup(find(id));assert.equal(v.host.querySelector('.ek-rule-block'),null);v.click('Show next exercise');assert.equal(v.host.querySelectorAll('.ek-rule-block').length,1);assert.equal(v.host.querySelector('.ek-inline-choice,.ek-group-grid'),null);v.click('Show next exercise');assert.ok(v.host.querySelector('.ek-inline-choice,.ek-group-grid'));const remote=setup(find(id),{navigationReadOnly:true});remote.handle.setViewState(v.handle.getViewState(),false);assert.ok(remote.host.querySelector('.ek-inline-choice,.ek-group-grid'));}});
-test('three order questions open together after explanation, in a compact composition',()=>{const v=setup(find('L3-M08'));assert.equal(v.host.querySelectorAll('.ek-order-target').length,0);v.click('Show next exercise');assert.equal(v.host.querySelectorAll('.ek-order-target').length,3);assert.ok(v.host.classList.contains('ek-stage-compact'));});
+test('question building reveals examples, rule and each checked task only on teacher arrows',()=>{
+ const def=find('L3-M08'),pupil=setup(def,{navigationReadOnly:true});
+ const teacher=setup(def,{onViewChange:view=>pupil.handle.setViewState(view,false),onChange:answers=>pupil.handle.setAnswers(answers)});
+ const fire=element=>element.dispatchEvent(new teacher.host.ownerDocument.defaultView.Event('click',{bubbles:true}));
+ assert.equal(teacher.host.querySelector('.ek-rule-block'),null);
+ assert.equal(teacher.host.querySelector('.ek-order-target'),null);
+ teacher.click('Show next exercise');
+ assert.equal(teacher.host.querySelectorAll('.ek-rule-block').length,1);
+ assert.equal(teacher.host.querySelector('.ek-order-target'),null);
+ assert.equal(pupil.host.querySelectorAll('.ek-rule-block').length,1);
+ teacher.click('Show next exercise');
+ for(let i=0;i<3;i++){
+   assert.equal(teacher.host.querySelectorAll('.ek-order-target').length,i+1);
+   assert.equal(pupil.host.querySelectorAll('.ek-order-target').length,i+1);
+   const next=teacher.host.querySelector('.ek-stage-down');if(i<2)assert.equal(next.disabled,true);
+   const child=teacher.host.querySelectorAll('.ek-stage-host')[i+2],task=def.exercises[i+2].exercise;
+   for(const id of task.correctOrder){const text=task.tokens.find(t=>t.id===id).text;fire([...child.querySelectorAll('.ek-bank button')].find(b=>b.textContent===text));}
+   fire(child.querySelector('.ek-check'));
+   assert.equal(teacher.host.querySelectorAll('.ek-order-target').length,i+1,'OK must not navigate');
+   if(i<2){assert.equal(teacher.host.querySelector('.ek-stage-down').disabled,false);teacher.click('Show next exercise');}
+ }
+ assert.equal(teacher.host.querySelector('.ek-stage-down'),null);
+ assert.equal(pupil.host.querySelector('.ek-stage-navigation').hidden,true);
+ const saved=teacher.handle.getAnswers(),restored=setup(def,{answers:saved});
+ assert.equal(restored.host.querySelectorAll('.ek-order-target').length,3);
+ teacher.click('Свернуть задание');
+ assert.equal(teacher.host.querySelectorAll('.ek-stage-section:not([hidden])').length,4);
+ assert.equal(pupil.host.querySelectorAll('.ek-stage-section:not([hidden])').length,4);
+ assert.equal(teacher.handle.getAnswers()['L3-M08-Q3'].__sw_checked,true);
+});
 test('open writing never auto-grades and possible answers require submission then a click',()=>{for(const id of ['L3-M10','L4-M10']){const v=setup(find(id));assert.equal(v.host.querySelector('details'),null);const a=Object.fromEntries(find(id).items.map(i=>[i.id,'My own response.']));assert.ok(Object.values(kit.grade(find(id),a)).every(g=>g==='review'));v.handle.setAnswers({...a,__sw_checked:true});const detail=v.host.querySelector('details');assert.ok(detail);assert.ok(!detail.open);assert.equal(detail.querySelector('summary').textContent,'Possible answers');v.click('Possible answers');assert.equal(detail.open,true);v.click('Reset exercise');assert.equal(v.host.querySelector('details'),null);}});
 test('checked choice feedback is a full sentence with the target emphasized',()=>{const d=find('L3-M06').exercises[1].exercise,v=setup(d);v.handle.setAnswers({'1':'A',__sw_checked:true});const p=v.host.querySelector('.ek-answer-pairs .ek-copy');assert.equal(p.textContent,'The scarf is for Nina’s sister.');assert.equal(p.querySelector('strong').textContent,'Nina’s sister');});
 test('future transcripts stay absent until supplied and stay closed until all attempts',()=>{const supplied=load({'a1-2-w4-l4':{L4_DIALOGUE_TEXT:{type:'text',text:'Test transcript supplied by author.'}}});const d=supplied.SpaceWhaleContent.find(l=>l.id==='a1-2-w4-l4').stages[5].exercise;const v=setup(d),detail=v.host.querySelector('details');assert.ok(detail.hidden);v.handle.setAnswers({'L4-M06-Q1':{'1':'C',__sw_checked:true},'L4-M06-Q2':{'2':'B',__sw_checked:true},revealed:4});assert.equal(detail.hidden,false);assert.ok(!detail.open);assert.equal(find('L4-M06').transcript,undefined);assert.equal(find('L4-M09').transcript,undefined);});
 test('useful phrases start open; final speaking has no fabricated conversation',()=>{for(const id of ['L3-M01','L3-M11','L4-M01','L4-M11']){const v=setup(find(id));assert.equal(v.host.querySelector('details').open,true);assert.equal(v.host.querySelectorAll('details').length,1);}});
 test('lesson 3 first listening transcript unlocks only after the later listening milestone',()=>{const a=load({'a1-2-w4-l3':{L3_DIALOGUE_TEXT:{type:'text',text:'Author transcript.'}}}),d=a.SpaceWhaleContent[2].stages[5].exercise;assert.equal(d.transcriptGate,'L3-M09');const before=setup(d,{isMilestoneAttempted:()=>false});assert.ok(before.host.querySelector('details').hidden);const after=setup(d,{isMilestoneAttempted:id=>id==='L3-M09'});assert.equal(after.host.querySelector('details').hidden,false);assert.ok(!after.host.querySelector('details').open);});
 test('existing Workspace catalog resolves new lessons and stable uppercase milestone IDs',()=>{const catalog=require('../workspace-catalog.js').createCatalog(app.SpaceWhaleContent,[]);for(const lesson of lessons){const route=catalog.normalize({view:'library',level:'A1.2',whale:4,lesson:lesson.id,exercise:lesson.stages[6].exercise.id,section:'tasks',panel:'class'});assert.equal(route.lesson,lesson.id);assert.equal(route.exercise,lesson.stages[6].exercise.id);assert.equal(catalog.lessons.find(l=>l.id===lesson.id).title,lesson.title);}});
+
+test('source media have no Skip and only components in one reveal step share linked spacing',()=>{
+ for(const [id,initial] of [['L3-M06',2],['L4-M06',3],['L4-M09',2]]){
+   const v=setup(find(id)),sections=[...v.host.querySelector('.ek-stage-stack').children];
+   assert.equal(sections.length,initial);
+   for(const s of sections.slice(0,-1))assert.equal(s.querySelector('.ek-skip'),null);
+   assert.equal(sections[initial-1].querySelectorAll('.ek-skip').length,1);
+   assert.ok(sections.slice(1).every(s=>s.classList.contains('ek-stage-linked')));
+ }
+ const v=setup(find('L3-M08'));v.click('Show next exercise');
+ assert.equal(v.host.querySelectorAll('.ek-stage-linked').length,0,'rule is a separate step');
+});
+test('skipped task does not block later checked questions',()=>{
+ const v=setup(find('L3-M08'));v.click('Show next exercise');v.click('Show next exercise');v.click('Skip exercise');
+ assert.equal(v.host.querySelectorAll('.ek-order-target').length,2);
+ const a=v.handle.getAnswers();assert.equal(a['L3-M08-Q1'].__sw_skipped,true);
+ a['L3-M08-Q2']={order:Array.from(find('L3-M08').exercises[3].exercise.correctOrder),__sw_checked:true};v.handle.setAnswers(a);
+ assert.equal(v.host.querySelector('.ek-stage-down').disabled,false);v.click('Show next exercise');
+ assert.equal(v.host.querySelectorAll('.ek-order-target').length,3);
+});
+test('listening contrast reveals one audio/question pair at a time and keeps the source mounted',()=>{
+ const v=setup(find('L4-M09'));assert.equal(v.host.querySelectorAll('.ek-audio-player').length,1);
+ assert.equal(v.host.querySelector('.ek-stage-down').disabled,true);
+ const first=v.host.querySelector('.ek-audio-player');
+ v.handle.setAnswers({'L4-M09-Q1':{'1':'B',__sw_checked:true}});v.click('Show next exercise');
+ assert.equal(v.host.querySelectorAll('.ek-audio-player').length,2);
+ assert.equal(v.host.querySelector('.ek-audio-player'),first);
+ const sections=[...v.host.querySelector('.ek-stage-stack').children];
+ assert.equal(sections[2].classList.contains('ek-stage-linked'),false);
+ assert.equal(sections[3].classList.contains('ek-stage-linked'),true);
+});
+test('pending pictures use the same numbered strip without leaking keys into captions',()=>{
+ for(const id of ['L3-M04','L3-M05']){
+   const def=find(id),v=setup(def),strip=v.host.querySelector('.ek-picture-cues');
+   assert.equal(strip.children.length,def.items.length);
+   assert.equal(strip.querySelectorAll('.ek-image-pending').length,def.items.length);
+   assert.deepEqual([...strip.querySelectorAll('figcaption')].map(e=>e.textContent),Array.from(def.items,(_,i)=>String(i+1)));
+   assert.equal(v.host.querySelectorAll('.ek-picture-sentence').length,def.items.length);
+   assert.equal(v.host.querySelector('.ek-picture-sentence .ek-image-pending'),null);
+ }
+});

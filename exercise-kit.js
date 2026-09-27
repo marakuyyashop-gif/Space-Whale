@@ -621,8 +621,10 @@
     const onKeydown = event => { if (event.key === 'Escape') { if(dialog?.open)event.preventDefault();closeDialog(); dismissInline(); } };
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
+    host.classList.toggle('ek-picture-practice',['gaps','writing'].includes(def.kind)&&def.layout==='picture-rows');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
     host.classList.toggle('ek-stage-compact',def.kind==='stage'&&def.compact===true);
+    host.classList.toggle('ek-stage-sequence',def.kind==='stage'&&def.progressive===true);
     host.replaceChildren();
     if(!config.hideHeading)host.append(node('h2', 'ek-title', def.title));
     if(def.instruction && def.instruction.trim()!==def.title.trim())host.append(node('p', 'ek-instruction', def.instruction));
@@ -783,6 +785,18 @@
       wrap.addEventListener('focusout', event => { if (event.relatedTarget && !wrap.contains(event.relatedTarget)) dismissInline(); });
       paintControls.set(id,paint);paint(); wrap.append(opener, menu); return {wrap,opener};
     }
+    function pictureCues(items) {
+      const track=node('div','ek-picture-correction-track ek-picture-cues');
+      track.setAttribute('aria-label','Numbered pictures');track.tabIndex=0;
+      items.forEach((item,index)=>{
+        const card=node('figure','ek-picture-correction-card ek-picture-cue-card');
+        const pictures=node('div','ek-picture-cue-images');
+        for(let i=0;i<(item.imageCopies||1);i++)pictures.append(illustration(item));
+        card.append(pictures,node('figcaption','ek-picture-cue-number',String(index+1)));
+        card.setAttribute('aria-label','Picture '+(index+1));track.append(card);
+      });
+      return track;
+    }
     function render() {
       dismissInline();
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
@@ -820,8 +834,11 @@
           const index = nestedMounts.length;
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
+          if(def.progressive&&index>0&&!stageStops.includes(index))section.classList.add('ek-stage-linked');
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();},syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          // Source media and lead-ins are materials, not separately skippable tasks.
+          const onSkip=['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -843,7 +860,7 @@
           });
           if(down && def.requireCheckBeforeNext){
             const tasks=def.exercises.slice(0,visibleCount).filter(block=>['matching','gaps','choice','order','sort','writing'].includes(block.exercise.kind));
-            down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>{const state=answers[block.id]||{},values=Object.values(grade(block.exercise,state));return !state.__sw_checked||!values.length||values.includes('empty');});
+            down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>{const state=answers[block.id]||{},values=Object.values(grade(block.exercise,state));return !state.__sw_skipped&&(!state.__sw_checked||!values.length||values.includes('empty'));});
           }
           if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly||config.navigationReadOnly) return;
@@ -1023,15 +1040,15 @@
           const bank = node('p', 'ek-word-list', def.bank.join(', '));
           bank.setAttribute('aria-label', 'Words to use'); body.append(bank);
         }
+        const pictureRows=def.layout==='picture-rows';
+        if(pictureRows)body.append(pictureCues(def.items));
         let gapNumber = 0;
         def.items.forEach((item, index) => {
-          const compact=def.layout==='picture-rows',container=compact?node('div','ek-picture-sentence'):body;
-          if(item.image || item.imagePending){
-            if(compact){const pictures=node('div','ek-picture-sentence-images');for(let i=0;i<(item.imageCopies||1);i++)pictures.append(illustration(item));container.append(pictures);}
-            else body.append(illustration(item));
-          }
+          const compact=pictureRows,container=compact?node('div','ek-picture-sentence'):body;
+          if(compact)container.append(node('span','ek-picture-response-number',`${index+1}.`));
+          if(!compact&&(item.image || item.imagePending))body.append(illustration(item));
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
-          if (!modern && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
+          if (!modern && !compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
             if (typeof segment === 'string') { row.append(doc.createTextNode(segment)); return; }
             gapNumber += 1;
@@ -1163,15 +1180,20 @@
         dropzone(bank, id => { delete answers[id]; save(); render(); });
         bank.hidden=!bank.children.length;body.append(groups, bank);
       }
-      if (def.kind === 'writing') def.items.forEach((item, index) => {
+      if (def.kind === 'writing') {
+        if(def.layout==='picture-rows')body.append(pictureCues(def.items));
+        def.items.forEach((item, index) => {
         const compact=def.layout==='picture-rows';
         const row=compact?node('div','ek-picture-sentence'):body;
-        if(item.image||item.imagePending){const pictures=node('div','ek-picture-sentence-images');pictures.append(illustration(item));row.append(pictures);}
-        const label = node('label', 'ek-writing', compact ? `${index+1}.` : `${index + 1}. ${item.prompt}`);
+        if(compact)row.append(node('span','ek-picture-response-number',`${index+1}.`));
+        if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
+        const label = node('label', 'ek-writing', compact ? '' : `${index + 1}. ${item.prompt}`);
         const input = node('input','ek-writing-input'); input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
+        if(compact)input.setAttribute('aria-label',`Word for picture ${index+1}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
         row.append(label);if(compact)body.append(row); controls.set(item.id, input);
       });
+      }
     }
     const lamps=new Map();
     function decorate(){

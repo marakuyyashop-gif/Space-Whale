@@ -47,14 +47,19 @@ test('setting a single image or audio URL later connects all uses without changi
  assert.equal(words.items[0].correctId,'coat');assert.equal(words.items[0].imagePending,undefined);
  assert.equal(attached.lesson.stages[5].exercise.exercises[0].exercise.audio,'assets/dialogue.mp3');
 });
-test('picture practice keeps every compact row together and reuses two coat images',()=>{
+test('picture practice shows a numbered image strip above all response rows and reuses two coats',()=>{
  for(const [id,count,mode] of [['word-choice',4,'select'],['word-type',3,'text']]){
    const def=stage(id),s=setup(def);assert.equal(s.host.querySelectorAll('.ek-picture-sentence').length,count);
    assert.equal(def.items.length,count);assert.equal(def.kind,'gaps');assert.equal(def.inputMode,mode);
    assert.equal(s.host.querySelector('.ek-stage-navigation'),null);assert.equal(s.host.querySelectorAll('.ek-check').length,1);
+   assert.equal(s.host.querySelectorAll('.ek-picture-cue-card').length,count);
+   assert.deepEqual([...s.host.querySelectorAll('.ek-picture-cue-number')].map(el=>el.textContent),Array.from({length:count},(_,i)=>String(i+1)));
+   assert.equal(s.host.querySelector('.ek-body').firstElementChild.classList.contains('ek-picture-cues'),true);
+   assert.equal(s.host.querySelector('.ek-picture-sentence img'),null);
+   assert.deepEqual([...s.host.querySelectorAll('.ek-picture-response-number')].map(el=>el.textContent),Array.from({length:count},(_,i)=>`${i+1}.`));
    assert.ok(!s.host.textContent.includes('______'));
  }
- const def=stage('word-type'),s=setup(def),coats=s.host.querySelectorAll('.ek-picture-sentence')[2];
+ const def=stage('word-type'),s=setup(def),coats=s.host.querySelectorAll('.ek-picture-cue-card')[2];
  assert.equal(coats.querySelectorAll('img').length,2);assert.equal(coats.querySelector('img').getAttribute('src'),media.A1M4L1_IMAGE_01.src);
  assert.equal(kit.grade(def,{'coats-gap':'coat'})['coats-gap'],'retry');assert.equal(kit.grade(def,{'coats-gap':'coats'})['coats-gap'],'correct');
  s.handle.setAnswers({sweater:{'sweater-gap':'sweater'},coats:{'coats-gap':'coats'}});assert.equal(s.handle.getAnswers()['coats-gap'],'coats');
