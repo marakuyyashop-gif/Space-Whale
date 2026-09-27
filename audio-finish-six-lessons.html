@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — Finish Six Lessons Audio</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:920px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:13px 20px;border:0;border-radius:11px;background:#111;color:#fff;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:16px;border-radius:12px;min-height:120px}
+.small{color:#666;font-size:14px}
+</style>
+</head>
+<body>
+<h1>Finish audio for the six current lessons</h1>
+<p>This fills only missing audio. Existing files are skipped wherever possible.</p>
+<p class="small">A1.2 L3: cap + precise tie · A2.1 M1 L1/L2: missing Listen & Repeat clips · B1.1 M1 L1/L2: full Listen & Repeat + dialogues.</p>
+<button id="run">Finish missing audio</button>
+<pre id="status">Ready.</pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async()=>{
+const client=window.spaceWhaleSupabase;
+const run=document.getElementById('run'),status=document.getElementById('status');
+const BASE='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/';
+const VOICE_F='cgSgspJ2msm6clMCkdW9',VOICE_M='JBFqnCBsd6RMkjVDRZzb';
+
+const {data:{session}}=await client.auth.getSession();
+if(!session){run.disabled=true;status.textContent='No active Space Whale owner session.';return;}
+
+const a2seq=[
+'First, we checked the address before leaving home.',
+'To begin with, we made a short plan for our day in the city.',
+'Then, we took a bus to the city centre and met Anna.',
+'Next, we bought two tickets for the afternoon tour.',
+'After that, we had lunch at a small café near the river.',
+'We finished lunch. Afterwards, we walked along the river.',
+'Later, we stopped at a bookshop and bought a present.',
+'We looked for the hotel for an hour. Eventually, we found it near the station.',
+'Finally, we went back to the hotel. That was the last part of our day.',
+'We wanted to take a bus, but there were no more buses. In the end, we took a taxi.'
+];
+const a2move=['climb up','climb over','jump over','step onto','move into','come out of','run around'];
+
+const b1l1=[
+['rent an apartment','We want to rent an apartment near the station.'],
+['move in together','They’re planning to move in together next month.'],
+['go freelance','My cousin wants to go freelance, but she needs more clients.'],
+['turn down an offer','The hours were too long, so I turned the offer down.'],
+['change your mind','You can change your mind before Friday.'],
+['take a chance','I don’t know anyone there, but I’m ready to take a chance.']
+];
+const b1l2=[
+['prepare','I need to prepare for my interview tomorrow.'],
+['revise','I’m going to revise the difficult topics before the exam.'],
+['concentrate','It’s hard to concentrate on my work with all this noise.'],
+['avoid','I try to avoid checking my phone during meetings.'],
+['consider','We’re going to consider moving to a smaller apartment.'],
+['refuse','She refused to work another weekend.']
+];
+
+const batchA=[
+{path:'a1-2/w4/l3/listen-repeat/L3_W04_r2.mp3',text:'Cap. <break time="0.25s" />',speed:.90},
+...a2seq.map((text,i)=>({path:'a2-1/m1/l1/listen-repeat/A2_SEQ_P'+String(i+1).padStart(2,'0')+'.mp3',text,speed:.90})),
+...a2move.map((text,i)=>({path:'a2-1/m1/l2/listen-repeat/A2_MOVE_P'+String(i+1).padStart(2,'0')+'.mp3',text:text.charAt(0).toUpperCase()+text.slice(1)+'. <break time="0.22s" />',speed:.90}))
+];
+
+const batchB=[];
+for(const [lesson,prefix,rows] of [[1,'B1D1',b1l1],[2,'B1D2',b1l2]]){
+ rows.forEach((row,i)=>{
+  const n=String(i+1).padStart(2,'0');
+  batchB.push({path:'b1-1/m1/l'+lesson+'/listen-repeat/'+prefix+'_W'+n+'.mp3',text:row[0].charAt(0).toUpperCase()+row[0].slice(1)+'. <break time="0.22s" />',speed:.90});
+  batchB.push({path:'b1-1/m1/l'+lesson+'/listen-repeat/'+prefix+'_E'+n+'.mp3',text:row[1],speed:.90});
+ });
+}
+
+const d1=[
+['Dana','I like my job, but I’d love to choose my own hours.'],
+['Chris','Would you go freelance if you had a few regular clients?'],
+['Dana','Maybe. If I had enough work for six months, I’d take a chance. I wouldn’t leave just for one project.'],
+['Chris','Fair enough. What about working from home?'],
+['Dana','I’d need a quieter place. My apartment’s small, and my flatmate takes calls all day.'],
+['Chris','Would you rent an apartment on your own?'],
+['Dana','If I earned more, I would. For now, it’s too expensive.'],
+['Chris','What would you do if a company offered you a full-time job with better hours?'],
+['Dana','I wouldn’t turn it down straight away. I’d ask a few questions. Maybe I’d change my mind.']
+];
+const d2=[
+['Leah','I have an interview for a weekend job at a café. My exam’s in three weeks, but the money would help.'],
+['Owen','If I were you, I’d ask how many weekends they need you to work.'],
+['Leah','I checked. Every weekend for the next month.'],
+['Owen','In your position, I wouldn’t agree to that. You need time to revise.'],
+['Leah','The interview’s tomorrow. I don’t want to cancel it.'],
+['Owen','You don’t have to. I’d prepare a few questions and ask about starting after the exam.'],
+['Leah','And if they need someone straight away?'],
+['Owen','I’d refuse the job for now. In your situation, the exam would come first.'],
+['Leah','That sounds fair. I’ll go to the interview and explain.']
+];
+
+const log=[];
+function show(s){log.push(s);status.textContent=log.join('\n');}
+async function invokeTts(label,clips){
+ show('• '+label+'…');
+ const {data,error}=await client.functions.invoke('generate-course-tts',{body:{voice_id:VOICE_F,clips}});
+ if(error){let d='';try{if(error.context?.clone)d=await error.context.clone().text();}catch{}throw Error(label+': '+(error.message||error)+(d?' | '+d:''));}
+ show('  ✓ '+label+' ('+(data?.clips?.length||0)+' checked)');
+}
+async function exists(path){
+ try{const r=await fetch(BASE+path,{method:'HEAD',cache:'no-store'});return r.ok;}catch{return false;}
+}
+async function dialogue(label,filename,rows){
+ const path='dialogues/'+filename+'.mp3';
+ if(await exists(path)){show('  ✓ '+label+' already exists');return;}
+ show('• '+label+'…');
+ const inputs=rows.map(([speaker,text])=>({text,voice_id:['Dana','Leah'].includes(speaker)?VOICE_F:VOICE_M}));
+ const {data,error}=await client.functions.invoke('generate-dialogue-audio',{body:{filename:filename+'.mp3',language_code:'en',speed:.90,inputs}});
+ if(error){let d='';try{if(error.context?.clone)d=await error.context.clone().text();}catch{}throw Error(label+': '+(error.message||error)+(d?' | '+d:''));}
+ show('  ✓ '+label+' generated');
+}
+
+function encodeWav(samples,sampleRate,lead=.055,tail=.22){
+ const l=Math.round(sampleRate*lead),t=Math.round(sampleRate*tail),total=l+samples.length+t;
+ const b=new ArrayBuffer(44+total*2),v=new DataView(b),write=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+ write(0,'RIFF');v.setUint32(4,36+total*2,true);write(8,'WAVE');write(12,'fmt ');
+ v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);write(36,'data');v.setUint32(40,total*2,true);
+ let o=44;for(let i=0;i<l;i++,o+=2)v.setInt16(o,0,true);
+ const fade=Math.max(1,Math.round(sampleRate*.006));
+ for(let i=0;i<samples.length;i++,o+=2){let g=1;if(i<fade)g=i/fade;if(samples.length-i-1<fade)g=Math.min(g,(samples.length-i-1)/fade);const x=Math.max(-1,Math.min(1,samples[i]*Math.max(0,g)));v.setInt16(o,x<0?x*32768:x*32767,true);}
+ for(let i=0;i<t;i++,o+=2)v.setInt16(o,0,true);
+ return new Blob([b],{type:'audio/wav'});
+}
+async function tie(){
+ const target='a1-2/w4/l3/listen-repeat/L3_W05_tie-from-sentence-v2.wav';
+ if(await exists(target)){show('  ✓ precise tie already exists');return;}
+ show('• Precise tie extraction…');
+ const source='a1-2/w4/l3/listen-repeat/L3_E05.mp3',transcript='My brother needs a tie for work.';
+ const {data:aligned,error}=await client.functions.invoke('align-course-audio-word',{body:{source_path:source,transcript,target_word:'tie',occurrence:1}});
+ if(error||!aligned?.ok)throw Error('tie alignment failed: '+(error?.message||JSON.stringify(aligned)));
+ const res=await fetch(BASE+source,{cache:'no-store'});if(!res.ok)throw Error('tie source load failed');
+ const bytes=await res.arrayBuffer(),ctx=new (window.AudioContext||window.webkitAudioContext)(),buf=await ctx.decodeAudioData(bytes.slice(0)),sr=buf.sampleRate,n=buf.length,mono=new Float32Array(n);
+ for(let ch=0;ch<buf.numberOfChannels;ch++){const d=buf.getChannelData(ch);for(let i=0;i<n;i++)mono[i]+=d[i]/buf.numberOfChannels;}
+ const start=Math.max(0,aligned.start-.018),end=Math.min(buf.duration,aligned.end+.026),cut=mono.slice(Math.floor(start*sr),Math.ceil(end*sr)),blob=encodeWav(cut,sr);
+ await ctx.close();
+ const {error:up}=await client.storage.from('course-audio').upload(target,blob,{contentType:'audio/wav',cacheControl:'31536000',upsert:true});
+ if(up)throw Error('tie upload failed: '+up.message);
+ show('  ✓ precise tie extracted');
+}
+
+run.onclick=async()=>{
+ run.disabled=true;log.length=0;
+ try{
+  show('Starting final audio pass…');
+  await invokeTts('A1.2 corrections + A2.1 missing Listen & Repeat',batchA);
+  await tie();
+  await invokeTts('B1.1 Listen & Repeat',batchB);
+  await dialogue('B1.1 Lesson 1 dialogue','b1-1-w1-misha-1-dialogue-s090',d1);
+  await dialogue('B1.1 Lesson 2 dialogue','b1-1-w1-misha-2-dialogue-s090',d2);
+  show('');
+  show('SUCCESS — all currently missing audio has been created or was already present.');
+ }catch(e){show('');show('FAILED: '+(e?.message||String(e)));run.disabled=false;}
+};
+})();
+</script>
+</body>
+</html>
