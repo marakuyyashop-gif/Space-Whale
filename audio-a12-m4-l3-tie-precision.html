@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — Precise tie extraction</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:860px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:10px}
+audio{width:100%;margin-top:10px}
+.small{color:#666;font-size:14px}
+.card{margin-top:18px;padding:16px;border:1px solid #ddd;border-radius:12px}
+</style>
+</head>
+<body>
+<h1>A1.2 · Module 4 · Lesson 3 · tie</h1>
+<p>Precisely extracts <b>tie</b> from “My brother needs a tie for work.” using word-level forced alignment.</p>
+<p class="small">The neighboring words are not included. A tiny safety pad is kept around the word and clean silence is added before/after it to avoid clipping.</p>
+<button id="run">Extract tie and upload it</button>
+<pre id="status">Ready.</pre>
+<div class="card" id="result" hidden>
+<b>tie — extracted from the sentence</b>
+<audio id="audio" controls></audio>
+<div class="small" id="info"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async()=>{
+  const client=window.spaceWhaleSupabase;
+  const run=document.getElementById('run');
+  const status=document.getElementById('status');
+  const result=document.getElementById('result');
+  const audio=document.getElementById('audio');
+  const info=document.getElementById('info');
+
+  const SOURCE_PATH='a1-2/w4/l3/listen-repeat/L3_E05.mp3';
+  const TARGET_PATH='a1-2/w4/l3/listen-repeat/L3_W05_tie-from-sentence-v2.wav';
+  const TRANSCRIPT='My brother needs a tie for work.';
+  const BASE='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/';
+
+  const {data:{session}}=await client.auth.getSession();
+  if(!session){run.disabled=true;status.textContent='No active Space Whale owner session.';return;}
+
+  function encodeWav(samples,sampleRate,lead=.055,tail=.22){
+    const leadN=Math.round(sampleRate*lead),tailN=Math.round(sampleRate*tail);
+    const total=leadN+samples.length+tailN;
+    const buffer=new ArrayBuffer(44+total*2),view=new DataView(buffer);
+    const write=(o,s)=>{for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));};
+    write(0,'RIFF');view.setUint32(4,36+total*2,true);write(8,'WAVE');write(12,'fmt ');
+    view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);
+    view.setUint32(24,sampleRate,true);view.setUint32(28,sampleRate*2,true);
+    view.setUint16(32,2,true);view.setUint16(34,16,true);write(36,'data');view.setUint32(40,total*2,true);
+    let off=44;
+    for(let i=0;i<leadN;i++,off+=2)view.setInt16(off,0,true);
+    const fade=Math.max(1,Math.round(sampleRate*.006));
+    for(let i=0;i<samples.length;i++,off+=2){
+      let gain=1;
+      if(i<fade)gain=i/fade;
+      if(samples.length-i-1<fade)gain=Math.min(gain,(samples.length-i-1)/fade);
+      const x=Math.max(-1,Math.min(1,samples[i]*Math.max(0,gain)));
+      view.setInt16(off,x<0?x*32768:x*32767,true);
+    }
+    for(let i=0;i<tailN;i++,off+=2)view.setInt16(off,0,true);
+    return new Blob([buffer],{type:'audio/wav'});
+  }
+
+  run.onclick=async()=>{
+    run.disabled=true;result.hidden=true;
+    status.textContent='1/3 Finding the exact word boundary for “tie”...';
+
+    const {data:aligned,error:alignError}=await client.functions.invoke('align-course-audio-word',{
+      body:{source_path:SOURCE_PATH,transcript:TRANSCRIPT,target_word:'tie',occurrence:1}
+    });
+
+    if(alignError||!aligned?.ok){
+      let details='';
+      try{if(alignError?.context?.clone)details=await alignError.context.clone().text();}catch{}
+      status.textContent='FAILED — alignment\n'+(alignError?.message||JSON.stringify(aligned)||'Unknown error')+(details?'\n\n'+details:'');
+      run.disabled=false;return;
+    }
+
+    status.textContent='2/3 Cutting only “tie” from the approved sentence...';
+    const res=await fetch(BASE+SOURCE_PATH,{cache:'no-store'});
+    if(!res.ok){status.textContent='FAILED — source audio '+res.status;run.disabled=false;return;}
+
+    const bytes=await res.arrayBuffer();
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const decoded=await ctx.decodeAudioData(bytes.slice(0));
+    const sr=decoded.sampleRate,n=decoded.length;
+    const mono=new Float32Array(n);
+    for(let ch=0;ch<decoded.numberOfChannels;ch++){
+      const data=decoded.getChannelData(ch);
+      for(let i=0;i<n;i++)mono[i]+=data[i]/decoded.numberOfChannels;
+    }
+
+    // Keep a tiny acoustic margin around the aligned word, but not enough to include
+    // the neighboring "a" or "for". The added outer silence gives the final T/Y sound room.
+    const start=Math.max(0,aligned.start-.018);
+    const end=Math.min(decoded.duration,aligned.end+.026);
+    const a=Math.floor(start*sr),b=Math.ceil(end*sr);
+    const wav=encodeWav(mono.slice(a,b),sr,.055,.22);
+    await ctx.close();
+
+    status.textContent='3/3 Uploading the extracted word...';
+    const {error:up}=await client.storage.from('course-audio').upload(TARGET_PATH,wav,{
+      contentType:'audio/wav',cacheControl:'31536000',upsert:true
+    });
+    if(up){status.textContent='FAILED — upload\n'+up.message;run.disabled=false;return;}
+
+    audio.src=BASE+TARGET_PATH+'?v='+Date.now();
+    info.textContent='Aligned tie: '+Number(aligned.start).toFixed(3)+'–'+Number(aligned.end).toFixed(3)+' s. Final cut: '+start.toFixed(3)+'–'+end.toFixed(3)+' s.';
+    result.hidden=false;
+    status.textContent='SUCCESS\n'+TARGET_PATH;
+  };
+})();
+</script>
+</body>
+</html>
