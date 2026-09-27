@@ -59,10 +59,10 @@ for(const prefix of Object.keys(lessonIds)){
   const n=String(i+1).padStart(2,'0'),root=audioRoots[prefix];
   if(prefix==='A2_SEQ'){
    // Revised text needs its own recording; never play the older phrase under it.
-   slots[`${prefix}_P${n}`]={type:'audio',src:null,script:sequenceChunks[i],workPhrase:phrase};
+   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3',script:sequenceChunks[i],workPhrase:phrase};
    slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
   }else{
-   slots[`${prefix}_P${n}`]={type:'audio',src:null,script:phrase,workPhrase:phrase};
+   slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_P'+n+'.mp3',script:phrase,workPhrase:phrase};
    slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3',script:examples[prefix][i]};
   }
  });
