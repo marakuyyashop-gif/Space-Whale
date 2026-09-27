@@ -7,17 +7,48 @@ const phrases={
  A2_SEQ:['first','to begin with','then','next','after that','afterwards','later','eventually','finally','in the end'],
  A2_MOVE:['climb up','climb over','jump over','step onto','move into','come out of','run around']
 };
+const examples={
+ A2_SEQ:[
+  'First, we bought the tickets.',
+  'To begin with, we checked the address.',
+  'Then, we took a bus.',
+  'Next, we walked to the hotel.',
+  'After that, we had lunch.',
+  'Afterwards, we went for a walk.',
+  'Later, we met some friends.',
+  'Eventually, we found the right place.',
+  'Finally, we arrived at the hotel.',
+  'In the end, everything was fine.'
+ ],
+ A2_MOVE:[
+  'We climbed up the ladder.',
+  'He climbed over the low wall.',
+  'She jumped over the log.',
+  'She stepped onto the rock.',
+  'We moved into the room.',
+  'The girl came out of the tent.',
+  'The dog ran around the tree.'
+ ]
+};
+const stories={
+ A2_SEQ:'I couldn’t find my phone after lunch. My friend was waiting for me at the cinema. First, I checked my bag. It wasn’t there. Then I looked in my jacket pockets. Nothing. I went back to the café and asked the waiter for help. We checked the tables and the floor. Eventually, he found it behind a chair. After that, I called my friend and walked to the cinema. In the end, I arrived before the film started.',
+ A2_MOVE:'We were camping near a lake. I was sitting outside our tent when our dog Max came out. He ran around a tree and then jumped over a log. My sister Sara stepped onto a rock to take a photo of him. Later, it started to rain, so we all moved into the tent. Max went to sleep, but Sara and I stayed awake and played cards.'
+};
+const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+const audioRoots={
+ A2_SEQ:courseAudioBase+'/a2-1/m1/l1',
+ A2_MOVE:courseAudioBase+'/a2-1/m1/l2'
+};
 const media={};
 for(const prefix of Object.keys(lessonIds)){
  const slots={};
  phrases[prefix].forEach((phrase,i)=>{
-  const n=String(i+1).padStart(2,'0');
-  // WORK supplies the phrase list. Exact recording scripts and examples await MEDIA.
-  slots[`${prefix}_P${n}`]={type:'audio',src:null,script:null,workPhrase:phrase};
-  slots[`${prefix}_E${n}`]={type:'audio',src:null,script:null};
+  const n=String(i+1).padStart(2,'0'),root=audioRoots[prefix];
+  slots[`${prefix}_P${n}`]={type:'audio',src:root+'/listen-repeat/P'+n+'.mp3',script:phrase,workPhrase:phrase};
+  slots[`${prefix}_E${n}`]={type:'audio',src:root+'/listen-repeat/'+prefix+'_E'+n+'.mp3',script:examples[prefix][i]};
  });
- slots[`${prefix}_STORY`]={type:'audio',src:null,script:null,transcriptId:`${prefix}_STORY_TEXT`};
- slots[`${prefix}_STORY_TEXT`]={type:'text',text:null};
+ slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
+ slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
  if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Pictures of her day'};
  else{
   const imageRoot='assets/lesson-media/a2-1/module-1/smy-2/images/';
