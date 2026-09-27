@@ -678,7 +678,7 @@
       },
       syncChecks: true,
       readOnly: false,
-      audioReadOnly:liveMode&&liveRole==='student',
+      audioReadOnly:false,
       navigationReadOnly:locked(),
       onSkip:()=>{if(locked())return;const stages=selectedLesson()?.stages||[],index=stages.findIndex(s=>s.exercise.id===exercise.id),next=stages[index+1];if(next)go({...route,exercise:next.exercise.id,exerciseView:null,section:stageSection(next)});},
       onViewChange:view=>{
