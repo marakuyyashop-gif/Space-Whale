@@ -61,7 +61,7 @@
         const active=current?.exercise_id===exerciseId()&&current?.key===el.dataset.ekAudioKey;
         const playing=active&&!player.paused&&!player.ended;
         button.textContent=playing?'❚❚':'▶';button.setAttribute('aria-label',(playing?'Pause ':'Play ')+(el.getAttribute('aria-label')||'audio'));
-        button.disabled=isLive()&&!canControl();
+        button.disabled=false;
         const range=wrap.querySelector('input[type=range]'),duration=active&&Number.isFinite(player.duration)?player.duration:0;
         if(range){range.disabled=isLive()&&!canControl()||!duration;range.value=String(duration?player.currentTime/duration*100:0);}
         wrap.dataset.state=playing?'playing':'paused';
@@ -142,7 +142,11 @@
     const click=event=>{
       const button=event.target.closest?.('.ek-audio-play,.ek-repeat-play');if(!button||!isLive())return;
       const el=button.parentElement.querySelector('audio');if(!el)return;
-      event.preventDefault();event.stopImmediatePropagation();if(!canControl()||!el.getAttribute('src'))return;
+      if(!canControl()){
+        clearTimeout(timer);pending=null;current=null;++applyToken;player.pause();paint();
+        return;
+      }
+      event.preventDefault();event.stopImmediatePropagation();if(!el.getAttribute('src'))return;
       const key=el.dataset.ekAudioKey;if(!key)return;
       const active=current?.key===key&&current.exercise_id===exerciseId();
       const action=active&&current.action==='play'&&!player.ended?'pause':'play';
