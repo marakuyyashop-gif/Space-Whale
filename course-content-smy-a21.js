@@ -68,7 +68,10 @@ for(const prefix of Object.keys(lessonIds)){
  });
  slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3?v=20260927-ready',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
- if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png',width:1448,height:1086,alt:'Six numbered scenes: making the bed, getting dressed, taking a bus, having lunch, working on a laptop and sleeping'};
+ if(prefix==='A2_SEQ'){
+  slots.A2_SEQ_OPENING={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Six scenes of a girl waking up, having breakfast, packing her bag, going to school, writing in class and reading at home'};
+  slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png',width:1448,height:1086,alt:'Six numbered scenes: making the bed, getting dressed, taking a bus, having lunch, working on a laptop and sleeping'};
+ }
  else{
   const imageRoot='assets/lesson-media/a2-1/module-1/smy-2/images/';
   slots.A2_MOVE_SHEET={type:'image',src:imageRoot+'movement-sheet.webp',width:1120,height:888,alt:'Six numbered scenes showing movement'};
@@ -123,7 +126,7 @@ const ruleTexts={
  }
 };
 const teacherNotes={
- "A2_SEQ_M01": "попросить коротко рассказать об одном событии или выходе из дома, а не перечислять весь распорядок. При затруднении с содержанием предложить знакомый пример: встреча с другом или поездка. Проверяется уже текущий навык — понятная последовательность. Не разворачивать отдельную практику I was / I went или прошедшего времени. Не требовать новых связок без опоры до их объяснения.",
+ "A2_SEQ_M01": "попросить коротко рассказать о дне девушки по шести картинкам слева направо, сначала верхний ряд, затем нижний. Достаточно по одной короткой фразе на сцену; придумывать проблему не нужно. Проверяется уже текущий навык — понятная последовательность. Не разворачивать отдельную практику I was / I went или прошедшего времени. Не требовать новых связок без опоры до их объяснения. На первую попытку — две минуты.",
  "A2_SEQ_M04": "оценивается значение в данном контексте, не якобы единственно возможная английская связка. Обсуждение других естественных формулировок допустимо.",
  "A2_SEQ_M05": "порядок определяется записью, а не произвольной «правильной» расстановкой синонимов. После проверки спросить, какие слова помогли проследить историю.",
  "A2_SEQ_M06": "проверять порядок, связность, формы знакомых глаголов и уместность выбранных связок. Новая языковая работа — самой построить и соединить предложения; готовый текст для замены then на afterwards не давать. Несколько естественных вариантов допустимы. Не требовать именно eventually: оно уместно при двадцатиминутном ожидании, но finally тоже возможно. Дополнительную деталь ученица может придумать, если она не противоречит заметкам. Мелкая пунктуация и несовпадение с образцом не означают неверный ответ.",
@@ -164,9 +167,9 @@ function repeat(prefix){
 }
 const seq=[];
 seq.push(step('Opening Speaking',2,P('A2_SEQ_M01','Tell the events in order.',[
- T('What did you do first?\nWhat happened after that?\nHow did it end?'),
+ I('A2_SEQ_OPENING'),T('What did she do first?\nWhat did she do after that?\nHow did she end her day?'),
  D('Useful phrases','First, …\nThen, … / After that, …\nFinally, …',true)
-],'Tell your partner about something you did yesterday.')));
+],'Look at the pictures. Tell your partner what she did yesterday.')));
 seq.push(step('Language Input',4.5,S('A2_SEQ_M02','Read the short story.',[
  P('A2_SEQ_M02-story','Read the short story.',[T('First, we went to the park. Then, we found a place near the lake. After that, we had a picnic. Later, it started to rain. Finally, we went to a café and had some tea.')]),
  C('A2_SEQ_M02-check','Read the short story.',[Q('1','What happened before the picnic?',['It started to rain.','They found a place near the lake.','They had some tea.'],'B','They found a place near the lake.',['found a place near the lake'])]),
