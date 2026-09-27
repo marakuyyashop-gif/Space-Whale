@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — A2.1 Module 1 Phrase Audio</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:900px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;cursor:pointer;margin-right:10px;margin-bottom:10px}
+button:disabled{opacity:.55;cursor:default}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:10px}
+.small{color:#666;font-size:14px}
+</style>
+</head>
+<body>
+<h1>A2.1 · Module 1 · Phrase audio</h1>
+<p>Generate only the exact phrase texts already present in Space Whale. No missing example sentences or listening stories are invented.</p>
+<p class="small">Voice: Jessica · speed 0.90 · short tail after each phrase.</p>
+<button id="l1">Generate Lesson 1 phrases</button>
+<button id="l2">Generate Lesson 2 phrases</button>
+<pre id="status">Ready.</pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async()=>{
+  const client=window.spaceWhaleSupabase;
+  const status=document.getElementById('status');
+  const {data:{session}}=await client.auth.getSession();
+  if(!session){
+    document.querySelectorAll('button').forEach(b=>b.disabled=true);
+    status.textContent='No active Space Whale owner session.';
+    return;
+  }
+
+  const mk=(base,items)=>items.map((text,i)=>({
+    path:base+'/P'+String(i+1).padStart(2,'0')+'.mp3',
+    text:text.charAt(0).toUpperCase()+text.slice(1)+'. <break time="0.22s" />',
+    speed:0.90
+  }));
+
+  const lesson1=mk('a2-1/m1/l1/listen-repeat',[
+    'first','to begin with','then','next','after that',
+    'afterwards','later','eventually','finally','in the end'
+  ]);
+  const lesson2=mk('a2-1/m1/l2/listen-repeat',[
+    'climb up','climb over','jump over','step onto',
+    'move into','come out of','run around'
+  ]);
+
+  async function run(label,clips){
+    document.querySelectorAll('button').forEach(b=>b.disabled=true);
+    status.textContent='Generating '+label+'...';
+    const {data,error}=await client.functions.invoke('generate-course-tts',{
+      body:{voice_id:'cgSgspJ2msm6clMCkdW9',clips}
+    });
+    if(error){
+      let details='';
+      try{if(error.context?.clone)details=await error.context.clone().text();}catch{}
+      status.textContent='FAILED\n'+(error.message||String(error))+(details?'\n\n'+details:'');
+    }else{
+      status.textContent='SUCCESS — '+label+'\n'+JSON.stringify(data,null,2);
+    }
+    document.querySelectorAll('button').forEach(b=>b.disabled=false);
+  }
+
+  document.getElementById('l1').onclick=()=>run('A2.1 Module 1 Lesson 1 phrase audio',lesson1);
+  document.getElementById('l2').onclick=()=>run('A2.1 Module 1 Lesson 2 phrase audio',lesson2);
+})();
+</script>
+</body>
+</html>
