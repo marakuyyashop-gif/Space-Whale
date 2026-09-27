@@ -154,7 +154,7 @@ run.onclick=async()=>{
  try{
   show('Starting final audio pass…');
   await invokeTts('A1.2 corrections + A2.1 missing Listen & Repeat',batchA);
-  await tie();
+  try{await tie();}catch(error){show('  ! tie extraction failed, continuing with the other lessons: '+(error?.message||String(error)));}
   await invokeTts('B1.1 Listen & Repeat',batchB);
   await dialogue('B1.1 Lesson 1 dialogue','b1-1-w1-misha-1-dialogue-s090',d1);
   await dialogue('B1.1 Lesson 2 dialogue','b1-1-w1-misha-2-dialogue-s090',d2);
