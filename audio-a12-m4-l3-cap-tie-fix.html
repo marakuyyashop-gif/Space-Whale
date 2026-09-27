@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — Lesson 3 cap + tie fixes</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:860px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;cursor:pointer}
+button:disabled{opacity:.55}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:10px}
+audio{width:100%;margin:8px 0 18px}
+.card{padding:16px;border:1px solid #ddd;border-radius:12px;margin:16px 0}
+.small{color:#666;font-size:14px}
+</style></head>
+<body>
+<h1>A1.2 · Module 4 · Lesson 3 · cap + tie fixes</h1>
+<p>Cap: new Jessica take at 0.90 with a short tail. Tie: cut from the approved sentence “My brother needs a tie for work.”</p>
+<button id="run">Create cap + tie fixes</button>
+<pre id="status">Ready.</pre>
+<div class="card" id="capCard" hidden><b>cap</b><audio id="capAudio" controls></audio></div>
+<div class="card" id="tieCard" hidden><b>tie — cut from sentence</b><audio id="tieAudio" controls></audio><div class="small" id="info"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async()=>{
+const client=window.spaceWhaleSupabase;
+const run=document.getElementById('run'),status=document.getElementById('status');
+const capCard=document.getElementById('capCard'),tieCard=document.getElementById('tieCard');
+const capAudio=document.getElementById('capAudio'),tieAudio=document.getElementById('tieAudio'),info=document.getElementById('info');
+const BASE='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/';
+const SRC=BASE+'a1-2/w4/l3/listen-repeat/L3_E05.mp3';
+const CAP='a1-2/w4/l3/listen-repeat/L3_W04_r2.mp3';
+const TIE='a1-2/w4/l3/listen-repeat/L3_W05_cut1.wav';
+
+const {data:{session}}=await client.auth.getSession();
+if(!session){run.disabled=true;status.textContent='No active owner session.';return;}
+
+function wav(mono,sr,lead=.05,tail=.20){
+ const l=Math.round(sr*lead),t=Math.round(sr*tail),n=l+mono.length+t;
+ const b=new ArrayBuffer(44+n*2),v=new DataView(b);
+ const s=(o,x)=>{for(let i=0;i<x.length;i++)v.setUint8(o+i,x.charCodeAt(i));};
+ s(0,'RIFF');v.setUint32(4,36+n*2,true);s(8,'WAVE');s(12,'fmt ');
+ v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+ v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+ s(36,'data');v.setUint32(40,n*2,true);
+ let o=44;for(let i=0;i<l;i++,o+=2)v.setInt16(o,0,true);
+ for(const x0 of mono){const x=Math.max(-1,Math.min(1,x0));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2;}
+ for(let i=0;i<t;i++,o+=2)v.setInt16(o,0,true);
+ return new Blob([b],{type:'audio/wav'});
+}
+async function cutTie(){
+ const res=await fetch(SRC,{cache:'no-store'});if(!res.ok)throw Error('Could not load source sentence');
+ const arr=await res.arrayBuffer(),ctx=new (window.AudioContext||window.webkitAudioContext)();
+ const buf=await ctx.decodeAudioData(arr.slice(0)),sr=buf.sampleRate,n=buf.length;
+ const mono=new Float32Array(n);
+ for(let ch=0;ch<buf.numberOfChannels;ch++){const d=buf.getChannelData(ch);for(let i=0;i<n;i++)mono[i]+=d[i]/buf.numberOfChannels;}
+ const frameSec=.004,frame=Math.max(1,Math.round(sr*frameSec)),count=Math.ceil(n/frame),env=new Float32Array(count);
+ for(let f=0;f<count;f++){let ss=0,a=f*frame,b=Math.min(n,a+frame);for(let i=a;i<b;i++)ss+=mono[i]*mono[i];env[f]=Math.sqrt(ss/Math.max(1,b-a));}
+ const smooth=new Float32Array(count);
+ for(let f=0;f<count;f++){let ss=0,k=0;for(let j=Math.max(0,f-3);j<=Math.min(count-1,f+3);j++){ss+=env[j];k++;}smooth[f]=ss/k;}
+ const dur=buf.duration;
+ // "My brother needs a tie for work." Target word is 5th of 7; estimate, then snap to nearby energy minima.
+ const estStart=dur*.55,estEnd=dur*.76;
+ const snap=(sec,rad)=>{
+   const a=Math.max(1,Math.floor((sec-rad)/frameSec)),b=Math.min(count-2,Math.ceil((sec+rad)/frameSec));
+   let best=a,val=Infinity;for(let f=a;f<=b;f++){if(smooth[f]<val){val=smooth[f];best=f;}}
+   return best*frameSec;
+ };
+ let start=snap(estStart,.13),end=snap(estEnd,.13);
+ start=Math.max(0,start-.025);end=Math.min(dur,end+.035);
+ if(end-start<.28){start=Math.max(0,estStart-.08);end=Math.min(dur,estEnd+.08);}
+ if(end-start>.75){start=estStart-.04;end=estEnd+.04;}
+ const a=Math.floor(start*sr),b=Math.ceil(end*sr),blob=wav(mono.slice(a,b),sr);
+ await ctx.close();return {blob,start,end};
+}
+run.onclick=async()=>{
+ run.disabled=true;capCard.hidden=true;tieCard.hidden=true;
+ try{
+  status.textContent='1/2 Generating cap...';
+  const {data,error}=await client.functions.invoke('generate-course-tts',{body:{
+    voice_id:'cgSgspJ2msm6clMCkdW9',
+    clips:[{path:CAP,text:'Cap. <break time="0.25s" />',speed:.90}]
+  }});
+  if(error){let d='';try{if(error.context?.clone)d=await error.context.clone().text();}catch{}throw Error((error.message||error)+(d?'\n'+d:''));}
+  capAudio.src=(data?.clips?.[0]?.url||BASE+CAP)+'?v='+Date.now();capCard.hidden=false;
+
+  status.textContent='2/2 Cutting tie from the approved sentence...';
+  const cut=await cutTie();
+  const {error:up}=await client.storage.from('course-audio').upload(TIE,cut.blob,{contentType:'audio/wav',cacheControl:'31536000',upsert:true});
+  if(up)throw up;
+  tieAudio.src=BASE+TIE+'?v='+Date.now();tieCard.hidden=false;
+  info.textContent='Cut '+cut.start.toFixed(3)+'s–'+cut.end.toFixed(3)+'s. Short silence added around the extracted word.';
+  status.textContent='SUCCESS\ncap → '+CAP+'\ntie → '+TIE+'\n\nListen to both players below.';
+ }catch(e){status.textContent='FAILED\n'+(e?.message||String(e));run.disabled=false;}
+};
+})();
+</script></body></html>
