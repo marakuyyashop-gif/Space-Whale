@@ -48,7 +48,7 @@ test('dialogue scripts exactly match source, transcripts are collapsed beside ev
  const source=fs.readFileSync(require.resolve('../lesson-sources/b1-1/module-1/B1_DECISIONS_WORK_v1.1.txt'),'utf8');
  for(const [lessonId,slots] of Object.entries(app.SpaceWhaleLessonMedia).filter(([id])=>id.startsWith('b1-'))){
   const p=lessonId.endsWith('1')?'B1D1':'B1D2';assert.ok(source.includes(slots[p+'_DIALOGUE'].script));assert.equal(slots[p+'_DIALOGUE'].script,slots[p+'_TRANSCRIPT'].text);
-  assert.equal(Object.values(slots).filter(s=>s.type==='audio').length,13);assert.ok(Object.values(slots).filter(s=>s.type==='audio').every(s=>s.src===null));assert.match(slots[p+'_SCENES'].src,/assets\/lesson-media\/b1-1\/module-1\/images\/B1D[12]_SCENES\.jpg$/);
+  assert.equal(Object.values(slots).filter(s=>s.type==='audio').length,13);assert.ok(Object.values(slots).filter(s=>s.type==='audio').every(s=>s.src===null));assert.match(slots[p+'_SCENES'].src,/assets\/lesson-media\/b1-1\/module-1\/images\/B1D[12]_SCENES\.jpg(?:\?v=[\w-]+)?$/);
  }
  for(const id of ['B1D1-M05','B1D1-M06','B1D2-M08']){
   const d=find(id),v=setup(d);const detail=v.host.querySelector('details');assert.equal(detail.querySelector('summary').textContent,'Transcript');assert.ok(!detail.open&&!detail.hidden);assert.match(detail.textContent,/Dana:|Leah:/);
