@@ -2,15 +2,21 @@
 'use strict';
 const kit=window.SpaceWhaleExerciseKit;
 const registry=window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
+const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+const lesson3Audio=courseAudioBase+'/a1-2/w4/l3/listen-repeat';
 const words3=['scarf','belt','gloves','cap','tie','sunglasses'];
 const words4=['polite','rude','helpful','lazy','quiet','noisy'];
 const examples3=['My scarf is on the chair.','Do you have a belt for these pants?','I need my gloves. It’s cold.','Can you put my cap in the backpack, please?','My brother needs a tie for work.','Where are my sunglasses? I need them today.'];
 const examples4=['Our new neighbor is polite.','That’s rude. Please don’t say that.','My colleague is helpful. She often helps me.','I’m sometimes lazy on Sundays.','My sister is quiet. She doesn’t talk much.','Our neighbors are noisy at night.'];
-// Stable author media IDs. Null is intentional: no fabricated URLs or dialogue scripts.
+// Stable author media IDs. Lesson 3 audio is stored in Supabase; Lesson 4 remains pending.
 const media={3:{},4:{}};
 for(const [n,words,examples] of [[3,words3,examples3],[4,words4,examples4]]){
- for(let i=0;i<6;i++){const k=String(i+1).padStart(2,'0');media[n]['L'+n+'_W'+k]={type:'audio',src:null,script:words[i]};media[n]['L'+n+'_E'+k]={type:'audio',src:null,script:examples[i]};}
- media[n]['L'+n+'_DIALOGUE']={type:'audio',src:null,script:null,transcriptId:'L'+n+'_DIALOGUE_TEXT'};
+ for(let i=0;i<6;i++){
+  const k=String(i+1).padStart(2,'0');
+  media[n]['L'+n+'_W'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_W'+k+'.mp3':null,script:words[i]};
+  media[n]['L'+n+'_E'+k]={type:'audio',src:n===3?lesson3Audio+'/L3_E'+k+'.mp3':null,script:examples[i]};
+ }
+ media[n]['L'+n+'_DIALOGUE']={type:'audio',src:n===3?courseAudioBase+'/dialogues/a1-2-w4-l3-listening-s090.mp3':null,script:null,transcriptId:'L'+n+'_DIALOGUE_TEXT'};
  media[n]['L'+n+'_DIALOGUE_TEXT']={type:'text',text:null};
 }
 media[3].L3_DIALOGUE.script="Nina: I need a scarf for my sister.\nLeo: Which one do you like?\nNina: This one. What do you think?\nLeo: I think it looks good. How much is it?\nNina: Twenty euros.\nLeo: Why do you like it?\nNina: Because it looks warm. My sister walks to work, and it’s cold in the morning.\nLeo: Does she need gloves too?\nNina: No, she has some.";
