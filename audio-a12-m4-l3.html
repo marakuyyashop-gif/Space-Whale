@@ -19,6 +19,10 @@ audio{width:100%;margin-top:12px}
 <p class="small">Listen & Repeat: Jessica, speed 0.90. Dialogue: Nina = Jessica, Leo = George, speed 0.90. Speaker names are not spoken.</p>
 <button id="run">Generate Lesson 3 audio</button>
 <pre id="status">Ready.</pre>
+<section id="lrPreview">
+<h2>Listen & Repeat preview</h2>
+<div id="lrPlayers"></div>
+</section>
 <audio id="dialogue" controls hidden></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,6 +33,31 @@ audio{width:100%;margin-top:12px}
   const run = document.getElementById('run');
   const status = document.getElementById('status');
   const dialogue = document.getElementById('dialogue');
+  const lrPlayers = document.getElementById('lrPlayers');
+  const base = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/a1-2/w4/l3/listen-repeat/';
+  const lrItems = [
+    ['scarf','L3_W01.mp3'],['My scarf is on the chair.','L3_E01.mp3'],
+    ['belt','L3_W02.mp3'],['Do you have a belt for these pants?','L3_E02.mp3'],
+    ['gloves','L3_W03.mp3'],['I need my gloves. It’s cold.','L3_E03.mp3'],
+    ['cap','L3_W04.mp3'],['Can you put my cap in the backpack, please?','L3_E04.mp3'],
+    ['tie','L3_W05.mp3'],['My brother needs a tie for work.','L3_E05.mp3'],
+    ['sunglasses','L3_W06.mp3'],['Where are my sunglasses? I need them today.','L3_E06.mp3']
+  ];
+  for (const [label,file] of lrItems) {
+    const wrap = document.createElement('div');
+    wrap.style.margin = '10px 0 16px';
+    const title = document.createElement('div');
+    title.textContent = label;
+    title.style.marginBottom = '6px';
+    const audio = document.createElement('audio');
+    audio.controls = true;
+    audio.preload = 'metadata';
+    audio.src = base + file;
+    audio.style.width = '100%';
+    wrap.append(title,audio);
+    lrPlayers.append(wrap);
+  }
+
 
   const { data: { session } } = await client.auth.getSession();
   if (!session) {
