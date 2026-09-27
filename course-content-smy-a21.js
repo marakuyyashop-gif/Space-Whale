@@ -79,7 +79,7 @@ const teacherNotes={
  "A2_SEQ_M06": "проверять порядок, связность, формы знакомых глаголов и уместность выбранных связок. Новая языковая работа — самой построить и соединить предложения; готовый текст для замены then на afterwards не давать. Несколько естественных вариантов допустимы. Не требовать именно eventually: оно уместно при двадцатиминутном ожидании, но finally тоже возможно. Дополнительную деталь ученица может придумать, если она не противоречит заметкам. Мелкая пунктуация и несовпадение с образцом не означают неверный ответ.",
  "A2_SEQ_M07": "задача — одна история, а не полный рассказ дважды. Действия на рисунке дают основу; проблему и её решение ученица придумывает, а не угадывает по изображению. При затруднении с идеей предложить «не могла найти тетрадь», не диктуя предложения.\nНа подготовку около минуты. Ожидаются примерно 5–7 предложений, несколько естественных переходов, понятный результат и короткий обмен вопросами. Можно объединить события; точное число предложений не является критерием правильности. Не требовать все десять связок и не поощрять связку перед каждым предложением ради количества. Сравнить самостоятельность и понятность рассказа с первой попыткой в M01, не скорость речи.",
  "A2_SEQ_M08": "отметить один удачный переход, предложить исправить один реально возникший сбой. Попросить ещё раз сформулировать начало и окончание рассказа. Завершить занятие на 30-й минуте; объём обратной связи подстроить под фактический темп, не объявлять неосвоенный материал усвоенным.",
- "A2_MOVE_M01": "первая попытка описать именно способ и направление движения. Опоры с новым target здесь допустимы; отметить, что ученица сказала самостоятельно, а что с подсказкой. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.",
+ "A2_MOVE_M01": "первая попытка описать все шесть картинок своими словами, без готовых Useful phrases. Отметить, как ученица самостоятельно описывает действия и направления; не требовать новых сочетаний до обучения. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.",
  "A2_MOVE_M02": "пояснить при необходимости по-русски: «перелез через стену на другую сторону». Не подставлять сюда картинку climb up и не называть подъём по лестнице примером climb over. Отдельная новая иллюстрация для этого короткого дополнения не нужна.",
  "A2_MOVE_M04": "это объяснение выбранных сочетаний, а не полный запрет in/on при движении. В некоторых сочетаниях in/into и on/onto возможны оба; не использовать такие допустимые варианты как ложные дистракторы. Come в примере — движение из палатки к наблюдателю снаружи; отдельную новую тему come/go не добавлять.",
  "A2_MOVE_M05": "предложения 1–4 переработаны из выбора предлогов PDF; 5–7 добавлены для явной практики оставшихся сочетаний. Не добавлять второй подходящий предлог в варианты, например on как заведомо неправильный ответ к onto.",
@@ -157,16 +157,18 @@ seq.push(step('Final Speaking',6,S('A2_SEQ_M07','Tell the story of her day.',[
 ],{progressive:true,instruction:'Use the pictures and add one problem you invent. Tell the story in the past.'})));
 
 const move=[];
-move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe how they move.',[
- I('A2_MOVE_SHEET'),T('How does the boy get to the top?\nHow does the girl get to the other side of the log?'),
- D('Useful phrases','He is climbing …\nShe is jumping …\nup … / over …',true)
-],'Look at pictures 4 and 2. Describe the action and direction.')));
+move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe what you see in all six pictures.',[
+ I('A2_MOVE_SHEET')
+])));
 move.push(step('Phrase Input',4,S('A2_MOVE_M02','Match the pictures with the phrases.',[
  E('A2_MOVE_M02-match','matching','Match the pictures with the phrases.',{
   layout:'picture-word',items:['move into','jump over','run around','climb up','come out of','step onto'].map((phrase,i)=>({id:`A2_MOVE_IMG0${i+1}`,mediaRef:`A2_MOVE_IMG0${i+1}`,text:`Picture ${i+1}`,correctId:phrase.replaceAll(' ','-')})),
   options:['step onto','run around','jump over','climb up','move into','come out of'].map(text=>({id:text.replaceAll(' ','-'),text}))
  }),
- P('A2_MOVE_M02-extra','Read one more phrase.',[T('climb over a wall — get to the other side of a wall by climbing\nHe climbed over the low wall because the gate was closed.')])
+ P('A2_MOVE_M02-extra','Read the explanation.',[{
+  ...T('Climb over the wall means get to the other side of the wall by climbing.\n\nExample: He climbed over the low wall because the gate was closed.'),
+  highlights:['Climb over the wall','Example:'],emphasis:['get to the other side of the wall by climbing']
+ }])
 ],{progressive:true,requireCheckBeforeNext:true})));
 move.push(step('Pronunciation',3,repeat('A2_MOVE')));
 move.push(step('Rule and Check',3,S('A2_MOVE_M04','Как описать направление движения',[

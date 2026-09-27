@@ -90,7 +90,12 @@
       def.blocks.forEach(block => {
         if (!['text', 'image', 'disclosure'].includes(block.type)) fail('Unsupported presentation block');
         if (block.type === 'image') { if (!block.imagePending) text(block.image, 'image'); media(block); }
-        else { text(block.text, 'block text'); if (block.type === 'disclosure') text(block.title, 'disclosure title'); }
+        else {
+          text(block.text, 'block text'); if (block.type === 'disclosure') text(block.title, 'disclosure title');
+          if (block.type === 'text') for (const field of ['highlights','emphasis']) {
+            if (block[field] != null) { array(block[field], field); block[field].forEach(part => { text(part, field); if (!block.text.includes(part)) fail('Formatted phrase missing from text'); }); }
+          }
+        }
       });
       return def;
     }
@@ -766,15 +771,16 @@
       host.append(dialog); dialog.showModal();fitDialog();
       view?.addEventListener?.('resize',fitDialog);view?.visualViewport?.addEventListener('resize',fitDialog);view?.visualViewport?.addEventListener('scroll',fitDialog);
     }
-    function richText(value, highlights = []) {
+    function richText(value, highlights = [], emphasis = []) {
       const el = node('p', 'ek-copy');
-      const pieces = [...highlights].filter(part => typeof part === 'string' && part.length).sort((a,b) => b.length - a.length);
+      const pieces = [...highlights.map(text => ({text,tag:'strong'})), ...emphasis.map(text => ({text,tag:'em'}))]
+        .filter(part => typeof part.text === 'string' && part.text.length).sort((a,b) => b.text.length - a.text.length);
       let rest = value;
       while (rest) {
-        let at = -1, match = '';
-        for (const part of pieces) { const i = rest.indexOf(part); if (i >= 0 && (at < 0 || i < at)) { at = i; match = part; } }
+        let at = -1, match;
+        for (const part of pieces) { const i = rest.indexOf(part.text); if (i >= 0 && (at < 0 || i < at)) { at = i; match = part; } }
         if (at < 0) { el.append(doc.createTextNode(rest)); break; }
-        el.append(doc.createTextNode(rest.slice(0, at)), node('strong', '', match)); rest = rest.slice(at + match.length);
+        el.append(doc.createTextNode(rest.slice(0, at)), node(match.tag, '', match.text)); rest = rest.slice(at + match.text.length);
       }
       return el;
     }
@@ -868,7 +874,7 @@
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
-          else body.append(node('p', 'ek-copy', block.text));
+          else body.append(richText(block.text, block.highlights, block.emphasis));
         });
       }
       if (def.kind === 'stage') {
