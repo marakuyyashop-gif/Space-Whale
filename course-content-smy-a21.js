@@ -68,7 +68,7 @@ for(const prefix of Object.keys(lessonIds)){
  });
  slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3?v=20260927-ready',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
- if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Pictures of her day'};
+ if(prefix==='A2_SEQ')slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png',width:1448,height:1086,alt:'Six numbered scenes: making the bed, getting dressed, taking a bus, having lunch, working on a laptop and sleeping'};
  else{
   const imageRoot='assets/lesson-media/a2-1/module-1/smy-2/images/';
   slots.A2_MOVE_SHEET={type:'image',src:imageRoot+'movement-sheet.webp',width:1120,height:888,alt:'Six numbered scenes showing movement'};
@@ -127,7 +127,7 @@ const teacherNotes={
  "A2_SEQ_M04": "оценивается значение в данном контексте, не якобы единственно возможная английская связка. Обсуждение других естественных формулировок допустимо.",
  "A2_SEQ_M05": "порядок определяется записью, а не произвольной «правильной» расстановкой синонимов. После проверки спросить, какие слова помогли проследить историю.",
  "A2_SEQ_M06": "проверять порядок, связность, формы знакомых глаголов и уместность выбранных связок. Новая языковая работа — самой построить и соединить предложения; готовый текст для замены then на afterwards не давать. Несколько естественных вариантов допустимы. Не требовать именно eventually: оно уместно при двадцатиминутном ожидании, но finally тоже возможно. Дополнительную деталь ученица может придумать, если она не противоречит заметкам. Мелкая пунктуация и несовпадение с образцом не означают неверный ответ.",
- "A2_SEQ_M07": "задача — одна история, а не полный рассказ дважды. Действия на рисунке дают основу; проблему и её решение ученица придумывает, а не угадывает по изображению. При затруднении с идеей предложить «не могла найти тетрадь», не диктуя предложения.\nНа подготовку около минуты. Ожидаются примерно 5–7 предложений, несколько естественных переходов, понятный результат и короткий обмен вопросами. Можно объединить события; точное число предложений не является критерием правильности. Не требовать все десять связок и не поощрять связку перед каждым предложением ради количества. Сравнить самостоятельность и понятность рассказа с первой попыткой в M01, не скорость речи.",
+ "A2_SEQ_M07": "задача — одна история, а не полный рассказ дважды. Действия на рисунке дают основу; проблему и её решение ученица придумывает, а не угадывает по изображению. При затруднении с идеей предложить «не мог найти нужный файл на ноутбуке», не диктуя предложения.\nНа подготовку около минуты. Ожидаются примерно 5–7 предложений, несколько естественных переходов, понятный результат и короткий обмен вопросами. Можно объединить события; точное число предложений не является критерием правильности. Не требовать все десять связок и не поощрять связку перед каждым предложением ради количества. Сравнить самостоятельность и понятность рассказа с первой попыткой в M01, не скорость речи.",
  "A2_SEQ_M08": "отметить один удачный переход, предложить исправить один реально возникший сбой. Попросить ещё раз сформулировать начало и окончание рассказа. Завершить занятие на 30-й минуте; объём обратной связи подстроить под фактический темп, не объявлять неосвоенный материал усвоенным.",
  "A2_MOVE_M01": "первая попытка описать все шесть картинок своими словами, без готовых Useful phrases. Отметить, как ученица самостоятельно описывает действия и направления; не требовать новых сочетаний до обучения. Не подменять задание называнием мальчика, цвета одежды или повторением Present Continuous. Ladder и log показать на картинке и кратко пояснить при необходимости. Диагностику закончить за две минуты, не требовать освоения до обучения.",
  "A2_MOVE_M02": "пояснить при необходимости по-русски: «перелез через стену на другую сторону». Не подставлять сюда картинку climb up и не называть подъём по лестнице примером climb over. Отдельная новая иллюстрация для этого короткого дополнения не нужна.",
@@ -200,14 +200,14 @@ seq.push(step('Guided Writing',4.5,S('A2_SEQ_M06','Write a message to a friend.'
  ]),
  W('A2_SEQ_M06-writing','Write a message to a friend.',[{id:'message',prompt:'Your message',multiline:true,possibleAnswers:['First, I went to the bus stop and waited for twenty minutes. Eventually, the bus arrived. After that, I met my sister at the café. In the end, we had a nice lunch together.']}])
 ],{layout:'grouped',instruction:'Use the notes. Write four or five sentences and link the events.'})));
-seq.push(step('Final Speaking',6,S('A2_SEQ_M07','Tell the story of her day.',[
- P('A2_SEQ_M07-speaking','Tell the story of her day.',[
-  I('A2_SEQ_DAY'),T('What happened first and next?\nWhat problem did she have?\nWhat did she do about it?\nHow did her day end?\n\nTell one connected story. Then ask your partner one question about it.'),
+seq.push(step('Final Speaking',6,S('A2_SEQ_M07','Tell the story of their day.',[
+ P('A2_SEQ_M07-speaking','Tell the story of their day.',[
+  I('A2_SEQ_DAY'),T('Imagine these people are friends.\n\nWhat happened first and next?\nWhat problem did one of them have?\nWhat did they do about it?\nHow did the day end?\n\nTell one connected story. Then ask your partner one question about it.'),
   D('Useful phrases','First, … / To begin with, …\nThen, … / Next, …\nAfter that, … / Afterwards, …\nLater, …\nFinally, …\nEventually, …\nIn the end, …',true),
-  D('Optional help','wake up → woke up\nhave breakfast → had breakfast\npack a bag → packed a bag\ngo to class → went to class\nwrite → wrote\nread → read')
+  D('Optional help','make the bed → made the bed\nget dressed → got dressed\ntake a bus → took a bus / catch a bus → caught a bus\nhave lunch → had lunch\nwork on a laptop → worked on a laptop / study → studied\ngo to bed → went to bed / sleep → slept')
  ]),
- sample('A2_SEQ_M07-sample','Tell the story of her day.','First, she woke up and had breakfast. Next, she packed her bag, but she couldn’t find her notebook. She looked for it for ten minutes. Eventually, she found it under her bag. After that, she went to class and took some notes. Later, she came home and read a book. In the end, she was happy with her day.')
-],{progressive:true,instruction:'Use the pictures and add one problem you invent. Tell the story in the past.'})));
+ sample('A2_SEQ_M07-sample','Tell the story of their day.','First, Anna made her bed and got dressed. Then Ben took a bus to meet her. They met at a café, and Anna had lunch. Later, Ben worked on his laptop to plan their trip, but he couldn’t find the tickets. Eventually, he found them in his email and finished his work. Finally, Anna went to bed.')
+],{progressive:true,instruction:'Use pictures 1–6 in order and add one problem you invent. Tell the story in the past.'})));
 
 const move=[];
 move.push(step('Opening Speaking',2,P('A2_MOVE_M01','Describe what the people and the dog are doing.',[
