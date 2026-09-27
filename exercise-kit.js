@@ -361,7 +361,7 @@
   }
   function mount(host, definition, config = {}) {
     validate(definition);
-    // A new speaking task uses the existing teacher-controlled sequence, while
+    // A follow-up task or rule uses the existing teacher-controlled sequence, while
     // preserving the original flat response IDs and saved checks.
     if(definition.followUp){
       const taskId=definition.id+'-practice',followId=definition.id+'-followup';
@@ -1381,7 +1381,8 @@
         const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});container.append(list);resultsBox.append(section);decorateDisclosures();
       }
       if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
-      if(attempted && def.afterCheck){const note=node('li','ek-correction');note.append(richText(def.afterCheck.text,def.afterCheck.highlights||[]));resultsBox.append(note);}
+      // Feedback contains the outcome and answers only. Teaching notes/rules belong
+      // to an explicit followUp or stage revealed by the teacher, never here.
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
     }
     const checkFeedback = () => {

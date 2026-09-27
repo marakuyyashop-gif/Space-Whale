@@ -16,7 +16,7 @@ test('two B1.1 module 1 lessons append without modifying existing lessons and al
   assert.equal(l.plannedTeachingMinutes+l.reserveMinutes,30);
   assert.equal(catalog.normalize(`?view=library&level=B1.1&whale=1&lesson=${l.id}`).exercise,l.stages[0].exercise.id);
   for(const [j,s] of l.stages.entries()){
-   assert.equal(s.exercise.id,`B1D${i+1}-M${String(j+1).padStart(2,'0')}`);kit.validate(s.exercise);
+   assert.match(s.exercise.id,new RegExp(`^B1D${i+1}-M\\d{2}$`));kit.validate(s.exercise);
    const v=setup(s.exercise);assert.doesNotMatch(v.host.textContent,/Key:|Служебно|Преподавателю|B1D[12]_|\*\*/);
    assert.equal(v.host.querySelector('audio[src]'),null);
    for(const details of v.host.querySelectorAll('details'))assert.equal(details.open,details.querySelector('summary').textContent==='Useful phrases');
@@ -48,7 +48,7 @@ test('dialogue scripts exactly match source, transcripts are collapsed beside ev
  const source=fs.readFileSync(require.resolve('../lesson-sources/b1-1/module-1/B1_DECISIONS_WORK_v1.1.txt'),'utf8');
  for(const [lessonId,slots] of Object.entries(app.SpaceWhaleLessonMedia).filter(([id])=>id.startsWith('b1-'))){
   const p=lessonId.endsWith('1')?'B1D1':'B1D2';assert.ok(source.includes(slots[p+'_DIALOGUE'].script));assert.equal(slots[p+'_DIALOGUE'].script,slots[p+'_TRANSCRIPT'].text);
-  assert.equal(Object.values(slots).filter(s=>s.type==='audio').length,13);assert.ok(Object.values(slots).filter(s=>s.type==='audio').every(s=>s.src===null));assert.match(slots[p+'_SCENES'].src,/assets\/lesson-media\/b1-1\/module-1\/images\/B1D[12]_SCENES\.jpg(?:\?v=[\w-]+)?$/);
+  assert.equal(Object.values(slots).filter(s=>s.type==='audio').length,13);assert.ok(Object.values(slots).filter(s=>s.type==='audio').every(s=>/^https:\/\//.test(s.src)));assert.match(slots[p+'_SCENES'].src,/assets\/lesson-media\/b1-1\/module-1\/images\/B1D[12]_SCENES\.jpg(?:\?v=[\w-]+)?$/);
  }
  for(const id of ['B1D1-M05','B1D1-M06','B1D2-M08']){
   const d=find(id),v=setup(d);const detail=v.host.querySelector('details');assert.equal(detail.querySelector('summary').textContent,'Transcript');assert.ok(!detail.open&&!detail.hidden);assert.match(detail.textContent,/Dana:|Leah:/);
@@ -102,11 +102,26 @@ test('open writing uses a multiline field, preserves shared drafts and never gra
  const detail=v.host.querySelector('details');assert.ok(detail&&!detail.open);assert.equal(detail.querySelector('summary').textContent,'Possible answers');
  assert.ok(detail.querySelector('strong'));v.click('Possible answers');assert.equal(detail.open,true);
 });
-test('lexical explanations stay in feedback; final speaking details require an arrow',()=>{
+test('lexical rules reveal outside feedback by teacher arrow and synchronize without losing flat answers',()=>{
  for(const id of ['B1D1-M02','B1D2-M02']){
-  const d=find(id),v=setup(d);assert.ok(d.afterCheck);assert.ok(!v.host.textContent.includes(d.afterCheck.text));
-  v.handle.setAnswers({...correct(d),__sw_checked:true});assert.ok(v.host.textContent.includes(d.afterCheck.text));
-  v.click('Reset exercise');assert.ok(!v.host.textContent.includes(d.afterCheck.text));
+  const d=find(id),rule=d.followUp.blocks[0],student=setup(d,{navigationReadOnly:true});
+  const teacher=setup(d,{onViewChange:view=>student.handle.setViewState(view,false),onChange:a=>student.handle.setAnswers(a)});
+  assert.equal(d.afterCheck,undefined);assert.equal(d.followUp.kind,'rule-page');
+  assert.equal(teacher.host.querySelector('.ek-rule-block'),null);
+  assert.equal(teacher.host.querySelector('.ek-stage-down').disabled,true);
+  const a={...correct(d),'1':'wrong',__sw_checked:true};teacher.handle.setAnswers(a);
+  assert.ok(teacher.host.querySelector('.ek-results').textContent.includes('Correct answers'));
+  assert.ok(!teacher.host.textContent.includes(rule.text),'checking does not reveal a rule');
+  teacher.click('Show next exercise');
+  for(const v of [teacher,student]){
+   assert.equal(v.host.querySelectorAll('.ek-rule-block').length,1);
+   assert.ok(v.host.querySelector('.ek-rule-block').textContent.includes(rule.text));
+   assert.ok(!v.host.querySelector('.ek-results').textContent.includes(rule.text));
+   assert.equal([...v.host.querySelectorAll('h2,h3')].filter(h=>h.textContent===rule.title).length,1,'one rule heading');
+  }
+  const saved=teacher.handle.getAnswers();for(const [key,value] of Object.entries(a))assert.deepEqual(saved[key],value);
+  assert.equal(saved.__sw_followup_revealed,2);assert.ok(setup(d,{answers:saved}).host.querySelector('.ek-rule-block'));
+  const skipped=setup(d);skipped.click('Skip exercise');assert.ok(skipped.host.querySelector('.ek-rule-block'));
  }
  for(const id of ['B1D1-M10','B1D2-M10']){
   const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details').open,true);assert.ok(!v.host.textContent.includes('Extra information'));
@@ -115,7 +130,7 @@ test('lexical explanations stay in feedback; final speaking details require an a
 });
 
 test('new oral tasks require a separate teacher arrow, retain flat saved answers and synchronize',()=>{
- for(const id of ['B1D1-M04','B1D1-M08','B1D2-M07']){
+ for(const id of ['B1D2-M07']){
   const d=find(id),text=d.followUp.blocks[0].text,student=setup(d,{navigationReadOnly:true});
   const teacher=setup(d,{onViewChange:view=>student.handle.setViewState(view,false),onChange:a=>student.handle.setAnswers(a)});
   assert.equal(d.afterCheck,undefined);assert.ok(!teacher.host.textContent.includes(text));
@@ -128,7 +143,7 @@ test('new oral tasks require a separate teacher arrow, retain flat saved answers
   assert.equal(saved.__sw_followup_revealed,2);const restored=setup(d,{answers:saved});assert.ok(restored.host.textContent.includes(text));
   teacher.click('Свернуть задание');assert.ok(teacher.host.querySelector('.ek-stage-section[hidden]'));
  }
- assert.match(find('B1D1-M08').followUp.blocks[0].text,/Choose any three situations/);
+ assert.equal(find('B1D1-M04').followUp,undefined);assert.equal(find('B1D1-M08').followUp,undefined);
  for(const id of ['B1D1-M05','B1D2-M05','B1D1-M09'])walk(find(id),d=>assert.equal(d.afterCheck,undefined));
 });
 
@@ -143,10 +158,29 @@ test('dropdown banks are not duplicated; typed banks remain visible and options 
 test('opening supplies concrete choices and compatible speaking support; old unscramble banks do not signal the first word',()=>{
  const opening=find('B1D1-M01'),body=opening.blocks[1].text,phrases=opening.blocks[2].text;
  assert.match(body,/rent an apartment/);assert.match(body,/need to decide whether to move/);assert.match(body,/don’t have regular clients yet/);assert.match(body,/need to decide where to live/);
- assert.match(phrases,/I’d be worried about/);assert.match(phrases,/because/);
+ assert.match(phrases,/I prefer/);assert.match(phrases,/because/);assert.doesNotMatch(body+' '+phrases,/would|I’d|could/i);
  let count=0;
  for(const l of app.SpaceWhaleContent.filter(l=>['a1-2-w4-l2','a1-2-w4-l3'].includes(l.id)))for(const s of l.stages)walk(s.exercise,d=>{
   if(d.kind!=='order')return;count++;assert.ok(d.sentenceCase);
   assert.ok(d.tokens.every(t=>t.text===t.text.toLowerCase()),d.id);
  });assert.equal(count,7);
+});
+
+
+test('Lesson 1 teaches Second Conditional before production and listening, with a 30-minute budget',()=>{
+ const l=lessons[0];
+ assert.deepEqual(Array.from(l.stages,s=>s.exercise.id),['B1D1-M01','B1D1-M02','B1D1-M03','B1D1-M04','B1D1-M07','B1D1-M08','B1D1-M05','B1D1-M06','B1D1-M09','B1D1-M10']);
+ for(const stage of l.stages.slice(0,4))assert.doesNotMatch(JSON.stringify(stage.exercise),/What would|Would you|I’d|If I had|If I earned/);
+ const focus=find('B1D1-M07');assert.doesNotMatch(focus.instruction,/from Dana’s conversation/);
+ assert.match(focus.exercises[0].exercise.blocks[0].text,/Dana has a full-time job/);
+ assert.match(focus.exercises[0].exercise.blocks[1].text,/If I earned more, I’d rent an apartment on my own/);
+ assert.match(find('B1D1-M05').exercises.at(-1).exercise.instruction,/Choose one question/);
+ assert.equal(l.plannedTeachingMinutes,28.5);assert.equal(l.reserveMinutes,1.5);
+});
+
+test('legacy afterCheck commentary cannot leak into shared answer feedback',()=>{
+ const base=find('B1D1-M02'),d={...base,afterCheck:{text:'Private author explanation',highlights:[]}};delete d.followUp;
+ const v=setup(d);v.handle.setAnswers({...correct(d),'1':'wrong',__sw_checked:true});
+ assert.ok(v.host.querySelector('.ek-results').textContent.includes('Correct answers'));
+ assert.ok(!v.host.textContent.includes('Private author explanation'));
 });
