@@ -496,13 +496,28 @@ const lessons=[
           "preserveLines": true,
           "instruction": "Use each phrase once.",
           "followUp": {
-            "title": "Give a different reply.",
+            "title": "What would you do?",
             "blocks": [
               {
                 "type": "text",
-                "text": "Choose one conversation. How else could B reply? Give your own reply."
+                "text": "1. You get a job offer in another city, but you don’t want to move away from your family. Would you take the job or turn it down? Why?"
+              },
+              {
+                "type": "text",
+                "text": "2. You’re moving to a new city and don’t know the neighbourhoods yet. Would you rent an apartment first or buy a home straight away? Why?"
+              },
+              {
+                "type": "text",
+                "text": "3. You want to go freelance. You have two clients, but they cannot promise regular work. Would you start now or wait? Why?"
+              },
+              {
+                "type": "disclosure",
+                "title": "Useful phrases",
+                "open": true,
+                "text": "I’d …\nI wouldn’t …\n… because …\nI’d need to know …"
               }
-            ]
+            ],
+            "instruction": "Choose one situation and explain your choice."
           }
         }
       },
@@ -616,9 +631,18 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "What is the main risk for Dana? Explain your answer."
+                    "text": "1. What could go wrong if Dana left her job with only one freelance project?"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2. A company offers you a full-time job with better hours. What else would you ask about before accepting it?"
+                  },
+                  {
+                    "type": "text",
+                    "text": "3. Would you leave a job you liked for more flexible working hours? Why or why not?"
                   }
-                ]
+                ],
+                "instruction": "Explain your answers. You can speak for an imaginary person."
               }
             }
           ],
@@ -1595,7 +1619,7 @@ const lessons=[
             "consider"
           ],
           "preserveLines": true,
-          "instruction": "Use each verb once. Keep the form in the word bank."
+          "instruction": "Use each verb once."
         }
       },
       {
@@ -1721,10 +1745,10 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "If I were you, I’d use that free hour to revise one topic.\nIn your place, I’d use your free mornings to revise for three hours.",
+                    "text": "If I were you, I’d use that free hour to revise one topic.\nIn your place, I’d avoid checking messages during that hour.",
                     "highlights": [
                       "If I were you, I’d use that free hour to revise one topic.",
-                      "In your place, I’d use your free mornings to revise for three hours."
+                      "In your place, I’d avoid checking messages during that hour."
                     ]
                   }
                 ]
@@ -1957,7 +1981,7 @@ const lessons=[
             "blocks": [
               {
                 "type": "text",
-                "text": "Finish this suggestion in your own way: “If I were you, I’d consider …”\nExplain why your advice would help."
+                "text": "Your friend has an exam next week and finds one topic difficult. What would you suggest?\nComplete: “If I were you, I’d consider …”\nExplain why your advice would help."
               }
             ]
           }

@@ -4,7 +4,7 @@ B1.1 · Module 1. Экспорт актуального текста сайта 
 
 Этот файл не содержит ключей, исправленных ответов и образцов Writing. Сначала решите все закрытые задания и дайте собственные ответы в открытых. Ключи находятся в отдельном MISHA_REVIEW_KEYS.json; откройте их только после фиксации своих решений.
 
-Аудиофайлы ещё не подключены; листы иллюстраций уже добавлены. Для проверки Listening ниже приведён точный сценарий в Transcript. На сайте Transcript начинается свёрнутым; Useful phrases открыты. Все ситуации должны оставаться понятными по тексту без изображений.
+В текущей сборке подключены ссылки на аудио и листы иллюстраций. Для проверки Listening ниже приведён точный сценарий в Transcript. На сайте Transcript начинается свёрнутым; Useful phrases открыты. Все ситуации должны оставаться понятными по тексту без изображений.
 
 ## Урок для Миши 1
 
@@ -120,9 +120,22 @@ B: No, I want to [пропуск 6]. I already have two clients.
 
 ↓ Отдельный устный шаг после проверки, по стрелке преподавателя
 
-**Give a different reply.**
+**What would you do?**
 
-Choose one conversation. How else could B reply? Give your own reply.
+Choose one situation and explain your choice.
+
+1. You get a job offer in another city, but you don’t want to move away from your family. Would you take the job or turn it down? Why?
+
+2. You’re moving to a new city and don’t know the neighbourhoods yet. Would you rent an apartment first or buy a home straight away? Why?
+
+3. You want to go freelance. You have two clients, but they cannot promise regular work. Would you start now or wait? Why?
+
+**Useful phrases**
+
+I’d …
+I wouldn’t …
+… because …
+I’d need to know …
 
 ### №5 · Listening · B1D1-M05
 
@@ -166,7 +179,13 @@ C. Her employer will not let her work from home.
 
 **Discuss Dana’s decision.**
 
-What is the main risk for Dana? Explain your answer.
+Explain your answers. You can speak for an imaginary person.
+
+1. What could go wrong if Dana left her job with only one freelance project?
+
+2. A company offers you a full-time job with better hours. What else would you ask about before accepting it?
+
+3. Would you leave a job you liked for more flexible working hours? Why or why not?
 
 ### №6 · Listen again · B1D1-M06
 
@@ -315,7 +334,7 @@ Would you rent it? What would make you change your mind?
 B. A company offers you one three-month freelance project. You already have a full-time job.
 Would you take a chance or turn the project down? What would you need to know first?
 
-C. Your partner wants to move in together. You prefer different parts of the city.
+C. You and your partner want to move in together, but you each prefer a different part of the city. You are comparing two apartments.
 What would you do? What would make the decision easier?
 
 Take turns. Give your first answer, explain why, and ask your partner a question. Then discuss the extra information for your situations.
@@ -414,7 +433,7 @@ She refused to work another weekend.
 
 **Complete the sentences.**
 
-Use each verb once. Keep the form in the word bank.
+Use each verb once.
 
 Варианты внутри dropdown (порядок сохранён): refuse · concentrate · prepare · avoid · revise · consider
 
@@ -472,7 +491,7 @@ What does Reply B assume that Jamie’s message does not support? Use the messag
 Read the examples and choose the answers.
 
 If I were you, I’d use that free hour to revise one topic.
-In your place, I’d use your free mornings to revise for three hours.
+In your place, I’d avoid checking messages during that hour.
 
 1. What does “If I were you” do here?
 
@@ -530,7 +549,8 @@ Use the verbs in brackets. In sentence 3, add the missing preposition too.
 
 **Give your own advice.**
 
-Finish this suggestion in your own way: “If I were you, I’d consider …”
+Your friend has an exam next week and finds one topic difficult. What would you suggest?
+Complete: “If I were you, I’d consider …”
 Explain why your advice would help.
 
 ### №8 · Listening · B1D2-M08
