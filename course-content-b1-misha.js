@@ -1637,13 +1637,13 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "2.5 min",
-          "teacherNotes": "свободные утра/три свободных часа у него не заявлены. Оценка совета привязана к данным сообщения, не к универсальному мнению автора о режиме учёбы."
+          "teacherNotes": "Различать уже предпринятую попытку (занимался после работы вчера), новую возможность (час после обеда с помощью родителей) и два совета. Ключи: 1 — B, 2 — A. Reply B учитывает отвлекающий телефон, но не усталость: не объявлять этот совет бессмысленным или всегда неправильным. После проверки или пропуска преподаватель открывает отдельный устный шаг стрелкой. Принимать разные формулировки с опорой на сообщение; автоматической проверки устного ответа нет. Useful phrases открыты, Possible answers раскрывать только после попытки. Первая реплика Reply A сохранена дословно для следующего Language Focus."
         },
         "exercise": {
           "version": 1,
           "id": "B1D2-M05",
           "kind": "stage",
-          "title": "Read the message and the replies.",
+          "title": "Read Jamie’s message and the replies.",
           "exercises": [
             {
               "id": "B1D2-M05-source",
@@ -1651,11 +1651,11 @@ const lessons=[
                 "version": 1,
                 "id": "B1D2-M05-source",
                 "kind": "presentation",
-                "title": "Read the message and the replies.",
+                "title": "Read Jamie’s message and the replies.",
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "Jamie:\n“My exam is on Friday. I look after my son all morning and work from two until nine in the evening. I have one free hour after lunch, while his grandparents look after him. I try to revise after work too, but I’m tired and keep checking messages. What would you suggest?”\n\nReply A:\n“If I were you, I’d use that free hour to revise one topic. I’d avoid checking messages during that time.”\n\nReply B:\n“In your place, I’d use your free mornings to revise for three hours.”"
+                    "text": "Jamie:\n“Hi everyone, my exam’s on Friday, and I haven’t revised enough. I’m looking after my son every morning this week, and I work from two until nine. By the time I get home, I’m usually too tired to concentrate.\n\nLast night I sat down with my notes, but I kept picking up my phone and hardly got anything done. My parents have offered to look after my son for an hour after lunch each day until the exam. I could study before work, but I’m not sure how to use that time. What would you suggest?”\n\nReply A:\n“If I were you, I’d use that free hour to revise one topic. I’d avoid checking messages during that time.”\n\nReply B:\n“In your place, I’d keep revising after work, but I’d leave my phone in another room.”"
                   }
                 ]
               }
@@ -1666,30 +1666,34 @@ const lessons=[
                 "version": 1,
                 "id": "B1D2-M05-questions",
                 "kind": "choice",
-                "title": "Read the message and the replies.",
+                "title": "Read Jamie’s message and the replies.",
                 "items": [
                   {
                     "id": "1",
-                    "prompt": "Why can’t Jamie study in the morning?",
+                    "prompt": "What has Jamie already tried?",
                     "options": [
                       {
                         "id": "A",
-                        "text": "He starts work very early."
+                        "text": "Studying during the hour when his parents look after his son."
                       },
                       {
                         "id": "B",
-                        "text": "He looks after his son."
+                        "text": "Revising after work."
                       },
                       {
                         "id": "C",
-                        "text": "He does not want to study before lunch."
+                        "text": "Leaving his phone in another room."
                       }
                     ],
-                    "correctId": "B"
+                    "correctId": "B",
+                    "feedbackText": "Jamie tried revising after work last night.",
+                    "feedbackHighlights": [
+                      "revising after work"
+                    ]
                   },
                   {
                     "id": "2",
-                    "prompt": "Which reply uses the time Jamie actually has?",
+                    "prompt": "Which reply suggests changing Jamie’s study time as well as reducing distractions?",
                     "options": [
                       {
                         "id": "A",
@@ -1700,7 +1704,13 @@ const lessons=[
                         "text": "Reply B."
                       }
                     ],
-                    "correctId": "A"
+                    "correctId": "A",
+                    "feedbackText": "Reply A suggests using the hour before work and avoiding messages. Reply B changes where he keeps his phone, but not when he studies.",
+                    "feedbackHighlights": [
+                      "Reply A",
+                      "using the hour before work",
+                      "avoiding messages"
+                    ]
                   }
                 ]
               }
@@ -1715,13 +1725,25 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "What does Reply B assume that Jamie’s message does not support? Use the message to explain your answer."
+                    "text": "What difficulty could Jamie still have if he followed Reply B?\nUse information from his message to explain your answer."
+                  },
+                  {
+                    "type": "disclosure",
+                    "title": "Useful phrases",
+                    "open": true,
+                    "text": "He would still …\nThis could help with …, but …\nThe message says …"
+                  },
+                  {
+                    "type": "disclosure",
+                    "title": "Possible answers",
+                    "open": false,
+                    "text": "He would still be tired after work.\nHe might still find it hard to concentrate because he finishes work late.\nPutting his phone away could help, but it wouldn’t solve the problem of tiredness."
                   }
                 ]
               }
             }
           ],
-          "instruction": "Choose the reply that uses Jamie’s available study time.",
+          "instruction": "Choose the answers supported by the text.",
           "progressive": true,
           "requireCheckBeforeNext": true,
           "revealStops": [
