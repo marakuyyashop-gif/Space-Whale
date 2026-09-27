@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale — A2.1 L2 slower phrase fixes</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:860px;margin:48px auto;padding:0 20px;color:#151515}
+button{font:inherit;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:10px}
+audio{width:100%;margin:8px 0 18px}
+.card{padding:14px 16px;border:1px solid #ddd;border-radius:12px;margin:14px 0}
+.small{color:#666;font-size:14px}
+</style>
+</head>
+<body>
+<h1>A2.1 · Module 1 · Lesson 2 — slower phrases</h1>
+<p>Only three phrase clips are regenerated: <b>climb up</b>, <b>jump over</b>, <b>come out of</b>.</p>
+<p class="small">Jessica · speed 0.92 · tiny pauses inside the phrase + a short tail after it.</p>
+<button id="run">Generate 3 revised clips</button>
+<pre id="status">Ready.</pre>
+<div id="players"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+(async()=>{
+  const client=window.spaceWhaleSupabase;
+  const run=document.getElementById('run');
+  const status=document.getElementById('status');
+  const players=document.getElementById('players');
+
+  const {data:{session}}=await client.auth.getSession();
+  if(!session){run.disabled=true;status.textContent='No active Space Whale owner session.';return;}
+
+  const clips=[
+    {
+      label:'climb up',
+      path:'a2-1/m1/l2/listen-repeat/A2_MOVE_P01_r2.mp3',
+      text:'Climb <break time="0.10s" /> up. <break time="0.22s" />',
+      speed:0.92
+    },
+    {
+      label:'jump over',
+      path:'a2-1/m1/l2/listen-repeat/A2_MOVE_P03_r2.mp3',
+      text:'Jump <break time="0.10s" /> over. <break time="0.22s" />',
+      speed:0.92
+    },
+    {
+      label:'come out of',
+      path:'a2-1/m1/l2/listen-repeat/A2_MOVE_P06_r2.mp3',
+      text:'Come <break time="0.08s" /> out <break time="0.06s" /> of. <break time="0.22s" />',
+      speed:0.92
+    }
+  ];
+
+  run.onclick=async()=>{
+    run.disabled=true;
+    players.replaceChildren();
+    status.textContent='Generating 3 revised clips...';
+
+    const {data,error}=await client.functions.invoke('generate-course-tts',{
+      body:{
+        voice_id:'cgSgspJ2msm6clMCkdW9',
+        clips
+      }
+    });
+
+    if(error){
+      let details='';
+      try{if(error.context?.clone)details=await error.context.clone().text();}catch{}
+      status.textContent='FAILED\n'+(error.message||String(error))+(details?'\n\n'+details:'');
+      run.disabled=false;
+      return;
+    }
+
+    status.textContent='SUCCESS\n'+JSON.stringify(data,null,2);
+    const base='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/';
+    for(const clip of clips){
+      const card=document.createElement('div');
+      card.className='card';
+      const label=document.createElement('b');
+      label.textContent=clip.label;
+      const audio=document.createElement('audio');
+      audio.controls=true;
+      audio.preload='metadata';
+      audio.src=base+clip.path+'?v='+Date.now();
+      card.append(label,audio);
+      players.append(card);
+    }
+  };
+})();
+</script>
+</body>
+</html>
