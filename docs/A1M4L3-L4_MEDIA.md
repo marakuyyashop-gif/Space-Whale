@@ -9,7 +9,7 @@ Fill `window.SpaceWhaleLessonMedia['a1-2-w4-l3']` / `['a1-2-w4-l4']` slots in th
 
 - `L1_SPEAKING_REUSE`: existing Lesson 1 shared clothes composition, reused without modification.
 - `L3_IMG_01` scarf; `02` belt; `03` gloves; `04` cap; `05` tie; `06` sunglasses. Reused by Matching, word practice and recall.
-- `L3_SPEAKING`: the complete selected accessory sheet, `assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png` (1536 × 1024).
+- `L3_SPEAKING`: the complete selected accessory sheet with a non-generative alpha mask, `lesson-3/media/speaking-cutout.webp` (1536 × 1024). Original upload remains `assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png`.
 - `L4_PEOPLE`: `lesson-4/media/people-abc.webp` (1020 × 388), used in Listening. A = original person 1 / Rosa; B = original person 3 / Ella; C = original person 2 / Nora (long curly hair, green eyes). The image only labels A/B/C, without names. Key remains C.
 - `L4_SPEAKING`: `lesson-4/media/speaking-ab.webp` (680 × 388), only Rosa and Ella with the existing behavioral notes. Personality is given by words/notes, never inferred from appearance. The untouched source sheet is `assets/lesson-media/a1-2/module-4/lesson-4-people.png`.
 - `L3_W01`…`L3_W06` and `L3_E01`…`L3_E06`: separate word/example clips. Exact display text and pronunciation script are taken from WORK.
@@ -20,7 +20,7 @@ Fill `window.SpaceWhaleLessonMedia['a1-2-w4-l3']` / `['a1-2-w4-l4']` slots in th
 
 ## Reveal and review
 
-- L3-M06: source + question 1, then question 2 after checking. Shared transcript unlocks only after L3-M09 has been attempted and checked; available in M09 and on returning to M06. Missing prior state fails closed.
+- L3-M06: source + question 1, then question 2 after checking. L3-M09 also reveals its questions one at a time: OK/Skip → teacher arrow, with the source retained. The shared kit applies this behavior to multi-question Choice tasks following an audio source, preserving existing item IDs and saved answer keys. Shared transcript unlocks only after L3-M09 has been attempted and checked; available in M09 and on returning to M06. Missing prior state fails closed.
 - L3-M07 and L4-M07: examples → one rule box → practice, using the shared progressive stage.
 - L3-M08: examples → arrow → rule → arrow → Order 1 → arrow → Order 2 → arrow → Order 3. OK checks but never advances; the teacher opens each next task after checking or deliberately skipping.
 - L4-M06: source, shared picture and question 1 → question 2 after checking → closed Transcript disclosure after both attempts.
@@ -50,3 +50,5 @@ The only shared kit additions are opt-in reveal stops, check-gated next steps, c
 | L3_IMG_04 | cap | cap.webp | 19, 548, 520, 919 |
 | L3_IMG_05 | tie | tie.webp | 620, 490, 931, 978 |
 | L3_IMG_06 | sunglasses | sunglasses.webp | 1004, 649, 1526, 898 |
+
+`remove-module4-speaking-background.py` creates only the Final Speaking alpha mask from the original sheet. It preserves source dimensions and visible RGB exactly after lossless encoding; pale scarf fabric is protected, the neck opening and paper shadow are excluded. Edges were inspected on light and dark backgrounds. Individual word-practice crops are unchanged.

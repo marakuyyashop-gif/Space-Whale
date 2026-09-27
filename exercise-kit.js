@@ -302,13 +302,59 @@
     movements.set(element,animation);
     animation.onfinish=()=>{if(movements.get(element)!==animation)return;animation.cancel();finish();};
   }
+  function taskFinished(def, state) {
+    if(state.__sw_skipped)return true;
+    const results=grade(def,state);
+    if(def.kind==='choice'&&Array.isArray(state.__sw_choice_checked))return def.items.every(item=>
+      state.__sw_choice_skipped?.includes(item.id)||(state.__sw_choice_checked.includes(item.id)&&results[item.id]!=='empty'));
+    return state.__sw_checked===true&&Object.values(results).length>0&&!Object.values(results).includes('empty');
+  }
+  // Listening questions reuse the existing progressive stage, while preserving
+  // the original flat item IDs for saved answers and realtime synchronization.
+  function mountListeningQuestions(host, definition, config) {
+    const items=definition.items,blockId=item=>'question-'+item.id;
+    let saved=clone(config.answers||{});
+    const unpack=value=>{
+      const state={revealed:value.__sw_choice_revealed||1};
+      for(const item of items){
+        const answer={};if(value[item.id]!==undefined)answer[item.id]=clone(value[item.id]);
+        if(value.__sw_checked||value.__sw_choice_checked?.includes(item.id))answer.__sw_checked=true;
+        if(value.__sw_skipped||value.__sw_choice_skipped?.includes(item.id))answer.__sw_skipped=true;
+        state[blockId(item)]=answer;
+      }
+      return state;
+    };
+    const pack=value=>{
+      const state={...saved},checked=[],skipped=[];
+      delete state.__sw_checked;delete state.__sw_skipped;
+      for(const item of items){
+        const answer=value[blockId(item)]||{};delete state[item.id];
+        if(answer[item.id]!==undefined)state[item.id]=clone(answer[item.id]);
+        if(answer.__sw_checked)checked.push(item.id);
+        if(answer.__sw_skipped)skipped.push(item.id);
+      }
+      state.__sw_choice_checked=checked;state.__sw_choice_skipped=skipped;
+      state.__sw_choice_revealed=value.revealed||1;
+      if(checked.length===items.length)state.__sw_checked=true;
+      if(skipped.length===items.length)state.__sw_skipped=true;
+      return state;
+    };
+    const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:definition.instruction,
+      progressive:true,requireCheckBeforeNext:true,exercises:items.map(item=>({id:blockId(item),
+        exercise:{...definition,id:definition.id+'-'+item.id,instruction:'',items:[item]}}))};
+    const handle=mount(host,stage,{...config,sequentialListening:false,syncChecks:true,answers:unpack(saved),
+      onChange:value=>{saved=pack(value);config.onChange?.(clone(saved));}});
+    return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>{saved=clone(value||{});handle.setAnswers(unpack(saved));}};
+  }
   function mount(host, definition, config = {}) {
     validate(definition);
+    if(config.sequentialListening&&definition.kind==='choice'&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
     const def = clone(definition);
     // Independent tasks reveal in sequence; a reading/audio source stays with its task.
     const taskKinds = new Set(['matching','gaps','choice','image-label','order','sort','writing','rule-page']);
     let stageStops = [];
     if (def.kind === 'stage') {
+      if(def.exercises.some(block=>block.exercise.kind==='audio')&&def.exercises.some(block=>block.exercise.kind==='choice'&&block.exercise.items.length>1))def.requireCheckBeforeNext=true;
       if (def.progressive) stageStops = def.revealStops || def.exercises.map((_,i)=>i+1);
       else {
         const tasks = def.exercises.flatMap((block,i)=>taskKinds.has(block.exercise.kind)?[i]:[]);
@@ -518,6 +564,7 @@
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
+      body.querySelectorAll('.ek-order-target [data-feedback]').forEach(token=>{token.removeAttribute('data-feedback');token.removeAttribute('aria-description');});
       body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
       resultsBox.replaceChildren(); announce('');
       if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label','Not checked');});}
@@ -838,7 +885,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, sequentialListening:def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -860,7 +907,7 @@
           });
           if(down && def.requireCheckBeforeNext){
             const tasks=def.exercises.slice(0,visibleCount).filter(block=>['matching','gaps','choice','order','sort','writing'].includes(block.exercise.kind));
-            down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>{const state=answers[block.id]||{},values=Object.values(grade(block.exercise,state));return !state.__sw_skipped&&(!state.__sw_checked||!values.length||values.includes('empty'));});
+            down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>!taskFinished(block.exercise,answers[block.id]||{}));
           }
           if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly||config.navigationReadOnly) return;
@@ -1222,15 +1269,39 @@
         summary.addEventListener('click',event=>{event.preventDefault();const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));if(open)detail.open=true;expand(content,open,()=>{detail.open=open;if(open)centerSection(detail);});});
       });
     }
+    function markOrderTokens(){
+      if(def.kind!=='order')return;
+      const candidates=[...(def.correctOrder?[def.correctOrder]:[]),...(def.acceptedOrders||[])];
+      if(!candidates.length)return;
+      const placed=[...body.querySelectorAll('.ek-order-target [data-ek-drag-id]')];
+      const matches=order=>placed.reduce((score,token,index)=>score+Number(order[index]===token.dataset.ekDragId),0);
+      const target=candidates.reduce((best,order)=>matches(order)>matches(best)?order:best);
+      placed.forEach((token,index)=>{
+        const result=target[index]===token.dataset.ekDragId?'correct':'retry';
+        if(def.layout==='image-grid'){
+          const badge=token.querySelector('.ek-order-number');if(badge){badge.dataset.result=result;badge.setAttribute('aria-label',result==='correct'?'Correct':'Try again');}
+        }else{token.dataset.feedback=result;token.setAttribute('aria-description',result==='correct'?'Correct position':'Incorrect position');}
+      });
+    }
+    function pictureCorrections(items,labelFor){
+      const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
+      track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
+      items.forEach(item=>{
+        const card=node('article','ek-picture-correction-card');card.append(illustration(item),node('strong','',labelFor(item)));track.append(card);
+      });
+      if(!track.children.length)return;
+      const move=direction=>{const distance=(track.firstElementChild?.getBoundingClientRect().width||180)+12;track.scrollBy?.({left:direction*distance,behavior:'smooth'});};
+      const controls=node('div','ek-picture-correction-controls');
+      for(const [direction,label,arrow] of [[-1,'Previous correct pictures','‹'],[1,'Next correct pictures','›']]){const control=button(arrow,()=>move(direction),'ek-button');control.setAttribute('aria-label',label);controls.append(control);}
+      carousel.append(track,controls);const section=node('li','ek-correction');section.append(node('strong','ek-feedback-heading','Correct answers'),carousel);resultsBox.append(section);
+    }
     function showFeedback(){
       feedback=grade(def,answers);resultsBox.replaceChildren();
       controls.forEach((control,id)=>{
-        const value=feedback[id];if(value)control.setAttribute('data-feedback',value);
+        const value=feedback[id];if(value&&def.kind!=='order')control.setAttribute('data-feedback',value);
         const lamp=lamps.get(id);if(lamp){lamp.dataset.result=value||'empty';lamp.setAttribute('aria-label',value==='correct'?'Correct':value==='retry'?'Try again':'Not answered');}
       });
-      if(def.kind==='order'&&def.layout==='image-grid')body.querySelectorAll('.ek-order-target [data-ek-drag-id]').forEach((card,index)=>{
-        const badge=card.querySelector('.ek-order-number');if(badge){badge.dataset.result=def.correctOrder?.[index]===card.dataset.ekDragId?'correct':'retry';badge.setAttribute('aria-label',badge.dataset.result==='correct'?'Correct':'Try again');}
-      });
+      markOrderTokens();
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
       // Legacy showAnswers:false hid essential solutions across the imported course.
       // Personal/open responses are never graded against example text.
@@ -1252,19 +1323,13 @@
         });
         else if(def.kind==='order' && needsSolution('order'))pair('',(def.correctOrder||def.acceptedOrders?.[0])?.map(id=>def.tokens.find(token=>token.id===id).text).join(' ').replace(/\s+([,.!?;:])/g,'$1'));
         else if(def.kind==='matching'&&def.layout==='picture-word'){
-          const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
-          track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
-          def.items.filter(item=>needsSolution(item.id)).forEach(item=>{
-            const card=node('article','ek-picture-correction-card');card.append(illustration(item),node('strong','',def.options.find(option=>option.id===item.correctId)?.text||''));track.append(card);
-          });
-          if(track.children.length){
-            const move=direction=>{const distance=(track.firstElementChild?.getBoundingClientRect().width||180)+12;track.scrollBy?.({left:direction*distance,behavior:'smooth'});};
-            const controls=node('div','ek-picture-correction-controls');
-            for(const [direction,label,arrow] of [[-1,'Previous correct pictures','‹'],[1,'Next correct pictures','›']]){const control=button(arrow,()=>move(direction),'ek-button');control.setAttribute('aria-label',label);controls.append(control);}
-            carousel.append(track,controls);const section=node('li','ek-correction');section.append(node('strong','ek-feedback-heading','Correct answers'),carousel);resultsBox.append(section);
-          }
+          pictureCorrections(def.items.filter(item=>needsSolution(item.id)),item=>def.options.find(option=>option.id===item.correctId)?.text||'');
         }
-        else if(def.kind==='writing')def.items.forEach(item=>{if(needsSolution(item.id))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
+        else if(def.kind==='writing'){
+          const pictures=def.items.filter(item=>needsSolution(item.id)&&(item.image||item.imagePending)&&item.acceptedAnswers?.length);
+          pictureCorrections(pictures,item=>item.acceptedAnswers[0]);
+          def.items.forEach(item=>{if(needsSolution(item.id)&&!pictures.includes(item))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
+        }
         else if(def.items)def.items.forEach(item=>{
           if(item.feedbackText){const row=node('li');row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
           if(!needsSolution(item.id))return;
@@ -1287,9 +1352,10 @@
       const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
       resultsBox.replaceChildren();
       Object.entries(feedback).forEach(([id, result], index) => {
-        controls.get(id)?.setAttribute('data-feedback', result);
+        if(def.kind!=='order')controls.get(id)?.setAttribute('data-feedback', result);
         const line = node('li', '', `${index + 1}. ${labels[result]}`); line.setAttribute('data-feedback', result); resultsBox.append(line);
       });
+      markOrderTokens();
       if (Object.values(feedback).some(result => result === 'retry' || result === 'empty')) {
         const correction = node('li', 'ek-correction'); correction.append(node('strong', '', def.kind==='order'?'Correct Answer':'Correct solution'));
         if (def.kind === 'gaps') def.items.forEach(item => {

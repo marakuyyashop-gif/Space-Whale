@@ -933,6 +933,11 @@
 .exercise-kit .ek-picture-correction-card>strong{display:block;padding:12px;font-weight:700}
 .exercise-kit .ek-picture-correction-controls{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 .exercise-kit .ek-picture-correction-controls .ek-button{width:36px;min-height:36px;padding:0;font-size:22px}
+/* Check each placed word, never the surrounding sentence tray. */
+.exercise-kit .ek-order-target>.ek-token[data-feedback]{position:relative;outline:none}
+.exercise-kit .ek-order-target>.ek-token[data-feedback=correct]{--ek-position-color:var(--sw-answer-correct,var(--ek-correct))}
+.exercise-kit .ek-order-target>.ek-token[data-feedback=retry]{--ek-position-color:var(--sw-answer-incorrect,var(--ek-incorrect))}
+.exercise-kit .ek-order-target>.ek-token:is([data-feedback=correct],[data-feedback=retry])::after{content:'';position:absolute;inset:0;border:2px dotted color-mix(in srgb,var(--ek-position-color) 78%,transparent);border-radius:inherit;box-sizing:border-box;pointer-events:none}
 /* Feedback dots belong on the card boundary/lamp, not behind the selected text. */
 .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger)[data-selected=true]::before{background-image:none}
 

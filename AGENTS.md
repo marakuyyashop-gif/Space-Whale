@@ -51,3 +51,7 @@
 - Independent tasks and grammar rules reveal only through teacher arrows. In L3-M08, examples, the rule and each Order question are separate reveal steps; never reveal all Order questions at once. OK checks the current task, without advancing automatically. A source plus its current question belongs to one group and must not acquire separate Skip controls. Compact related sentences inside one task remain together.
 
 - Existing lesson artwork must not be regenerated to remove backgrounds. Use the original uploaded pixels with an alpha mask, preserving colors and texture; inspect edges on light and dark backgrounds. Generative variants from the rejected Lesson 1 background-removal attempt must not be reused.
+
+- Picture-based Writing with objective accepted answers uses the same incorrect-picture correction cards as Picture–Word Matching. Keep open-response samples separate and hidden until requested.
+- Sentence/Chunk Order checks each placed token’s position and applies the shared correct/incorrect dotted outline around that token’s rounded rectangle, never around the full answer tray. Clear marks on edit/reset; respect accepted alternative orders.
+- Multiple Choice questions tied to one audio source reveal individually using teacher arrows after checking or skipping. Keep the player available, preserve flat item answer IDs, and synchronize reveal separately from answers. Ordinary compact grammar Choice tasks without audio stay together.

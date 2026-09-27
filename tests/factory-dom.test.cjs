@@ -288,6 +288,67 @@ test('grouped listening keeps independent components and answers; Check label is
   assert.equal(setup('progressive-stage-demo').host.classList.contains('ek-stage-grouped'),false);
 });
 
+test('listening questions reveal only after check and a teacher arrow, preserving flat saved IDs',()=>{
+ const def={version:1,id:'two-listening-questions',kind:'stage',title:'Listen and choose.',layout:'grouped',transcript:'Author transcript.',transcriptAfter:['questions'],exercises:[
+  {id:'audio',exercise:{version:1,id:'source',kind:'audio',title:'Listen and choose.',audio:'dialogue.mp3'}},
+  {id:'questions',exercise:{version:1,id:'questions',kind:'choice',title:'Listen and choose.',items:[
+   {id:'first',prompt:'First question?',options:[{id:'a',text:'One'},{id:'b',text:'Two'}],correctId:'a'},
+   {id:'second',prompt:'Second question?',options:[{id:'a',text:'Three'},{id:'b',text:'Four'}],correctId:'b'}]}}]};
+ const teacher=setup(def,{syncChecks:true,onViewChange:()=>{}}),pupil=setup(def,{syncChecks:true,navigationReadOnly:true});
+ const choose=(s,n)=>{const el=s.host.querySelectorAll('input[type=radio]')[n];el.checked=true;s.fire(el,'change');};
+ const source=teacher.host.querySelector('audio');
+ assert.equal(teacher.host.querySelectorAll('.ek-question').length,1);
+ assert.equal(teacher.button('Show next exercise').disabled,true);
+ choose(teacher,0);teacher.click('OK');
+ assert.equal(teacher.host.querySelectorAll('.ek-question').length,1,'OK does not reveal');
+ assert.equal(teacher.mount.getAnswers().questions.first,'a');
+ assert.equal(teacher.mount.getAnswers().questions.__sw_checked,undefined,'whole task is not checked yet');
+ teacher.click('Show next exercise');
+ pupil.mount.setAnswers(teacher.mount.getAnswers());pupil.mount.setViewState(teacher.mount.getViewState(),false);
+ assert.equal(pupil.host.querySelectorAll('.ek-question').length,2);
+ assert.ok([...pupil.host.querySelectorAll('.ek-stage-navigation')].every(nav=>nav.hidden));
+ assert.equal(teacher.host.querySelector('audio'),source);
+ choose(teacher,3);
+ teacher.fire(teacher.host.querySelectorAll('.ek-check')[1],'click');
+ const saved=teacher.mount.getAnswers();assert.equal(saved.questions.second,'b');assert.equal(saved.questions.__sw_checked,true);
+ assert.equal(teacher.host.querySelector('details').hidden,false);assert.equal(teacher.host.querySelector('details').open,false);
+ const restored=setup(def,{syncChecks:true,answers:saved});
+ assert.equal(restored.host.querySelectorAll('.ek-question').length,2);
+ assert.equal(restored.host.querySelectorAll('.ek-question[data-feedback=correct]').length,2);
+ restored.fire(restored.host.querySelectorAll('.ek-reset')[1],'click');
+ assert.equal(restored.mount.getAnswers().questions.first,'a');assert.equal(restored.mount.getAnswers().questions.second,undefined);
+ assert.equal(restored.mount.getAnswers().questions.__sw_checked,undefined);
+ assert.equal(restored.host.querySelector('details').hidden,true);
+ const legacy=setup(def,{syncChecks:true,answers:{questions:{first:'a',second:'b',__sw_checked:true}}});
+ legacy.click('Show next exercise');assert.equal(legacy.host.querySelectorAll('.ek-question[data-feedback=correct]').length,2);
+ const skipped=setup(def,{syncChecks:true});skipped.click('Skip exercise');
+ assert.equal(skipped.host.querySelectorAll('.ek-question').length,2);assert.deepEqual(skipped.mount.getAnswers().questions.__sw_choice_skipped,['first']);
+});
+
+test('sentence feedback marks individual positions, handles accepted orders and clears on edits',()=>{
+ const def={version:1,id:'positions',kind:'order',title:'Build the question.',tokens:[{id:'which',text:'Which cap'},{id:'does',text:'does'},{id:'he',text:'he'},{id:'want',text:'want'},{id:'end',text:'?'}],correctOrder:['which','does','he','want','end']};
+ const s=setup(def,{syncChecks:true});s.mount.setAnswers({order:['which','want','he','does','end'],__sw_checked:true});
+ assert.equal(s.host.querySelector('.ek-order-target').hasAttribute('data-feedback'),false);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-order-target>.ek-token')].map(token=>token.dataset.feedback),['correct','retry','correct','retry','correct']);
+ assert.equal(s.host.querySelector('.ek-answer-pairs').textContent,'Which cap does he want?');
+ s.click('want');assert.equal(s.host.querySelectorAll('.ek-order-target [data-feedback]').length,0);
+ s.click('Reset exercise');assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
+ const alternative=setup({...def,acceptedOrders:[['he','does','want','which','end']]},{syncChecks:true});
+ alternative.mount.setAnswers({order:['he','does','want','which','end'],__sw_checked:true});
+ assert.equal(alternative.host.querySelectorAll('.ek-order-target>.ek-token[data-feedback=correct]').length,5);
+});
+
+test('picture writing corrections reuse picture-word cards without exposing open-response samples',()=>{
+ const def={version:1,id:'picture-recall',kind:'writing',title:'Write the words.',responseMode:'accepted',items:[
+  {id:'cap',prompt:'Picture 1',image:'cap.webp',alt:'Picture 1',acceptedAnswers:['cap','a cap']},
+  {id:'belt',prompt:'Picture 2',image:'belt.webp',alt:'Picture 2',acceptedAnswers:['belt','a belt']}]};
+ const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
+ s.mount.setAnswers({cap:'hat',belt:'a belt',__sw_checked:true});
+ const cards=s.host.querySelectorAll('.ek-picture-corrections .ek-picture-correction-card');
+ assert.equal(cards.length,1);assert.equal(cards[0].querySelector('img').src,'cap.webp');assert.equal(cards[0].querySelector('strong').textContent,'cap');
+ assert.ok(s.button('Next correct pictures'));s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
+});
+
 test('shared Check result restores remotely without echo; editing clears shared Check',()=>{
  const a=setup('choice-demo',{syncChecks:true});
  const input=a.host.querySelectorAll('input')[1];input.checked=true;a.fire(input,'change');a.click('OK');
