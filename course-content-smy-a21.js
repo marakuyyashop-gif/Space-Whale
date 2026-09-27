@@ -92,7 +92,7 @@ const T=text=>({type:'text',text});
 const D=(title,text,open=false)=>({type:'disclosure',title,text,open});
 const I=mediaRef=>({type:'image',mediaRef});
 const P=(id,title,blocks,instruction)=>E(id,'presentation',title,{blocks,...(instruction?{instruction}:{})});
-const S=(id,title,children,extra={})=>E(id,'stage',title,{exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
+const S=(id,title,children,extra={})=>E(id,'stage',title,{exercises:children.map(exercise=>({id:exercise.id,exercise:exercise.kind==='rule-page'?{...exercise,title,blocks:exercise.blocks.map(block=>({...block,title:block.title===title?'':block.title}))}:exercise})),...extra});
 const C=(id,title,items)=>E(id,'choice',title,{items});
 const Q=(id,prompt,options,correctId,feedbackText,feedbackHighlights=[])=>({id,prompt,options:options.map((text,i)=>({id:String.fromCharCode(65+i),text})),correctId,feedbackText,feedbackHighlights});
 const W=(id,title,items,extra={})=>E(id,'writing',title,{responseMode:'open',revealPossibleAnswers:true,items,...extra});
@@ -203,12 +203,12 @@ move.push(step('Final Speaking',5,S('A2_MOVE_M08','Tell your partner what happen
   T('Mark used a ladder to reach a low platform. A wall was the next part of the activity. He couldn’t jump over it.\nExplain how he got to the platform and then to the other side of the wall.\nUse: climb / step\n\nAsk your partner one question about the story. You can add your own details.'),
   D('Useful phrases','He climbed …\nHe stepped …\nHow did …?\nWhere did …?',true)
  ]),
- sample('A2_MOVE_M08-sample1','Story 1 — At an activity centre','Mark climbed up the ladder and stepped onto the platform. Then he climbed over the wall to get to the other side.'),
+ sample('A2_MOVE_M08-sample1','Tell your partner what happened.','Mark climbed up the ladder and stepped onto the platform. Then he climbed over the wall to get to the other side.'),
  P('A2_MOVE_M08-story2','Story 2 — At the campsite',[
   T('You were outside a tent. Your dog was inside.\nThe dog left the tent, went round a tree and crossed a log in one jump. Then it started to rain.\nExplain what the dog did and where you all went.\nUse: come / run / jump / move\n\nAsk your partner one question about the story. You can add your own details.'),
   D('Useful phrases','Our dog came …\nIt ran …\nIt jumped …\nWe moved …\nHow did …?\nWhere did …?',true)
  ]),
- sample('A2_MOVE_M08-sample2','Story 2 — At the campsite','Our dog came out of the tent. It ran around a tree and jumped over a log. When it started to rain, we all moved into the tent.')
+ sample('A2_MOVE_M08-sample2','Tell your partner what happened.','Our dog came out of the tent. It ran around a tree and jumped over a log. When it started to rain, we all moved into the tent.')
 ],{progressive:true,instruction:'Use the situations and verbs to tell two short stories in the past.'})));
 
 function attach(value,slots){
