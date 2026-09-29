@@ -44,3 +44,13 @@ This revision supersedes the old Opening description above and the M01 section o
 The student sees: title → situation → shared route illustration → task → open Useful phrases → open Words. The target chunks are available before teaching; the teacher guide distinguishes independent use from supported use and accepts natural alternatives without treating them as target mastery. No automatic grading or visible answer key is added.
 
 New media ID: `A2_MOVE_ROUTES`, `images/outdoor-adventure-routes.webp` (1254 × 1254), optimized from the supplied `Outdoor Adventure Routes.png`. The source composition, colors, route labels and six scenes are preserved. Route A is the top row, Route B the bottom row; the tunnel scene supports both movement into and out of the tunnel. The original `A2_MOVE_SHEET` and all six matching crops remain unchanged for the vocabulary work. M02–M09 and all audio are unchanged.
+
+## 2026-09-29: revised park image and Final Speaking
+
+This revision supersedes the preceding M01/M08 descriptions. `A2_MOVE_ROUTES` now uses `images/activity-park-routes.webp` (1310 × 1200), optimized from the user's supplied `image(20260929-122428).png` without changing its composition or colors. The original source and earlier asset remain available. Route A is explicitly the top row (climb up / jump over / run around); Route B is the bottom row (step onto / move into / come out of). Words now match the image: wall, log, obstacle, platform, tunnel. The guide records the ambiguity of the run-around scene instead of marking a natural alternative wrong.
+
+Milestone 8 keeps ID `A2_MOVE_M08` and four minutes. Its new task, **Plan your film**, asks learners to explain six possible film actions, then select three. Useful phrases and Words start open. A separate teacher-revealed sample stays closed until explicitly opened. The old suitcase/cat/shower and dog-walk tasks are replaced, not appended. The new child IDs prevent reuse of the old inner-task state.
+
+`A2_MOVE_FILM` is an explicit pending image slot (`src: null`), ready for the user's later illustration. Its author-only scenario and attachment contract are in `docs/lessons/a2-move-film-visual-scenario.md`. The pupil page contains only the English task and language support, not the visual-generation brief. The picture-dependent task is not yet ready for delivery until the supplied image is attached.
+
+M02–M07, their keys, matching images and recordings, the other lesson, and the two-minute feedback are unchanged. All seven movement phrases remain covered in the lesson; the Test/Final pair focuses on the same six.
