@@ -36,3 +36,11 @@ A2_MOVE_M04 now starts with seven contextual meaning questions (climb up / climb
 A2_MOVE_M08 retains its two sequential oral tasks and closed samples, with the latest user-supplied situations replacing the earlier fragmented notes. Task 1 asks about a suitcase on a high shelf, a cat crossing a garden wall and stepping onto a bath mat. Task 2 keeps all four dog-walk situations together and asks for one connected past-tense story, not individual answers followed by a second retelling. Each task has its own title, subtitle and body; Useful phrases start open and samples are teacher-revealed after an oral attempt, with no writing fields or automatic grading. Existing IDs and teacher-arrow order are preserved. No new images or audio are needed. This revision supersedes WORK and the earlier hill-walk version for M08.
 
 Timing: Rule and Check 4 min; Final Speaking 4 min. Total remains 28 min of activities plus 2 min feedback. All other stages and media are unchanged.
+
+## 2026-09-29: Test Task — Choose your route
+
+This revision supersedes the old Opening description above and the M01 section of WORK only. `A2_MOVE_M01` now asks the learner to explain two activity-park routes and choose one with a partner. The sidebar label is Test Task; its stable exercise ID and two-minute diagnostic allocation are preserved.
+
+The student sees: title → situation → shared route illustration → task → open Useful phrases → open Words. The target chunks are available before teaching; the teacher guide distinguishes independent use from supported use and accepts natural alternatives without treating them as target mastery. No automatic grading or visible answer key is added.
+
+New media ID: `A2_MOVE_ROUTES`, `images/outdoor-adventure-routes.webp` (1254 × 1254), optimized from the supplied `Outdoor Adventure Routes.png`. The source composition, colors, route labels and six scenes are preserved. Route A is the top row, Route B the bottom row; the tunnel scene supports both movement into and out of the tunnel. The original `A2_MOVE_SHEET` and all six matching crops remain unchanged for the vocabulary work. M02–M09 and all audio are unchanged.
