@@ -1,0 +1,130 @@
+{
+  "lessonId": "a2-1-w1-smy-3",
+  "revision": "r1",
+  "voice": {
+    "id": "cgSgspJ2msm6clMCkdW9",
+    "name": "Jessica"
+  },
+  "model": "eleven_v3",
+  "directions": [
+    "calmly",
+    "slightly slower"
+  ],
+  "numericSpeedSetting": null,
+  "postprocessing": "L&R: trim only between phrases, retain 200ms lead and 250ms tail where available, append 150ms silence. No pitch or tempo processing. Listening: original generated file.",
+  "master": "listen-repeat-master_r1.mp3",
+  "qa": {
+    "decode": "passed",
+    "sourceScript": "unchanged",
+    "silenceBoundaries": "measured; eight separated phrases",
+    "automatedTranscription": "provider returns script including direction tags; not an independent listening assessment",
+    "auditoryReview": "not performed: audio input unavailable",
+    "teacherStudentPlayback": "not verified in signed-in live lesson"
+  },
+  "assets": [
+    {
+      "id": "A2_DIR_P01",
+      "script": "Go along River Street.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P01_r1.mp3",
+      "sourceIntervalSeconds": [
+        0,
+        1.65136
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "de92aad24ed298e48db97a02e010cfb3acb883f8e46cc79186592c4fead040b6",
+      "durationSeconds": 1.828571
+    },
+    {
+      "id": "A2_DIR_P02",
+      "script": "Walk across the bridge.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P02_r1.mp3",
+      "sourceIntervalSeconds": [
+        2.7441,
+        4.50295
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "e964576705d82ff3d304b92cefc61fb24ff540c333d044d7ebe22751267dcd5a",
+      "durationSeconds": 1.959184
+    },
+    {
+      "id": "A2_DIR_P03",
+      "script": "Keep going straight.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P03_r1.mp3",
+      "sourceIntervalSeconds": [
+        5.57054,
+        7.12816
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "8a2a4db7e1de49357feabbcdd80f7e9dca3383687bd09209e082f00aad6a487f",
+      "durationSeconds": 1.750204
+    },
+    {
+      "id": "A2_DIR_P04",
+      "script": "Continue through the park.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P04_r1.mp3",
+      "sourceIntervalSeconds": [
+        8.13054,
+        9.91918
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "ffec70601a630d4f2870c98838c2ab7f9784978ef7dd02e90a6fd22dcf9c9d81",
+      "durationSeconds": 1.985306
+    },
+    {
+      "id": "A2_DIR_P05",
+      "script": "Head towards the fountain.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P05_r1.mp3",
+      "sourceIntervalSeconds": [
+        11.1477,
+        12.9944
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "0e563d500a079a644d326f994a49e0c370cd489d1d05b5c8af5fdc1c04573d34",
+      "durationSeconds": 2.037551
+    },
+    {
+      "id": "A2_DIR_P06",
+      "script": "Walk past the bank.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P06_r1.mp3",
+      "sourceIntervalSeconds": [
+        14.0827,
+        15.6704
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "88ababf619c31eb22db307da245cbb79a666e5004fe4d1bd92eb96162d2cd85c",
+      "durationSeconds": 1.776327
+    },
+    {
+      "id": "A2_DIR_P07",
+      "script": "Go down the stairs.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P07_r1.mp3",
+      "sourceIntervalSeconds": [
+        16.6881,
+        18.3192
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "7e0ff7170c7252273a54a2dbc3122d9b679ce3c92682f988fc400a3d60a20eb6",
+      "durationSeconds": 1.828571
+    },
+    {
+      "id": "A2_DIR_P08",
+      "script": "Pass the café.",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_P08_r1.mp3",
+      "sourceIntervalSeconds": [
+        19.4607,
+        20.72
+      ],
+      "generationId": "J2qnDt4IXwixlzkKw0XT",
+      "sha256": "8f5aa9dc79fdb30e756aef1ae388b295d87aef41d4e77dfd2b867892819b5fe2",
+      "durationSeconds": 1.436735
+    },
+    {
+      "id": "A2_DIR_LISTENING",
+      "script": "Hi, Alex. I’m at the café by the river. From the station, go along King Street. Walk past the cinema — don’t turn there. Continue through the small park. When you come out, head towards the bridge, but don’t cross it. Turn left before the bridge and go down the stairs. The café is at the bottom, on your right. See you there!",
+      "path": "assets/lesson-media/a2-1/module-1/smy-3/audio/A2_DIR_LISTENING_r1.mp3",
+      "generationId": "QkJ4I0Vs0f3dV6rXvhm2",
+      "sha256": "277d960346c9ddd5112d285cdbb7f3ce14421bd3d47a8e2cb28d3324c2e7506a",
+      "durationSeconds": 22.674286
+    }
+  ]
+}

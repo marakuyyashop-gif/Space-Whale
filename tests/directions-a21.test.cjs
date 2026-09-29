@@ -16,7 +16,7 @@ test('every stage mounts without exposing notes or requesting missing media',()=
  for(const stage of lesson.stages){const {host,handle}=setup(stage.exercise);assert.ok(!host.textContent.includes('ТОЧНЫЙ АУДИОСКРИПТ'));
  for(const img of host.querySelectorAll('img[src]'))assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',img.getAttribute('src'))));
  for(const d of host.querySelectorAll('details'))if(d.querySelector('summary').textContent==='Useful phrases')assert.equal(d.open,true);
- assert.equal(host.querySelectorAll('audio[src]').length,0);handle.destroy();}
+ for(const audio of host.querySelectorAll('audio[src]'))assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',audio.getAttribute('src'))));handle.destroy();}
 });
 test('closed tasks grade and provide complete corrections',()=>{
  for(const s of lesson.stages)walk(s.exercise,d=>{const a={};if(['choice','matching'].includes(d.kind))d.items.forEach(i=>a[i.id]=i.correctId);if(d.kind==='gaps')d.items.forEach(i=>i.segments.forEach(g=>{if(typeof g!=='string')a[g.id]=g.answers[0];}));if(Object.keys(a).length)assert.ok(Object.values(kit.grade(d,a)).every(v=>v==='correct'),d.id);});
@@ -27,3 +27,5 @@ test('transcript stays gated until all comprehension attempts',()=>{
  handle.setAnswers({'A2_DIR_M06-main':{'1':'B',__sw_checked:true}});assert.equal(transcript.hidden,true);
  handle.setAnswers({'A2_DIR_M06-main':{'1':'B',__sw_checked:true},'A2_DIR_M06-details':{'1':'C','2':'A','3':'B',__sw_choice_checked:['1','2','3'],__sw_choice_revealed:3,__sw_checked:true}});assert.equal(transcript.hidden,false);assert.equal(transcript.open,false);handle.destroy();
 });
+
+test("all nine lesson audio sources resolve to revisioned MP3 files",()=>{const media=app.SpaceWhaleLessonMedia[lesson.id];assert.equal(Object.keys(media).length,9);for(const entry of Object.values(media)){assert.match(entry.src,/_r1\.mp3$/);assert.ok(fs.statSync(require("node:path").join(__dirname,"..",entry.src)).size>10000);}walk(lesson.stages.find(s=>s.exercise.id==="A2_DIR_M03").exercise,d=>assert.equal(d.items.length,8));});
