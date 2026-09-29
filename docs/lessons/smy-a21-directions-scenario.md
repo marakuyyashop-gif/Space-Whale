@@ -121,9 +121,9 @@ go down → move from a higher place to a lower place
 
 ID: A2_DIR_M02-pass · presentation
 
-Pass the café = walk past the café.
+Pass the bank = walk past the bank.
 
-The café is next to your route. You do not go inside; you continue to the next building.
+The bank is next to your route. You do not go inside; you keep walking.
 
 Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана в этом задании перед вопросом.
 

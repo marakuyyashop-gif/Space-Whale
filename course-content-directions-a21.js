@@ -36,7 +36,7 @@ step('Phrase Input',4,S('A2_DIR_M02','Match the phrases with their meanings.',[
  E('A2_DIR_M02-match','matching','Match the phrases with their meanings.',{
  items:definitions.map(([id,text])=>({id,text,correctId:id})),
  options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][2]}))}),
- P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the café = walk past the café.\n\nThe café is next to your route. You do not go inside; you continue to the next building.'),I('test-route.svg'),T('Look at the map again. Show a place you pass on your way to the café.')])
+ P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the bank = walk past the bank.\n\nThe bank is next to your route. You do not go inside; you keep walking.'),I('test-route.svg'),T('Look at the map again. Show a place you pass on your way to the café.')])
 ],{progressive:true,requireCheckBeforeNext:true}),'Цель: ввести все семь сочетаний и pass. Сначала дать ученику попытаться сопоставить значения, затем вместе проверить; это ввод с поддержкой, а не тест после объяснения. При необходимости показать участок карты. Не объявлять одну линию на карте однозначным изображением along / straight / towards. Down здесь — значение со stairs. Pass вводится и применяется в последней короткой реплике. Базовые go / walk знакомы; keep going, continue, head и pass изучаются в контексте, без второго искусственного словарного списка.');
 step('Pronunciation',3,E('A2_DIR_M03','audio','Listen and repeat.',{
  layout:'listen-repeat',instruction:'Listen and repeat each phrase.',
