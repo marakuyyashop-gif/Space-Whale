@@ -1,7 +1,7 @@
 # A2_MOVE_M08 — Plan your film
 
 Lesson: `a2-1-w1-smy-2`, Milestone 8. Media slot: `A2_MOVE_FILM`.
-Status: student task published; illustration supplied separately by the user and currently pending.
+Status: student task published; the user-supplied illustration is connected as `assets/lesson-media/a2-1/module-1/smy-2/images/film-action-scenes.webp` (1536 × 1024), with its composition and colors preserved.
 
 ## Student task
 

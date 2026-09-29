@@ -54,3 +54,8 @@ Milestone 8 keeps ID `A2_MOVE_M08` and four minutes. Its new task, **Plan your f
 `A2_MOVE_FILM` is an explicit pending image slot (`src: null`), ready for the user's later illustration. Its author-only scenario and attachment contract are in `docs/lessons/a2-move-film-visual-scenario.md`. The pupil page contains only the English task and language support, not the visual-generation brief. The picture-dependent task is not yet ready for delivery until the supplied image is attached.
 
 M02–M07, their keys, matching images and recordings, the other lesson, and the two-minute feedback are unchanged. All seven movement phrases remain covered in the lesson; the Test/Final pair focuses on the same six.
+
+
+## 2026-09-29: Final Speaking image attached
+
+The pending `A2_MOVE_FILM` slot now uses `images/film-action-scenes.webp` (1536 × 1024), optimized from the supplied `image(20260929-123535).png`. The six scene positions match the existing task and sample: ladder, puddle, van, box, entering the garage, leaving the garage. Composition, colors and proportions are preserved. This supersedes the pending-image status above; student wording, other milestones, keys and recordings remain unchanged.
