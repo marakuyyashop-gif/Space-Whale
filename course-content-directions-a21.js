@@ -36,7 +36,7 @@ step('Phrase Input',4,S('A2_DIR_M02','Match the phrases with their meanings.',[
  E('A2_DIR_M02-match','matching','Match the phrases with their meanings.',{
  items:definitions.map(([id,text])=>({id,text,correctId:id})),
  options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][2]}))}),
- P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the café = walk past the café.\n\nThe café is next to your route. You do not go inside; you continue to the next building.'),T('Look at the map again. Show a place you pass on your way to the café.')])
+ P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the café = walk past the café.\n\nThe café is next to your route. You do not go inside; you continue to the next building.'),I('test-route.svg'),T('Look at the map again. Show a place you pass on your way to the café.')])
 ],{progressive:true,requireCheckBeforeNext:true}),'Цель: ввести все семь сочетаний и pass. Сначала дать ученику попытаться сопоставить значения, затем вместе проверить; это ввод с поддержкой, а не тест после объяснения. При необходимости показать участок карты. Не объявлять одну линию на карте однозначным изображением along / straight / towards. Down здесь — значение со stairs. Pass вводится и применяется в последней короткой реплике. Базовые go / walk знакомы; keep going, continue, head и pass изучаются в контексте, без второго искусственного словарного списка.');
 step('Pronunciation',3,E('A2_DIR_M03','audio','Listen and repeat.',{
  layout:'listen-repeat',instruction:'Listen and repeat each phrase.',
@@ -55,8 +55,8 @@ step('Controlled Practice',3,E('A2_DIR_M05','gaps','Choose the correct words.',{
  g('2','Stay outside the shop. Walk ',['through','across','past'],'past',' it and stop at the next building.'),
  g('3','Enter the park at this gate and leave by the gate on the other side. Continue ',['through','past','towards'],'through',' the park.'),
  g('4','You are on the upper path; the café is on the lower path. Go ',['across','down','past'],'down',' the stairs to the café.'),
- g('5','Stay on this road as it follows the river. Go ',['across','through','along'],'along',' River Street until the bridge.'),
- g('6','Do not turn at the crossing. Keep ',['go straight','going straight','to go straight'],'going straight',' until the bank.'),
+ g('5','Stay on this road as it follows the river. Go ',['across','through','along'],'along',' River Street until you reach the bridge.'),
+ g('6','Do not turn at the crossing. Keep ',['go straight','going straight','to go straight'],'going straight',' until you reach the bank.'),
  g('7','The cinema is the building after the café. ',['Pass','Pass past','Pass towards'],'Pass',' the café and stop at the cinema.')
 ]}),'Цель: выбрать направление и форму в однозначном контексте. Towards проверен в discovery и далее в Listening; не добавлять искусственный восьмой пункт ради количества. Контекст второго пункта исключает through; четвёртого — past. В первом towards не означает завершённого пересечения, тогда как инструкция требует попасть на другую сторону. После OK — полное правильное предложение; правило в feedback не добавлять.');
 step('Listening',5,S('A2_DIR_M06','Find the meeting place.',[
@@ -74,10 +74,10 @@ step('Final Speaking',6,S('A2_DIR_M07','Help your friend get to the cinema.',[
  P('A2_DIR_M07-sample','Compare your directions.',[D('Possible answers','Walk past the shop and continue through the garden. Walk across the bridge. Then go along Garden Street and turn right at the end. Follow the path round to the right. Keep going straight at the crossing. Go down the stairs and head towards the cinema.\n\nPartner: Do I turn at the crossing?\nYou: No, keep going straight.')])
 ],{progressive:true}),'Цель: то же умение, что в Test Task, на другом маршруте, без нового времени и придумывания истории. Карта общая; не называть это information gap. 1 минута на подготовку, 3–4 на объяснение и уточнение, остаток на исправление. Оценка: понятен порядок; направления соответствуют пути; сочетания выбраны по смыслу; собеседник может следовать указаниям. Не требовать все chunks и точного совпадения с sample. Along и straight могут совместно описывать участок. Useful phrases остаются открытыми. Образец только после попытки через стрелку и закрытое раскрытие.\n\nЕщё 2 минуты Feedback: сравнить начальную и итоговую попытки при одинаковых опорах; назвать один удачный участок и предложить исправить одну реально возникшую ошибку. Если времени мало, сократить повторные произнесения уже освоенных строк; не убирать Final.');
 const homework=[
- ['Выходи из отеля и иди вдоль Ривер-стрит.','Leave the hotel and go along River Street.'],
- ['Пройди через парк к выходу на другой стороне.','Walk through the park to the exit on the other side.'],
- ['Пройди мимо банка и продолжай идти прямо.','Walk past the bank and keep going straight.'],
- ['Спустись по лестнице; кафе справа внизу.','Go down the stairs; the café is at the bottom on your right.'],
+ ['Выйдите из отеля и идите вдоль Ривер-стрит до входа в парк.','Leave the hotel and go along River Street until you reach the park entrance.'],
+ ['Пройдите через парк к воротам на другой стороне.','Walk through the park to the gate on the other side.'],
+ ['За воротами поверните направо и пройдите мимо банка.','After the gate, turn right and walk past the bank.'],
+ ['Продолжайте идти прямо до лестницы. Спуститесь по ней; кафе справа внизу.','Keep going straight until you reach the stairs. Go down them; the café is at the bottom on your right.'],
  ['Мы у вокзала. Как нам пройти в кинотеатр?','We are at the station. How do we get to the cinema?'],
  ['Перейдите через площадь на другую сторону.','Walk across the square to the other side.'],
  ['Направляйтесь к фонтану, но поверните направо перед ним.','Head towards the fountain, but turn right before you reach it.'],

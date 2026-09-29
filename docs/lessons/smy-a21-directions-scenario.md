@@ -125,6 +125,8 @@ Pass the café = walk past the café.
 
 The café is next to your route. You do not go inside; you continue to the next building.
 
+Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана в этом задании перед вопросом.
+
 Look at the map again. Show a place you pass on your way to the café.
 
 
@@ -221,11 +223,11 @@ ID: A2_DIR_M05 · gaps
 4. You are on the upper path; the café is on the lower path. Go [across / down / past] the stairs to the café.
 Авторский ключ: You are on the upper path; the café is on the lower path. Go down the stairs to the café.
 
-5. Stay on this road as it follows the river. Go [across / through / along] River Street until the bridge.
-Авторский ключ: Stay on this road as it follows the river. Go along River Street until the bridge.
+5. Stay on this road as it follows the river. Go [across / through / along] River Street until you reach the bridge.
+Авторский ключ: Stay on this road as it follows the river. Go along River Street until you reach the bridge.
 
-6. Do not turn at the crossing. Keep [go straight / going straight / to go straight] until the bank.
-Авторский ключ: Do not turn at the crossing. Keep going straight until the bank.
+6. Do not turn at the crossing. Keep [go straight / going straight / to go straight] until you reach the bank.
+Авторский ключ: Do not turn at the crossing. Keep going straight until you reach the bank.
 
 7. The cinema is the building after the café. [Pass / Pass past / Pass towards] the café and stop at the cinema.
 Авторский ключ: The cinema is the building after the café. Pass the café and stop at the cinema.
@@ -350,17 +352,17 @@ ID: A2_DIR_HW1 · writing
 
 Translate the directions into English.
 
-Выходи из отеля и иди вдоль Ривер-стрит.
-Возможный ответ после попытки: Leave the hotel and go along River Street.
+Выйдите из отеля и идите вдоль Ривер-стрит до входа в парк.
+Возможный ответ после попытки: Leave the hotel and go along River Street until you reach the park entrance.
 
-Пройди через парк к выходу на другой стороне.
-Возможный ответ после попытки: Walk through the park to the exit on the other side.
+Пройдите через парк к воротам на другой стороне.
+Возможный ответ после попытки: Walk through the park to the gate on the other side.
 
-Пройди мимо банка и продолжай идти прямо.
-Возможный ответ после попытки: Walk past the bank and keep going straight.
+За воротами поверните направо и пройдите мимо банка.
+Возможный ответ после попытки: After the gate, turn right and walk past the bank.
 
-Спустись по лестнице; кафе справа внизу.
-Возможный ответ после попытки: Go down the stairs; the café is at the bottom on your right.
+Продолжайте идти прямо до лестницы. Спуститесь по ней; кафе справа внизу.
+Возможный ответ после попытки: Keep going straight until you reach the stairs. Go down them; the café is at the bottom on your right.
 
 
 ## Homework 2 — после урока
