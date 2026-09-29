@@ -106,7 +106,7 @@ const ruleTexts={
   ]
  },
  "movement": {
-  "text": "Глагол показывает способ движения, а предлог — путь. Climb up the ladder — подняться по лестнице вверх. Climb over the wall — перелезть через стену на другую сторону. Если препятствие преодолевают прыжком, используйте jump over: She jumped over the log.\n\nOnto показывает переход на поверхность: She stepped onto the rock. Сравните: She is on the rock описывает положение, а не переход.\n\nInto показывает перемещение внутрь: It started to rain, so we moved into the tent. Здесь move into означает «переместиться внутрь», не «переехать жить». Out of показывает обратное направление: I was outside when she came out of the tent. Перед названием места сохраняйте обе части: out of the tent.\n\nAround описывает путь вокруг предмета: The dog ran around the tree. Предлог не меняется из-за времени; форму времени получает глагол: run → ran, come → came.",
+  "text": "Глагол показывает способ движения, а предлог — путь. Climb up the ladder — подняться по лестнице вверх. Climb over the wall — перелезть через стену на другую сторону. Если препятствие преодолевают прыжком, используйте jump over: She jumped over the log.\n\nOnto показывает переход на поверхность: She stepped onto the rock. Сравните: She is on the rock описывает положение, а не переход.\n\nInto показывает перемещение внутрь: It started to rain, so we moved into the tent. Здесь move into означает «переместиться внутрь», не «переехать жить». Out of показывает обратное направление: I was outside when she came out of the tent. Перед названием места сохраняйте обе части: out of the tent.\n\nAround описывает движение вокруг предмета или в обход него. Полный круг необязателен: The dog ran around the tree to reach its ball. Предлог не меняется из-за времени; форму времени получает глагол: run → ran, come → came.",
   "highlights": [
    "Climb up the ladder",
    "Climb over the wall",
@@ -121,7 +121,7 @@ const ruleTexts={
    "I was outside when she came out of the tent.",
    "out of the tent",
    "Around",
-   "The dog ran around the tree.",
+   "The dog ran around the tree to reach its ball.",
    "run → ran",
    "come → came"
   ]
@@ -241,10 +241,10 @@ move.push(step('Rule and Check',4,S('A2_MOVE_M04','Read the examples and choose 
   movementMeaning('climb-up','The cat climbed up the tree to reach a branch.','climbed up',['It came down towards the ground.','It went higher into the tree.','It went round the tree.'],'B','The cat went higher into the tree.'),
   movementMeaning('climb-over','The gate was locked, so Sam climbed over the low wall.','climbed over',['He reached the top and stayed there.','He went through an opening in it.','He crossed the top to the other side.'],'C','Sam crossed the top of the wall to reach the other side.'),
   movementMeaning('jump-over','Lena jumped over the puddle and landed on dry ground.','jumped over',['She crossed it in one jump.','She jumped into the water.','She walked round its edge.'],'A','Lena crossed the puddle in one jump.'),
-  movementMeaning('step-onto','To see better, Alex stepped onto a low rock.','stepped onto',['He walked past the rock.','He stepped down from the rock.','He went from the ground onto its surface.'],'C','Alex stepped from the ground onto the surface of the rock.'),
+  movementMeaning('step-onto','To see better, Alex stepped onto a low rock.','stepped onto',['He walked past the rock.','He stepped down from the rock.','He moved from the ground to the top of the rock.'],'C','Alex stepped from the ground onto the surface of the rock.'),
   movementMeaning('move-into','It started to rain, so we moved into the café.','moved into',['We went from inside to outside.','We went from outside to inside.','We walked past it and stayed outside.'],'B','We went from outside to inside the café.'),
   movementMeaning('come-out-of','I was waiting outside when Nina came out of the shop.','came out of',['She left the inside and joined me outside.','She entered the shop from the street.','She stayed inside near the door.'],'A','Nina left the shop and joined me outside.'),
-  movementMeaning('run-around','The dog ran around the tree in a circle.','ran around',['It ran straight towards the tree.','It ran in a circle round the tree.','It ran past the tree in a straight line.'],'B','The dog ran in a circle round the tree.')
+  movementMeaning('run-around','The dog ran around the tree to reach its ball on the other side.','ran around',['It ran straight towards the tree.','It passed the tree on one side to reach the ball.','It ran past the tree in a straight line.'],'B','The dog passed the tree on one side to reach the ball.')
  ]),
  R('A2_MOVE_M04-rule','Как описать направление движения','movement')
 ],{progressive:true,requireCheckBeforeNext:true})));

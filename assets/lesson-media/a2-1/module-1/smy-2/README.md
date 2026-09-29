@@ -59,3 +59,7 @@ M02–M07, their keys, matching images and recordings, the other lesson, and the
 ## 2026-09-29: Final Speaking image attached
 
 The pending `A2_MOVE_FILM` slot now uses `images/film-action-scenes.webp` (1536 × 1024), optimized from the supplied `image(20260929-123535).png`. The six scene positions match the existing task and sample: ladder, puddle, van, box, entering the garage, leaving the garage. Composition, colors and proportions are preserved. This supersedes the pending-image status above; student wording, other milestones, keys and recordings remain unchanged.
+
+## 2026-09-29: Milestone 4 meaning cues
+
+The approved M04 refinements remove `onto` from the correct meaning option and replace the `run around … in a circle` prompt with a context about reaching a ball on the other side of a tree. The run-around meaning option and feedback now match that context; the rule explicitly allows movement around an obstacle without a complete circle. Its highlight is synchronized with the revised example. Correct option IDs, the seven target phrases, stage order, timing, recordings, other milestones and lessons remain unchanged.
