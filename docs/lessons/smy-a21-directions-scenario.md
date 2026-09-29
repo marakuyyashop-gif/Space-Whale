@@ -300,7 +300,7 @@ ID: A2_DIR_M08 · writing, open response
 
 ### Check the directions.
 
-Your friend has written these directions. Each sentence has one mistake. Correct it without changing the meaning.
+Your friend wrote these directions. Correct one mistake in each sentence. Keep the same meaning.
 
 1. Keep go straight at the crossing.
 2. Pass past the bank and stop at the next building.
@@ -314,11 +314,11 @@ ID: A2_DIR_M09 · stage; карта и поле ввода открываютс�
 
 ### Send your friend directions.
 
-Your friend has just walked past the bank. You are waiting at the café.
+Your friend is on the road just past the bank. You are waiting at the café.
 
 Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана рядом с заданием.
 
-Look at the map. Write a short message explaining the rest of the route to the café.
+Look at the map. Write a short message to your friend. Explain how to get from the bank to the café.
 
 **Useful phrases** — открыто сразу
 
@@ -331,7 +331,7 @@ The café is…
 Поле: Write 3–4 sentences. Одно многострочное поле, ID A2_DIR_M09-message.
 
 Possible answers — после попытки:
-Head towards the fountain, but turn left before you reach it. Follow the path to the stairs and go down them. Keep going straight at the crossing. The café is at the end of the path.
+Head towards the fountain, but turn left before you reach it. Turn left at the corner and go down the stairs. Keep going straight at the crossing. The café is in front of you.
 
 Преподавателю: проверить маршрут от точки после банка, поворот до фонтана, спуск и движение прямо через пересечение. Принимать естественные варианты. Образец не единственный ответ, автоматической оценки свободного текста нет.
 
@@ -350,11 +350,11 @@ ID: A2_DIR_M07 · stage
 
 ID: A2_DIR_M07-speaking · presentation
 
-Your friend has arrived at the station. You are waiting at the cinema. Explain how to get there.
+Your friend is at the station. You are waiting at the cinema. Explain how to get there.
 
 Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/final-route.svg
 
-Follow the dotted route from START to FINISH. Give your partner clear directions. Your partner follows the route and asks one question to check a direction.
+Look at the map. Follow the black line from START to FINISH. Tell your friend how to get there. Your friend asks one question about the way.
 
 **Useful phrases** — открыто сразу
 
@@ -377,7 +377,7 @@ ID: A2_DIR_M07-sample · presentation
 
 **Possible answers** — закрыто; после попытки
 
-Walk past the shop and continue through the garden. Walk across the bridge. Then go along Garden Street and turn right at the end. Follow the path round to the right. Keep going straight at the crossing. Go down the stairs and head towards the cinema.
+Walk past the shop and continue through the garden. Walk across the bridge. Then go along Garden Street and turn right at the end. Then turn right again. Keep going straight at the crossing. Go down the stairs and head towards the cinema.
 
 Partner: Do I turn at the crossing?
 You: No, keep going straight.
