@@ -132,13 +132,13 @@ Look at the map again. Show a place you pass on your way to the café.
 
 ## Pronunciation — 3 min
 
-Преподавателю: Цель: произнести восемь осмысленных фраз. Преподаватель включает запись; ученик слушает и повторяет. Работать целыми сочетаниями; не читать названия предлогов отдельно. Не засчитывать этот этап как Listening comprehension. План записи: взрослый нейтральный английский голос, без музыки; восемь отдельных клипов строго по видимым строкам.
+Преподавателю: Цель: произнести восемь осмысленных фраз. Преподаватель включает запись; ученик слушает и повторяет. Работать целыми сочетаниями; не читать названия предлогов отдельно. Не засчитывать этот этап как Listening comprehension. Восемь отдельных записей Jessica, строго по видимым строкам.
 
 ### Listen and repeat.
 
 ID: A2_DIR_M03 · audio
 
-Listen to your teacher and repeat each phrase. The recordings have not been added yet.
+Listen and repeat each phrase.
 
 Go along River Street.
 Walk across the bridge.
@@ -247,7 +247,7 @@ ID: A2_DIR_M06 · stage
 
 ID: A2_DIR_M06-audio · audio
 
-Alex is at the station. Listen to the message your teacher reads. The recording has not been added yet.
+Alex is at the station. Listen to the message.
 
 
 #### Find the meeting place.
