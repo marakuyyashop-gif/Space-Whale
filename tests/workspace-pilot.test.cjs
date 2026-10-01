@@ -136,7 +136,7 @@ test('level is beside session controls; module and lesson pickers navigate; over
  assert.equal(d.querySelector('button.workspace-lesson-selector'),null);
  assert.ok(d.querySelector('.workspace-lesson-heading [role=button]'));
  const choose=(selector,label)=>{s.click(d.querySelector(selector));s.click([...d.querySelectorAll('.workspace-picker-option')].find(el=>el.textContent.includes(label)));};
- choose('.selector-level','A1.2');choose('.selector-module','04');choose('.selector-lesson','Как выглядит эта вещь?');
+ choose('.selector-level','A1.2');choose('.selector-module','04');choose('.selector-lesson','Примерочная');
  const overview=d.querySelector('.workspace-lesson-overview');assert.match(overview.textContent,/look \/ looks/);assert.doesNotMatch(overview.textContent,/coat|sweater|blouse/);
  assert.match(s.location.search,/lesson=a1-2-w4-l1/);
 });

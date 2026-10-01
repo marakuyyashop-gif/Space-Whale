@@ -42,7 +42,7 @@
   const step = (menu,minutes,definition,aim) => ({menu,section:'tasks',navigationTitle:menu,guide:{time:minutes+' min',aim},exercise:definition});
   const listeningQuestion = (id,title,prompt,words,correctId) => exercise(id,'choice',title,{items:[{id:'answer',prompt,options:options(words),correctId}]});
   const lesson = {
-    id:'a1-2-w4-l1',title:'Как выглядит эта вещь?',level:'A1.2',whale:4,
+    id:'a1-2-w4-l1',title:'Примерочная',level:'A1.2',whale:4,
     summary:'Учимся называть предметы одежды, описывать их внешний вид и сравнивать со знакомыми вещами.',
     grammar:'look / looks + adjective; look / looks like + noun; How does it look?',
     words:wordList,durationMinutes:29,
@@ -119,7 +119,7 @@
 
   const lesson2 = {
     id: 'a1-2-w4-l2',
-    title: 'Описываем внешний вид одежды',
+    title: 'Оценка',
     level: 'A1.2',
     whale: 4,
     stages: [

@@ -39,14 +39,14 @@ test('Whales are isolated by level; publishing a topic only needs content metada
   assert.deepEqual(catalog.normalize(catalog.query(route)), route);
 });
 
-test('A1 course outline exposes real Whale names and catalog-only lesson titles', () => {
+test('A1 course outline exposes source module names and catalog-only lesson titles', () => {
   const { lessons, templates } = content();
   const catalog = createCatalog(lessons, templates);
-  assert.equal(levels.find(level => level.id === 'A1.1').whales[0].title, 'Whale 1 · Short Talk');
-  assert.equal(levels.find(level => level.id === 'A1.2').whales[6].title, 'Whale 7 · Итоговое повторение A1');
+  assert.equal(levels.find(level => level.id === 'A1.1').whales[0].title, 'Module 1 · Общение');
+  assert.equal(levels.find(level => level.id === 'A1.2').whales[6].title, 'Module 7 · Практика');
   const a11w1 = catalog.topics({view:'library',level:'A1.1',whale:1});
   assert.deepEqual(a11w1.map(lesson => lesson.title), [
-    'Как я рад встрече!','Рад знакомству','Как вас зовут?','Заполняем анкету','Давайте обменяемся контактами','Какая замечательная сегодня погода!','Знакомимся и обмениваемся информацией'
+    'Встреча','Вежливость','Алфавит','Анкета','Числа','Десятки','Контакты','Погода','Разговор · Повторение'
   ]);
   assert.ok(a11w1.every(lesson => lesson.outline && lesson.stages.length === 0));
   const a12w1 = catalog.topics({view:'library',level:'A1.2',whale:1});
@@ -60,7 +60,7 @@ test('A1.2 lesson one uses the replacement title and ten class stages', () => {
   const { lessons, templates } = content();
   const catalog = createCatalog(lessons, templates);
   const lesson = catalog.topics({view:'library',level:'A1.2',whale:4}).find(item => item.id === 'a1-2-w4-l1');
-  assert.equal(lesson.title, 'Как выглядит эта вещь?');
+  assert.equal(lesson.title, 'Примерочная');
   assert.equal(lesson.outline, undefined);
   assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 10);
   assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 0);
@@ -73,7 +73,7 @@ test('A1.2 clothing appearance lesson replaces its second outline with nine clas
   const { lessons, templates } = content();
   const catalog = createCatalog(lessons, templates);
   const lesson = catalog.topics({view:'library',level:'A1.2',whale:4}).find(item => item.id === 'a1-2-w4-l2');
-  assert.equal(lesson.title, 'Описываем внешний вид одежды');
+  assert.equal(lesson.title, 'Оценка');
   assert.equal(lesson.outline, undefined);
   assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 9);
   assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
@@ -189,21 +189,21 @@ test('compact course controls keep whole-Whale selection and restore it after re
   assert.ok(buttons(state).some(b=>b.textContent==='W 1'));
   assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
   assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-level-toggle').length,0);
-  buttons(state).find(b=>b.textContent==='Как я рад встрече!').click();
+  buttons(state).find(b=>b.textContent==='Встреча').click();
   assert.equal(state.mounts.length,0);
   assert.ok(!buttons(state).some(b=>b.textContent==='Tasks'));
-  buttons(state).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.1 · Whale 1 · Short Talk').click();
+  buttons(state).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.1 · Module 1 · Общение').click();
   state.nodes.get('classTab').click();
   const titles=buttons(state).map(b=>b.textContent);
-  assert.ok(titles.includes('Какая замечательная сегодня погода!'));
+  assert.ok(titles.includes('Погода'));
   assert.ok(!titles.includes('Описываем одежду'));
   assert.equal(state.nodes.get('workspaceClockPanel').hidden,false);
   const restored=app(state.location.search,state.storage);
-  assert.ok(buttons(restored).some(b=>b.textContent==='Рад знакомству'));
-  buttons(restored).find(b=>b.attrs['aria-label']==='Убрать из класса: A1.1 · Whale 1 · Short Talk').click();
-  assert.ok(!buttons(restored).some(b=>b.textContent==='Рад знакомству'));
+  assert.ok(buttons(restored).some(b=>b.textContent==='Вежливость'));
+  buttons(restored).find(b=>b.attrs['aria-label']==='Убрать из класса: A1.1 · Module 1 · Общение').click();
+  assert.ok(!buttons(restored).some(b=>b.textContent==='Вежливость'));
   restored.nodes.get('libraryTab').click();
-  assert.ok(buttons(restored).some(b=>b.textContent==='Рад знакомству'));
+  assert.ok(buttons(restored).some(b=>b.textContent==='Вежливость'));
 });
 
 test('Class retains a standalone lesson and timer is independent of exercise and navigation', () => {
@@ -356,7 +356,7 @@ test('temporary guest Workspace limits the room to the two allowed lessons and k
   assert.ok(!buttons(teacher).some(b=>b.className==='workspace-add'));
   const topicLabels = buttons(teacher).map(button => button.textContent);
   assert.ok(topicLabels.includes('Описываем одежду'));
-  assert.ok(topicLabels.includes('Описываем внешний вид одежды'));
+  assert.ok(topicLabels.includes('Оценка'));
   assert.ok(!topicLabels.includes('Объясняем свой выбор'));
   assert.ok(teacher.location.search.includes('guest=guest-token'));
 
@@ -414,12 +414,12 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   buttons(teacher).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
   buttons(teacher).find(b=>b.textContent==='A1.2').click();
   buttons(teacher).find(b=>b.attrs['aria-label']==='Выбрать Whale').click();
-  buttons(teacher).find(b=>b.textContent==='Whale 4 · Описываем и объясняем выбор').click();
-  buttons(teacher).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.2 · Whale 4 · Описываем и объясняем выбор').click();
+  buttons(teacher).find(b=>b.textContent==='Module 4 · Выбор').click();
+  buttons(teacher).find(b=>b.attrs['aria-label']==='Добавить в класс: A1.2 · Module 4 · Выбор').click();
   await flush();
   student.nodes.get('classTab').click();
   assert.ok(buttons(student).some(b=>b.textContent==='Описываем одежду'));
-  assert.ok(!buttons(student).some(b=>b.textContent==='Как я рад встрече!'));
+  assert.ok(!buttons(student).some(b=>b.textContent==='Встреча'));
   student.nodes.get('libraryTab').click();
   buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
   buttons(teacher).find(b=>b.textContent==='Описываем одежду').click();
@@ -434,7 +434,7 @@ test('empty guest room supports both editors, teacher navigation and restored sh
   assert.equal(teacher.mounts.at(-1).answers.pw2,'dark');
   assert.equal(teacher.mounts.at(-1).answers.__sw_checked,true);
   const before=student.location.search;
-  buttons(student).find(b=>b.textContent==='Описываем внешний вид одежды').click();
+  buttons(student).find(b=>b.textContent==='Оценка').click();
   assert.equal(student.location.search,before);
   const server=collaboration.create('server');
   server.merge(saved.get(teacher.mounts.at(-1).exercise.id));
@@ -471,10 +471,10 @@ test('selectors isolate a single Whale, expose templates and keep the clock visi
   buttons(state).find(b=>b.textContent==='A1.2').click();
   assert.equal(new URLSearchParams(state.location.search).get('level'),'A1.2');
   buttons(state).find(b=>b.attrs['aria-label']==='Выбрать Whale').click();
-  buttons(state).find(b=>b.textContent==='Whale 4 · Описываем и объясняем выбор').click();
+  buttons(state).find(b=>b.textContent==='Module 4 · Выбор').click();
   assert.ok(buttons(state).some(b=>b.textContent==='Описываем одежду'));
-  assert.ok(!buttons(state).some(b=>b.textContent==='Как я рад встрече!'));
-  buttons(state).find(b=>b.textContent==='Описываем внешний вид одежды').click();
+  assert.ok(!buttons(state).some(b=>b.textContent==='Встреча'));
+  buttons(state).find(b=>b.textContent==='Оценка').click();
   assert.equal(state.nodes.get('workspaceTopics').querySelectorAll('.workspace-topic-body').length,0);
   assert.equal(buttons(state).filter(b=>b.className==='workspace-topic-toggle'&&b.getAttribute('aria-current')==='page').length,1);
   buttons(state).find(b=>b.attrs['aria-label']==='Выбрать уровень').click();
