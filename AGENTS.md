@@ -16,6 +16,8 @@
 
 ## Workspace
 
+- `workspace-catalog.js` is the canonical course outline: titles, order and placement come from it, never from lesson exercise files. Lesson IDs are permanent identities, not positions: inserting a lesson must not reassign existing IDs or their saved answers/media. Test the final catalog with every script loaded by classroom.html, not the outline alone.
+
 - Course keys: Module then Lesson. The compact current-level selector is beside Start/Finish. Each opens its existing selection menu.
 - The lesson overview is plain information: title with completion mark, short goal/description, grammar and constructions. No lesson-number banner, selectable lesson card, repeated tags, or standalone target-word list. Never display `words` or an imported word bank there, even when included in the author draft. Use `grammar` / `constructions` explicitly; do not assume `lexis` contains constructions.
 - Persistent floating notices and dialogs require a visible, keyboard-accessible close control. Dismiss the notice, not the lesson, call, or saved state. New messages may be shown again.

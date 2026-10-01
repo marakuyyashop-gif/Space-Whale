@@ -15,7 +15,7 @@ function setup(def,config={}){
  return {host,handle,changes,fire,click};
 }
 test('replacement is lesson one with the ten requested steps and no leftover homework',()=>{
- assert.equal(lesson.id,'a1-2-w4-l1');assert.equal(lesson.title,'Примерочная');assert.equal(lesson.stages.length,10);
+ assert.equal(lesson.id,'a1-2-w4-l1');assert.equal(lesson.title,undefined);assert.equal(lesson.stages.length,10);
  assert.equal(lesson.stages.reduce((sum,s)=>sum+parseInt(s.guide.time),0),29);
  lesson.stages.forEach(s=>{assert.equal(s.section,'tasks');kit.validate(s.exercise);});
  assert.equal(stage('short-production').responseMode,'open');assert.match(stage('short-production').items[1].prompt,/Is this your coat\?/);

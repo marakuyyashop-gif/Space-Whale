@@ -74,9 +74,13 @@
     whales: level.whales.map(whale => ({ id: whale.id, title: whale.title }))
   }));
 
+  // Stable IDs are not lesson positions. Keep existing links, answers and media
+  // attached to their original lessons when new lessons are inserted.
+  const firstModuleIds = [1, 2, 3, 4, 'numbers', 'tens', 5, 6, 7];
   const outlineLessons = courseOutline.flatMap(level => level.whales.flatMap(whale =>
     whale.topics.map((title, index) => ({
-      id: `${level.id.toLowerCase().replace('.', '-')}-w${whale.id}-l${index + 1}`,
+      id: `${level.id.toLowerCase().replace('.', '-')}-w${whale.id}-l${level.id === 'A1.1' && whale.id === 1 ? firstModuleIds[index] : index + 1}`,
+      lessonNumber: index + 1,
       title,
       level: level.id,
       whale: whale.id,
@@ -86,6 +90,13 @@
   ));
 
   function createCatalog(lessons, templates) {
+    // Course metadata belongs exclusively to the outline, never to exercises.
+    const outlineById = new Map(outlineLessons.map(lesson => [lesson.id, lesson]));
+    lessons = lessons.map(lesson => {
+      const outline = outlineById.get(lesson.id);
+      return outline ? {...lesson, title: outline.title, level: outline.level,
+        whale: outline.whale, lessonNumber: outline.lessonNumber} : lesson;
+    });
     // A sidebar tab accepts one exercise or a sequence; the shared engine owns the arrows.
     // Existing exercise definitions and their answer IDs are left untouched.
     lessons = lessons.map(lesson => ({...lesson, stages: lesson.stages.map(stage => {

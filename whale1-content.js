@@ -3,7 +3,6 @@
   const lessons = [
   {
     "id": "a1-1-w1-l1",
-    "title": "Как я рад встрече!",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -589,7 +588,6 @@
   },
   {
     "id": "a1-1-w1-l2",
-    "title": "Рад знакомству",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -1385,7 +1383,6 @@
   },
   {
     "id": "a1-1-w1-l3",
-    "title": "Как вас зовут?",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -2121,7 +2118,6 @@
   },
   {
     "id": "a1-1-w1-l4",
-    "title": "Заполняем анкету",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -2899,7 +2895,6 @@
   },
   {
     "id": "a1-1-w1-l5",
-    "title": "Давайте обменяемся контактами",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -3440,7 +3435,6 @@
   },
   {
     "id": "a1-1-w1-l6",
-    "title": "Какая замечательная сегодня погода!",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,
@@ -4204,7 +4198,6 @@
   },
   {
     "id": "a1-1-w1-l7",
-    "title": "Знакомимся и обмениваемся информацией",
     "level": "A1.1",
     "whale": 1,
     "durationMinutes": 30,

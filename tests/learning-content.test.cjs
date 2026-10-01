@@ -81,7 +81,7 @@ test('A1.2 clothing appearance lesson keeps look and look like targets and split
   const window = { SpaceWhaleExerciseKit: kit, SpaceWhaleContent: [] };
   vm.runInNewContext(source, { window });
   const lesson = window.SpaceWhaleContent.find(item => item.id === 'a1-2-w4-l2');
-  assert.equal(lesson.title, 'Оценка');
+  assert.equal(lesson.title, undefined); // Title is owned by the course catalog.
   assert.equal(lesson.stages.filter(stage => (stage.section || 'tasks') === 'tasks').length, 9);
   assert.equal(lesson.stages.filter(stage => stage.section === 'self-study').length, 2);
   lesson.stages.forEach(stage => kit.validate(stage.exercise));

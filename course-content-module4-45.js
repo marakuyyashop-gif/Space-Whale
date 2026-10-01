@@ -155,8 +155,8 @@ function attach(value,slots){
  Object.values(value).forEach(v=>{if(Array.isArray(v))v.forEach(x=>attach(x,slots));else if(v&&typeof v==='object')attach(v,slots);});
 }
 const lessons=[
- {id:'a1-2-w4-l4',title:'Сосед',words:words4,constructions:'What is he/she like? · What does he/she look like?',summary:'Узнаём и описываем качества человека и его внешность.',reserveMinutes:2,stages:l4},
- {id:'a1-2-w4-l5',title:'Категории',words:words5,constructions:'It’s a kind of … · It’s a type of …',summary:'Объясняем предмет через общую категорию двумя способами и понимаем объяснения собеседника.',reserveMinutes:2.5,stages:l5}
+ {id:'a1-2-w4-l4',words:words4,constructions:'What is he/she like? · What does he/she look like?',summary:'Узнаём и описываем качества человека и его внешность.',reserveMinutes:2,stages:l4},
+ {id:'a1-2-w4-l5',words:words5,constructions:'It’s a kind of … · It’s a type of …',summary:'Объясняем предмет через общую категорию двумя способами и понимаем объяснения собеседника.',reserveMinutes:2.5,stages:l5}
 ];
 for(const [i,lesson] of lessons.entries()){
  const slots=media[i+4],old=registry[lesson.id]||{};
