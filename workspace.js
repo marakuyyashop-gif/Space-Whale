@@ -667,7 +667,11 @@
       ? (liveAnswers.get(exercise.id) || {})
       : localAnswers;
 
-    mounted = kit.mount(host, exercise, {
+    const viewerRole = liveMode ? (liveReady ? liveRole : 'connecting') :
+      (window.SpaceWhaleIsTeacher === true ? 'teacher' : 'student');
+    const renderedExercise = window.SpaceWhaleLessonView?.(exercise, viewerRole) || exercise;
+    mounted = kit.mount(host, renderedExercise, {
+      syncDisclosures: selected.syncDisclosures === true,
       answers: initialAnswers,
       isMilestoneAttempted: id => {
         const target=selected.stages.find(stage=>stage.exercise.id===id)?.exercise;
@@ -700,6 +704,15 @@
         }
       }
     });
+
+    // Opt-in lesson guidance: never mount on a guest/student or unresolved live session.
+    if(selected.showTeacherNotes && stage.guide?.teacherNotes &&
+       (liveMode ? liveReady && liveRole === 'teacher' : window.SpaceWhaleIsTeacher === true)) {
+      const notes=document.createElement('details');notes.className='ek-disclosure';
+      const label=document.createElement('summary');label.textContent='Заметки преподавателя';
+      const copy=document.createElement('p');copy.className='ek-copy';copy.textContent=stage.guide.teacherNotes;
+      notes.append(label,copy);host.append(notes);
+    }
 
     mounted.setViewState?.(route.exerciseView,false);lessonAudio?.refresh();
     updateMilestoneProgress(exercise,initialAnswers);

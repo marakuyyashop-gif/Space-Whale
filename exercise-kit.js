@@ -435,7 +435,21 @@
       };
       if(view?.requestAnimationFrame)scrollFrame=view.requestAnimationFrame(place);else place();
     };
-    const getViewState=()=>({repeat:repeatIndex,revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
+    // Opt-in shared disclosures. Existing lessons keep their local disclosure behavior.
+    let disclosureState=null;
+    const ownDisclosures=()=>[...body.querySelectorAll('details.ek-disclosure'),...resultsBox.querySelectorAll('details.ek-disclosure')].filter(detail=>detail.closest('.exercise-kit')===host);
+    const applyDisclosures=(states,animate=false)=>{
+      if(!config.syncDisclosures||!Array.isArray(states))return;
+      ownDisclosures().forEach((detail,index)=>{
+        if(typeof states[index]!=='boolean')return;
+        const open=states[index]&&!detail.hidden,summary=detail.querySelector('summary'),content=detail.querySelector('.ek-disclosure-content');
+        summary?.setAttribute('aria-expanded',String(open));
+        if(open)detail.open=true;
+        if(content&&animate)expand(content,open,()=>{detail.open=open;if(open)centerSection(detail);});
+        else{detail.open=open;if(content){content.hidden=!open;content.inert=!open;}}
+      });
+    };
+    const getViewState=()=>({...(config.syncDisclosures?{disclosures:ownDisclosures().map(detail=>!detail.hidden&&detail.querySelector('summary')?.getAttribute('aria-expanded')==='true')}:{}),repeat:repeatIndex,revealed:visibleCount,rule:Boolean(answers.__sw_rule_visible),children:Object.fromEntries([...nestedMountsByBlock].map(([id,handle])=>[id,handle.getViewState()]))});
     const viewChanged=()=>{if(config.onViewChange)config.onViewChange(getViewState());else save();};
     const setViewState=(view,animate=true)=>{
       if(!view||typeof view!=='object')return;
@@ -443,6 +457,7 @@
       if(def.kind==='audio'&&def.layout==='listen-repeat'&&Number.isFinite(view.repeat)){repeatIndex=Math.max(0,Math.floor(view.repeat));syncRepeat?.();}
       if(def.kind==='rule-page'){answers.__sw_rule_visible=Boolean(view.rule);syncRules?.(animate);}
       for(const [id,handle] of nestedMountsByBlock)handle.setViewState(view.children?.[id],animate);
+      if(config.syncDisclosures&&Array.isArray(view.disclosures)){disclosureState=view.disclosures;applyDisclosures(disclosureState,animate);}
     };
     let dialog;
     let trigger;
@@ -883,7 +898,7 @@
           else if (block.type === 'disclosure') {
             const detail = node('details', 'ek-disclosure');
             const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : /useful language/i.test(block.title) ? 'Use phrases' : block.title;
-            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || ['useful language','useful phrases','use phrases'].includes(normalize(block.title)));
+            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || (block.open !== false && ['useful language','useful phrases','use phrases'].includes(normalize(block.title))));
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
@@ -913,7 +928,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, sequentialListening:def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, sequentialListening:def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1010,6 +1025,7 @@
               onSkip:()=>{if(revealable.length&&!answers.__sw_rule_visible){answers.__sw_rule_visible=true;syncRules?.(true);viewChanged();}else config.onSkip?.();},
               navigationReadOnly:Boolean(config.navigationReadOnly),
               onViewChange:config.onViewChange?viewChanged:undefined,
+              syncDisclosures:Boolean(config.syncDisclosures),
               syncChecks: Boolean(config.syncChecks),
               readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly),
               answers: answers[block.id] || {},
@@ -1301,7 +1317,14 @@
         const summary=detail.querySelector('summary'),content=node('div','ek-disclosure-content');
         [...detail.childNodes].filter(child=>child!==summary).forEach(child=>content.append(child));detail.append(content);content.hidden=!detail.open;
         summary.setAttribute('aria-expanded',String(Boolean(detail.open)));
-        summary.addEventListener('click',event=>{event.preventDefault();const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));if(open)detail.open=true;expand(content,open,()=>{detail.open=open;if(open)centerSection(detail);});});
+        summary.addEventListener('click',event=>{
+          event.preventDefault();
+          if(config.syncDisclosures&&(config.navigationReadOnly||detail.hidden))return;
+          const open=summary.getAttribute('aria-expanded')!=='true';summary.setAttribute('aria-expanded',String(open));
+          if(open)detail.open=true;
+          expand(content,open,()=>{detail.open=open;if(open)centerSection(detail);});
+          if(config.syncDisclosures){disclosureState=getViewState().disclosures;viewChanged();}
+        });
       });
     }
     function markOrderTokens(){
@@ -1492,7 +1515,7 @@
     const setAnswers = next => {
       const newFeedback=config.syncChecks&&next?.__sw_checked&&JSON.stringify(next)!==JSON.stringify(answers);
       setAnswersCore(next);updateActions();
-      if(config.syncChecks&&answers.__sw_checked){checkFeedback();if(newFeedback)centerSection(status,resultsBox.hidden?status:resultsBox,true);}
+      if(config.syncChecks&&answers.__sw_checked){checkFeedback();if(disclosureState)applyDisclosures(disclosureState);if(newFeedback)centerSection(status,resultsBox.hidden?status:resultsBox,true);}
     };
 
     const renderReadOnly = () => {
@@ -1504,7 +1527,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate();updateActions();renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); };
+    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate();updateActions();renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); if(disclosureState)applyDisclosures(disclosureState); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);
