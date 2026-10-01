@@ -60,3 +60,41 @@ test('open production accepts alternatives for teacher review, with no visible f
  for(const id of ['L4-M10','L5-M07']){const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details'),null);assert.equal(v.host.textContent.includes('What is he like?'),false);assert.equal(v.host.textContent.includes('It’s a kind of food.'),false);assert.ok(Object.values(kit.grade(d,Object.fromEntries(d.items.map(i=>[i.id,'an alternative answer'])))).every(g=>g==='review'));v.handle.destroy();}
  const v=setup(find('L4-M01'));assert.equal(v.host.querySelector('details').open,true);v.handle.destroy();
 });
+
+test('v7 final scripts and objective choice items match the approved source',()=>{
+ const source=fs.readFileSync(require.resolve('../lesson-sources/a12-m4-l4-l5-v7-final.md'),'utf8');
+ const parts=source.split('# A1.2 M4 L5 · Категории');
+ const norm=s=>s.replace(/\*\*/g,'').replace(/\s+/g,' ').trim();
+ for(const [index,n] of [4,5].entries()){
+  const pairs=parts[index].split('## Exact script')[1].split('## Teacher note')[0].trim().split(/\n\s*\n/);
+  const items=find(`L${n}-M03`).items;
+  assert.equal(items.length,pairs.length);
+  items.forEach((item,i)=>assert.equal(norm(item.text+' '+item.example),norm(pairs[i])));
+ }
+ const exactDialogue=parts[0].split('## Exact listening script')[1].split('## Answer key / possible answers')[0];
+ assert.equal(norm(find('L4-M06').transcript),norm(exactDialogue));
+ const choiceSections=[
+  ['L4-M04',parts[0].split('## 2.3. E01')[1].split('## Answer key')[0]],
+  ['L4-M08',parts[0].split('## 3.3A. E01')[1].split('## Answer key')[0]],
+  ['L5-form-choice',parts[1].split('## 3.3A. E01')[1].split('## Answer key')[0]]
+ ];
+ for(const [id,section] of choiceSections){
+  const expected=[...section.matchAll(/^[ABC]\. (.+)$/gm)].map(m=>norm(m[1]));
+  assert.deepEqual(Array.from(find(id).items).flatMap(i=>Array.from(i.options,o=>norm(o.text))),expected,id);
+ }
+ assert.equal(Array.from(find('L4-M04').items,i=>i.correctId).join(','),'1,0,0,1,1,0');
+ assert.equal(Array.from(find('L5-form-choice').items,i=>i.correctId).join(','),'1,2,0,1');
+});
+test('v7 image category exercise hides author briefs and both final tasks start without help',()=>{
+ const d=find('L5-M04'),v=setup(d);
+ assert.equal(v.host.querySelectorAll('.ek-image-pending').length,6);
+ assert.equal(d.layout,'picture-word');
+ assert.deepEqual(Array.from(d.items,i=>i.text),['A','B','C','D','E','F']);
+ for(const text of ['muffin','supermarket','касса','предметы мебели','магазин одежды'])assert.equal(v.host.textContent.includes(text),false);
+ assert.match(app.SpaceWhaleLessonMedia['a1-2-w4-l5']['L5-I06'].brief,/касса/);
+ v.handle.destroy();
+ for(const id of ['L4-M11','L5-M09'])assert.ok(find(id).blocks.filter(b=>b.type==='disclosure').every(b=>!b.open));
+ const prompts=find('L5-M07').items;
+ assert.equal(prompts[2].prompt,'What is a sofa?');assert.equal(prompts[2].hint,'furniture · kind');
+ assert.equal(prompts[3].hint,'clothing · type');
+});
