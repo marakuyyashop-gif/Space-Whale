@@ -95,6 +95,7 @@ Useful Language disclosures open initially. Standalone Possible Answers disclosu
 - Each nested exercise has its own Check/Reset. A stage has no global Reset. Progressive stages offer Show next exercise / Hide last exercise; hiding changes only the revealed count and retains all block answers for reopening and synchronization. Progressive reveal belongs to the stage, not to individual templates.
 - `setAnswers` hydrates remote state without emitting another onChange. Read-only mounts block changes.
 - Global and per-item players stop other playing audio when starting.
+- Listen & Repeat reveals a cumulative list: word, example sentence, next word, next sentence. Both use the same normal-weight text style. The teacher's next arrow adds one row; earlier rows and their audio controls stay mounted and visible. The previous arrow hides only the last row. The existing `repeat` view-state index synchronizes this reveal with learners, who cannot advance it themselves.
 
 ## Changes to appearance
 

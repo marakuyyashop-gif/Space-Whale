@@ -186,11 +186,12 @@ test('read-only drag cannot mutate answers', () => {
   s.drag(s.button('[Item 1]'),s.host.querySelector('.ek-sort-group'));
   assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
 });
-test('Listen & Repeat reveals one phrase at a time and pauses the previous recording', async () => {
+test('Listen & Repeat retains prior rows and playing a second recording pauses the first', async () => {
   const s=setup('listen-repeat-demo');s.fire(s.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
-  const first=s.host.querySelector('audio');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item').length,1);
-  s.click('Next phrase');assert.equal(first.paused,true);s.fire(s.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
-  const second=s.host.querySelector('audio');assert.notEqual(first,second);assert.equal(second.paused,false);assert.equal(s.button('Next phrase'),undefined);
+  const first=s.host.querySelector('audio');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item:not([hidden])').length,1);
+  s.click('Next phrase');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item:not([hidden])').length,2);
+  s.fire(s.host.querySelectorAll('.ek-repeat-play')[1],'click');await Promise.resolve();
+  const second=s.host.querySelectorAll('audio')[1];assert.notEqual(first,second);assert.equal(first.paused,true);assert.equal(second.paused,false);assert.equal(s.button('Next phrase'),undefined);
   s.mount.destroy();assert.equal(second.paused,true);
 });
 
@@ -640,11 +641,25 @@ test('Skip records a separate status and invokes teacher navigation without mark
  assert.equal(skipped,1);assert.equal(s.mount.getAnswers().__sw_skipped,true);assert.equal(s.mount.getAnswers().__sw_checked,undefined);
  const pupil=setup('choice-demo',{navigationReadOnly:true,onSkip:()=>skipped++});assert.equal(pupil.button('Skip exercise').hidden,true);pupil.click('Skip exercise');assert.equal(skipped,1);
 });
-test('Listen & Repeat view synchronizes word/example steps; pupils cannot advance',()=>{
+test('Listen & Repeat reveals a cumulative plain list and synchronizes without replacing audio',async()=>{
  const def={version:1,id:'repeat-steps',kind:'audio',layout:'listen-repeat',title:'Repeat',items:[{id:'a',text:'Bright',audio:'bright.wav',example:'This shirt is bright.',exampleAudio:'shirt.wav'},{id:'b',text:'Dark',audio:'dark.wav'}]};
  let view;const teacher=setup(def,{onViewChange:v=>{view=v;}}),pupil=setup(def,{navigationReadOnly:true});
- teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'This shirt is bright.');assert.equal(pupil.button('Next phrase').hidden,true);
- teacher.click('Next phrase');pupil.mount.setViewState(view);assert.equal(pupil.host.querySelector('.ek-repeat-line').textContent,'Dark');assert.equal(teacher.button('Next phrase'),undefined);
+ const visible=s=>[...s.host.querySelectorAll('.ek-repeat-item')].filter(row=>!row.hidden).map(row=>row.querySelector('.ek-repeat-line').textContent);
+ assert.deepEqual(visible(teacher),['Bright']);
+ const first=teacher.host.querySelector('audio');teacher.fire(teacher.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
+ teacher.click('Next phrase');pupil.mount.setViewState(view);
+ assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);assert.equal(pupil.button('Next phrase').hidden,true);
+ pupil.click('Next phrase');assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);
+ assert.equal(teacher.host.querySelector('audio'),first);assert.equal(first.paused,false);
+ teacher.mount.setViewState(view);assert.equal(first.paused,false);
+ teacher.click('Next phrase');pupil.mount.setViewState(view);
+ assert.deepEqual(visible(pupil),['Bright','This shirt is bright.','Dark']);assert.equal(teacher.button('Next phrase'),undefined);
+ assert.equal(teacher.host.querySelector('.ek-repeat-list strong, .ek-repeat-list b'),null);
+ const last=teacher.host.querySelectorAll('audio')[2];teacher.fire(teacher.host.querySelectorAll('.ek-repeat-play')[2],'click');await Promise.resolve();
+ teacher.click('Previous phrase');pupil.mount.setViewState(view);assert.equal(last.paused,true);
+ assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);
+ teacher.click('Next phrase');assert.equal(teacher.host.querySelectorAll('audio')[2],last);
+ assert.deepEqual(visible(teacher),['Bright','This shirt is bright.','Dark']);
 });
 
 test('writing hints sit under the field and never enter submitted answer examples',()=>{

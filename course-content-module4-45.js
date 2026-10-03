@@ -48,7 +48,7 @@ l4.push(stage('Speaking',2,kit.speaking({
  },
  use:[
   {words:['polite','rude','helpful','lazy','quiet','noisy'],phrases:['What is he/she like?','He/She is ...']},
-  {words:['tall','short','slim','fat'],phrases:['What does he/she look like?','He/She is ...']}
+  {words:['long hair','short hair','brown hair','blonde hair'],phrases:['What does he/she look like?','He/She has ...']}
  ]
 })));
 const meanings4=[['polite','вежливый'],['rude','грубый'],['helpful','готовый помочь'],['lazy','ленивый'],['quiet','тихий'],['noisy','шумный']];
@@ -73,7 +73,7 @@ l4.push(stage('Final · Speaking',5,kit.speaking({
  },
  use:[
   {words:['polite','rude','helpful','lazy','quiet','noisy'],phrases:['What is he/she like?','He/She is ...']},
-  {words:['tall','short','slim','fat'],phrases:['What does he/she look like?','He/She is ...']}
+  {words:['long hair','short hair','brown hair','blonde hair'],phrases:['What does he/she look like?','He/She has ...']}
  ]
 })));
 const l5=[];
@@ -126,7 +126,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion='v7_FINAL+speaking-word-pick-2026-10-03';
+ lesson.contentVersion='v7_FINAL+speaking-word-pick-2026-10-03'+(i===0?'+hair-support':'');
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }

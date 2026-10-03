@@ -311,6 +311,7 @@
   align-items: center;
   padding: 11px 2px;
 }
+.exercise-kit .ek-repeat-item[hidden] { display: none; }
 .exercise-kit .ek-repeat-audio audio { display: none; }
 .exercise-kit .ek-repeat-play {
   width: 28px;
@@ -328,7 +329,7 @@
 .exercise-kit .ek-repeat-line {
   min-width: 0;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.35;
   color: var(--ek-ink);
 }

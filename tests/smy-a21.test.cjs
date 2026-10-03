@@ -128,6 +128,9 @@ test('future media fills existing IDs, with a separate example step and no inven
   A2_SEQ_DAY:{type:'image',src:'assets/test-day.webp',width:800,height:600,alt:'Story pictures'}
  }});
  const s=setup(find('A2_SEQ_M03',supplied));assert.equal(s.host.querySelector('audio').src,'assets/test-word.wav');
- s.click('Next phrase');assert.equal(s.host.querySelector('audio').src,'assets/test-example.wav');assert.match(s.host.textContent,/Exact supplied example/);
+ s.click('Next phrase');
+ const rows=s.host.querySelectorAll('.ek-repeat-item:not([hidden])');assert.equal(rows.length,2);
+ assert.equal(rows[0].querySelector('audio').src,'assets/test-word.wav');
+ assert.equal(rows[1].querySelector('audio').src,'assets/test-example.wav');assert.match(rows[1].textContent,/Exact supplied example/);
  const final=setup(find('A2_SEQ_M07',supplied));assert.equal(final.host.querySelector('img').src,'assets/test-day.webp');
 });

@@ -492,7 +492,7 @@
     const setViewState=(view,animate=true)=>{
       if(!view||typeof view!=='object')return;
       if(def.kind==='stage'&&def.progressive){const count=stageCount(view.revealed);answers.revealed=count;if(count!==visibleCount)syncStage?.(count,animate);}
-      if(def.kind==='audio'&&def.layout==='listen-repeat'&&Number.isFinite(view.repeat)){repeatIndex=Math.max(0,Math.floor(view.repeat));syncRepeat?.();}
+      if(def.kind==='audio'&&def.layout==='listen-repeat'&&Number.isFinite(view.repeat)){repeatIndex=Math.max(0,Math.floor(view.repeat));syncRepeat?.(animate);}
       if(def.kind==='rule-page'){answers.__sw_rule_visible=Boolean(view.rule);syncRules?.(animate);}
       for(const [id,handle] of nestedMountsByBlock)handle.setViewState(view.children?.[id],animate);
       if(config.syncDisclosures&&Array.isArray(view.disclosures)){disclosureState=view.disclosures;applyDisclosures(disclosureState,animate);}
@@ -1115,14 +1115,27 @@
         if (def.layout === 'listen-repeat') {
           const list=node('div','ek-repeat-list'),navigation=node('div','ek-stage-navigation');
           const steps=def.items.flatMap(item=>[{text:item.text,audio:item.audio,key:item.id+':word'},...(item.example?[{text:item.example,audio:item.exampleAudio,key:item.id+':example'}]:[])]);
-          syncRepeat=()=>{
+          const rows=steps.map(step=>{
+            const row=node('article','ek-repeat-item');
+            row.append(repeatAudioButton(step.audio,step.text,step.key),node('span','ek-repeat-line',step.text));
+            row.hidden=true;row.inert=true;list.append(row);return row;
+          });
+          let previousIndex=null;
+          syncRepeat=(animate=false)=>{
             repeatIndex=Math.min(steps.length-1,Math.max(0,repeatIndex));
-            list.querySelectorAll('audio').forEach(audio=>audio.pause());list.replaceChildren();navigation.replaceChildren();
-            const step=steps[repeatIndex],row=node('article','ek-repeat-item');
-            row.append(repeatAudioButton(step.audio,step.text,step.key),node('span','ek-repeat-line',step.text));list.append(row);
-            const control=(direction,index,label)=>{const b=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;repeatIndex=index;syncRepeat();viewChanged();},'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
+            if(previousIndex===repeatIndex)return;
+            rows.forEach((row,index)=>{
+              const hidden=index>repeatIndex;
+              if(hidden&&!row.hidden)row.querySelectorAll('audio').forEach(audio=>audio.pause());
+              row.hidden=hidden;row.inert=hidden;
+            });
+            navigation.replaceChildren();
+            const control=(direction,index,label)=>{const b=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;repeatIndex=index;syncRepeat(true);viewChanged();},'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
             if(repeatIndex<steps.length-1)control('down',repeatIndex+1,'Next phrase');
             if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
+            navigation.hidden=Boolean(config.navigationReadOnly);
+            if(animate&&previousIndex!==null)centerSection(rows[repeatIndex],navigation.hidden?rows[repeatIndex]:navigation);
+            previousIndex=repeatIndex;
           };
           body.append(list,navigation);syncRepeat();
         } else {

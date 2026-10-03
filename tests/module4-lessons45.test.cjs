@@ -38,6 +38,10 @@ test('approved opening and final Speaking use the shared layout in teacher and l
   }
  }
  const opening=find('L4-M01');assert.match(opening.image.image,/1973\.png$/);
+ for(const id of ['L4-M01','L4-M11']){
+  assert.deepEqual(Array.from(find(id).use[1].words),['long hair','short hair','brown hair','blonde hair']);
+  assert.deepEqual(Array.from(find(id).use[1].phrases),['What does he/she look like?','He/She has ...']);
+ }
  assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',opening.image.image)));
  assert.equal(opening.image.imageWidth,1448);assert.equal(opening.image.imageHeight,1086);
 });
