@@ -1,4 +1,4 @@
-@import url("exercise-theme.css?v=20261003-orange-white-sidebar");
+@import url("exercise-theme.css?v=20261003-all-white");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
@@ -1006,3 +1006,8 @@
 .exercise-kit.ek-modern :is(.ek-check,.ek-stage-toggle):hover:not(:disabled){
   background:var(--sw-action-hover);color:var(--sw-action-ink);filter:none;
 }
+
+/* White answer/control surfaces, including checked answers; dots retain feedback. */
+body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger){background-color:#fff;background-image:none!important}
+body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-card,.ek-radio,.ek-token,.ek-option,.ek-inline-option,.ek-writing-input,.ek-typed-gap,.ek-status){background-color:#fff}
+body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter:none}

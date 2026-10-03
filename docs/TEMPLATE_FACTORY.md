@@ -150,3 +150,5 @@ See root `AGENTS.md` for source-to-layout mapping, inline dropdowns, picture/tas
 ## Workspace color update (2026-10-03)
 
 The light workspace canvas is solid white without a grid, with black primary lesson text. Supporting/correction text stays muted. OK and up/down progression buttons use `--sw-action-background: #EE7C37`, `--sw-action-hover: #EE7C37`, and black action text, centrally defined in `exercise-theme.css`. Sidebar surfaces are white in light mode. Answer selectors, audio controls and feedback colors keep their existing appearance. Dark mode keeps a solid dark canvas and readable text. This supersedes the earlier all-monochrome direction for these specific action buttons.
+
+- Latest appearance (2026-10-03 evening) supersedes orange/grey surfaces: all light-theme workspace control and content surfaces are white, including OK/arrows, sidebar selectors/session buttons, menus, answer fields, correction panels and audio-player surfaces. No orange fill or outline. Preserve shadows, readable text/icons, audio progress and correct/incorrect indicators. Dark-theme contrast remains supported.

@@ -83,3 +83,5 @@
 - Workspace appearance (2026-10-03): light-mode lesson background is pure white and primary lesson text is black; retain muted supporting/correction text. Only OK (`.ek-check`) and up/down progression controls (`.ek-stage-toggle`) use the shared orange (#EE7C37) action tokens in `exercise-theme.css`. Sidebar surfaces are white in light mode. Preserve answer controls, audio, feedback colors, sizes and dark-theme readability. Do not reintroduce a canvas texture.
 
 - Never render teacher notes in the workspace, including Listen & Repeat or other lessons. Author guidance may remain in source data only.
+
+- Latest appearance (2026-10-03 evening) supersedes orange/grey surfaces: all light-theme workspace control and content surfaces are white, including OK/arrows, sidebar selectors/session buttons, menus, answer fields, correction panels and audio-player surfaces. No orange fill or outline. Preserve shadows, readable text/icons, audio progress and correct/incorrect indicators. Dark-theme contrast remains supported.
