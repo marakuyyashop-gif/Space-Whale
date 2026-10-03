@@ -266,6 +266,7 @@
     if (def.kind === 'writing') def.items.forEach(item => {
       media(item); text(item.prompt,'prompt');
       if(item.hint!=null)text(item.hint,'hint');
+      if(item.placeholder!=null)text(item.placeholder,'placeholder');
       if(item.multiline!=null&&typeof item.multiline!=='boolean')fail('multiline must be boolean');
       for (const field of ['possibleAnswers','acceptedAnswers']) {
         if (item[field] != null) { array(item[field],field); item[field].forEach(answer=>text(answer,field)); }
@@ -1374,7 +1375,7 @@
         if(compact)row.append(node('span','ek-picture-response-number',`${index+1}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
         const label = node('label', 'ek-writing', compact ? '' : `${index + 1}. ${item.prompt}`);
-        const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
+        const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; if(item.placeholder)input.placeholder=item.placeholder; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${index+1}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
         row.append(label);if(compact)body.append(row); controls.set(item.id, input);

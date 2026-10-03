@@ -72,7 +72,7 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | sort | `items[{id,text,correctId}]`, `groups[{id,text}]` | `{ itemId: groupId }` |
 | order | `tokens[{id,text,image?,alt?}]`, `correctOrder` | `{ order: [tokenIds] }` |
 | image-label | `image`, `alt`, `items[{id,x,y,prompt,correctId}]`, `options` | `{ targetId: optionId }` |
-| writing | `items[{id,prompt,acceptedAnswers?,possibleAnswers?}]`, optional `responseMode:"accepted"/"open"` | `{ itemId: freeText }` |
+| writing | `items[{id,prompt,placeholder?,acceptedAnswers?,possibleAnswers?}]`, optional `responseMode:"accepted"/"open"` | `{ itemId: freeText }` |
 | presentation | `blocks` with text, image or disclosure for source materials/legacy content; Speaking uses `layout:'speaking'`, `image`, `task`, `use` via the shared factory | no automatic grade |
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
@@ -145,7 +145,7 @@ See root `AGENTS.md` for source-to-layout mapping, inline dropdowns, picture/tas
 
 ## Writing cues and expansion feedback
 
-`writing.items[].hint` is optional non-empty supporting text. It renders beneath its field, in smaller muted type, and is associated through `aria-describedby`. Store only the question in `prompt`; submitted examples and corrections intentionally omit `hint`. All answer examples are bold, with a thin separator between the feedback status and the answer section. All inline disclosures and newly submitted feedback use the same full-range scroll behavior as progressive tasks and rules.
+`writing.items[].placeholder` is an optional muted spelling cue inside an empty response field. It disappears on focus and while typing, is never saved as an answer and never affects grading. `writing.items[].hint` is optional non-empty supporting text. It renders beneath its field, in smaller muted type, and is associated through `aria-describedby`. Store only the question in `prompt`; submitted examples and corrections intentionally omit `hint`. All answer examples are bold, with a thin separator between the feedback status and the answer section. All inline disclosures and newly submitted feedback use the same full-range scroll behavior as progressive tasks and rules.
 
 ## Workspace color update (2026-10-03)
 

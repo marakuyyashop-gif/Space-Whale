@@ -282,3 +282,11 @@ test('writing accepted-answer contract rejects conflicting modes and missing key
   assert.throws(()=>validate({...def,responseMode:'open'}),/Open writing/);
   assert.throws(()=>validate({...def,items:[{...def.items[0],acceptedAnswers:[]}]}),/non-empty/);
 });
+
+test('writing placeholder is a display hint and never an accepted answer',()=>{
+  const def={version:1,id:'placeholder-writing',kind:'writing',title:'Translate',responseMode:'accepted',items:[{id:'answer',prompt:'На что похож бинбэг?',placeholder:'beanbag',acceptedAnswers:['What is a beanbag like?']}]};
+  assert.equal(validate(def),def);
+  assert.equal(grade(def,{answer:''}).answer,'empty');
+  assert.equal(grade(def,{answer:'beanbag'}).answer,'retry');
+  assert.equal(grade(def,{answer:'What is a beanbag like?'}).answer,'correct');
+});

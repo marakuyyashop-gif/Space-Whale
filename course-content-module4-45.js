@@ -15,7 +15,7 @@ const roleText=(audience,text)=>({...T(text),audience});
 const P=(id,title,blocks,instruction='')=>E(id,'presentation',title,{blocks,instruction});
 const R=(id,text)=>E(id,'rule-page','Language focus',{blocks:[{type:'rule',text}]});
 const C=(id,title,rows)=>E(id,'choice',title,{items:rows.map(([prompt,options,key],i)=>({id:String(i+1),prompt,options:options.map((text,j)=>({id:String(j),text})),correctId:String(key)}))});
-const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{responseMode:accepted?'accepted':'open',revealPossibleAnswers:!accepted,instruction,items:rows.map(([prompt,answers,hint],i)=>({id:String(i+1),prompt,...(hint?{hint}:{}),[accepted?'acceptedAnswers':'possibleAnswers']:Array.isArray(answers)?answers:[answers]}))});
+const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{responseMode:accepted?'accepted':'open',revealPossibleAnswers:!accepted,instruction,items:rows.map(([prompt,answers,hint,placeholder],i)=>({id:String(i+1),prompt,...(hint?{hint}:{}),...(placeholder?{placeholder}:{}),[accepted?'acceptedAnswers':'possibleAnswers']:Array.isArray(answers)?answers:[answers]}))});
 const M=(id,title,rows,order)=>E(id,'matching',title,{items:rows.map(([text],i)=>({id:String(i+1),text,correctId:'o'+i})),options:order.map(i=>({id:'o'+i,text:rows[i][1]}))});
 const l5WordPicSheet='Images/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png';
 const l5WordPicOrder=['furniture','drink','clothing','building','food','shop'];
@@ -282,9 +282,62 @@ l5.push(stage('Final · Speaking',5,kit.speaking({
  ]
 })));
 
-// L5 homework remains unchanged; obsolete L4 drafts were removed with its rebuild.
-l5.push(stage('Homework 1',0,W('L5-homework-1','Translate into English.',[['Что такое маффин?','What’s a muffin?'],['Это вид еды.',['It’s a kind of food.','It’s a type of food.']],['Что такое чай?','What’s tea?'],['Это вид напитка.',['It’s a type of drink.','It’s a kind of drink.']]],false,'Друг спрашивает о еде и напитках. Используйте оба способа объяснения.'),'Полные формы допустимы. Kind/type не противопоставляются.','self-study'));
-l5.push(stage('Homework 2',0,W('L5-homework-2','Translate into English.',[['Что такое кресло?','What’s an armchair?'],['Это вид мебели.',['It’s a kind of furniture.','It’s a type of furniture.']],['Что такое пальто?','What’s a coat?'],['Это вид одежды.',['It’s a type of clothing.','It’s a kind of clothing.']]],false,'Друг спрашивает о вещах для дома.'),'Проверка по смыслу и форме. Образцы не единственные допустимые ответы.','self-study'));
+const acceptedEnglish=(...values)=>[...new Set(values.flatMap(value=>{
+ const clean=String(value).trim(), noPunctuation=clean.replace(/[.!?]$/,'');
+ const curly=clean.replace(/'/g,'’'), curlyNoPunctuation=curly.replace(/[.!?]$/,'');
+ return [clean,noPunctuation,curly,curlyNoPunctuation];
+}))];
+const categoryAnswer=(subject,article,category)=>acceptedEnglish(
+ `${article}${subject} is a kind of ${category}.`,
+ `${article}${subject} is a type of ${category}.`,
+ `${article}${subject} is a sort of ${category}.`,
+ `It is a kind of ${category}.`, `It's a kind of ${category}.`,
+ `It is a type of ${category}.`, `It's a type of ${category}.`,
+ `It is a sort of ${category}.`, `It's a sort of ${category}.`
+);
+const similarityAnswer=(subject,article,comparison)=>acceptedEnglish(
+ `${article}${subject} is like ${comparison}.`,
+ `It is like ${comparison}.`, `It's like ${comparison}.`
+);
+const categoryQuestion=(term,article='')=>acceptedEnglish(
+ `What is ${article}${term}?`,
+ `What's ${article}${term}?`
+);
+const similarityQuestion=(term,article='')=>acceptedEnglish(
+ `What is ${article}${term} like?`,
+ `What's ${article}${term} like?`
+);
+
+const homeworkSimilarity5=[
+ ['На что похож бинбэг?',similarityQuestion('beanbag','a '),null,'beanbag'],
+ ['Бинбэг похож на большую подушку.',similarityAnswer('beanbag','A ','a big cushion'),null,'beanbag'],
+ ['На что похоже бабл-ти?',similarityQuestion('bubble tea'),null,'bubble tea'],
+ ['Бабл-ти похоже на чай.',similarityAnswer('bubble tea','', 'tea'),null,'bubble tea'],
+ ['На что похоже пончо?',similarityQuestion('poncho','a '),null,'poncho'],
+ ['Пончо похоже на одеяло.',similarityAnswer('poncho','A ','a blanket'),null,'poncho'],
+ ['На что похоже иглу?',similarityQuestion('igloo','an '),null,'igloo'],
+ ['Иглу похоже на маленький дом.',similarityAnswer('igloo','An ','a small house'),null,'igloo'],
+ ['На что похоже бао?',acceptedEnglish(...similarityQuestion('bao'),...similarityQuestion('bao','a ')),null,'bao'],
+ ['Бао похоже на булочку.',acceptedEnglish(...similarityAnswer('bao','', 'a bun'),...similarityAnswer('bao','A ','a bun')),null,'bao'],
+ ['На что похож киоск?',similarityQuestion('kiosk','a '),null,'kiosk'],
+ ['Киоск похож на маленький супермаркет.',similarityAnswer('kiosk','A ','a small supermarket'),null,'kiosk']
+];
+const homeworkCategory5=[
+ ['Что такое бинбэг?',categoryQuestion('beanbag','a '),null,'beanbag'],
+ ['Бинбэг — это вид мебели.',categoryAnswer('beanbag','A ','furniture'),null,'beanbag'],
+ ['Что такое бабл-ти?',categoryQuestion('bubble tea'),null,'bubble tea'],
+ ['Бабл-ти — это вид напитка.',categoryAnswer('bubble tea','', 'drink'),null,'bubble tea'],
+ ['Что такое пончо?',categoryQuestion('poncho','a '),null,'poncho'],
+ ['Пончо — это вид одежды.',categoryAnswer('poncho','A ','clothing'),null,'poncho'],
+ ['Что такое иглу?',categoryQuestion('igloo','an '),null,'igloo'],
+ ['Иглу — это вид здания.',categoryAnswer('igloo','An ','building'),null,'igloo'],
+ ['Что такое бао?',acceptedEnglish(...categoryQuestion('bao'),...categoryQuestion('bao','a ')),null,'bao'],
+ ['Бао — это вид еды.',acceptedEnglish(...categoryAnswer('bao','', 'food'),...categoryAnswer('bao','A ','food')),null,'bao'],
+ ['Что такое киоск?',categoryQuestion('kiosk','a '),null,'kiosk'],
+ ['Киоск — это вид магазина.',categoryAnswer('kiosk','A ','shop'),null,'kiosk']
+];
+l5.push(stage('Homework 1',0,W('L5-homework-1','Translate into English.',homeworkSimilarity5,true,'Переведите вопросы и ответы на английский.'),'Каждая строка проверяется отдельно; подсказка в поле показывает только написание необычного слова.','self-study'));
+l5.push(stage('Homework 2',0,W('L5-homework-2','Translate into English.',homeworkCategory5,true,'Переведите вопросы и ответы на английский.'),'Kind, type и sort принимаются как правильные варианты одной функции.','self-study'));
 function attach(value,slots){
  if(!value||typeof value!=='object')return;
  if(value.imageMediaRef){const slot=slots[value.imageMediaRef];if(slot?.src)Object.assign(value,{image:slot.src,imagePending:false});}
@@ -301,7 +354,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'ready',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-word-pic-f988-keyfix-2026-10-03';
+ lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-homework-translation-placeholders-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }
