@@ -31,7 +31,10 @@ const addAudio=(n,id,script)=>{
  const repeatSrc=n===4&&/^L4-W\\d{2}(?:-example)?$/.test(id)
   ?courseAudioBase+'/a1-2/w4/l4/listen-repeat/'+id+'.mp3?v='+repeatAudioVersion
   :null;
- media[n][id]={type:'audio',src:repeatSrc,script};return id;
+ const dialogueSrc=n===5&&id==='L5-CAFE-D01'
+  ?courseAudioBase+'/probes/elevenlabs-2026-10-03/emma-daniel-sarah-george-slow-speed1.mp3?v=20261003-slow1'
+  :null;
+ media[n][id]={type:'audio',src:repeatSrc||dialogueSrc,script};return id;
 };
 function repeat(n,id,words,examples){
  return E(id,'audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,items:words.map((text,i)=>{const code='L'+n+'-W'+String(i+1).padStart(2,'0');return {id:code,text,mediaRef:addAudio(n,code,text),example:examples[i],exampleMediaRef:addAudio(n,code+'-example',examples[i])};})});
@@ -205,7 +208,7 @@ const explanationGaps5=[
 l5.push(stage('Fill in the gaps',4,E('L5-explanation-gaps','gaps','Complete the sentences.',{
  inputMode:'text',items:explanationGaps5.map(([before,answers,after],i)=>({id:String(i+1),segments:[before,{id:'gap'+(i+1),answers},after]}))
 })));
-const dialogue5="Emma: This café is nice. There are so many drinks here.\n\nDaniel: Yes. I usually have tea, but I want to try something different today.\n\nEmma: What about bubble tea?\n\nDaniel: I don’t know it. What is it?\n\nEmma: It’s a type of drink. It’s like tea with milk.\n\nDaniel: Okay. How much is it?\n\nEmma: Four dollars.\n\nDaniel: Okay. And what do you want?\n\nEmma: I think I want juice. The bubble tea looks interesting, but it’s a little too sweet for me.\n\nDaniel: Okay then, juice for you, bubble tea for me.\n\nEmma: Good choice.";
+const dialogue5="Emma: This café is nice. There are so many drinks here.\n\nDaniel: Yes. I usually have tea, but I want to try something different today.\n\nEmma: What about bubble tea?\n\nDaniel: I don’t know it. What is it?\n\nEmma: It’s a type of drink. It’s like tea with milk.\n\nDaniel: Sounds good. How much is it?\n\nEmma: Four dollars.\n\nDaniel: Okay. And what do you want?\n\nEmma: I think I want juice. The bubble tea looks interesting, but it’s a little too sweet for me.\n\nDaniel: Okay then, juice for you, bubble tea for me.\n\nEmma: Good choice.";
 const listeningTitle5='Listen to the conversation and do the tasks.';
 l5.push(stage('Listening',4,S('L5-cafe-listening',listeningTitle5,[
  E('L5-cafe-player','audio',listeningTitle5,{mediaRef:addAudio(5,'L5-CAFE-D01',dialogue5),audioPending:true}),
