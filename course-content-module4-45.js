@@ -26,14 +26,16 @@ const S=(id,title,children,extra={})=>E(id,'stage',title,{progressive:true,exerc
 const stage=(menu,time,exercise,teacherNotes='',section='tasks')=>({menu,navigationTitle:menu,section,guide:{time:time?time+' min':'Self study',teacherNotes},exercise});
 const media={4:{},5:{}};
 const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
-const repeatAudioVersion='20261003-bella-v3';
+const repeatAudioVersion='20261003-sarah-v3-slow-speed1';
 const addAudio=(n,id,script)=>{
- const repeatSrc=n===4&&/^L4-W\\d{2}(?:-example)?$/.test(id)
-  ?courseAudioBase+'/a1-2/w4/l4/listen-repeat/'+id+'.mp3?v='+repeatAudioVersion
+ const repeatSrc=((n===4&&/^L4-W\\d{2}(?:-example)?$/.test(id))||(n===5&&/^L5-W\\d{2}(?:-example)?$/.test(id)))
+  ?courseAudioBase+'/a1-2/w4/l'+n+'/listen-repeat/'+id+'.mp3?v='+repeatAudioVersion
   :null;
- const dialogueSrc=n===5&&id==='L5-CAFE-D01'
-  ?courseAudioBase+'/probes/elevenlabs-2026-10-03/emma-daniel-sarah-george-slow-speed1.mp3?v=20261003-slow1'
-  :null;
+ const dialogueSrc=n===4&&id==='L4-NICK-EMMA-D01'
+  ?courseAudioBase+'/dialogues/a1-2-w4-l4-ben-lisa-sarah-will-slow1.mp3?v=20261003-slow1'
+  :n===5&&id==='L5-CAFE-D01'
+   ?courseAudioBase+'/probes/elevenlabs-2026-10-03/emma-daniel-sarah-george-slow-speed1.mp3?v=20261003-slow1'
+   :null;
  media[n][id]={type:'audio',src:repeatSrc||dialogueSrc,script};return id;
 };
 function repeat(n,id,words,examples){
