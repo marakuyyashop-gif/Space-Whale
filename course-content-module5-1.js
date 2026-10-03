@@ -27,8 +27,8 @@
       id: String(index + 1),
       text: String(index + 1),
       image: sheet,
-      imageWidth: 720,
-      imageHeight: 540,
+      imageWidth: 420,
+      imageHeight: 315,
       crop: crops[index],
       alt: `Picture ${index + 1}`,
       correctId: word
