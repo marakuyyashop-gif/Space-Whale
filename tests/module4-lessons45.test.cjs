@@ -22,7 +22,7 @@ test('every exercise mounts, objective keys grade correctly and unrelated answer
  kit.validate(d);const v=setup(app.SpaceWhaleLessonView(d,'student'));
  const a={},bad={};if(d.kind==='choice')d.items.forEach(i=>{a[i.id]=d.multiple?i.correctIds:i.correctId;bad[i.id]=d.multiple?['wrong']:'wrong';});if(d.kind==='gaps')d.items.forEach(i=>i.segments.filter(s=>typeof s!=='string').forEach(s=>{a[s.id]=s.answers[0];bad[s.id]='wrong';}));if(d.kind==='matching')d.items.forEach(i=>{a[i.id]=i.correctId;bad[i.id]='wrong';});
  if(Object.keys(a).length){assert.ok(Object.values(kit.grade(d,a)).every(g=>g==='correct'),d.id);assert.ok(Object.values(kit.grade(d,bad)).every(g=>g==='retry'),d.id);}
- if(d.id==='L4-M03')assert.equal(v.host.querySelectorAll('audio[src]').length,12);else if(['L5-cafe-listening','L5-cafe-player'].includes(d.id))assert.equal(v.host.querySelectorAll('audio[src]').length,1);else assert.equal(v.host.querySelector('audio[src]'),null);v.handle.destroy();});
+ if(['L4-M03','L5-M03'].includes(d.id))assert.equal(v.host.querySelectorAll('audio[src]').length,12);else if(['L4-neighbors-listening','L4-neighbors-player','L5-cafe-listening','L5-cafe-player'].includes(d.id))assert.equal(v.host.querySelectorAll('audio[src]').length,1);else assert.equal(v.host.querySelector('audio[src]'),null);v.handle.destroy();});
 });
 test('approved opening and final Speaking use the shared layout in teacher and learner views',()=>{
  const titles={'L4-M01':'Describe your new neighbors','L4-M11':'Describe the new students','L5-M01':'Explain the unusual things','L5-M09':'Help your new colleague'};
