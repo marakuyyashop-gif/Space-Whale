@@ -348,7 +348,7 @@
     else if(/listen.*repeat|слушай.*повтор|произнош/.test(text)||def.layout==='listen-repeat'){name='Listen & Repeat';description='Послушаем образец и повторим, обращая внимание на произношение.';}
     else if(/listen|аудир|на слух|послуш|слуша/.test(text)||def.kind==='audio'){name='Listening';description='Послушаем запись и потренируем понимание на слух.';}
     else if(/grammar|граммат|правил|discovery/.test(text)||def.kind==='rule-page'){name='Grammar';description='Рассмотрим примеры и разберём, как устроена языковая конструкция.';}
-    else if(/speaking|говор|обсуд|диалог|общени/.test(text)||def.kind==='speaking'){name='Speaking';description='Используем изученные фразы в разговоре.';}
+    else if(kit.isSpeaking(def)||/speaking|говор|обсуд|диалог|общени/.test(text)||def.kind==='speaking'){name='Speaking';description='Используем изученные фразы в разговоре.';}
     else if(/reading|чтени|прочит/.test(text)){name='Reading';description='Прочитаем текст и разберём его основную мысль.';}
     else if(/writing|письм|напиш/.test(text)||def.kind==='writing'){name='Writing';description='Сформулируем собственный письменный ответ.';}
     else if(/слов|лексик|фраз|word|vocabulary/.test(text)&&(/перв|нов|знаком|значени|discovery|present/.test(text)||def.kind==='presentation')){name='Word Discovery';description='Познакомимся с новой лексикой и разберём её значение.';}
@@ -706,7 +706,7 @@
     });
 
     // Opt-in lesson guidance: never mount on a guest/student or unresolved live session.
-    if(selected.showTeacherNotes && stage.guide?.teacherNotes &&
+    if(!kit.isSpeaking(exercise) && selected.showTeacherNotes && stage.guide?.teacherNotes &&
        (liveMode ? liveReady && liveRole === 'teacher' : window.SpaceWhaleIsTeacher === true)) {
       const notes=document.createElement('details');notes.className='ek-disclosure';
       const label=document.createElement('summary');label.textContent='Заметки преподавателя';

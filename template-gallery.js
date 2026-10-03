@@ -1,6 +1,8 @@
 (() => {
   'use strict';
   // Synthetic fixtures only. All rendering/state belongs to exercise-kit.js.
+  const kit = window.SpaceWhaleExerciseKit;
+  const speaking = id => kit.speaking({id,title:'[Speaking title]',image:image(1),task:{text:'[Situation and task]',bullets:['[What to say or find out]']},use:[{words:['[Word 1]','[Word 2]'],phrases:['[Target phrase]','[Response pattern]']}]});
   const base = (id, kind, title, data = {}) => ({version:1,id,kind,title,...data});
   const image = number => ({image:`assets/factory/image-${number}.svg`,alt:`[Image ${number}]`});
   const option = (id, text) => ({id,text});
@@ -39,7 +41,7 @@
     order('order-demo'),
     sort('sort-demo'),
     base('writing-demo','writing','Open Writing',{instruction:'[Writing instruction] Ответ оценивает преподаватель.',items:[{id:'response',prompt:'[Writing prompt]',possibleAnswers:['[Possible answer]']}]}),
-    base('presentation-demo','presentation','Speaking / Presentation',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'}]}),
+    speaking('presentation-demo'),
     base('image-label-demo','image-label','Image Label',{instruction:'Перетащите подписи в зоны. Подпись остаётся там до вашего следующего действия. Нажатие возвращает подпись в набор. С клавиатуры: Alt + ← / →.',...image(1),items:[{id:'target1',prompt:'[Target 1]',x:30,y:45,correctId:'label1'},{id:'target2',prompt:'[Target 2]',x:70,y:70,correctId:'label2'}],options:[option('label2','[Label 2]'),option('label1','[Label 1]')]}),
     order('picture-order-demo',true),
     audio('audio-demo'),
@@ -51,7 +53,7 @@
     choice('image-choice-demo',false,true),
     choice('multiple-choice-demo',true),
     choice('image-multiple-demo',true,true),
-    base('speaking-language-demo','presentation','Speaking · Use phrases',{blocks:[{type:'text',text:'[Speaking situation]\n[Speaking prompt]'},{type:'disclosure',title:'Use phrases',text:'[Phrase 1]\n[Phrase 2]',open:true}]}),
+    speaking('speaking-language-demo'),
     base('possible-answers-demo','presentation','Possible Answers',{blocks:[{type:'text',text:'[Open task prompt]'},{type:'disclosure',title:'Possible Answers',role:'possible-answers',text:'[Model response]'}]}),
     audio('audio-script-demo',true),
     base('reference-demo','rule-page','Rule / Language Reference',{blocks:[{type:'rule',title:'[Rule title]',text:'[Language reference]',formula:'[Form] + [Form]',examples:['[Example 1]','[Example 2]']}]}),
@@ -63,7 +65,6 @@
     stage('listening-order-demo','Listening + Order',[audio('lo-source'),order('lo-task')]),
     stage('progressive-stage-demo','Stage · последовательное раскрытие',[reading('ps-source'),choice('ps-choice'),gaps('ps-gaps')],true)
   ];
-  const kit = window.SpaceWhaleExerciseKit;
   examples.forEach((definition,index) => { definition.label = `${index+1} · ${definition.title}`; kit.validate(definition); });
   // Keep legacy fixtures available for regression coverage, not as catalog entries.
   window.SpaceWhaleTemplateExamples = examples;
@@ -94,11 +95,8 @@
     preview('repeat-template','Listen & Repeat','compositions',byId('listen-repeat-demo'),['listen-repeat-demo'],'Аудио и отдельные слова или фразы для повторения.'),
     preview('audio-task-template','Audio + task','compositions',stage('audio-tasks','Audio + task',[audio('at-source',true),choice('at-choice'),gaps('at-gap'),sort('at-sort'),order('at-order')]),['listening-choice-demo','listening-gap-demo','listening-sort-demo','listening-order-demo'],'Аудио и первое задание доступны вместе; следующие задания раскрываются стрелкой.'),
     preview('text-task-template','Text + task','compositions',stage('text-tasks','Text + task',[reading('tt-source'),choice('tt-choice'),gaps('tt-gap')]),['reading-choice-demo','reading-gap-demo'],'Текст и первое задание доступны вместе; следующие задания раскрываются стрелкой.'),
-    preview('image-task-template','Image + task','compositions',stage('image-task','Image + task',[
-      base('it-source','presentation','Image',{blocks:[{type:'image',...image(1)}]}),
-      base('it-speaking','presentation','Speaking',{blocks:[{type:'text',text:'[Describe the picture. What can you see?]'}]})
-    ]),[],'Пример Image + Speaking. Изображение также сочетается с механиками ответа.'),
-    preview('speaking-template','Speaking layout','compositions',byId('speaking-language-demo'),['presentation-demo','speaking-language-demo'],'Ситуация и вопрос с необязательными Useful phrases.'),
+    preview('image-task-template','Image + task','compositions',speaking('image-task'),[],'Изображение с заданием в общем шаблоне Speaking.'),
+    preview('speaking-template','Speaking layout','compositions',byId('speaking-language-demo'),['presentation-demo','speaking-language-demo'],'Название → картинка → задание → Use: слова и речевые модели.'),
     preview('sequence-template','Progressive sequence','compositions',stage('sequence','Progressive sequence',[choice('sequence-choice'),gaps('sequence-gap'),byId('rule-page-demo')],true),['progressive-stage-demo','rule-page-demo'],'Первое задание видно сразу. Следующие шаги открываются стрелкой; Guided Discovery — один из примеров.')
   ];
   templates.forEach(definition => kit.validate(definition));

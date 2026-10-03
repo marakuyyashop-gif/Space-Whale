@@ -1,6 +1,12 @@
 # Space Whale — shared template catalog
 
-Catalog updated: 2026-09-26. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
+Catalog updated: 2026-10-03. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
+
+## Fixed authoring formats across the workspace
+
+Every new exercise fills an existing shared kind/layout. Do not create per-lesson controls, windows, labels, HTML or CSS. New formats and changes to the common layout require an explicit user request. Existing response mechanics keep their established behavior; a Speaking request does not change Writing, Matching, audio or navigation.
+
+All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title → image slot → task → Use:**. See [SPEAKING_TEMPLATE.md](SPEAKING_TEMPLATE.md) for the exact schema and authoring process. The renderer fixes this order, prints one bold `Use:`, places words before phrase models in each group, and supplies no disclosures, teacher notes, Test label or exercise buttons. Missing artwork leaves a hidden slot. Extra content/layout fields are rejected. The same renderer is used in the catalog and every lesson, including live teacher/student views. Legacy presentation definitions remain compatible until their content is deliberately revised.
 
 ## One source of truth
 
@@ -67,7 +73,7 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | order | `tokens[{id,text,image?,alt?}]`, `correctOrder` | `{ order: [tokenIds] }` |
 | image-label | `image`, `alt`, `items[{id,x,y,prompt,correctId}]`, `options` | `{ targetId: optionId }` |
 | writing | `items[{id,prompt,acceptedAnswers?,possibleAnswers?}]`, optional `responseMode:"accepted"/"open"` | `{ itemId: freeText }` |
-| presentation | `blocks` with text, image or disclosure | no automatic grade |
+| presentation | `blocks` with text, image or disclosure for source materials/legacy content; Speaking uses `layout:'speaking'`, `image`, `task`, `use` via the shared factory | no automatic grade |
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
 | stage | `exercises[{id,exercise}]`, `progressive:true/false`, optional `layout:"grouped"` | child answers under block ID, plus `revealed` count |

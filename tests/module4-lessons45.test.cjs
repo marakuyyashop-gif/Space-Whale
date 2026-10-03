@@ -61,8 +61,9 @@ test('open production accepts alternatives for teacher review, with no visible f
  const opening=find('L4-M01'),v=setup(opening);
  assert.equal(v.host.querySelector('details'),null);
  assert.equal(v.host.querySelector('img, .ek-image-pending'),null);
- for(const text of ['Useful language:','What is he/she like?','What does he/she look like?','helpful','noisy','polite','lazy','quiet','rude'])assert.ok(v.host.textContent.includes(text));
- assert.equal(opening.blocks.some(b=>b.audience),false);
+ for(const text of ['Use:','What is he/she like?','What does he/she look like?','helpful','noisy','polite','lazy','quiet','rude'])assert.ok(v.host.textContent.includes(text));
+ assert.equal(kit.isSpeaking(opening),true);
+ assert.equal(v.host.querySelectorAll('button').length,0);
  v.handle.destroy();
 });
 

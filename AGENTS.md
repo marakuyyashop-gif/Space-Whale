@@ -1,5 +1,15 @@
 # Space Whale project conventions
 
+## Shared templates — applies to the entire website (2026-10-03)
+
+- Before authoring or changing any exercise, read `docs/TEMPLATE_FACTORY.md`. Choose its existing shared kind/layout and fill its content fields. These rules apply to every level, module, lesson, preview and teacher/student view.
+- Do not invent lesson-specific markup, styles, windows, buttons, labels, headings or new exercise formats. A request to add lesson content authorizes filling an existing template, not changing that template. Change the common template only when the user explicitly requests that change; preserve unrelated mechanics, navigation, audio and live synchronization.
+- Every new or rewritten Speaking uses `SpaceWhaleExerciseKit.speaking(...)`, documented in `docs/SPEAKING_TEMPLATE.md`. Never hand-build Speaking from arbitrary presentation/disclosure blocks. The fixed order is **English title → image slot → situation/task → Use:**. The image may be pending; do not add a visible placeholder label or empty frame.
+- The single bold label is **Use:**. Each meaning group contains a row of words separated by `·`, then phrase/question/response models. Group count and content vary; the structure does not. No `Test`, `Words`, `Useful language`, `Useful phrases`, translations, answer samples, teacher notes or exercise buttons in this Speaking layout. Complete grammar scaffolds ARE allowed here; the separate Writing cue rules below do not apply to Speaking.
+- The Speaking renderer is shared in the kit and catalog, not attached to a particular lesson. Existing legacy exercises remain compatible; migrate their content when that exercise is next revised, preserving its learning task. Do not automatically rewrite unrelated lessons, transcripts or role-card information merely to normalize an old format.
+- For future content requests, show the exercise text for approval before publishing unless the user already authorized publication of that specific content. The current approval authorizes implementing this shared template and connecting the already approved L4-M01 text.
+- Run the existing test suite after changes to shared rendering/validation, and keep the Speaking contract regression checks. Validation rejects extra Speaking fields instead of silently ignoring them. For content-only additions, use existing checks; do not duplicate rendering code or tests per lesson.
+
 ## Lesson authoring
 
 - Source lesson drafts describe content, not literal screen layout. Underscores denote a missing word; never render them as a fake blank next to separate answer buttons.
@@ -55,7 +65,7 @@
 - In live lessons learners see the audio player, waveform and synchronized progress but cannot play, pause or seek. Enforce this in nested exercise controls as well as shared audio transport. Keep remote teacher playback and the browser audio-permission recovery button operational.
 - Submitted feedback must reveal its full ending and the adjacent next-step arrow with 48px of bottom clearance, including feedback arriving through shared answers. For feedback taller than the viewport, prioritize its end; newly opened exercise/rule content still prioritizes its beginning. Measure after parent layout updates, and do not scroll again for identical synchronized snapshots or across another visible task.
 
-- A1.2 Module 4 picture-based word practice uses one compact exercise: a numbered picture strip at Matching correction-card size, then numbered left-aligned response rows. Keep every item of that task together with one shared check button. Retain `picture-rows` layout/answer IDs for compatibility; no tiny thumbnail beside each sentence. Lesson 1 keeps two copies of the existing coat picture for “These … are new.” Speaking questions go below the image; Useful phrases start open, Possible answers start closed. Language Focus reveals one multiline rule block.
+- A1.2 Module 4 picture-based word practice uses one compact exercise: a numbered picture strip at Matching correction-card size, then numbered left-aligned response rows. Keep every item of that task together with one shared check button. Retain `picture-rows` layout/answer IDs for compatibility; no tiny thumbnail beside each sentence. Lesson 1 keeps two copies of the existing coat picture for “These … are new.” Existing legacy Speaking disclosures retain their saved behavior; new/revised Speaking follows the shared template above. Language Focus reveals one multiline rule block.
 
 - Independent tasks and grammar rules reveal only through teacher arrows. In L3-M08, examples, the rule and each Order question are separate reveal steps; never reveal all Order questions at once. OK checks the current task, without advancing automatically. A source plus its current question belongs to one group and must not acquire separate Skip controls. Compact related sentences inside one task remain together.
 

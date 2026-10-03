@@ -25,6 +25,14 @@
   ]);
   const isPossibleAnswersBlock = block =>
     block?.role === 'possible-answers' || possibleAnswerAliases.has(normalize(block?.title));
+  const isSpeaking = def => def?.kind === 'presentation' && def.layout === 'speaking';
+
+  // All Speaking content uses this one layout, in lessons and in the catalog.
+  function speaking(content) {
+    const definition = { version: 1, kind: 'presentation', layout: 'speaking', image: null, ...content };
+    if (!isSpeaking(definition) || definition.version !== 1) throw new Error('Speaking uses the shared presentation layout');
+    return clone(validate(definition));
+  }
 
   function validate(def) {
     const fail = message => { throw new Error(message); };
@@ -86,6 +94,36 @@
       return def;
     }
     if (def.kind === 'presentation') {
+      if (def.layout != null && def.layout !== 'speaking') fail('Unsupported presentation layout');
+      if (isSpeaking(def)) {
+        const only = (object, allowed, name) => {
+          if (!object || typeof object !== 'object' || Array.isArray(object)) fail(`${name}: expected an object`);
+          for (const field of Object.keys(object)) if (!allowed.includes(field)) fail(`${name}: unsupported field ${field}`);
+        };
+        // Catalog metadata is never rendered as exercise content.
+        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description'], 'Speaking');
+        if (def.image !== null) {
+          only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
+          if (!def.image.imagePending) text(def.image.image, 'image');
+          media(def.image);
+        }
+        only(def.task, ['text','bullets'], 'Speaking task');
+        text(def.task.text, 'Speaking task text');
+        if (def.task.bullets != null) {
+          if (!Array.isArray(def.task.bullets)) fail('Speaking bullets: expected a list');
+          def.task.bullets.forEach(value => text(value, 'Speaking bullet'));
+        }
+        array(def.use, 'Speaking Use');
+        def.use.forEach(group => {
+          only(group, ['words','phrases'], 'Speaking Use group');
+          for (const field of ['words','phrases']) {
+            if (group[field] != null && !Array.isArray(group[field])) fail(`Speaking ${field}: expected a list`);
+            (group[field] || []).forEach(value => text(value, `Speaking ${field}`));
+          }
+          if (!group.words?.length && !group.phrases?.length) fail('Speaking Use group must contain words or phrases');
+        });
+        return def;
+      }
       array(def.blocks, 'blocks');
       def.blocks.forEach(block => {
         if (!['text', 'image', 'disclosure'].includes(block.type)) fail('Unsupported presentation block');
@@ -892,7 +930,27 @@
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
       body.querySelectorAll('audio').forEach(audio => audio.pause());
       body.replaceChildren(); controls.clear(); paintControls.clear(); resultsBox.replaceChildren();
-      if (def.kind === 'presentation') {
+      if (isSpeaking(def)) {
+        const picture = node('div', 'ek-speaking-image');
+        if (def.image?.image) picture.append(illustration(def.image));
+        else picture.hidden = true;
+        const task = node('div', 'ek-speaking-task');
+        task.append(node('p', 'ek-copy', def.task.text));
+        if (def.task.bullets?.length) {
+          const list = node('ul', 'ek-speaking-bullets');
+          def.task.bullets.forEach(text => list.append(node('li', '', text)));
+          task.append(list);
+        }
+        const use = node('div', 'ek-speaking-use');
+        use.append(node('strong', 'ek-speaking-use-title', 'Use:'));
+        def.use.forEach(group => {
+          const content = node('div', 'ek-speaking-group');
+          if (group.words?.length) content.append(node('p', 'ek-copy ek-speaking-words', group.words.join(' · ')));
+          if (group.phrases?.length) content.append(node('p', 'ek-copy ek-speaking-phrases', group.phrases.join('\n')));
+          use.append(content);
+        });
+        body.append(picture, task, use);
+      } else if (def.kind === 'presentation') {
         def.blocks.forEach(block => {
           if (block.type === 'image') body.append(illustration(block));
           else if (block.type === 'disclosure') {
@@ -1449,7 +1507,7 @@
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
       centerSection(status,resultsBox.hidden?status:resultsBox,true);
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
-    if(['presentation','audio'].includes(def.kind)&&config.onSkip){
+    if(['presentation','audio'].includes(def.kind)&&!isSpeaking(def)&&config.onSkip){
       const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;config.onChange?.(clone(answers));config.onSkip();},'ek-button ek-secondary ek-skip');
       skip.setAttribute('aria-label','Skip exercise');skip.hidden=Boolean(config.navigationReadOnly);actions.append(skip);
     }
@@ -1542,7 +1600,7 @@
       destroy: () => { disposed=true;if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
-  const api = { validate, grade, mount, kinds, uiLabels, feedbackMessage, motion:{expand} };
+  const api = { validate, grade, mount, speaking, isSpeaking, kinds, uiLabels, feedbackMessage, motion:{expand} };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.SpaceWhaleExerciseKit = api;
 })(typeof window !== 'undefined' ? window : globalThis);

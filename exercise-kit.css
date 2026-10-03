@@ -65,6 +65,13 @@
 .exercise-kit .ek-image { display: block; width: 100%; max-height: 420px; object-fit: contain; border-radius: var(--ek-radius); }
 .exercise-kit .ek-radio .ek-image { width: 110px; }
 .exercise-kit .ek-copy { margin: 0; white-space: pre-wrap; }
+/* Fixed Speaking composition. Content cannot introduce panels or controls. */
+.exercise-kit .ek-speaking-image > .ek-image { display: block; width: auto; max-width: min(100%, 560px); height: auto; margin: 0; }
+.exercise-kit .ek-speaking-task, .exercise-kit .ek-speaking-use, .exercise-kit .ek-speaking-group { min-width: 0; }
+.exercise-kit .ek-speaking-bullets { margin: 8px 0 0; padding-left: 1.4em; }
+.exercise-kit .ek-speaking-use { display: grid; gap: 16px; }
+.exercise-kit .ek-speaking-use-title { font-weight: 600; }
+.exercise-kit .ek-speaking-group { display: grid; gap: 10px; }
 .exercise-kit .ek-disclosure { border-top: 1px solid var(--ek-line); padding: 16px 0; }
 .exercise-kit .ek-disclosure summary { cursor: pointer; }
 @media(max-width:600px) {
