@@ -25,7 +25,14 @@ const pictureWords=(id,lesson,words,order)=>E(id,'matching','Соедините 
 const S=(id,title,children,extra={})=>E(id,'stage',title,{progressive:true,exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
 const stage=(menu,time,exercise,teacherNotes='',section='tasks')=>({menu,navigationTitle:menu,section,guide:{time:time?time+' min':'Self study',teacherNotes},exercise});
 const media={4:{},5:{}};
-const addAudio=(n,id,script)=>{media[n][id]={type:'audio',src:null,script};return id;};
+const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+const repeatAudioVersion='20261003-bella-v3';
+const addAudio=(n,id,script)=>{
+ const repeatSrc=n===4&&/^L4-W\\d{2}(?:-example)?$/.test(id)
+  ?courseAudioBase+'/a1-2/w4/l4/listen-repeat/'+id+'.mp3?v='+repeatAudioVersion
+  :null;
+ media[n][id]={type:'audio',src:repeatSrc,script};return id;
+};
 function repeat(n,id,words,examples){
  return E(id,'audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,items:words.map((text,i)=>{const code='L'+n+'-W'+String(i+1).padStart(2,'0');return {id:code,text,mediaRef:addAudio(n,code,text),example:examples[i],exampleMediaRef:addAudio(n,code+'-example',examples[i])};})});
 }
