@@ -28,7 +28,7 @@ const media={4:{},5:{}};
 const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
 const repeatAudioVersion='20261003-sarah-v3-slow-speed1';
 const addAudio=(n,id,script)=>{
- const repeatSrc=((n===4&&/^L4-W\\d{2}(?:-example)?$/.test(id))||(n===5&&/^L5-W\\d{2}(?:-example)?$/.test(id)))
+ const repeatSrc=((n===4&&/^L4-W\d{2}(?:-example)?$/.test(id))||(n===5&&/^L5-W\d{2}(?:-example)?$/.test(id)))
   ?courseAudioBase+'/a1-2/w4/l'+n+'/listen-repeat/'+id+'.mp3?v='+repeatAudioVersion
   :null;
  const dialogueSrc=n===4&&id==='L4-NICK-EMMA-D01'
