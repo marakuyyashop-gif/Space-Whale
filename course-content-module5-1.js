@@ -5,7 +5,7 @@
   if (!kit) return;
 
   const words = ['sleep', 'smile', 'laugh', 'stand', 'lie', 'cry'];
-  const sheet = 'assets/lesson-media/a1-2/module-5/lesson-1/actions-sheet.webp';
+  const sheet = 'Images/A.1.2/Module 4/lesson 4 - sosed/26d89984-db65-4db8-83af-532d3782ee5e.png';
   const crops = [
     { x: 0, y: 0, w: 33.333, h: 50 },
     { x: 33.333, y: 0, w: 33.333, h: 50 },
@@ -27,8 +27,8 @@
       id: String(index + 1),
       text: String(index + 1),
       image: sheet,
-      imageWidth: 420,
-      imageHeight: 315,
+      imageWidth: 1536,
+      imageHeight: 1024,
       crop: crops[index],
       alt: `Picture ${index + 1}`,
       correctId: word
@@ -46,7 +46,7 @@
     grammar: 'Present Continuous: am/is/are + V-ing',
     constructions: 'now · right now · at the moment',
     words,
-    contentVersion: 'm02-picture-word-2026-10-03',
+    contentVersion: 'm02-picture-word-highres-2026-10-03',
     stages: [{
       menu: 'New Words',
       navigationTitle: 'Word Discovery',
