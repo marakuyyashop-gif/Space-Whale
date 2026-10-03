@@ -146,3 +146,7 @@ See root `AGENTS.md` for source-to-layout mapping, inline dropdowns, picture/tas
 ## Writing cues and expansion feedback
 
 `writing.items[].hint` is optional non-empty supporting text. It renders beneath its field, in smaller muted type, and is associated through `aria-describedby`. Store only the question in `prompt`; submitted examples and corrections intentionally omit `hint`. All answer examples are bold, with a thin separator between the feedback status and the answer section. All inline disclosures and newly submitted feedback use the same full-range scroll behavior as progressive tasks and rules.
+
+## Workspace color update (2026-10-03)
+
+The light workspace canvas is solid white without a grid, with black primary lesson text. Supporting/correction text stays muted. OK and up/down progression buttons use `--sw-action-background: #ffd3a3`, `--sw-action-hover: #ffc58a`, and black action text, centrally defined in `exercise-theme.css`. Sidebar, answer selectors, audio controls and feedback colors keep their existing appearance. Dark mode keeps a solid dark canvas and readable text. This supersedes the earlier all-monochrome direction for these specific action buttons.

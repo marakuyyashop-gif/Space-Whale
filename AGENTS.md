@@ -49,7 +49,7 @@
 
 ## Canvas and selected text
 
-- The top utility area and lesson share one continuous dotted canvas. Paint the texture on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Keep the scroll viewport below the actual utility controls for every role and viewport; retain a transparent, continuous canvas with no painted header strip. Automatic reveal positioning must leave the floating controls clear.
+- The top utility area and lesson share one solid canvas: white in the light theme, with no grid or dots. Paint the background on `.class-area`; keep `.class-content` and `.lesson-scroll` transparent in both themes. Account for the dark-theme selector specificity. Keep the scroll viewport below the actual utility controls for every role and viewport; retain a transparent, continuous canvas with no painted header strip. Automatic reveal positioning must leave the floating controls clear.
 - Selected answer text uses an unpatterned surface. Do not apply the empty selector's tiled facet texture behind selected words.
 - After OK, checked word/sentence answer surfaces keep their colored dot fill with a soft gradient, alongside the rounded dotted outline. The fill belongs inside the answer, not across the whole exercise; it disappears with feedback on edit/reset. Do not confuse it with the empty selector's facet texture.
 - Order feedback is headed `Correct Answer` and renders the completed sentence with spaces, without directional arrows between words.
@@ -79,3 +79,5 @@
 - Sentence/Chunk Order checks each placed token’s position and applies the shared correct/incorrect dotted outline around that token’s rounded rectangle, never around the full answer tray. Clear marks on edit/reset; respect accepted alternative orders.
 - Multiple Choice questions tied to one audio source reveal individually using teacher arrows after checking or skipping. Keep the player available, preserve flat item answer IDs, and synchronize reveal separately from answers. Ordinary compact grammar Choice tasks without audio stay together.
 - Writing uses `items[].multiline: true` for a short message/story; it is an opt-in textarea within the same Writing renderer and answer synchronization. Keep single-word and short sentence fields unchanged. Oral samples can be a separate teacher-revealed presentation containing a closed Possible answers disclosure; do not require an OK for an informational or oral block.
+
+- Workspace appearance (2026-10-03): light-mode lesson background is pure white and primary lesson text is black; retain muted supporting/correction text. Only OK (`.ek-check`) and up/down progression controls (`.ek-stage-toggle`) use the shared pale-orange action tokens in `exercise-theme.css`. Preserve sidebar, answer controls, audio, feedback colors, sizes and dark-theme readability. Do not reintroduce a canvas texture.

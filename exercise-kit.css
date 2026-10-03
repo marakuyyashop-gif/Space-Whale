@@ -1,4 +1,4 @@
-@import url("exercise-theme.css?v=20260926-pilot");
+@import url("exercise-theme.css?v=20261003-white-orange");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
@@ -996,3 +996,13 @@
 .exercise-kit.ek-stage-sequence>.ek-body>.ek-stage-stack>.ek-stage-section+.ek-stage-section{margin-top:var(--sw-stage-gap,48px)}
 .exercise-kit.ek-stage-sequence.ek-stage-compact>.ek-body>.ek-stage-stack>.ek-stage-section+.ek-stage-section{margin-top:20px}
 .exercise-kit.ek-stage-sequence>.ek-body>.ek-stage-stack>.ek-stage-section.ek-stage-linked{margin-top:var(--sw-component-gap,24px);padding-top:0;border-top:0}
+
+/* Only check and progressive navigation actions use the warm accent. */
+.exercise-kit :is(.ek-check,.ek-stage-toggle),
+.exercise-kit.ek-modern :is(.ek-check,.ek-stage-toggle){
+  background:var(--sw-action-background);color:var(--sw-action-ink);border-color:transparent;
+}
+.exercise-kit :is(.ek-check,.ek-stage-toggle):hover:not(:disabled),
+.exercise-kit.ek-modern :is(.ek-check,.ek-stage-toggle):hover:not(:disabled){
+  background:var(--sw-action-hover);color:var(--sw-action-ink);filter:none;
+}
