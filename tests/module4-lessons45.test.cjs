@@ -33,8 +33,7 @@ test('approved opening and final Speaking use the shared layout in teacher and l
    assert.equal(v.host.querySelector('button,details,input'),null);
    assert.equal(v.host.querySelector('.ek-speaking-use-title').textContent,'Use:');
    assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,2);
-   if(id==='L5-M09')assert.equal(v.host.querySelector('img'),null);
-   else assert.ok(v.host.querySelector('img'));
+   assert.ok(v.host.querySelector('img'));
    v.handle.destroy();
   }
  }
@@ -66,7 +65,7 @@ test('approved L4 order, exact repeat lines and typed picture strip replace obso
  assert.deepEqual(Array.from(find('L4-M03').items,i=>i.example),['My father is very polite.','This man is rude.','My children are very helpful.','I’m sometimes lazy on weekends.','My sister is usually quiet.','Our neighbors are noisy at night.']);
  const d=find('L4-typed-gap'),v=setup(d);
  assert.equal(d.inputMode,'text');assert.equal(v.host.querySelectorAll('.ek-picture-cue-card').length,4);
- assert.equal(v.host.querySelectorAll('.ek-typed-gap').length,4);assert.equal(v.host.querySelector('img'),null);
+ assert.equal(v.host.querySelectorAll('.ek-typed-gap').length,4);assert.equal(v.host.querySelectorAll('img').length,4);
  assert.equal(v.host.querySelector('.ek-body').firstElementChild.classList.contains('ek-picture-cues'),true);
  assert.equal(v.host.textContent.includes('_____'),false);assert.equal(v.host.querySelectorAll('.ek-check').length,1);
  ['helpful','lazy','noisy','rude'].forEach((answer,i)=>{

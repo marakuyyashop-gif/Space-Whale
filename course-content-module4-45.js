@@ -82,11 +82,11 @@ const typed4=[
 ];
 typed4.forEach((item,i)=>{
  const ref='L4-TYPED-I'+String(i+1).padStart(2,'0');
- media[4][ref]={type:'image',src:null,brief:[
+ media[4][ref]={type:'image',src:`assets/lesson-media/a1-2/module-4/lesson-4/word-pick/${['helpful','lazy','noisy','rude'][i]}.webp`,brief:[
   'Anna helps carry boxes.', 'Max does not want to help at home.',
   'People are making too much noise to hear a conversation.', 'Ben pushes another person.'
  ][i]};
- Object.assign(item,{imagePending:true,imageMediaRef:ref,assetId:ref,imageWidth:480,imageHeight:600});
+ Object.assign(item,{imagePending:true,imageMediaRef:ref,assetId:ref,alt:'Картинка '+(i+1),imageWidth:480,imageHeight:600});
 });
 const typedGap4=E('L4-typed-gap','gaps','Complete the sentences.',{
  inputMode:'text',layout:'picture-rows',instruction:'Посмотрите на картинки и впишите подходящие слова из урока.',items:typed4
@@ -179,7 +179,7 @@ l5.push(stage('Chat exchange',4,S('L5-M08','Ответьте другу в ча�
 l5.push(stage('Final · Speaking',5,kit.speaking({
  id:'L5-M09',
  title:'Help your new colleague',
- image:null,
+ image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/04470db6-bc5f-48d0-84bf-4a87f0f6d53a.png',alt:'Шесть необычных вещей для объяснения категории и сходства.',imageWidth:1448,imageHeight:1086},
  task:{text:'В вашем офисе появился новый сотрудник. В первый день его удивляют некоторые вещи вокруг, и он спрашивает, что это такое. Объясните ему:',bullets:['к какой категории относится каждая вещь;','на что она похожа.']},
  use:[
   {words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...','It’s a sort of ...']},

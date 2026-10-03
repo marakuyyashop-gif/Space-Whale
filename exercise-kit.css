@@ -1,4 +1,4 @@
-@import url("exercise-theme.css?v=20261003-white-orange");
+@import url("exercise-theme.css?v=20261003-orange-white-sidebar");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
