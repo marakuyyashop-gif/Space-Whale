@@ -2,7 +2,9 @@
 'use strict';
 // Base content: lesson-sources/a12-m4-l4-l5-v7-final.md.
 // L4/L5 opening and final Speaking use docs/SPEAKING_TEMPLATE.md (approved 2026-10-03).
-// Existing IDs retained; remaining v7 scripts and exercises are unchanged.
+// L4 tasks 3–10: owner-approved replacement on 2026-10-03.
+// New task identities have new IDs; retained Speaking/Word Pick/media IDs stay stable.
+// L5 remains based on v7; L4 Listening awaits the continuation.
 // Media scripts are ready; recordings remain explicitly pending.
 const kit=window.SpaceWhaleExerciseKit, registry=window.SpaceWhaleLessonMedia;
 const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
@@ -53,16 +55,78 @@ l4.push(stage('Speaking',2,kit.speaking({
 })));
 const meanings4=[['polite','вежливый'],['rude','грубый'],['helpful','готовый помочь'],['lazy','ленивый'],['quiet','тихий'],['noisy','шумный']];
 l4.push(stage('Word Pick',3,S('L4-M02','Соедините картинки и слова.',[pictureWords('L4-word-translation',4,words4,[3,5,0,4,1,2])])));
-l4.push(stage('Listen & Repeat',2,repeat(4,'L4-M03',words4,["Our new neighbor is polite and friendly.", "He is rude to people at work.", "My friend is helpful at home.", "He is lazy and doesn’t help at home.", "Our neighbor is quiet in the evening.", "Our neighbors are noisy in the evening."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
-l4.push(stage('Words · Choose',3,C('L4-M04','Выберите вариант, который подходит слову.',[["polite", ["Give me that.", "Excuse me. Can you help me, please? Thank you."], 1], ["rude", ["Move. I want this chair.", "Can I sit here, please?"], 0], ["helpful", ["I can help you.", "I don’t want to help."], 0], ["lazy", ["I help at home every day.", "I never help at home. I can help, but I don’t want to."], 1], ["quiet", ["He talks a lot.", "He doesn’t talk much."], 1], ["noisy", ["They speak very loudly.", "They don’t talk much."], 0]])));
-const examples4="— What is he like?  \n— He is helpful. He helps me at home.\n\n— What does he look like?  \n— He is tall. He has short straight hair.\n\n— What is she like?  \n— She is quiet.\n\n— What does she look like?  \n— She has long curly hair and green eyes.";
-l4.push(stage('Two questions · Match',2,S('L4-M07','Прочитайте примеры. Затем соедините вопросы с их значениями.',[P('L4-question-examples','Примеры.',[T(examples4)]),M('L4-two-questions-match','Соедините вопросы и значения.',[['What is he/she like?','узнать о качествах / поведении человека'],['What does he/she look like?','узнать о внешности']],[1,0])],{revealStops:[2]})));
-l4.push(stage('Language focus',2,R('L4-question-rule',"Чтобы узнать, какой человек в общении или по своим качествам, используйте:\n\nWhat is he like?  \nWhat is she like?\n\nWhat is he like?  \n— He is polite and helpful.\n\nЧтобы узнать именно о внешности человека, используйте:\n\nWhat does he look like?  \nWhat does she look like?\n\nWhat does she look like?  \n— She is tall. She has curly hair.\n\nВ первом вопросе используется is.  \nВо втором вопросе используется does + look. После does у look нет окончания -s.\n\nВ ответе используйте знакомые модели:\n\nbe + adjective  \nShe is tall. / He is helpful.\n\nhave/has + noun  \nShe has curly hair. / He has blue eyes.\n\nВажно: is в ответе не означает автоматически «характер».  \nShe is tall. — это описание внешности.")));
-l4.push(stage('Choose the question',1.5,C('L4-M08','Выберите подходящий вопрос.',[["Вы хотите узнать, какой новый сосед в общении.", ["What does he look like?", "What is he like?"], 1], ["Вы ждёте новую коллегу у входа и хотите узнать её внешность.", ["What does she look like?", "What is she like?"], 0], ["She is quiet and helpful.", ["What is she like?", "What does she look like?"], 0], ["He has short curly hair.", ["What is he like?", "What does he look like?"], 1]])));
-l4.push(stage('Build questions and answers',3.5,W('L4-M10','Напишите вопрос или ответ.',[["Спросите, какой мужчина в общении.", ["What is he like?", "What’s he like?"]], ["Спросите о внешности женщины.", "What does she look like?"], ["Спросите, какая женщина в общении.", ["What is she like?", "What’s she like?"]], ["Спросите о внешности мужчины.", "What does he look like?"], ["Ответьте о мужчине.\nhelpful · polite", ["He is helpful and polite.", "He is polite and helpful."]], ["Ответьте о женщине.\nlong curly hair · green eyes", ["She has long curly hair and green eyes.", "She has green eyes and long curly hair."]]]), 'Полные вопросительные образцы из Rule не остаются открытой подсказкой. Помощь — после затруднения. Принимаются естественные варианты ответа.'));
-const dialogue4="Nora: Do you know our new neighbors?  \nBen: Yes. The man is Daniel.  \nNora: What is he like?  \nBen: He’s polite, quiet, and very helpful.  \nNora: What does he look like?  \nBen: He’s tall. He has short straight hair and blue eyes.  \nNora: And the woman?  \nBen: Her name is Anna.  \nNora: What is she like?  \nBen: She’s friendly, but a little noisy.  \nNora: What does she look like?  \nBen: She’s young. She has long curly hair and brown eyes.";
-const listeningQuestions4=W('L4-listening-details','Listen and answer the questions.',[["What is Daniel like?", ["Polite, quiet and helpful.", "He is polite, quiet and helpful."]], ["What does Daniel look like?", ["Tall; short straight hair; blue eyes.", "He is tall and has short straight hair and blue eyes."]], ["What is Anna like?", ["Friendly and a little noisy.", "She is friendly and a little noisy."]], ["What does Anna look like?", ["Young; long curly hair; brown eyes.", "She is young and has long curly hair and brown eyes."]]],false,'1. Послушайте разговор о Daniel и Anna. Можно начать отвечать.\n2. Послушайте ещё раз, дополните и проверьте четыре ответа.');
-l4.push(stage('Listening',4,S('L4-M06','Listen and answer the questions.',[E('L4-listening-player','audio','Listen.',{mediaRef:addAudio(4,'L4-D01',dialogue4),audioPending:true}),listeningQuestions4],{revealStops:[2],transcript:dialogue4,transcriptAfter:['L4-listening-details']}),'Два прослушивания; проверка после второго. Transcript скрыт до самостоятельной работы. Ориентир записи: 35–40 секунд. Запись ожидается.\n\nScript:\n'+dialogue4));
+l4.push(stage('Listen & Repeat',2,repeat(4,'L4-M03',words4,[
+ 'My father is very polite.',
+ 'This man is rude.',
+ 'My children are very helpful.',
+ 'I’m sometimes lazy on weekends.',
+ 'My sister is usually quiet.',
+ 'Our neighbors are noisy at night.'
+])));
+const gap4=(id,before,answer,after,options)=>({id,segments:[before,{id,answers:[answer],...(options?{options}:{})},after]});
+l4.push(stage('Dropdown Gap',2.5,E('L4-dropdown-gap','gaps','Complete the sentences with the correct words.',{
+ inputMode:'select',instruction:'Choose the correct options.',items:[
+  gap4('1','I can’t hear you. The people next to me are very ','noisy','. Can you say it again, please?',['quiet','noisy','helpful']),
+  gap4('2','I don’t have a charger. Eva is ','helpful',' and gives me one.',['lazy','rude','helpful']),
+  gap4('3','Ben’s very ','polite',', he always says “please” and “thank you”.',['polite','noisy','rude']),
+  gap4('4','“Give me your sandwich!” — “Don’t be ','rude','. Say ‘please’.”',['helpful','quiet','rude']),
+  gap4('5','Sam is ','quiet',' at school, he doesn’t talk with his classmates.',['noisy','quiet','lazy'])
+ ]
+})));
+const typed4=[
+ gap4('1','Anna is always very ','helpful','. She helps me carry these boxes.'),
+ gap4('2','Max is so ','lazy',', he never wants to help at home.'),
+ gap4('3','These people are too ','noisy','. I can’t hear you.'),
+ gap4('4','Don’t push me, Ben. That’s ','rude','.')
+];
+typed4.forEach((item,i)=>{
+ const ref='L4-TYPED-I'+String(i+1).padStart(2,'0');
+ media[4][ref]={type:'image',src:null,brief:[
+  'Anna helps carry boxes.', 'Max does not want to help at home.',
+  'People are making too much noise to hear a conversation.', 'Ben pushes another person.'
+ ][i]};
+ Object.assign(item,{imagePending:true,imageMediaRef:ref,assetId:ref,imageWidth:480,imageHeight:600});
+});
+l4.push(stage('Typed Gap',2.5,E('L4-typed-gap','gaps','Complete the sentences.',{
+ inputMode:'text',layout:'picture-rows',instruction:'Посмотрите на картинки и впишите подходящие слова из урока.',items:typed4
+})));
+const rule4=E('L4-question-rule','rule-page','Как спросить о человеке',{
+ blocks:[{type:'rule',text:'Вопросы What is he/she like? и What does he/she look like? помогают узнать разную информацию о человеке.\n\nWhat is he/she like? — «Какой он / какая она?» Так спрашивают о характере и поведении. В ответе можно использовать He/She is + прилагательное.\n\n— What is he like?\n— He is quiet and polite.\n\nWhat does he/she look like? — «Как он / она выглядит?» Так спрашивают о внешности. Чтобы описать волосы, используйте He/She has + описание волос.\n\n— What does she look like?\n— She has short curly hair.\n\nВ первом вопросе используется is, во втором — does + look. После does у look нет окончания -s. Повторять look like в ответе не нужно.\n\nНе путайте эти вопросы с What does she like? — «Что ей нравится?» Это вопрос о предпочтениях.',
+ highlights:['What is he/she like?','What does he/she look like?','He/She is + прилагательное','What is he like?','He/She has + описание волос','What does she look like?','does + look','look like','What does she like?']
+ }]
+});
+const discovery4=E('L4-complete-rule','gaps','Complete the rules.',{
+ inputMode:'select',instruction:'Choose the correct options.',items:[
+  gap4('1','Используем What does she look like?, когда хотим узнать ','как она выглядит','.', ['какая она в общении','как она выглядит','что она любит']),
+  gap4('2','Используем What is she like?, когда хотим узнать ','какая она в общении','.', ['как она выглядит','что она любит','какая она в общении'])
+ ]
+});
+l4.push(stage('Complete the Rule · Rule',4,S('L4-discovery-rule','Complete the rules.',[
+ P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),highlights:['look like?','like?']}]),
+ discovery4,rule4
+],{revealStops:[2,3],requireCheckBeforeNext:true})));
+l4.push(stage('Multiple Select',2,E('L4-multiple-select','choice','Choose the answers.',{
+ multiple:true,instruction:'Отметьте все правильные ответы.',items:[
+  {id:'1',prompt:'What does she look like?',options:[
+   'She is helpful.','Her hair is long.','She is rude.','She has curly brown hair.','She is lazy.','Her hair is short and straight.'
+  ].map((text,i)=>({id:String(i+1),text})),correctIds:['2','4','6']},
+  {id:'2',prompt:'What is he like?',options:[
+   'He is quiet.','His hair is short.','He is polite.','He is noisy.','He has straight hair.','His hair is long.'
+  ].map((text,i)=>({id:String(i+1),text})),correctIds:['1','3','4']}
+ ]
+})));
+l4.push(stage('Matching',2,M('L4-question-answer-match','Match the questions with the answers.',[
+ ['What is he like?','He’s a little lazy at home.'],
+ ['What does she look like?','Her hair is short and curly.'],
+ ['What does he look like?','He has long straight hair.'],
+ ['What is she like?','She’s helpful. She often helps me with my homework.']
+],[1,0,3,2])));
+l4.push(stage('Write the questions',3,W('L4-questions-for-answers','Write the questions for the answers.',[
+ ['Jake is a very rude and lazy boy. He never helps his mom.',['What is Jake like?','What is he like?']],
+ ['Nora has brown eyes and short hair.',['What does Nora look like?','What does she look like?']],
+ ['Yes, she is tall and beautiful, she has long blonde hair.',['Is she tall and beautiful?','Does she have long blonde hair?']],
+ ['My parents are very kind and smart.',['What are your parents like?','What are they like?']]
+],false,'Задайте вопрос к предложению.')));
 l4.push(stage('Final · Speaking',5,kit.speaking({
  id:'L4-M11',
  title:'Describe the new students',
@@ -105,9 +169,7 @@ l5.push(stage('Final · Speaking',5,kit.speaking({
  use:[{words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...']}]
 })));
 
-// Previously prepared homework stays separate from the 30-minute class flow.
-l4.push(stage('Homework 1',0,W('L4-homework-1','Translate into English.',[['Какой он по характеру?','What is he like?'],['Он вежливый и отзывчивый.','He’s polite and helpful.'],['Как он выглядит?','What does he look like?'],['Он высокий, и у него короткие волосы.','He’s tall and has short hair.']],false,'Друг спрашивает о Бене.'),'Проверка по смыслу и конструкции. Полные формы и естественное разбиение последней реплики на два предложения допустимы.','self-study'));
-l4.push(stage('Homework 2',0,W('L4-homework-2','Translate into English.',[['Как она выглядит?','What does she look like?'],['У неё длинные кудрявые волосы.','She has long curly hair.'],['Какая она в общении?','What is she like?'],['Она тихая и отзывчивая.','She’s quiet and helpful.']],false,'Вы спрашиваете о новой соседке.'),'Образцы — не единственно допустимые строки.','self-study'));
+// L5 homework remains unchanged; obsolete L4 drafts were removed with its rebuild.
 l5.push(stage('Homework 1',0,W('L5-homework-1','Translate into English.',[['Что такое маффин?','What’s a muffin?'],['Это вид еды.',['It’s a kind of food.','It’s a type of food.']],['Что такое чай?','What’s tea?'],['Это вид напитка.',['It’s a type of drink.','It’s a kind of drink.']]],false,'Друг спрашивает о еде и напитках. Используйте оба способа объяснения.'),'Полные формы допустимы. Kind/type не противопоставляются.','self-study'));
 l5.push(stage('Homework 2',0,W('L5-homework-2','Translate into English.',[['Что такое кресло?','What’s an armchair?'],['Это вид мебели.',['It’s a kind of furniture.','It’s a type of furniture.']],['Что такое пальто?','What’s a coat?'],['Это вид одежды.',['It’s a type of clothing.','It’s a kind of clothing.']]],false,'Друг спрашивает о вещах для дома.'),'Проверка по смыслу и форме. Образцы не единственные допустимые ответы.','self-study'));
 function attach(value,slots){
@@ -126,7 +188,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion='v7_FINAL+speaking-word-pick-2026-10-03'+(i===0?'+hair-support':'');
+ lesson.contentVersion=i===0?'approved-tasks-3-10-2026-10-03':'v7_FINAL+speaking-word-pick-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }
