@@ -179,10 +179,32 @@ groups5.items.forEach((item,i)=>{media[5][item.imageMediaRef]={type:'image',src:
 l5.push(stage('Match the groups',3,groups5,"Изображения пока ожидаются. Авторские описания не показываются ученику.\n### Group A\nИзображения: muffin · rice · bread.\n\n### Group B\nИзображения: tea · juice · coffee.\n\n### Group C\nИзображения: sofa · wardrobe · armchair.\n\n### Group D\nИзображения: coat · jacket · hat.\n\n### Group E\nИзображения: house · hospital · library.\n\n### Group F\nТри отдельные сцены покупки:\n1. supermarket — полки с продуктами, корзина/тележка, касса, покупатель;\n2. магазин книг — стеллажи с книгами, ценники, касса, покупатель оплачивает книгу;\n3. магазин одежды — стойки/вешалки с одеждой, ценники, касса, покупатель выбирает или оплачивает вещь.\n\nДля сцен 2–3 не вводить новые английские названия магазинов. Эти авторские описания не показываются ученику.\n- Group E показывает именно здания как объекты.\n- Group F считывается как место покупки за счёт кассы, покупателя, товаров и ценников.\n- Не использовать одну фотографию supermarket как закрытый выбор shop vs building.\n- На самих изображениях не писать готовые английские названия target-категорий."));
 l5.push(stage('Find the meaning',2,S('L5-M06','Read the examples. Choose the correct meaning.',[P('L5-kind-context','Read the examples.',[T('A muffin is a kind of food.\nTea is a type of drink.\nA sofa is a type of furniture.')]),C('L5-kind-meaning','Choose the correct meaning.',[['Что показывают a kind of / a type of в этих примерах?',['К какой общей категории относится предмет.','Что два предмета просто похожи внешне.'],0]])],{revealStops:[2]})));
 l5.push(stage('Language focus',2,E('L5-kind-rule','rule-page','Как объяснить незнакомую вещь',{blocks:[{type:'rule',text:"В английском языке незнакомую или необычную вещь можно объяснить двумя способами: сказать, к какой категории она относится, или сравнить её с чем-то знакомым.\n\n1. A kind of / a type of / a sort of\n\nИспользуйте a kind of, a type of или a sort of, чтобы сказать, к какой общей категории относится предмет.\n\nВ этом значении kind, type и sort означают практически одно и то же.\n\nIt’s a kind of furniture. — Это вид мебели.\nIt’s a type of drink. — Это вид напитка.\nIt’s a sort of building. — Это вид здания.\n\nПосле a kind of / a type of / a sort of называем общую категорию:\n\nfood · drink · furniture · clothing · building · shop\n\nОбратите внимание: в этой конструкции используется a:\n\na kind of · a type of · a sort of\n\n2. It’s like\n\nИспользуйте It’s like + noun, когда хотите сказать, на что похож предмет.\n\nIt’s like a big cushion. — Это похоже на большую подушку.\nIt’s like tea. — Это похоже на чай.\nIt’s like a small house. — Это похоже на маленький дом.\nIt’s like a bun. — Это похоже на булочку.\n\nСравните:\n\nIt’s a kind of furniture. — мы говорим, что это за категория.\nIt’s like a big cushion. — мы говорим, на что это похоже.\n\nТаким образом:\n\na kind of / a type of / a sort of → category\nlike → similarity",highlights:['A kind of / a type of / a sort of','a kind of','a type of','a sort of','It’s like','на что похож предмет','что это за категория','на что это похоже','like → similarity']}]})));
-l5.push(stage('Choose the explanation',2,C('L5-form-choice','Выберите правильный вариант.',[["What is a muffin?", ["It’s kind food.", "It’s a kind of food.", "It’s a food kind."], 1], ["What is a sofa?", ["It’s type of furniture.", "It’s a type of a furniture.", "It’s a type of furniture."], 2], ["Что показывают a kind of / a type of в этом уроке?", ["Общую категорию.", "Только внешнее сходство.", "Место предмета."], 0], ["What is a hospital?", ["It’s type of a building.", "It’s a type of building.", "It’s a type building."], 1]])));
-l5.push(stage('Build explanations',3,W('L5-M07','Ответьте полным предложением.',[["What is a pancake?", ["It’s a kind of food.", "A pancake is a kind of food."], "food · kind"], ["What is tea?", ["It’s a type of drink.", "Tea is a type of drink."], "drink · type"], ["What is a sofa?", ["It’s a kind of furniture.", "A sofa is a kind of furniture."], "furniture · kind"], ["What is a jacket?", ["It’s a type of clothing.", "A jacket is a type of clothing."], "clothing · type"], ["What is a hospital?", ["It’s a kind of building.", "It’s a type of building."], "building"], ["What is a supermarket?", ["It’s a kind of shop.", "It’s a type of shop."], "shop"]]),'Принимаются полные варианты с названием предмета. Целевая модель ответа — It’s …; в последних двух пунктах подходят kind и type.'));
-const chat5=[["Sam: What’s a wardrobe?", ["It’s a kind of furniture.", "It’s a type of furniture."]], ["Sam: Can I put my jacket in it?", ["Yes, you can.", "Yes."]], ["Sam: Thanks. And what’s a coat?", ["It’s a kind of clothing.", "It’s a type of clothing."]], ["Sam: Can I put it in the wardrobe?", ["Yes, you can.", "Yes."]]].map((row,i)=>W('L5-chat-'+(i+1),'Напишите ответ.',[row]));
-l5.push(stage('Chat exchange',4,S('L5-M08','Ответьте другу в чате.',chat5,{requireCheckBeforeNext:true,instruction:'Каждая следующая реплика продолжает тот же разговор.'}),"Следующую реплику даёт преподаватель после понятного предыдущего ответа.\n\nЕсли категория выбрана неверно или ответ непонятен, сначала помочь ученику исправить его, затем продолжить чат. Не показывать следующую реплику так, будто любой свободный ответ автоматически принят."));
+const categorySentences5=[
+ ['It’s a kind of furniture.','category'],['It’s like a big cushion.','similarity'],
+ ['It’s a type of drink.','category'],['It’s like tea.','similarity'],
+ ['It’s a sort of clothing.','category'],['It’s like a blanket.','similarity'],
+ ['It’s a kind of building.','category']
+];
+l5.push(stage('Sort into groups',2,E('L5-category-similarity-sort','sort','Put the sentences into categories.',{
+ groups:[{id:'category',text:'Category'},{id:'similarity',text:'Similarity'}],
+ items:[3,0,5,2,6,1,4].map(i=>({id:String(i+1),text:categorySentences5[i][0],correctId:categorySentences5[i][1]}))
+})));
+l5.push(stage('Matching',3,M('L5-explanation-matching','Match the phrases to make correct sentences.',[
+ ['A beanbag is a kind of','furniture.'],['Bubble tea is like','tea.'],
+ ['A poncho is a sort of','clothing.'],['An igloo is like','a small house.'],
+ ['Bao is a type of','food.'],['A kiosk is a kind of','shop.']
+],[3,5,1,4,0,2])));
+const explanationGaps5=[
+ ['This beanbag is in the living room. It’s a ',['kind','type','sort'],' of furniture.'],
+ ['I’d like bubble tea, please. It’s a ',['type','kind','sort'],' of drink.'],
+ ['This poncho is warm and colorful. It’s a ',['sort','kind','type'],' of clothing.'],
+ ['This igloo is small. It’s ',['like'],' a little house.'],
+ ['Bao is food, but it looks different from the food I usually eat. It’s a ',['type','kind','sort'],' of food.'],
+ ['There is a kiosk near the park. It’s ',['like'],' a small supermarket.']
+];
+l5.push(stage('Fill in the gaps',4,E('L5-explanation-gaps','gaps','Complete the sentences.',{
+ inputMode:'text',items:explanationGaps5.map(([before,answers,after],i)=>({id:String(i+1),segments:[before,{id:'gap'+(i+1),answers},after]}))
+})));
 l5.push(stage('Final · Speaking',5,kit.speaking({
  id:'L5-M09',
  title:'Help your new colleague',
