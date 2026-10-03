@@ -14,6 +14,11 @@ const R=(id,text)=>E(id,'rule-page','Language focus',{blocks:[{type:'rule',text}
 const C=(id,title,rows)=>E(id,'choice',title,{items:rows.map(([prompt,options,key],i)=>({id:String(i+1),prompt,options:options.map((text,j)=>({id:String(j),text})),correctId:String(key)}))});
 const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{responseMode:accepted?'accepted':'open',revealPossibleAnswers:!accepted,instruction,items:rows.map(([prompt,answers,hint],i)=>({id:String(i+1),prompt,...(hint?{hint}:{}),[accepted?'acceptedAnswers':'possibleAnswers']:Array.isArray(answers)?answers:[answers]}))});
 const M=(id,title,rows,order)=>E(id,'matching',title,{items:rows.map(([text],i)=>({id:String(i+1),text,correctId:'o'+i})),options:order.map(i=>({id:'o'+i,text:rows[i][1]}))});
+const pictureWords=(id,lesson,words,order)=>E(id,'matching','Соедините картинки и слова.',{
+ layout:'picture-word',
+ items:words.map((word,i)=>({id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+i,image:`assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp`,imageWidth:480,imageHeight:600})),
+ options:order.map(i=>({id:'o'+i,text:words[i]}))
+});
 const S=(id,title,children,extra={})=>E(id,'stage',title,{progressive:true,exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
 const stage=(menu,time,exercise,teacherNotes='',section='tasks')=>({menu,navigationTitle:menu,section,guide:{time:time?time+' min':'Self study',teacherNotes},exercise});
 const media={4:{},5:{}};
@@ -47,7 +52,7 @@ l4.push(stage('Speaking',2,kit.speaking({
  ]
 })));
 const meanings4=[['polite','вежливый'],['rude','грубый'],['helpful','готовый помочь'],['lazy','ленивый'],['quiet','тихий'],['noisy','шумный']];
-l4.push(stage('Words · Matching',3,S('L4-M02','Соедините слова и переводы.',[M('L4-word-translation','Соедините слова и переводы.',meanings4,[5,2,3,0,4,1]),P('L4-word-context','Значения слов.',[T("- polite — говорит «пожалуйста» и «спасибо», вежливо просит.\n- rude — говорит с людьми грубо, например требует вместо вежливой просьбы.\n- helpful — предлагает помощь или помогает другому человеку.\n- lazy — может сделать простое дело, но не хочет и старается его избежать.\n- quiet — говорит мало или тихо, не шумит.\n- noisy — говорит или ведёт себя громко, создаёт много шума.")])],{requireCheckBeforeNext:true})));
+l4.push(stage('Word Pick',3,S('L4-M02','Соедините картинки и слова.',[pictureWords('L4-word-translation',4,words4,[3,5,0,4,1,2])])));
 l4.push(stage('Listen & Repeat',2,repeat(4,'L4-M03',words4,["Our new neighbor is polite and friendly.", "He is rude to people at work.", "My friend is helpful at home.", "He is lazy and doesn’t help at home.", "Our neighbor is quiet in the evening.", "Our neighbors are noisy in the evening."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
 l4.push(stage('Words · Choose',3,C('L4-M04','Выберите вариант, который подходит слову.',[["polite", ["Give me that.", "Excuse me. Can you help me, please? Thank you."], 1], ["rude", ["Move. I want this chair.", "Can I sit here, please?"], 0], ["helpful", ["I can help you.", "I don’t want to help."], 0], ["lazy", ["I help at home every day.", "I never help at home. I can help, but I don’t want to."], 1], ["quiet", ["He talks a lot.", "He doesn’t talk much."], 1], ["noisy", ["They speak very loudly.", "They don’t talk much."], 0]])));
 const examples4="— What is he like?  \n— He is helpful. He helps me at home.\n\n— What does he look like?  \n— He is tall. He has short straight hair.\n\n— What is she like?  \n— She is quiet.\n\n— What does she look like?  \n— She has long curly hair and green eyes.";
@@ -80,7 +85,7 @@ l5.push(stage('Speaking',2,kit.speaking({
  use:[{words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...']}]
 })));
 const meanings5=[['food','еда'],['drink','напиток'],['furniture','мебель'],['clothing','одежда'],['building','здание'],['shop','магазин']];
-l5.push(stage('Words · Matching',2.5,S('L5-M02','Соедините слова и переводы.',[M('L5-word-translation','Соедините слова и переводы.',meanings5,[2,5,1,3,0,4])])));
+l5.push(stage('Word Pick',2.5,S('L5-M02','Соедините картинки и слова.',[pictureWords('L5-word-translation',5,words5,[2,5,1,4,0,3])])));
 l5.push(stage('Listen & Repeat',2,repeat(5,'L5-M03',words5,["We need some food for the party.", "I’d like a drink, please.", "There is new furniture in the living room.", "This shop has clothing for men and women.", "The library is an old building.", "There is a small shop near my house."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
 const groups5=E('L5-M04','matching','Посмотрите на шесть групп картинок. Соедините каждую группу с подходящим словом.',{layout:'picture-word',items:words5.map((word,i)=>({id:String(i+1),text:String.fromCharCode(65+i),alt:'Группа '+String.fromCharCode(65+i),correctId:'o'+i,imagePending:true,imageMediaRef:'L5-I'+String(i+1).padStart(2,'0')})),options:[5,2,0,4,1,3].map(i=>({id:'o'+i,text:words5[i]}))});
 const groupBriefs=["Изображения: muffin · rice · bread.\n\n", "Изображения: tea · juice · coffee.\n\n", "Изображения: sofa · wardrobe · armchair.\n\n", "Изображения: coat · jacket · hat.\n\n", "Изображения: house · hospital · library.\n\n", "Три отдельные сцены покупки:\n1. supermarket — полки с продуктами, корзина/тележка, касса, покупатель;\n2. магазин книг — стеллажи с книгами, ценники, касса, покупатель оплачивает книгу;\n3. магазин одежды — стойки/вешалки с одеждой, ценники, касса, покупатель выбирает или оплачивает вещь.\n\nДля сцен 2–3 не вводить новые английские названия магазинов. Эти авторские описания не показываются ученику."];
@@ -121,7 +126,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion='v7_FINAL+approved-speaking-2026-10-03';
+ lesson.contentVersion='v7_FINAL+speaking-word-pick-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }
