@@ -87,3 +87,5 @@
 - Latest appearance (2026-10-03 evening) supersedes orange/grey surfaces: all light-theme workspace control and content surfaces are white, including OK/arrows, sidebar selectors/session buttons, menus, answer fields, correction panels and audio-player surfaces. No orange fill or outline. Preserve shadows, readable text/icons, audio progress and correct/incorrect indicators. Dark-theme contrast remains supported.
 
 - Guided Discovery model examples must emphasize the target constructions in bold using shared text-block `highlights`. Include every construction needed to answer the discovery questions.
+
+- Bold only the target grammar/construction in Discovery examples and rule prompts, never the following content nouns/adjectives (e.g. furniture, drink, clothing, big cushion). Gap prompts use item.highlights for the same emphasis.

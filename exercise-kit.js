@@ -1225,7 +1225,11 @@
           if (def.preserveLines) row.style.whiteSpace = 'pre-wrap';
           if (!modern && !compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
           item.segments.forEach(segment => {
-            if (typeof segment === 'string') { row.append(doc.createTextNode(segment)); return; }
+            if (typeof segment === 'string') {
+              if(item.highlights?.length) row.append(...Array.from(richText(segment,item.highlights).childNodes));
+              else row.append(doc.createTextNode(segment));
+              return;
+            }
             gapNumber += 1;
             const number = gapNumber;
             const label = `Sentence ${index + 1}, gap ${segment.id}`;
