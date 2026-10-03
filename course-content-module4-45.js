@@ -194,6 +194,32 @@ l4.push(stage('Final · Speaking',5,kit.speaking({
   {words:['long hair','short hair','brown hair','blonde hair'],phrases:['What does he/she look like?','He/She has ...']}
  ]
 })));
+
+const acceptedEnglish=(...values)=>[...new Set(values.flatMap(value=>{
+ const clean=String(value).trim(), noPunctuation=clean.replace(/[.!?]$/,'');
+ const curly=clean.replace(/'/g,'’'), curlyNoPunctuation=curly.replace(/[.!?]$/,'');
+ return [clean,noPunctuation,curly,curlyNoPunctuation];
+}))];
+
+const l4Homework1=[
+ ['Какой Джейк?',acceptedEnglish('What is Jake like?',"What's Jake like?"),null,'Jake'],
+ ['Джейк грубый и шумный.',acceptedEnglish('Jake is rude and noisy.','He is rude and noisy.',"He's rude and noisy."),null,'Jake'],
+ ['Как выглядит Нора?',acceptedEnglish('What does Nora look like?'),null,'Nora'],
+ ['У Норы длинные каштановые волосы.',acceptedEnglish('Nora has long brown hair.','She has long brown hair.'),null,'Nora'],
+ ['Какая Эмма?',acceptedEnglish('What is Emma like?',"What's Emma like?"),null,'Emma'],
+ ['Эмма вежливая и готовая помочь.',acceptedEnglish('Emma is polite and helpful.','She is polite and helpful.',"She's polite and helpful."),null,'Emma']
+];
+const l4Homework2=[
+ ['Как выглядит Бен?',acceptedEnglish('What does Ben look like?'),null,'Ben'],
+ ['У Бена короткие светлые волосы.',acceptedEnglish('Ben has short blonde hair.','He has short blonde hair.'),null,'Ben'],
+ ['Какая Лили?',acceptedEnglish('What is Lily like?',"What's Lily like?"),null,'Lily'],
+ ['Лили тихая.',acceptedEnglish('Lily is quiet.','She is quiet.',"She's quiet."),null,'Lily'],
+ ['Какой Макс?',acceptedEnglish('What is Max like?',"What's Max like?"),null,'Max'],
+ ['Макс ленивый.',acceptedEnglish('Max is lazy.','He is lazy.',"He's lazy."),null,'Max']
+];
+l4.push(stage('Homework 1',0,W('L4-homework-1','Translate into English.',l4Homework1,true,'Переведите вопросы и ответы на английский.'),'Вопросы о характере и внешности перемешаны; каждая строка проверяется отдельно.','self-study'));
+l4.push(stage('Homework 2',0,W('L4-homework-2','Translate into English.',l4Homework2,true,'Переведите вопросы и ответы на английский.'),'Используйте What is ... like? для характера и What does ... look like? для внешности.','self-study'));
+
 const l5=[];
 l5.push(stage('Speaking',2,kit.speaking({
  id:'L5-M01',
@@ -282,11 +308,6 @@ l5.push(stage('Final · Speaking',5,kit.speaking({
  ]
 })));
 
-const acceptedEnglish=(...values)=>[...new Set(values.flatMap(value=>{
- const clean=String(value).trim(), noPunctuation=clean.replace(/[.!?]$/,'');
- const curly=clean.replace(/'/g,'’'), curlyNoPunctuation=curly.replace(/[.!?]$/,'');
- return [clean,noPunctuation,curly,curlyNoPunctuation];
-}))];
 const categoryAnswer=(subject,article,category)=>acceptedEnglish(
  `${article}${subject} is a kind of ${category}.`,
  `${article}${subject} is a type of ${category}.`,
@@ -294,10 +315,6 @@ const categoryAnswer=(subject,article,category)=>acceptedEnglish(
  `It is a kind of ${category}.`, `It's a kind of ${category}.`,
  `It is a type of ${category}.`, `It's a type of ${category}.`,
  `It is a sort of ${category}.`, `It's a sort of ${category}.`
-);
-const similarityAnswer=(subject,article,comparison)=>acceptedEnglish(
- `${article}${subject} is like ${comparison}.`,
- `It is like ${comparison}.`, `It's like ${comparison}.`
 );
 const categoryQuestion=(term,article='')=>acceptedEnglish(
  `What is ${article}${term}?`,
@@ -307,37 +324,33 @@ const similarityQuestion=(term,article='')=>acceptedEnglish(
  `What is ${article}${term} like?`,
  `What's ${article}${term} like?`
 );
+const categoryAndSimilarity=(subject,article,category,comparison)=>acceptedEnglish(
+ `${article}${subject} is a kind of ${category}. It is like ${comparison}.`,
+ `${article}${subject} is a kind of ${category}. It's like ${comparison}.`,
+ `${article}${subject} is a type of ${category}. It is like ${comparison}.`,
+ `${article}${subject} is a type of ${category}. It's like ${comparison}.`,
+ `${article}${subject} is a sort of ${category}. It is like ${comparison}.`,
+ `${article}${subject} is a sort of ${category}. It's like ${comparison}.`
+);
 
-const homeworkSimilarity5=[
+const l5Homework1=[
  ['На что похож бинбэг?',similarityQuestion('beanbag','a '),null,'beanbag'],
- ['Бинбэг похож на большую подушку.',similarityAnswer('beanbag','A ','a big cushion'),null,'beanbag'],
- ['На что похоже бабл-ти?',similarityQuestion('bubble tea'),null,'bubble tea'],
- ['Бабл-ти похоже на чай.',similarityAnswer('bubble tea','', 'tea'),null,'bubble tea'],
- ['На что похоже пончо?',similarityQuestion('poncho','a '),null,'poncho'],
- ['Пончо похоже на одеяло.',similarityAnswer('poncho','A ','a blanket'),null,'poncho'],
- ['На что похоже иглу?',similarityQuestion('igloo','an '),null,'igloo'],
- ['Иглу похоже на маленький дом.',similarityAnswer('igloo','An ','a small house'),null,'igloo'],
- ['На что похоже бао?',acceptedEnglish(...similarityQuestion('bao'),...similarityQuestion('bao','a ')),null,'bao'],
- ['Бао похоже на булочку.',acceptedEnglish(...similarityAnswer('bao','', 'a bun'),...similarityAnswer('bao','A ','a bun')),null,'bao'],
- ['На что похож киоск?',similarityQuestion('kiosk','a '),null,'kiosk'],
- ['Киоск похож на маленький супермаркет.',similarityAnswer('kiosk','A ','a small supermarket'),null,'kiosk']
-];
-const homeworkCategory5=[
- ['Что такое бинбэг?',categoryQuestion('beanbag','a '),null,'beanbag'],
- ['Бинбэг — это вид мебели.',categoryAnswer('beanbag','A ','furniture'),null,'beanbag'],
+ ['Бинбэг — это вид мебели. Он похож на большую подушку.',categoryAndSimilarity('beanbag','A ','furniture','a big cushion'),null,'beanbag'],
  ['Что такое бабл-ти?',categoryQuestion('bubble tea'),null,'bubble tea'],
  ['Бабл-ти — это вид напитка.',categoryAnswer('bubble tea','', 'drink'),null,'bubble tea'],
- ['Что такое пончо?',categoryQuestion('poncho','a '),null,'poncho'],
- ['Пончо — это вид одежды.',categoryAnswer('poncho','A ','clothing'),null,'poncho'],
  ['Что такое иглу?',categoryQuestion('igloo','an '),null,'igloo'],
- ['Иглу — это вид здания.',categoryAnswer('igloo','An ','building'),null,'igloo'],
- ['Что такое бао?',acceptedEnglish(...categoryQuestion('bao'),...categoryQuestion('bao','a ')),null,'bao'],
- ['Бао — это вид еды.',acceptedEnglish(...categoryAnswer('bao','', 'food'),...categoryAnswer('bao','A ','food')),null,'bao'],
- ['Что такое киоск?',categoryQuestion('kiosk','a '),null,'kiosk'],
- ['Киоск — это вид магазина.',categoryAnswer('kiosk','A ','shop'),null,'kiosk']
+ ['Иглу — это вид здания.',categoryAnswer('igloo','An ','building'),null,'igloo']
 ];
-l5.push(stage('Homework 1',0,W('L5-homework-1','Translate into English.',homeworkSimilarity5,true,'Переведите вопросы и ответы на английский.'),'Каждая строка проверяется отдельно; подсказка в поле показывает только написание необычного слова.','self-study'));
-l5.push(stage('Homework 2',0,W('L5-homework-2','Translate into English.',homeworkCategory5,true,'Переведите вопросы и ответы на английский.'),'Kind, type и sort принимаются как правильные варианты одной функции.','self-study'));
+const l5Homework2=[
+ ['На что похоже пончо?',similarityQuestion('poncho','a '),null,'poncho'],
+ ['Пончо — это вид одежды. Оно похоже на одеяло.',categoryAndSimilarity('poncho','A ','clothing','a blanket'),null,'poncho'],
+ ['Что такое бао?',acceptedEnglish(...categoryQuestion('bao'),...categoryQuestion('bao','a ')),null,'bao'],
+ ['Бао — это вид еды. Он похож на булочку.',acceptedEnglish(...categoryAndSimilarity('bao','', 'food','a bun'),...categoryAndSimilarity('bao','A ','food','a bun')),null,'bao'],
+ ['На что похож киоск?',similarityQuestion('kiosk','a '),null,'kiosk'],
+ ['Киоск — это вид магазина. Он похож на маленький супермаркет.',categoryAndSimilarity('kiosk','A ','shop','a small supermarket'),null,'kiosk']
+];
+l5.push(stage('Homework 1',0,W('L5-homework-1','Translate into English.',l5Homework1,true,'Переведите вопросы и ответы на английский.'),'В одном задании смешаны category и similarity; каждая строка проверяется отдельно.','self-study'));
+l5.push(stage('Homework 2',0,W('L5-homework-2','Translate into English.',l5Homework2,true,'Переведите вопросы и ответы на английский.'),'Kind, type и sort принимаются как правильные варианты; like используется для сходства.','self-study'));
 function attach(value,slots){
  if(!value||typeof value!=='object')return;
  if(value.imageMediaRef){const slot=slots[value.imageMediaRef];if(slot?.src)Object.assign(value,{image:slot.src,imagePending:false});}
@@ -354,7 +367,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'ready',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-homework-translation-placeholders-2026-10-03';
+ lesson.contentVersion=i===0?'approved-l4-homework-translation-2026-10-03':'approved-l5-homework-mixed-translation-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }

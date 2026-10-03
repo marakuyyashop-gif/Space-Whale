@@ -15,7 +15,24 @@ const find=id=>{let found;lessons.forEach(l=>l.stages.forEach(s=>walk(s.exercise
 function click(v,selector){v.host.querySelector(selector).dispatchEvent(new v.window.Event('click',{bubbles:true,cancelable:true}));}
 test('revision is isolated to L4/L5, with 30-minute plan including reserve and separate homework',()=>{
  for(const l of app.SpaceWhaleContent)if(prior.has(l.id)&&l.id!=='a1-2-w4-l4')assert.equal(JSON.stringify(l),prior.get(l.id));
- for(const l of lessons){assert.equal(app.SpaceWhaleContent.filter(x=>x.id===l.id).length,1);assert.equal(l.stages.filter(s=>s.section==='tasks').reduce((a,s)=>a+parseFloat(s.guide.time),l.reserveMinutes),30);assert.equal(l.stages.filter(s=>s.section==='self-study').length,l.id==='a1-2-w4-l4'?0:2);}
+ for(const l of lessons){assert.equal(app.SpaceWhaleContent.filter(x=>x.id===l.id).length,1);assert.equal(l.stages.filter(s=>s.section==='tasks').reduce((a,s)=>a+parseFloat(s.guide.time),l.reserveMinutes),30);assert.equal(l.stages.filter(s=>s.section==='self-study').length,2);}
+});
+test('L4 and L5 homework each have two six-line keyed translation tasks',()=>{
+ for(const lessonId of ['a1-2-w4-l4','a1-2-w4-l5']){
+  const lesson=lessons.find(l=>l.id===lessonId),homework=lesson.stages.filter(s=>s.section==='self-study');
+  assert.deepEqual(Array.from(homework,s=>s.menu),['Homework 1','Homework 2']);
+  for(const stage of homework){
+   assert.equal(stage.exercise.kind,'writing');
+   assert.equal(stage.exercise.responseMode,'accepted');
+   assert.equal(stage.exercise.items.length,6);
+   assert.ok(stage.exercise.items.every(item=>item.acceptedAnswers?.length));
+  }
+ }
+ const l5h1=find('L5-homework-1'),l5h2=find('L5-homework-2');
+ assert.deepEqual(Array.from(l5h1.items,i=>i.placeholder),['beanbag','beanbag','bubble tea','bubble tea','igloo','igloo']);
+ assert.deepEqual(Array.from(l5h2.items,i=>i.placeholder),['poncho','poncho','bao','bao','kiosk','kiosk']);
+ const allL4=lessons.find(l=>l.id==='a1-2-w4-l4').stages.filter(s=>s.section==='self-study').flatMap(s=>s.exercise.items.map(i=>i.prompt)).join(' ');
+ for(const word of ['грубый','шумный','вежливая','готовая помочь','тихая','ленивый'])assert.ok(allL4.includes(word));
 });
 test('every exercise mounts, objective keys grade correctly and unrelated answers fail',()=>{
  for(const l of lessons)for(const s of l.stages)walk(s.exercise,d=>{
