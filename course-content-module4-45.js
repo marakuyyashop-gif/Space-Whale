@@ -18,19 +18,21 @@ const C=(id,title,rows)=>E(id,'choice',title,{items:rows.map(([prompt,options,ke
 const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{responseMode:accepted?'accepted':'open',revealPossibleAnswers:!accepted,instruction,items:rows.map(([prompt,answers,hint],i)=>({id:String(i+1),prompt,...(hint?{hint}:{}),[accepted?'acceptedAnswers':'possibleAnswers']:Array.isArray(answers)?answers:[answers]}))});
 const M=(id,title,rows,order)=>E(id,'matching',title,{items:rows.map(([text],i)=>({id:String(i+1),text,correctId:'o'+i})),options:order.map(i=>({id:'o'+i,text:rows[i][1]}))});
 const l5WordPicSheet='Images/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png';
-const l5WordPicCrops={
- food:{x:0,y:0,w:33.333,h:50},
- drink:{x:33.333,y:0,w:33.333,h:50},
- furniture:{x:66.666,y:0,w:33.334,h:50},
- clothing:{x:0,y:50,w:33.333,h:50},
- building:{x:33.333,y:50,w:33.333,h:50},
- shop:{x:66.666,y:50,w:33.334,h:50}
-};
+const l5WordPicOrder=['furniture','drink','clothing','building','food','shop'];
+const l5WordPicCrops=[
+ {x:0,y:0,w:33.333,h:50},
+ {x:33.333,y:0,w:33.333,h:50},
+ {x:66.666,y:0,w:33.334,h:50},
+ {x:0,y:50,w:33.333,h:50},
+ {x:33.333,y:50,w:33.333,h:50},
+ {x:66.666,y:50,w:33.334,h:50}
+];
 const pictureWords=(id,lesson,words,order)=>E(id,'matching','Соедините картинки и слова.',{
  layout:'picture-word',
- items:words.map((word,i)=>{
-  const sheetCrop=lesson===5?l5WordPicCrops[word]:null;
-  return {id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+i,
+ items:(lesson===5?l5WordPicOrder:words).map((word,i)=>{
+  const sheetCrop=lesson===5?l5WordPicCrops[i]:null;
+  const wordIndex=words.indexOf(word);
+  return {id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+wordIndex,
    image:sheetCrop?l5WordPicSheet:`assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp`,
    ...(sheetCrop?{crop:sheetCrop}:{imageWidth:480,imageHeight:600})
   };
@@ -299,7 +301,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'ready',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-word-pic-f988-2026-10-03';
+ lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-word-pic-f988-keyfix-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }
