@@ -189,8 +189,8 @@ test('read-only drag cannot mutate answers', () => {
 test('Listen & Repeat retains prior rows and playing a second recording pauses the first', async () => {
   const s=setup('listen-repeat-demo');s.fire(s.host.querySelector('.ek-repeat-play'),'click');await Promise.resolve();
   const first=s.host.querySelector('audio');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item:not([hidden])').length,1);
-  s.click('Next phrase');assert.equal(first.paused,false);assert.equal(s.host.querySelectorAll('.ek-repeat-item:not([hidden])').length,2);
-  s.fire(s.host.querySelectorAll('.ek-repeat-play')[1],'click');await Promise.resolve();
+  s.click('Next phrase');assert.equal(first.paused,true);assert.equal(s.host.querySelectorAll('.ek-repeat-item:not([hidden])').length,2);
+  await Promise.resolve();
   const second=s.host.querySelectorAll('audio')[1];assert.notEqual(first,second);assert.equal(first.paused,true);assert.equal(second.paused,false);assert.equal(s.button('Next phrase'),undefined);
   s.mount.destroy();assert.equal(second.paused,true);
 });
@@ -464,15 +464,15 @@ test('writing uses one line; picture choices retain accessible names without vis
 });
 
 
-test('writing checks reveal possible answers only after OK; edits, reset and remote restore agree',()=>{
+test('open writing shows Well done without model answers; edits, reset and remote restore agree',()=>{
   const s=setup('writing-demo',{syncChecks:true});const input=s.host.querySelector('input');
   assert.ok(s.button('OK'));assert.equal(s.host.querySelector('.ek-writing-answers'),null);
   s.click('OK');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
   input.value='My own response';s.fire(input,'input');s.click('OK');
-  assert.ok(s.host.querySelector('.ek-writing-answers').textContent.includes('[Possible answer]'));
+  assert.equal(s.host.querySelector('.ek-writing-answers'),null);assert.equal(s.host.querySelector('.ek-status').textContent,'Well done');
   assert.equal(input.dataset.feedback,'review');assert.equal(input.value,'My own response');assert.ok(s.button('OK'));
   const snapshot=s.mount.getAnswers();const peer=setup('writing-demo',{syncChecks:true});peer.mount.setAnswers(snapshot);
-  assert.ok(peer.host.querySelector('.ek-writing-answers'));assert.equal(peer.host.querySelector('input').value,'My own response');
+  assert.equal(peer.host.querySelector('.ek-writing-answers'),null);assert.equal(peer.host.querySelector('.ek-status').textContent,'Well done');assert.equal(peer.host.querySelector('input').value,'My own response');
   input.value='Another response';s.fire(input,'input');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
   s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-writing-answers'),null);assert.equal(s.host.querySelector('input').value,'');
 });
@@ -548,14 +548,14 @@ test('actual personal form keeps source with first task; gender is neutral and O
   assert.equal(teacher.host.querySelectorAll('input[type=text]').length,5);
   assert.equal(teacher.host.querySelector('input[type=radio]'),null);
   const input=teacher.host.querySelector('input');input.value='Alex';teacher.fire(input,'input');teacher.click('OK');
-  assert.ok(teacher.host.querySelector('.ek-writing-answers').textContent.includes('Alex'));
+  assert.equal(teacher.host.querySelector('.ek-writing-answers'),null);
   teacher.click('Show next exercise');student.mount.setViewState(view);
   for(const screen of [teacher,student])assert.equal(screen.host.querySelectorAll('input[type=radio]').length,2);
   const section=[...teacher.host.querySelectorAll('.ek-stage-section')].find(el=>el.querySelector('input[type=radio]'));
   for(const radio of section.querySelectorAll('input[type=radio]')){
     radio.checked=true;teacher.fire(radio,'change');teacher.fire(section.querySelector('.ek-check'),'click');
     assert.equal(section.querySelector('fieldset').dataset.feedback,'review');
-    assert.match(section.querySelector('.ek-status').textContent,/нет единственного/);
+    assert.equal(section.querySelector('.ek-status').textContent,'Well done');
     assert.ok(section.querySelector('.ek-check'));assert.equal(section.querySelector('[data-feedback=retry]'),null);
   }
   const before=student.mount.getViewState();student.mount.setAnswers(teacher.mount.getAnswers());
@@ -602,7 +602,7 @@ test('accepted writing grades alternatives, reveals corrections and synchronizes
   s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-correction'),null);
   const free=setup(fixture('writing-template').exercises[1].exercise);
   const input=free.host.querySelector('.ek-writing-input');input.value='Any personal response';free.fire(input,'input');free.click('OK');
-  assert.equal(input.dataset.feedback,'review');assert.match(free.host.querySelector('.ek-correction').textContent,/Possible answers/);
+  assert.equal(input.dataset.feedback,'review');assert.equal(free.host.querySelector('.ek-correction'),null);assert.equal(free.host.querySelector('.ek-status').textContent,'Well done');
 });
 test('audio composition starts with first response, retains source and hidden answers', () => {
   const s=setup('audio-task-template',{syncChecks:true});
@@ -650,12 +650,13 @@ test('Listen & Repeat reveals a cumulative plain list and synchronizes without r
  teacher.click('Next phrase');pupil.mount.setViewState(view);
  assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);assert.equal(pupil.button('Next phrase').hidden,true);
  pupil.click('Next phrase');assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);
- assert.equal(teacher.host.querySelector('audio'),first);assert.equal(first.paused,false);
- teacher.mount.setViewState(view);assert.equal(first.paused,false);
+ assert.equal(teacher.host.querySelector('audio'),first);assert.equal(first.paused,true);
+ assert.ok([...pupil.host.querySelectorAll('audio')].every(audio=>audio.paused));
+ teacher.mount.setViewState(view);assert.equal(first.paused,true);assert.equal(teacher.host.querySelectorAll('audio')[1].paused,false);
  teacher.click('Next phrase');pupil.mount.setViewState(view);
  assert.deepEqual(visible(pupil),['Bright','This shirt is bright.','Dark']);assert.equal(teacher.button('Next phrase'),undefined);
  assert.equal(teacher.host.querySelector('.ek-repeat-list strong, .ek-repeat-list b'),null);
- const last=teacher.host.querySelectorAll('audio')[2];teacher.fire(teacher.host.querySelectorAll('.ek-repeat-play')[2],'click');await Promise.resolve();
+ const last=teacher.host.querySelectorAll('audio')[2];await Promise.resolve();assert.equal(last.paused,false);
  teacher.click('Previous phrase');pupil.mount.setViewState(view);assert.equal(last.paused,true);
  assert.deepEqual(visible(pupil),['Bright','This shirt is bright.']);
  teacher.click('Next phrase');assert.equal(teacher.host.querySelectorAll('audio')[2],last);
@@ -667,8 +668,7 @@ test('writing hints sit under the field and never enter submitted answer example
  const s=setup(def),input=s.host.querySelector('input'),hint=s.host.querySelector('.ek-writing-hint');
  assert.equal(input.nextElementSibling,hint);assert.equal(input.getAttribute('aria-describedby'),hint.id);
  input.value='It looks very warm.';s.fire(input,'input');s.click('OK');
- const feedback=s.host.querySelector('.ek-writing-answers');assert.match(feedback.textContent,/How does it look\?/);assert.doesNotMatch(feedback.textContent,/Use:/);
- assert.equal(feedback.querySelector('.ek-answer-pairs strong').textContent,'It looks warm.');assert.equal(input.dataset.feedback,'review');
+ assert.equal(s.host.querySelector('.ek-writing-answers'),null);assert.equal(s.host.querySelector('.ek-status').textContent,'Well done');assert.equal(input.dataset.feedback,'review');
  assert.throws(()=>kit.validate({...def,items:[{...def.items[0],hint:42}]}),/hint/);
 });
 test('opening a disclosure scrolls its complete content, with the beginning taking priority',()=>{

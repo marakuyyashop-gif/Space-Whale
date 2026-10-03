@@ -100,13 +100,13 @@ test('repeated listening details reveal one by one and transcript waits for all 
  s.handle.setAnswers({...s.handle.getAnswers(),'A2_MOVE_M06-details':{'1':'A','2':'C','3':'B',__sw_choice_checked:['1','2','3'],__sw_choice_revealed:3,__sw_checked:true}});
  assert.equal(detail().hidden,false);assert.ok(!detail().open);assert.equal(s.host.querySelector('.ek-audio-player'),player);
 });
-test('multiline Writing saves newlines, restores shared answers and reveals examples only after OK',()=>{
+test('multiline Writing saves newlines, restores shared answers and confirms without automatic examples',()=>{
  const def=find('A2_SEQ_M06'),s=setup(def),area=s.host.querySelector('textarea');assert.ok(area);
  assert.equal(s.host.querySelectorAll('.ek-writing-input').length,1);assert.equal(s.host.querySelectorAll('details').length,1);
  area.value='First, I waited.\nLater, the bus arrived.';s.fire(area,'input');
  assert.equal(s.handle.getAnswers()['A2_SEQ_M06-writing'].message,area.value);
  s.click('Check answers');const samples=[...s.host.querySelectorAll('details')].find(d=>d.querySelector('summary').textContent==='Possible answers');
- assert.ok(samples);assert.ok(!samples.open);assert.match(s.host.textContent,/Ответ записан/);
+ assert.equal(samples,undefined);assert.match(s.host.textContent,/Well done/);
  const student=setup(def,{navigationReadOnly:true});student.handle.setAnswers(s.handle.getAnswers());assert.equal(student.host.querySelector('textarea').value,area.value);
  s.handle.setAnswers({'A2_SEQ_M06-writing':{message:'Another\nmessage'}});assert.equal(s.host.querySelector('textarea'),area);assert.equal(area.value,'Another\nmessage');
  s.click('Reset exercise');assert.equal(s.host.querySelector('textarea').value,'');

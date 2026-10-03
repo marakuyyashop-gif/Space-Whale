@@ -4,7 +4,8 @@
 // L4/L5 opening and final Speaking use docs/SPEAKING_TEMPLATE.md (approved 2026-10-03).
 // L4 tasks 3–10: owner-approved replacement on 2026-10-03.
 // New task identities have new IDs; retained Speaking/Word Pick/media IDs stay stable.
-// L5 remains based on v7; L4 Listening awaits the continuation.
+// L4 uses the approved Nick/Emma listening continuation and revised rule/questions.
+// L5 content remains based on v7.
 // Media scripts are ready; recordings remain explicitly pending.
 const kit=window.SpaceWhaleExerciseKit, registry=window.SpaceWhaleLessonMedia;
 const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
@@ -43,7 +44,7 @@ const l4=[];
 l4.push(stage('Speaking',2,kit.speaking({
  id:'L4-M01',
  title:'Describe your new neighbors',
- image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/8566029d-525c-4963-93f5-2e8f36741973.png',alt:'Два соседа в шести бытовых ситуациях.',imageWidth:1448,imageHeight:1086},
+ image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/4ebce181-0d97-4783-903a-db13ce05549d.png',alt:'Два соседа в шести бытовых ситуациях.',imageWidth:1448,imageHeight:1086},
  task:{
   text:'В ваш район переехали новые соседи. Вы уже с ними познакомились, и ваш друг расспрашивает вас о них. Расскажите ему:',
   bullets:['какие они;','как они выглядят.']
@@ -64,7 +65,7 @@ l4.push(stage('Listen & Repeat',2,repeat(4,'L4-M03',words4,[
  'Our neighbors are noisy at night.'
 ])));
 const gap4=(id,before,answer,after,options)=>({id,segments:[before,{id,answers:[answer],...(options?{options}:{})},after]});
-l4.push(stage('Dropdown Gap',2.5,E('L4-dropdown-gap','gaps','Complete the sentences with the correct words.',{
+const dropdown4=E('L4-dropdown-gap','gaps','Complete the sentences with the correct words.',{
  inputMode:'select',instruction:'Choose the correct options.',items:[
   gap4('1','I can’t hear you. The people next to me are very ','noisy','. Can you say it again, please?',['quiet','noisy','helpful']),
   gap4('2','I don’t have a charger. Eva is ','helpful',' and gives me one.',['lazy','rude','helpful']),
@@ -72,7 +73,7 @@ l4.push(stage('Dropdown Gap',2.5,E('L4-dropdown-gap','gaps','Complete the senten
   gap4('4','“Give me your sandwich!” — “Don’t be ','rude','. Say ‘please’.”',['helpful','quiet','rude']),
   gap4('5','Sam is ','quiet',' at school, he doesn’t talk with his classmates.',['noisy','quiet','lazy'])
  ]
-})));
+});
 const typed4=[
  gap4('1','Anna is always very ','helpful','. She helps me carry these boxes.'),
  gap4('2','Max is so ','lazy',', he never wants to help at home.'),
@@ -87,50 +88,61 @@ typed4.forEach((item,i)=>{
  ][i]};
  Object.assign(item,{imagePending:true,imageMediaRef:ref,assetId:ref,imageWidth:480,imageHeight:600});
 });
-l4.push(stage('Typed Gap',2.5,E('L4-typed-gap','gaps','Complete the sentences.',{
+const typedGap4=E('L4-typed-gap','gaps','Complete the sentences.',{
  inputMode:'text',layout:'picture-rows',instruction:'Посмотрите на картинки и впишите подходящие слова из урока.',items:typed4
-})));
-const rule4=E('L4-question-rule','rule-page','Как спросить о человеке',{
- blocks:[{type:'rule',text:'Вопросы What is he/she like? и What does he/she look like? помогают узнать разную информацию о человеке.\n\nWhat is he/she like? — «Какой он / какая она?» Так спрашивают о характере и поведении. В ответе можно использовать He/She is + прилагательное.\n\n— What is he like?\n— He is quiet and polite.\n\nWhat does he/she look like? — «Как он / она выглядит?» Так спрашивают о внешности. Чтобы описать волосы, используйте He/She has + описание волос.\n\n— What does she look like?\n— She has short curly hair.\n\nВ первом вопросе используется is, во втором — does + look. После does у look нет окончания -s. Повторять look like в ответе не нужно.\n\nНе путайте эти вопросы с What does she like? — «Что ей нравится?» Это вопрос о предпочтениях.',
- highlights:['What is he/she like?','What does he/she look like?','He/She is + прилагательное','What is he like?','He/She has + описание волос','What does she look like?','does + look','look like','What does she like?']
- }]
 });
+l4.push(stage('Word Practice',4,S('L4-word-practice','Complete the sentences.',[dropdown4,typedGap4],{requireCheckBeforeNext:true})));
+const rule4=E('L4-question-rule','rule-page','Как спросить о человеке',{blocks:[{type:'rule',text:"В английском языке вопросы What is he/she like? и What does he/she look like? используются, когда мы хотим узнать разную информацию о человеке.\n\n1. What is he/she like?\n\nИспользуйте What is he/she like?, чтобы спросить, какой человек по характеру или поведению.\n\nWhat is she like? — Какая она?\nShe is polite and helpful. — Она вежливая и готовая помочь.\n\nВ ответе используйте be + adjective:\n\nHe is quiet.\nShe is rude.\n\n2. What does he/she look like?\n\nИспользуйте What does he/she look like?, чтобы спросить, как человек выглядит.\n\nWhat does she look like? — Как она выглядит?\nShe has long brown hair. — У неё длинные каштановые волосы.\n\nДля описания внешности можно использовать have/has + noun:\n\nHe has short straight hair.\nShe has long curly hair.\n\n3. What does he/she like?\n\nНе путайте What is she like? и What does she like?\n\nWhat does she like? означает «Что ей нравится?»\n\nWhat does she like? — Что ей нравится?\nShe likes music. — Ей нравится музыка.",highlights:['What is he/she like?','What does he/she look like?','What does he/she like?','What is she like?','What does she look like?','What does she like?','be + adjective','have/has + noun']}]});
 const discovery4=E('L4-complete-rule','gaps','Complete the rules.',{
  inputMode:'select',instruction:'Choose the correct options.',items:[
   gap4('1','Используем What does she look like?, когда хотим узнать ','как она выглядит','.', ['какая она в общении','как она выглядит','что она любит']),
   gap4('2','Используем What is she like?, когда хотим узнать ','какая она в общении','.', ['как она выглядит','что она любит','какая она в общении'])
  ]
 });
-l4.push(stage('Complete the Rule · Rule',4,S('L4-discovery-rule','Complete the rules.',[
+l4.push(stage('Complete the Rule',3,S('L4-discovery-rule','Complete the rules.',[
  P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),highlights:['look like?','like?']}]),
  discovery4,rule4
 ],{revealStops:[2,3],requireCheckBeforeNext:true})));
-l4.push(stage('Multiple Select',2,E('L4-multiple-select','choice','Choose the answers.',{
- multiple:true,instruction:'Отметьте все правильные ответы.',items:[
-  {id:'1',prompt:'What does she look like?',options:[
-   'She is helpful.','Her hair is long.','She is rude.','She has curly brown hair.','She is lazy.','Her hair is short and straight.'
-  ].map((text,i)=>({id:String(i+1),text})),correctIds:['2','4','6']},
-  {id:'2',prompt:'What is he like?',options:[
-   'He is quiet.','His hair is short.','He is polite.','He is noisy.','He has straight hair.','His hair is long.'
-  ].map((text,i)=>({id:String(i+1),text})),correctIds:['1','3','4']}
- ]
-})));
+const dialogue4='Ben: I want to invite our new neighbors for coffee. Do you know them?\n\nLisa: Yes. Their names are Nick and Emma.\n\nBen: What is Nick like?\n\nLisa: He’s really helpful. He often helps me with my bike.\n\nBen: What does he look like?\n\nLisa: He has short curly hair.\n\nBen: And Emma? What is she like?\n\nLisa: She’s polite and quiet.\n\nBen: What does she look like?\n\nLisa: She has long straight hair.\n\nBen: Do you have their phone number?\n\nLisa: Yes, I do. Here it is.\n\nBen: Great, thanks!';
+const listeningTitle4='Listen to the audio and answer the questions.';
+l4.push(stage('Listening',4,S('L4-neighbors-listening',listeningTitle4,[
+ E('L4-neighbors-player','audio',listeningTitle4,{mediaRef:addAudio(4,'L4-NICK-EMMA-D01',dialogue4),audioPending:true}),
+ E('L4-listening-multiple','choice','Choose the answers.',{
+  multiple:true,items:[
+   {id:'emma',prompt:'What is Emma like?',options:['polite','quiet','helpful','noisy'].map((text,i)=>({id:String(i+1),text})),correctIds:['1','2']},
+   {id:'nick',prompt:'What does Nick look like?',options:['He has short hair.','He has curly hair.','He has long hair.','He has straight hair.'].map((text,i)=>({id:String(i+1),text})),correctIds:['1','2']}
+  ]
+ }),
+ C('L4-listening-purpose','Choose the correct answer.',[
+  ['What does Ben want to do?',['Visit his sister.','Invite his new neighbors for coffee.','Have dinner with his parents.'],1]
+ ]),
+ E('L4-listening-true-false','gaps','Are the sentences true or false?',{
+  inputMode:'select',instruction:'Listen again.',items:[
+   gap4('1','Nick often helps Lisa with her bike. ','True','',['True','False']),
+   gap4('2','Emma is noisy. ','False','',['True','False']),
+   gap4('3','Lisa has Nick and Emma’s phone number. ','True','',['True','False']),
+   gap4('4','Ben wants to invite Nick and Emma for coffee. ','True','',['True','False'])
+  ]
+ }),
+ P('L4-listening-script',listeningTitle4,[D('Script',dialogue4,false)])
+],{revealStops:[2,3,5],requireCheckBeforeNext:true})));
 l4.push(stage('Matching',2,M('L4-question-answer-match','Match the questions with the answers.',[
  ['What is he like?','He’s a little lazy at home.'],
  ['What does she look like?','Her hair is short and curly.'],
  ['What does he look like?','He has long straight hair.'],
  ['What is she like?','She’s helpful. She often helps me with my homework.']
 ],[1,0,3,2])));
-l4.push(stage('Write the questions',3,W('L4-questions-for-answers','Write the questions for the answers.',[
- ['Jake is a very rude and lazy boy. He never helps his mom.',['What is Jake like?','What is he like?']],
- ['Nora has brown eyes and short hair.',['What does Nora look like?','What does she look like?']],
- ['Yes, she is tall and beautiful, she has long blonde hair.',['Is she tall and beautiful?','Does she have long blonde hair?']],
- ['My parents are very kind and smart.',['What are your parents like?','What are they like?']]
-],false,'Задайте вопрос к предложению.')));
+const questions4=[
+ ['Jake is very rude and lazy. He never helps his mom.',['What is Jake like?','What is he like?',"What's Jake like?","What's he like?",'What’s Jake like?','What’s he like?']],
+ ['Nora has brown eyes and short hair.',['What does she look like?','What does Nora look like?']],
+ ['She is tall and slim. She has long curly hair.',['What does she look like?']],
+ ['My parents are very kind and smart.',['What are they like?','What are your parents like?']]
+].map(([prompt,answers])=>[prompt,[...answers,...answers.map(answer=>answer.replace(/\?$/,''))]]);
+l4.push(stage('Write the questions',3,W('L4-questions-for-answers','Write the questions for the answers.',questions4,true,'Задайте вопрос к предложению.')));
 l4.push(stage('Final · Speaking',5,kit.speaking({
  id:'L4-M11',
  title:'Describe the new students',
- image:null,
+ image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/f55b31c3-30bd-4e45-9485-3a020903c8df.png',alt:'Две новые ученицы и ситуации, показывающие их характер и поведение.',imageWidth:1448,imageHeight:1086},
  task:{
   text:'В ваш класс пришли два новых ученика. Вы уже с ними познакомились, и ваш одноклассник расспрашивает вас о них. Расскажите ему:',
   bullets:['какие они;','как они выглядят.']
@@ -188,7 +200,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
- lesson.contentVersion=i===0?'approved-tasks-3-10-2026-10-03':'v7_FINAL+speaking-word-pick-2026-10-03';
+ lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'v7_FINAL+speaking-word-pick-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }

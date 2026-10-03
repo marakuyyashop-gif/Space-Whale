@@ -334,7 +334,7 @@
     const values=Object.values(results),correct=values.filter(value=>value==='correct').length;
     if(!values.length||values.every(value=>value==='empty'))return ['gaps','writing'].includes(kind)?'Write an answer.':'Choose an answer.';
     if(values.includes('retry')){const band=correct===0?0:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));return feedbackMessages[band];}
-    if(values.includes('review'))return values.includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. Обсудите его с преподавателем.';
+    if(values.includes('review'))return values.includes('empty')?'Заполните оставшиеся поля.':'Well done';
     const band=correct===0?0:correct===values.length?4:Math.max(1,Math.min(3,Math.round(correct/values.length*4)));
     return feedbackMessages[band];
   }
@@ -622,10 +622,12 @@
         return wrap;
       }
       const audio = node('audio'); audio.preload = 'auto'; audio.src = src; audio.setAttribute('aria-label', label);audio.dataset.ekAudioKey=(config.audioPath||def.id)+':'+key;
-      const play = button('▶', async () => {
+      const play = button('▶', async event => {
         if(config.audioReadOnly)return;
         host.querySelectorAll('audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
-        if (audio.paused) {
+        const autoplay=event.detail?.repeatAutoplay===true;
+        if (audio.paused||autoplay) {
+          if(autoplay)audio.currentTime=0;
           doc.querySelectorAll('.exercise-kit audio').forEach(other => { if (other !== audio && !other.paused) other.pause(); });
           try { await audio.play(); } catch { announce('Audio could not be played.'); }
         } else audio.pause();
@@ -1130,7 +1132,16 @@
               row.hidden=hidden;row.inert=hidden;
             });
             navigation.replaceChildren();
-            const control=(direction,index,label)=>{const b=button('',()=>{if(config.readOnly||config.navigationReadOnly)return;repeatIndex=index;syncRepeat(true);viewChanged();},'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
+            const control=(direction,index,label)=>{const b=button('',()=>{
+              if(config.readOnly||config.navigationReadOnly)return;
+              repeatIndex=index;syncRepeat(true);viewChanged();
+              // Use the same Play event path as a manual click so live audio transport
+              // broadcasts one teacher command. Remote view hydration never autoplays.
+              if(direction==='down'&&!config.audioReadOnly){
+                const play=rows[index].querySelector('.ek-repeat-play');
+                if(play&&!play.disabled)play.dispatchEvent(new doc.defaultView.CustomEvent('click',{bubbles:true,cancelable:true,detail:{repeatAutoplay:true}}));
+              }
+            },'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
             if(repeatIndex<steps.length-1)control('down',repeatIndex+1,'Next phrase');
             if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
             navigation.hidden=Boolean(config.navigationReadOnly);
@@ -1436,9 +1447,6 @@
       // Personal/open responses are never graded against example text.
       const attempted=Object.values(feedback).some(value=>value!=='empty');
       const examples=[];
-      if(def.kind==='writing')def.items.forEach(item=>{
-        if(!item.acceptedAnswers && feedback[item.id]!=='empty' && item.possibleAnswers?.length) examples.push([item.prompt,item.possibleAnswers.join(' / ')]);
-      });
       if(def.kind==='gaps')def.items.forEach(item=>item.segments.forEach(segment=>{
         if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
       }));
@@ -1459,7 +1467,7 @@
         else if(def.kind==='writing'){
           const pictures=def.items.filter(item=>needsSolution(item.id)&&(item.image||item.imagePending)&&item.acceptedAnswers?.length);
           pictureCorrections(pictures,item=>item.acceptedAnswers[0]);
-          def.items.forEach(item=>{if(needsSolution(item.id)&&!pictures.includes(item))pair(item.prompt,item.acceptedAnswers?.join(' / '));});
+          def.items.forEach(item=>{if(needsSolution(item.id)&&!pictures.includes(item))pair(item.prompt,item.acceptedAnswers?.[0]);});
         }
         else if(def.items)def.items.forEach(item=>{
           if(item.feedbackText){const row=node('li');row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
@@ -1474,7 +1482,7 @@
         const section=node('li','ek-correction ek-writing-answers'),container=def.revealPossibleAnswers?node('details','ek-disclosure'):section;container.append(node(def.revealPossibleAnswers?'summary':'strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));if(container!==section)section.append(container);
         const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});container.append(list);resultsBox.append(section);decorateDisclosures();
       }
-      if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Ответ записан. В этой анкете нет единственного правильного варианта.';
+      if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Well done';
       // Feedback contains the outcome and answers only. Teaching notes/rules belong
       // to an explicit followUp or stage revealed by the teacher, never here.
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);

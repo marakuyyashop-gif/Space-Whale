@@ -82,7 +82,7 @@ Typed gaps default to keyboard input. A bank is only a hint and may contain a ba
 
 Multiple Select uses checkboxes and exact set comparison; order of selected options does not matter. An omitted key requires teacher review.
 
-Useful Language disclosures open initially. Standalone Possible Answers disclosures and audio transcripts start closed. Writing has OK: authored `items[].possibleAnswers` appear in the feedback panel only after submission, never before it. Editing or resetting hides the examples again; synchronized checked state restores them. Examples are not accepted-answer keys. Open tasks never receive automatic correct/incorrect grades. For keyed writing use `responseMode:"accepted"` and a non-empty `acceptedAnswers` list on every item; omissions are rejected. For free writing use `responseMode:"open"` (or omit mode and keys). Open/personal modes reject conflicting keys. Keys normalize case, Unicode NFKC and whitespace only; author punctuation and contraction alternatives explicitly. Accepted writing uses the shared feedback and Correct answers panel; arbitrary paraphrases are not semantically graded. Personal forms can set `responseMode:"personal"` for a neutral confirmation. Do not invent correct keys for personal data.
+Useful Language disclosures open initially. Standalone Possible Answers disclosures and audio transcripts start closed. Writing has OK: completed open/personal responses show `Well done`, with no automatic Possible answers section. Legacy `items[].possibleAnswers` remain compatible data but are not rendered in Writing feedback. Open tasks never receive automatic correct/incorrect grades. For keyed writing use `responseMode:"accepted"` and a non-empty `acceptedAnswers` list on every item; omissions are rejected. For free writing use `responseMode:"open"` (or omit mode and keys). Open/personal modes reject conflicting keys. Keys normalize case, Unicode NFKC and whitespace only; author punctuation and contraction alternatives explicitly. Accepted writing uses the shared feedback and Correct answers panel: a muted prompt followed by the first accepted answer in bold. Other accepted variants are used for checking only; arbitrary paraphrases are not semantically graded. Personal forms can set `responseMode:"personal"` for a neutral confirmation. Do not invent correct keys for personal data.
 
 ## Interaction/state guarantees
 
@@ -96,6 +96,8 @@ Useful Language disclosures open initially. Standalone Possible Answers disclosu
 - `setAnswers` hydrates remote state without emitting another onChange. Read-only mounts block changes.
 - Global and per-item players stop other playing audio when starting.
 - Listen & Repeat reveals a cumulative list: word, example sentence, next word, next sentence. Both use the same normal-weight text style. The teacher's next arrow adds one row; earlier rows and their audio controls stay mounted and visible. The previous arrow hides only the last row. The existing `repeat` view-state index synchronizes this reveal with learners, who cannot advance it themselves.
+- The forward Listen & Repeat arrow also starts the newly revealed recording from its beginning. It dispatches a Play request inside the user's click so the live transport sends one synchronized teacher command. Remote view updates and backward arrows do not autoplay. Missing audio remains disabled. Play controls still allow manual replay.
+- Related vocabulary exercises belong to one progressive stage (e.g. Dropdown → Typed Gap), with `requireCheckBeforeNext:true` and separate checks, rather than separate lesson pages. Group by the same practice goal; new discovery and listening focuses get their own entries. Preserve each child ID when grouping.
 
 ## Changes to appearance
 
@@ -128,7 +130,7 @@ Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px ins
 ## Feedback contract (2026-09-26)
 
 - Closed tasks retain correct/retry indicators after OK. Incorrect or unanswered items in an attempted task reveal their authored solutions, including matching and picture tasks. Legacy `feedback.showAnswers:false` no longer suppresses these essential corrections in the modern workspace. Two-option choices and dropdowns also reveal corrections. When a gaps task has any mistake, its feedback shows all complete corrected sentences with muted context and highlighted answer spans.
-- Free writing and unkeyed gaps require teacher review; examples must be supplied by the author as `possibleAnswers`. No AI grammar or semantic grading is connected. Personal data can vary.
+- Free writing and unkeyed gaps require teacher review; no AI grammar or semantic grading is connected. Writing confirms completed input with `Well done` without showing examples. Personal data can vary.
 - OK remains available after checking. Changing a response clears old feedback; reset clears both answers and feedback.
 
 ## Pending source media and post-task transcript (2026-09-26)

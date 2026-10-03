@@ -149,9 +149,10 @@
       event.preventDefault();event.stopImmediatePropagation();if(!el.getAttribute('src'))return;
       const key=el.dataset.ekAudioKey;if(!key)return;
       const active=current?.key===key&&current.exercise_id===exerciseId();
-      const action=active&&current.action==='play'&&!player.ended?'pause':'play';
+      const autoplay=event.detail?.repeatAutoplay===true;
+      const action=!autoplay&&active&&current.action==='play'&&!player.ended?'pause':'play';
       // Prime while still inside the teacher's actual click (important on Safari).
-      const time=active&&!player.ended?(player.currentTime||0):0,id=exerciseId();
+      const time=!autoplay&&active&&!player.ended?(player.currentTime||0):0,id=exerciseId();
       const run=()=>{if(id===exerciseId())void issue(key,action,time);};
       if(!unlocked&&!current)void prime().then(run);else run();
     };

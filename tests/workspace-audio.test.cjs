@@ -1,18 +1,38 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),{parseHTML}=require('linkedom');
 const source=fs.readFileSync(require.resolve('../workspace-audio.js'),'utf8');
 const flush=()=>new Promise(r=>setImmediate(r));
-function fixture(teacher=false){
+function fixture(teacher=false,readyMedia=false){
  const {window,document}=parseHTML('<html><body><button id="enable"></button><main><div class="ek-repeat-audio"><audio data-ek-audio-key="phrase:word" src="word.wav"></audio><button class="ek-repeat-play">▶</button></div></main></body></html>');
  let clock=1000,id='exercise1',blocked=false;const timers=new Map(),sent=[],notices=[];let timerId=0;
  const original=document.createElement.bind(document);document.createElement=tag=>{const el=original(tag);if(tag==='audio'){
- el.paused=true;el.currentTime=0;el.duration=10;el.ended=false;Object.defineProperty(el,'src',{get:()=>el.getAttribute('src'),set:v=>el.setAttribute('src',v)});
+ el.paused=true;el.currentTime=0;el.duration=10;el.ended=false;if(readyMedia){el.readyState=3;el.load=()=>{};}Object.defineProperty(el,'src',{get:()=>el.getAttribute('src'),set:v=>el.setAttribute('src',v)});
  el.play=async()=>{if(blocked)throw Object.assign(Error('blocked'),{name:'NotAllowedError'});el.paused=false;el.dispatchEvent(new window.Event('play'));};el.pause=()=>{el.paused=true;el.dispatchEvent(new window.Event('pause'));};}return el;};
- vm.runInNewContext(source,{window,console,setTimeout:(fn,delay)=>{timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:n=>timers.delete(n)});
+ vm.runInNewContext(source,{window,console,...(readyMedia?{fetch:async src=>({ok:true,blob:async()=>src}),URL:{createObjectURL:src=>src,revokeObjectURL(){}}}:{}),setTimeout:(fn,delay)=>{timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:n=>timers.delete(n)});
  const root=document.querySelector('main'),enable=document.getElementById('enable');
  const api=window.SpaceWhaleLessonAudio.create({root,enable,isLive:()=>true,canControl:()=>teacher,exerciseId:()=>id,now:()=>clock,send:async c=>{sent.push(c);return 'ok';},requestState:async()=>{},notice:t=>notices.push(t)});
  return {api,root,enable,window,sent,timers,notices,setTime:t=>{clock=t;},setId:v=>{id=v;},block:v=>{blocked=v;},click:()=>root.querySelector('button').dispatchEvent(new window.Event('click',{bubbles:true})),run:()=>{const jobs=[...timers.values()];timers.clear();jobs.forEach(j=>j.fn());}};
 }
 const cmd={exercise_id:'exercise1',key:'phrase:word',action:'play',position:0,at:1250,revision:1000,serial:1};
+test('Repeat forward arrow uses live transport once; synchronized reveal never starts independent playback',async()=>{
+ const kit=require('../exercise-kit.js');
+ const def={version:1,id:'repeat-live',kind:'audio',layout:'listen-repeat',title:'Repeat',items:[
+  {id:'word',text:'polite',audio:'word.wav',example:'My father is very polite.',exampleAudio:'example.wav'}
+ ]};
+ const t=fixture(true,true),p=fixture(false,true);
+ const teacher=kit.mount(t.root,def),pupil=kit.mount(p.root,def,{navigationReadOnly:true,audioReadOnly:true});
+ t.api.refresh();p.api.refresh();
+ t.root.querySelector('.ek-stage-down').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ await flush();await flush();
+ assert.equal(t.sent.length,1);assert.equal(t.sent[0].key,'repeat-live:word:example');assert.equal(t.sent[0].action,'play');assert.equal(t.sent[0].position,0);
+ pupil.setViewState(teacher.getViewState(),false);assert.equal(p.sent.length,0);
+ p.api.receive(t.sent[0]);await flush();p.setTime(t.sent[0].at);p.run();await flush();
+ assert.equal(p.api.player.getAttribute('src'),'example.wav');assert.equal(p.api.player.paused,false);
+ t.api.player.currentTime=2;
+ t.root.querySelector('.ek-stage-up').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ t.root.querySelector('.ek-stage-down').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ await flush();await flush();assert.equal(t.sent.length,2);assert.equal(t.sent[1].action,'play');assert.equal(t.sent[1].position,0);
+ teacher.destroy();pupil.destroy();t.api.destroy();p.api.destroy();
+});
 test('teacher command carries one scheduled start; pupil plays the trusted mounted source',async()=>{
  const t=fixture(true),p=fixture();t.click();await flush();assert.equal(t.sent.length,1);assert.equal(t.sent[0].at,1250);
  p.api.receive(t.sent[0]);assert.equal(p.api.player.getAttribute('src'),'word.wav');assert.equal(p.api.player.paused,true);

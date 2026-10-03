@@ -1,48 +1,62 @@
-# A1.2 Module 4 Lesson 4 — requested rebuild
+# A1.2 Module 4 Lesson 4 — approved final flow, 2026-10-03
 
-Source: owner's 2026-10-03 request, attached planning conversation, and subsequent message supplying approved tasks 3–10, ending “продолжение следует”. Tasks 3–10 are now implemented. The new listening task has not yet been supplied; do not invent it.
+Source: owner's approved tasks 3–10, followed by the Nick/Emma listening transcript, replacement rule, grouping instructions, and four revised question-writing items. The later message supersedes the earlier standalone Multiple Select and open Writing drafts.
 
-## Confirmed changes
+## Lesson entries
 
-- Preserve the opening Speaking, Word Pick and final Speaking, including their stable IDs and existing images.
-- In both Speaking appearance groups, use `long hair · short hair · brown hair · blonde hair`, `What does he/she look like?`, `He/She has ...`. Keep the personality words and `He/She is ...`.
-- The common Listen & Repeat component reveals word and example as successive plain rows. Prior rows remain visible; both have equal normal-weight typography. Preserve audio controls and teacher/learner synchronization. Recordings will be supplied separately.
+1. Opening Speaking — retained, `L4-M01`.
+2. Word Pick — retained, `L4-M02`.
+3. Listen & Repeat — retained supplied six words/examples, `L4-M03`.
+4. Word Practice — `L4-word-practice`: Dropdown Gap then Typed Gap. Each has its own OK; the next teacher arrow reveals Typed Gap. Original child IDs and the four pending numbered image slots are preserved.
+5. Complete the Rule — `L4-discovery-rule`: examples and dropdowns first, then the replacement “Как спросить о человеке” rule after checking and a teacher arrow. The full replacement explains What is … like?, What does … look like?, and What does … like?; the old rule is not appended.
+6. Listening — `L4-neighbors-listening`, detailed below.
+7. Matching — retained, `L4-question-answer-match`.
+8. Write the questions — revised, keyed `L4-questions-for-answers`.
+9. Final Speaking — retained, `L4-M11`.
 
-## Approved order
+Timing: 28 minutes of tasks plus 2 minutes reserve. Lesson 5 content is unchanged. Older L4 exercises and homework drafts remain outside the active lesson.
 
-1. Opening Speaking (retain).
-2. Word Pick (retain; latest request supersedes the earlier Image Label suggestion).
-3. Listen & Repeat — existing `audio` / `listen-repeat` template.
-4. Dropdown Gap — `gaps`, `inputMode: 'select'`, options inside each sentence.
-5. Typed Gap with reserved illustration — `gaps` with typed fields; numbered picture strip and matching numbered sentences.
-6. Guided discovery / Complete Rule — contextual examples and inline dropdowns. Confirmed examples: `What is she like? — She is polite and helpful.` and `What does she look like? — She has long brown hair.`
-7. Language focus — existing `rule-page`, nested after discovery in the common progressive sequence. The examples and two dropdowns open together; after checking, the teacher arrow opens the rule. These two logical tasks share one navigation entry, `Complete the Rule · Rule`.
-8. Multiple Select — `choice` with `multiple: true`; allow all appropriate answers.
-9. Matching — questions and expanded answers.
-10. Write questions for supplied answers — existing open Writing template. Each complete supplied answer is above an empty field. No cue bank. The third answer starts with “Yes”, so possible yes/no questions are kept as post-attempt samples and evaluated by the teacher, not a single exact key.
-11. Listening — awaiting the continuation. The earlier plan calls for first listening for understanding and second for True/False details; no replacement text is published yet.
-12. Final Speaking — retained at the end, moving naturally as approved tasks are added.
+## Listening
 
-The core new vocabulary remains `polite, rude, helpful, lazy, quiet, noisy`. Hair descriptions are supporting familiar language. Do not expand the lesson into new have/has grammar or revise Lesson 5.
+One heading: Listen to the audio and answer the questions.
+One source/player: `L4-NICK-EMMA-D01`. The owner will supply the recording; there is no generated, old, or demonstration audio attached.
 
-## Supplied content and checking
+- Choose the answers: What is Emma like? Options polite / quiet / helpful / noisy; keys polite + quiet.
+- Next question after OK and arrow: What does Nick look like? Options short / curly / long / straight hair in the supplied complete sentences; keys short + curly.
+- After checking Nick and the next arrow: Choose the correct answer. What does Ben want to do? Key: Invite his new neighbors for coffee. Distractors: Visit his sister; Have dinner with his parents.
+- After OK and the next arrow: Listen again. Are the sentences true or false? Four compact rows: Nick helps Lisa with her bike (True); Emma is noisy (False); Lisa has their phone number (True); Ben wants to invite them for coffee (True).
+- Under the final task: one Script disclosure, closed by default. Teacher opening/closing is synchronized to the learner. It is manually available with this task and is not opened automatically by OK.
 
-- Listen & Repeat: `polite — My father is very polite.`; `rude — This man is rude.`; `helpful — My children are very helpful.`; `lazy — I’m sometimes lazy on weekends.`; `quiet — My sister is usually quiet.`; `noisy — Our neighbors are noisy at night.` The exact example scripts replace the old scripts in their existing media slots; mismatched old recordings are not attached.
-- Dropdown keys, in supplied sentence order: noisy, helpful, polite, rude, quiet. All option orders are preserved.
-- Typed Gap keys: helpful, lazy, noisy, rude. Four numbered blank image slots precede the corresponding four sentence rows. Image references: `L4-TYPED-I01` through `L4-TYPED-I04`. Artwork is pending.
-- Discovery keys: как она выглядит; какая она в общении. Source examples and the full supplied contrast rule are preserved.
-- Multiple Select: question 1 options 2, 4, 6; question 2 options 1, 3, 4. These are all compatible answer forms, not a mutually consistent description of one real person.
-- Matching: 1–B, 2–A, 3–D, 4–C, preserving the supplied option order.
-- Writing samples are optional post-attempt examples. Named subjects/pronouns and other natural questions remain open to teacher review.
-- Mechanical cleanup only: `Ben ’s` → `Ben’s`, `правельные` → `правильные`, ordinary spacing and sentence-final periods. All supplied sentences, distractors and rule content remain in the lesson, including “Yes” in Writing item 3 and curly/straight hair in the approved practice.
-- Obsolete L4 classroom exercises, old listening and old homework drafts are removed from the active lesson. Old source files and unused media registrations remain historical. Lesson 5 is unchanged.
+The original player remains mounted throughout. The exact supplied Ben/Lisa conversation, including Nick and Emma and the coffee invitation, is stored both in the media script and the shared Script disclosure.
 
-## Completion checklist
+## Question writing
 
-- Done: supplied texts/options/scripts use existing shared definitions; author-only descriptions stay outside the learner view.
-- Done: old intermediate tasks replaced; retained tasks/media keep their IDs and changed task identities receive new IDs.
-- Done: four pending illustration slots reserved without invented artwork.
-- Done: opening/final Speaking and Word Pick preserved; new order and answer keys checked; dropdown, typed input, multiple selection and rule reveal exercised, including synchronized teacher/learner state.
-- Pending: receive and insert the Listening continuation, then update lesson timing for the final complete flow.
+Each supplied answer sits above a blank question field. Keys are hidden until an incorrect checked attempt; then the prompt is muted and the canonical question is bold.
 
-Current publication contains all approved tasks 3–10 and the retained Speaking/Word Pick. It does not claim that the missing Listening continuation has been completed.
+| Supplied answer | Canonical question |
+| --- | --- |
+| Jake is very rude and lazy. He never helps his mom. | What is Jake like? |
+| Nora has brown eyes and short hair. | What does she look like? |
+| She is tall and slim. She has long curly hair. | What does she look like? |
+| My parents are very kind and smart. | What are they like? |
+
+Accept natural subject/pronoun alternatives, contractions for What is, and an omitted final question mark. Do not accept appearance questions for character or vice versa. Feedback shows the canonical question once, not every allowed variant. No Possible answers section.
+
+## Shared template updates
+
+- Related vocabulary practice belongs to one progressive lesson entry, not separate pages. Each response task keeps its own check and teacher arrow.
+- Listen & Repeat forward arrow reveals and autoplays the next recording via the same live transport as Play. Previous rows stay visible. Backward arrows and remote view hydration do not start audio. Missing recordings remain disabled.
+- Completed open/personal Writing shows Well done without automatic Possible answers. This remains confirmation, not semantic grading. Keyed Writing retains grading and canonical corrections. Standalone authored teaching/sample disclosures are not removed.
+
+## Verification
+
+- All lesson definitions mount and closed keys grade correctly.
+- Dropdown → Typed and discovery → rule require check plus a separate arrow.
+- Listening checked through Emma → Nick → Ben → True/False, retaining one audio element and synchronizing the closed/open Script.
+- Question-writing prompts and canonical corrections match the latest user message.
+- Listen & Repeat forward playback is tested through both the shared kit and live transport, including replay from zero and no independent learner autoplay on hydration.
+- Relevant regression suites pass. The full suite retains five pre-existing failing files (clothes-lesson-one, learning-content, module4-lessons34, workspace-audio legacy cases, workspace); it is not reported as fully green.
+
+Pending assets: owner-provided audio recordings and replacement exercise images.
+
+Concurrent upload reconciliation: GitHub main `4ecf5c2` removed the previous opening Speaking image ending 1973 and added two replacements. After visual inspection, opening Speaking now uses `4ebce181-0d97-4783-903a-db13ce05549d.png` (neighbors) and final Speaking uses `f55b31c3-30bd-4e45-9485-3a020903c8df.png` (two students). Both retain the shared rounded image layout. Their task text and language supports are unchanged.

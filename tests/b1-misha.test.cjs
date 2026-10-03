@@ -99,8 +99,7 @@ test('open writing uses a multiline field, preserves shared drafts and never gra
  assert.equal(kit.grade(d,{reply:own}).reply,'review');
  v.handle.setAnswers({[d.id]:{reply:own,__sw_checked:true}});
  assert.equal(v.host.querySelector('textarea').value,own);
- const detail=v.host.querySelector('details');assert.ok(detail&&!detail.open);assert.equal(detail.querySelector('summary').textContent,'Possible answers');
- assert.ok(detail.querySelector('strong'));v.click('Possible answers');assert.equal(detail.open,true);
+ assert.equal(v.host.querySelector('details'),null);assert.match(v.host.textContent,/Well done/);
 });
 test('lexical rules reveal outside feedback by teacher arrow and synchronize without losing flat answers',()=>{
  for(const id of ['B1D1-M02','B1D2-M02']){

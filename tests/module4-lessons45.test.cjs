@@ -11,7 +11,7 @@ function setup(def,config={}){
  const host=document.querySelector('main'),handle=kit.mount(host,def,{syncChecks:true,syncDisclosures:true,...config});return {host,handle,window};
 }
 function walk(d,fn){fn(d);d.exercises?.forEach(e=>walk(e.exercise,fn));}
-const find=id=>lessons.flatMap(l=>l.stages).find(s=>s.exercise.id===id).exercise;
+const find=id=>{let found;lessons.forEach(l=>l.stages.forEach(s=>walk(s.exercise,d=>{if(d.id===id)found=d;})));return found;};
 function click(v,selector){v.host.querySelector(selector).dispatchEvent(new v.window.Event('click',{bubbles:true,cancelable:true}));}
 test('revision is isolated to L4/L5, with 30-minute plan including reserve and separate homework',()=>{
  for(const l of app.SpaceWhaleContent)if(prior.has(l.id)&&l.id!=='a1-2-w4-l4')assert.equal(JSON.stringify(l),prior.get(l.id));
@@ -33,14 +33,16 @@ test('approved opening and final Speaking use the shared layout in teacher and l
    assert.equal(v.host.querySelector('button,details,input'),null);
    assert.equal(v.host.querySelector('.ek-speaking-use-title').textContent,'Use:');
    assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,id.startsWith('L4')?2:1);
-   if(id!=='L4-M01')assert.equal(v.host.querySelector('img'),null);
+   if(id.startsWith('L5'))assert.equal(v.host.querySelector('img'),null);
+   else assert.ok(v.host.querySelector('img'));
    v.handle.destroy();
   }
  }
- const opening=find('L4-M01');assert.match(opening.image.image,/1973\.png$/);
+ const opening=find('L4-M01');assert.match(opening.image.image,/549d\.png$/);
  for(const id of ['L4-M01','L4-M11']){
   assert.deepEqual(Array.from(find(id).use[1].words),['long hair','short hair','brown hair','blonde hair']);
   assert.deepEqual(Array.from(find(id).use[1].phrases),['What does he/she look like?','He/She has ...']);
+  assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',find(id).image.image)));
  }
  assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',opening.image.image)));
  assert.equal(opening.image.imageWidth,1448);assert.equal(opening.image.imageHeight,1086);
@@ -60,7 +62,7 @@ test('discovery reveals its rule only after checking and a teacher arrow, synchr
 });
 test('approved L4 order, exact repeat lines and typed picture strip replace obsolete drafts',()=>{
  const l4=lessons.find(l=>l.id==='a1-2-w4-l4');
- assert.deepEqual(Array.from(l4.stages,s=>s.exercise.id),['L4-M01','L4-M02','L4-M03','L4-dropdown-gap','L4-typed-gap','L4-discovery-rule','L4-multiple-select','L4-question-answer-match','L4-questions-for-answers','L4-M11']);
+ assert.deepEqual(Array.from(l4.stages,s=>s.exercise.id),['L4-M01','L4-M02','L4-M03','L4-word-practice','L4-discovery-rule','L4-neighbors-listening','L4-question-answer-match','L4-questions-for-answers','L4-M11']);
  assert.deepEqual(Array.from(find('L4-M03').items,i=>i.example),['My father is very polite.','This man is rude.','My children are very helpful.','I’m sometimes lazy on weekends.','My sister is usually quiet.','Our neighbors are noisy at night.']);
  const d=find('L4-typed-gap'),v=setup(d);
  assert.equal(d.inputMode,'text');assert.equal(v.host.querySelectorAll('.ek-picture-cue-card').length,4);
@@ -83,15 +85,15 @@ test('L4 dropdowns and multiple selections check actual learner interactions',()
   assert.equal(picker.querySelector('.ek-inline-menu').hidden,true);
  });
  click(v,'.ek-check');assert.ok(Object.values(kit.grade(d,v.handle.getAnswers())).every(g=>g==='correct'));v.handle.destroy();
- const m=find('L4-multiple-select'),c=setup(m);assert.equal(c.host.querySelectorAll('input[type="checkbox"]').length,12);
- [['2','4','6'],['1','3','4']].forEach((answers,i)=>{
+ const m=find('L4-listening-multiple'),c=setup(m);assert.equal(c.host.querySelectorAll('input[type="checkbox"]').length,8);
+ [['1','2'],['1','2']].forEach((answers,i)=>{
   const group=c.host.querySelectorAll('fieldset')[i];answers.forEach(id=>{
    const input=[...group.querySelectorAll('input')].find(el=>el.value===id);input.checked=true;input.dispatchEvent(new c.window.Event('change',{bubbles:true}));
   });
  });
- click(c,'.ek-check');assert.deepEqual(kit.grade(m,c.handle.getAnswers()),{'1':'correct','2':'correct'});
- assert.equal(kit.grade(m,{'1':['2'],'2':['1','3','4','5']})['1'],'retry');
- assert.equal(kit.grade(m,{'1':['2'],'2':['1','3','4','5']})['2'],'retry');c.handle.destroy();
+ click(c,'.ek-check');assert.deepEqual(kit.grade(m,c.handle.getAnswers()),{'emma':'correct','nick':'correct'});
+ assert.equal(kit.grade(m,{'emma':['1'],'nick':['1','2','3']})['emma'],'retry');
+ assert.equal(kit.grade(m,{'emma':['1'],'nick':['1','2','3']})['nick'],'retry');c.handle.destroy();
  const matching=find('L4-question-answer-match');
  assert.deepEqual(Array.from(matching.items,i=>matching.options.find(o=>o.id===i.correctId).text),['He’s a little lazy at home.','Her hair is short and curly.','He has long straight hair.','She’s helpful. She often helps me with my homework.']);
 });
@@ -106,7 +108,7 @@ test('chat advances only by teacher arrow after review, collapse and reopening p
  t.handle.destroy();s.handle.destroy();
 });
 test('open production accepts alternatives for teacher review, with no visible full model before attempt',()=>{
- for(const id of ['L4-questions-for-answers','L5-M07']){const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details'),null);assert.equal(v.host.textContent.includes('What is he like?'),false);assert.equal(v.host.textContent.includes('It’s a kind of food.'),false);assert.ok(Object.values(kit.grade(d,Object.fromEntries(d.items.map(i=>[i.id,'an alternative answer'])))).every(g=>g==='review'));v.handle.destroy();}
+ for(const id of ['L5-M07']){const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details'),null);assert.equal(v.host.textContent.includes('What is he like?'),false);assert.equal(v.host.textContent.includes('It’s a kind of food.'),false);assert.ok(Object.values(kit.grade(d,Object.fromEntries(d.items.map(i=>[i.id,'an alternative answer'])))).every(g=>g==='review'));v.handle.destroy();}
  const opening=find('L4-M01'),v=setup(opening);
  assert.equal(v.host.querySelector('details'),null);
  assert.ok(v.host.querySelector('.ek-speaking-image img'));
@@ -127,6 +129,56 @@ test('L5 scripts and choices remain based on the approved v7 source',()=>{
  const expected=[...section.matchAll(/^[ABC]\. (.+)$/gm)].map(m=>norm(m[1]));
  assert.deepEqual(Array.from(find('L5-form-choice').items).flatMap(i=>Array.from(i.options,o=>norm(o.text))),expected);
  assert.equal(Array.from(find('L5-form-choice').items,i=>i.correctId).join(','),'1,2,0,1');
+});
+test('word practice reveals typed fields only after dropdown OK and a teacher arrow',()=>{
+ const t=setup(find('L4-word-practice'));
+ assert.equal(t.host.querySelectorAll('.ek-typed-gap').length,0);
+ assert.equal(t.host.querySelector('.ek-stage-down').disabled,true);
+ t.handle.setAnswers({'L4-dropdown-gap':{'1':'noisy','2':'helpful','3':'polite','4':'rude','5':'quiet',__sw_checked:true}});
+ assert.equal(t.host.querySelectorAll('.ek-typed-gap').length,0);
+ click(t,'.ek-stage-down');assert.equal(t.host.querySelectorAll('.ek-typed-gap').length,4);
+ assert.equal(t.host.querySelectorAll('.ek-choice-trigger').length,5);t.handle.destroy();
+});
+test('one Listening keeps its player through Emma, Nick, purpose and true/false; Script syncs closed/open',()=>{
+ const d=find('L4-neighbors-listening'),t=setup(d),p=setup(d,{navigationReadOnly:true});
+ const audio=t.host.querySelector('audio');
+ const visibleText=()=>[...t.host.querySelectorAll('legend')].map(x=>x.textContent).join(' ');
+ const choose=(host,values)=>{for(const input of host.querySelectorAll('input[type="checkbox"]'))if(values.includes(input.value)){input.checked=true;input.dispatchEvent(new t.window.Event('change',{bubbles:true}));}};
+ assert.match(visibleText(),/Emma/);assert.doesNotMatch(visibleText(),/Nick|Ben/);
+ assert.equal(t.host.querySelectorAll('audio').length,1);assert.equal(t.host.querySelector('details'),null);
+ choose(t.host,['1','2']);click(t,'.ek-check');
+ assert.doesNotMatch(visibleText(),/Nick/);
+ const innerDown=t.host.querySelector('.ek-stage-section .ek-stage-down');assert.equal(innerDown.disabled,false);
+ innerDown.dispatchEvent(new t.window.Event('click',{bubbles:true}));assert.match(visibleText(),/Nick/);
+ const nick=t.host.querySelectorAll('fieldset')[1];choose(nick,['1','2']);
+ nick.closest('.exercise-kit').querySelector('.ek-check').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ const outerNav=()=>t.host.querySelector('.ek-body').lastElementChild;
+ assert.equal(outerNav().querySelector('.ek-stage-down').disabled,false);
+ outerNav().querySelector('.ek-stage-down').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ assert.match(visibleText(),/What does Ben want to do/);assert.equal(t.host.querySelector('audio'),audio);
+ const purpose=[...t.host.querySelectorAll('input[type="radio"]')].find(input=>input.value==='1');
+ purpose.checked=true;purpose.dispatchEvent(new t.window.Event('change',{bubbles:true}));
+ purpose.closest('.exercise-kit').querySelector('.ek-check').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ outerNav().querySelector('.ek-stage-down').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ assert.equal(t.host.querySelectorAll('.ek-choice-trigger').length,4);assert.equal(t.host.querySelector('audio'),audio);
+ const script=t.host.querySelector('details');assert.equal(script.querySelector('summary').textContent,'Script');assert.equal(Boolean(script.open),false);
+ script.querySelector('summary').dispatchEvent(new t.window.Event('click',{bubbles:true}));
+ p.handle.setAnswers(t.handle.getAnswers());p.handle.setViewState(t.handle.getViewState(),false);
+ assert.equal(p.host.querySelector('details').open,true);assert.match(script.textContent,/Nick and Emma/);
+ assert.equal(t.host.querySelectorAll('audio').length,1);
+ assert.deepEqual(kit.grade(find('L4-listening-true-false'),{'1':'True','2':'False','3':'True','4':'True'}),{'1':'correct','2':'correct','3':'correct','4':'correct'});
+ t.handle.destroy();p.handle.destroy();
+});
+test('revised question writing grades keys and shows muted prompt with one bold correction only after OK',()=>{
+ const d=find('L4-questions-for-answers'),v=setup(d);
+ assert.equal(d.responseMode,'accepted');
+ assert.deepEqual(Array.from(d.items,i=>i.prompt),['Jake is very rude and lazy. He never helps his mom.','Nora has brown eyes and short hair.','She is tall and slim. She has long curly hair.','My parents are very kind and smart.']);
+ assert.equal(v.host.querySelectorAll('.ek-writing-input').length,4);assert.equal(v.host.textContent.includes('What is Jake like?'),false);
+ assert.deepEqual(kit.grade(d,{'1':'What is Jake like?','2':'What does she look like?','3':'What does she look like?','4':'What are they like?'}),{'1':'correct','2':'correct','3':'correct','4':'correct'});
+ v.handle.setAnswers({'1':'What does Jake look like?','2':'wrong','3':'wrong','4':'wrong',__sw_checked:true});
+ assert.equal(v.host.querySelector('.ek-answer-pairs .ek-muted').textContent,d.items[0].prompt);
+ assert.deepEqual([...v.host.querySelectorAll('.ek-answer-pairs strong')].map(x=>x.textContent),['What is Jake like?','What does she look like?','What does she look like?','What are they like?']);
+ assert.equal(v.host.textContent.includes('Possible answers'),false);v.handle.destroy();
 });
 test('v7 image category exercise hides author briefs and Writing cues remain unchanged',()=>{
  const d=find('L5-M04'),v=setup(d);
