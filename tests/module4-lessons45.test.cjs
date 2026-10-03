@@ -24,18 +24,22 @@ test('every exercise mounts, objective keys grade correctly and unrelated answer
  if(Object.keys(a).length){assert.ok(Object.values(kit.grade(d,a)).every(g=>g==='correct'),d.id);assert.ok(Object.values(kit.grade(d,bad)).every(g=>g==='retry'),d.id);}
  assert.equal(v.host.querySelector('audio[src]'),null);v.handle.destroy();});
 });
-test('final role-card information is absent from the opposite rendered view and unknown roles',()=>{
- for(const id of ['L4-M11']){const d=find(id),teacherText=d.blocks.find(b=>b.audience==='teacher').text,studentText=d.blocks.find(b=>b.audience==='student').text;
- for(const role of ['teacher','student','connecting']){const v=setup(app.SpaceWhaleLessonView(d,role));assert.equal(v.host.textContent.includes(teacherText),role==='teacher');assert.equal(v.host.textContent.includes(studentText),role==='student');v.handle.destroy();}}
-});
-test('teacher disclosure open/close synchronizes, learner cannot reopen it, reconnect restores it',()=>{
- const t=setup(find('L4-M11'),{onViewChange:()=>{}}),s=setup(find('L4-M11'),{navigationReadOnly:true});
- assert.equal(Boolean(s.host.querySelector('details').open),false);
- click(t,'summary');s.handle.setViewState(t.handle.getViewState(),false);assert.equal(s.host.querySelector('details').open,true);
- click(t,'summary');s.handle.setViewState(t.handle.getViewState(),false);assert.equal(s.host.querySelector('details').open,false);
- click(s,'summary');assert.equal(s.host.querySelector('details').open,false);
- click(t,'summary');const reconnected=setup(find('L4-M11'),{navigationReadOnly:true});reconnected.handle.setViewState(t.handle.getViewState(),false);assert.equal(reconnected.host.querySelector('details').open,true);
- for(const v of [t,s,reconnected])v.handle.destroy();
+test('approved opening and final Speaking use the shared layout in teacher and learner views',()=>{
+ const titles={'L4-M01':'Describe your new neighbors','L4-M11':'Describe the new students','L5-M01':'Explain the unusual things','L5-M09':'Help your new colleague'};
+ for(const [id,title] of Object.entries(titles)){
+  const d=find(id);assert.equal(d.title,title);assert.equal(kit.isSpeaking(d),true);
+  for(const role of ['teacher','student','connecting']){
+   const v=setup(app.SpaceWhaleLessonView(d,role),{onSkip(){}});
+   assert.equal(v.host.querySelector('button,details,input'),null);
+   assert.equal(v.host.querySelector('.ek-speaking-use-title').textContent,'Use:');
+   assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,id.startsWith('L4')?2:1);
+   if(id!=='L4-M01')assert.equal(v.host.querySelector('img'),null);
+   v.handle.destroy();
+  }
+ }
+ const opening=find('L4-M01');assert.match(opening.image.image,/1973\.png$/);
+ assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',opening.image.image)));
+ assert.equal(opening.image.imageWidth,1448);assert.equal(opening.image.imageHeight,1086);
 });
 test('listening shows all four questions before audio and gates transcript until a complete attempt',()=>{
  const d=find('L4-M06'),v=setup(d),details=v.host.querySelector('details');
@@ -60,7 +64,8 @@ test('open production accepts alternatives for teacher review, with no visible f
  for(const id of ['L4-M10','L5-M07']){const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details'),null);assert.equal(v.host.textContent.includes('What is he like?'),false);assert.equal(v.host.textContent.includes('It’s a kind of food.'),false);assert.ok(Object.values(kit.grade(d,Object.fromEntries(d.items.map(i=>[i.id,'an alternative answer'])))).every(g=>g==='review'));v.handle.destroy();}
  const opening=find('L4-M01'),v=setup(opening);
  assert.equal(v.host.querySelector('details'),null);
- assert.equal(v.host.querySelector('img, .ek-image-pending'),null);
+ assert.ok(v.host.querySelector('.ek-speaking-image img'));
+ assert.equal(v.host.querySelector('.ek-image-pending'),null);
  for(const text of ['Use:','What is he/she like?','What does he/she look like?','helpful','noisy','polite','lazy','quiet','rude'])assert.ok(v.host.textContent.includes(text));
  assert.equal(kit.isSpeaking(opening),true);
  assert.equal(v.host.querySelectorAll('button').length,0);
@@ -91,7 +96,7 @@ test('v7 final scripts and objective choice items match the approved source',()=
  assert.equal(Array.from(find('L4-M04').items,i=>i.correctId).join(','),'1,0,0,1,1,0');
  assert.equal(Array.from(find('L5-form-choice').items,i=>i.correctId).join(','),'1,2,0,1');
 });
-test('v7 image category exercise hides author briefs and both final tasks start without help',()=>{
+test('v7 image category exercise hides author briefs and Writing cues remain unchanged',()=>{
  const d=find('L5-M04'),v=setup(d);
  assert.equal(v.host.querySelectorAll('.ek-image-pending').length,6);
  assert.equal(d.layout,'picture-word');
@@ -99,7 +104,6 @@ test('v7 image category exercise hides author briefs and both final tasks start 
  for(const text of ['muffin','supermarket','касса','предметы мебели','магазин одежды'])assert.equal(v.host.textContent.includes(text),false);
  assert.match(app.SpaceWhaleLessonMedia['a1-2-w4-l5']['L5-I06'].brief,/касса/);
  v.handle.destroy();
- for(const id of ['L4-M11','L5-M09'])assert.ok(find(id).blocks.filter(b=>b.type==='disclosure').every(b=>!b.open));
  const prompts=find('L5-M07').items;
  assert.equal(prompts[2].prompt,'What is a sofa?');assert.equal(prompts[2].hint,'furniture · kind');
  assert.equal(prompts[3].hint,'clothing · type');

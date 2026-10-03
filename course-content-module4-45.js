@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 // Base content: lesson-sources/a12-m4-l4-l5-v7-final.md.
-// L4-M01 uses the approved shared Speaking contract in docs/SPEAKING_TEMPLATE.md.
+// L4/L5 opening and final Speaking use docs/SPEAKING_TEMPLATE.md (approved 2026-10-03).
 // Existing IDs retained; remaining v7 scripts and exercises are unchanged.
 // Media scripts are ready; recordings remain explicitly pending.
 const kit=window.SpaceWhaleExerciseKit, registry=window.SpaceWhaleLessonMedia;
@@ -36,7 +36,7 @@ const l4=[];
 l4.push(stage('Speaking',2,kit.speaking({
  id:'L4-M01',
  title:'Describe your new neighbors',
- image:null,
+ image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/8566029d-525c-4963-93f5-2e8f36741973.png',alt:'Два соседа в шести бытовых ситуациях.',imageWidth:1448,imageHeight:1086},
  task:{
   text:'В ваш район переехали новые соседи. Вы уже с ними познакомились, и ваш друг расспрашивает вас о них. Расскажите ему:',
   bullets:['какие они;','как они выглядят.']
@@ -58,9 +58,27 @@ l4.push(stage('Build questions and answers',3.5,W('L4-M10','Напишите в�
 const dialogue4="Nora: Do you know our new neighbors?  \nBen: Yes. The man is Daniel.  \nNora: What is he like?  \nBen: He’s polite, quiet, and very helpful.  \nNora: What does he look like?  \nBen: He’s tall. He has short straight hair and blue eyes.  \nNora: And the woman?  \nBen: Her name is Anna.  \nNora: What is she like?  \nBen: She’s friendly, but a little noisy.  \nNora: What does she look like?  \nBen: She’s young. She has long curly hair and brown eyes.";
 const listeningQuestions4=W('L4-listening-details','Listen and answer the questions.',[["What is Daniel like?", ["Polite, quiet and helpful.", "He is polite, quiet and helpful."]], ["What does Daniel look like?", ["Tall; short straight hair; blue eyes.", "He is tall and has short straight hair and blue eyes."]], ["What is Anna like?", ["Friendly and a little noisy.", "She is friendly and a little noisy."]], ["What does Anna look like?", ["Young; long curly hair; brown eyes.", "She is young and has long curly hair and brown eyes."]]],false,'1. Послушайте разговор о Daniel и Anna. Можно начать отвечать.\n2. Послушайте ещё раз, дополните и проверьте четыре ответа.');
 l4.push(stage('Listening',4,S('L4-M06','Listen and answer the questions.',[E('L4-listening-player','audio','Listen.',{mediaRef:addAudio(4,'L4-D01',dialogue4),audioPending:true}),listeningQuestions4],{revealStops:[2],transcript:dialogue4,transcriptAfter:['L4-listening-details']}),'Два прослушивания; проверка после второго. Transcript скрыт до самостоятельной работы. Ориентир записи: 35–40 секунд. Запись ожидается.\n\nScript:\n'+dialogue4));
-l4.push(stage('Final · Speaking',5,P('L4-M11','Узнайте о Mark и расскажите о Sara.',[T("узнайте у преподавателя, какой Mark по характеру и как он выглядит. Затем ответьте на вопросы преподавателя о Sara."),T('Сначала попробуйте выполнить задание без раскрытой помощи.'),roleText('teacher','Mark\nyoung · long straight hair · blue eyes · polite · helpful'),roleText('student','Sara\ntall · short curly hair · brown eyes · quiet · helpful'),D('Useful phrases',phrases4),D('Words','polite · helpful · quiet · tall · young\nlong hair · short hair · straight hair · curly hair\nblue eyes · brown eyes')]),"### Round 1\nLearner asks both target questions about Mark.  \nTeacher answers from the Mark card.\n\n### Round 2\nTeacher asks both target questions about Sara.  \nLearner answers from the Sara card.\n\n## Possible answers\nMark:\nHe is polite and helpful.  \nHe is young. He has long straight hair and blue eyes.\n\nSara:\nShe is quiet and helpful.  \nShe is tall. She has short curly hair and brown eyes.\n\n## Success criteria\n- learner uses both target questions correctly;\n- learner separates qualities/behavior from appearance;\n- be / have-has work as familiar support;\n- a natural equivalent answer is accepted;\n- result without opened Help is marked as independent; with Help — supported."));
+l4.push(stage('Final · Speaking',5,kit.speaking({
+ id:'L4-M11',
+ title:'Describe the new students',
+ image:null,
+ task:{
+  text:'В ваш класс пришли два новых ученика. Вы уже с ними познакомились, и ваш одноклассник расспрашивает вас о них. Расскажите ему:',
+  bullets:['какие они;','как они выглядят.']
+ },
+ use:[
+  {words:['polite','rude','helpful','lazy','quiet','noisy'],phrases:['What is he/she like?','He/She is ...']},
+  {words:['tall','short','slim','fat'],phrases:['What does he/she look like?','He/She is ...']}
+ ]
+})));
 const l5=[];
-l5.push(stage('Test Task',2,P('L5-M01','Объясните слова.',[T("друг не знает эти английские слова. Скажите, к какой общей группе относится каждый предмет. Затем выслушайте одно объяснение и выберите подходящее слово."),T('muffin · sofa · museum'),D('Useful phrases',phrases5,true),T('Words: food — еда\nfurniture — мебель\nbuilding — здание'),T('A. sofa\nB. museum')]),"What is a muffin?  \n— It’s a kind/type of food.\n\nWhat is a sofa?  \n— It’s a kind/type of furniture.\n\nWhat is a museum?  \n— It’s a kind/type of building.\n\n## Reverse comprehension\nTeacher: It’s a type of building. Which word is it?\n\nA. sofa  \nB. museum\n\nAnswer: B\n\n## Teacher note\nЭто проба с опорами. Не требовать устойчивого самостоятельного владения kind/type до части 3."));
+l5.push(stage('Speaking',2,kit.speaking({
+ id:'L5-M01',
+ title:'Explain the unusual things',
+ image:null,
+ task:{text:'Ваш друг рассматривает ваши фотографии и замечает несколько необычных вещей. Он не знает, что это такое. Объясните ему, к какой категории относится каждая вещь.'},
+ use:[{words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...']}]
+})));
 const meanings5=[['food','еда'],['drink','напиток'],['furniture','мебель'],['clothing','одежда'],['building','здание'],['shop','магазин']];
 l5.push(stage('Words · Matching',2.5,S('L5-M02','Соедините слова и переводы.',[M('L5-word-translation','Соедините слова и переводы.',meanings5,[2,5,1,3,0,4])])));
 l5.push(stage('Listen & Repeat',2,repeat(5,'L5-M03',words5,["We need some food for the party.", "I’d like a drink, please.", "There is new furniture in the living room.", "This shop has clothing for men and women.", "The library is an old building.", "There is a small shop near my house."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
@@ -74,7 +92,13 @@ l5.push(stage('Choose the explanation',2,C('L5-form-choice','Выберите п
 l5.push(stage('Build explanations',3,W('L5-M07','Ответьте полным предложением.',[["What is a pancake?", ["It’s a kind of food.", "A pancake is a kind of food."], "food · kind"], ["What is tea?", ["It’s a type of drink.", "Tea is a type of drink."], "drink · type"], ["What is a sofa?", ["It’s a kind of furniture.", "A sofa is a kind of furniture."], "furniture · kind"], ["What is a jacket?", ["It’s a type of clothing.", "A jacket is a type of clothing."], "clothing · type"], ["What is a hospital?", ["It’s a kind of building.", "It’s a type of building."], "building"], ["What is a supermarket?", ["It’s a kind of shop.", "It’s a type of shop."], "shop"]]),'Принимаются полные варианты с названием предмета. Целевая модель ответа — It’s …; в последних двух пунктах подходят kind и type.'));
 const chat5=[["Sam: What’s a wardrobe?", ["It’s a kind of furniture.", "It’s a type of furniture."]], ["Sam: Can I put my jacket in it?", ["Yes, you can.", "Yes."]], ["Sam: Thanks. And what’s a coat?", ["It’s a kind of clothing.", "It’s a type of clothing."]], ["Sam: Can I put it in the wardrobe?", ["Yes, you can.", "Yes."]]].map((row,i)=>W('L5-chat-'+(i+1),'Напишите ответ.',[row]));
 l5.push(stage('Chat exchange',4,S('L5-M08','Ответьте другу в чате.',chat5,{requireCheckBeforeNext:true,instruction:'Каждая следующая реплика продолжает тот же разговор.'}),"Следующую реплику даёт преподаватель после понятного предыдущего ответа.\n\nЕсли категория выбрана неверно или ответ непонятен, сначала помочь ученику исправить его, затем продолжить чат. Не показывать следующую реплику так, будто любой свободный ответ автоматически принят."));
-l5.push(stage('Final · Speaking',5,P('L5-M09','Объясните и выберите.',[T("объясните шесть знакомых слов через более общую категорию. Затем выслушайте два объяснения и выберите подходящее слово."),T('waffle · coffee · armchair · hat · house · supermarket'),T('Сначала объясните слова без раскрытой помощи.'),D('Useful phrases','It’s a kind of …\nIt’s a type of …'),D('Words','shop · furniture · food · building · drink · clothing'),T('Послушайте два объяснения. Выберите слово:\n1. A. jacket   B. wardrobe\n2. A. tea   B. muffin')]),"waffle → food  \ncoffee → drink  \narmchair → furniture  \nhat → clothing  \nhouse → building  \nsupermarket → shop\n\n## Possible answers\nIt’s a kind/type of food.  \nIt’s a kind/type of drink.  \nIt’s a kind/type of furniture.  \nIt’s a kind/type of clothing.  \nIt’s a kind/type of building.  \nIt’s a kind/type of shop.\n\n## Teacher criterion for both models\nЕсли в самостоятельной речи ученик использовал только одну модель, после нескольких естественных ответов попросите один другой предмет объяснить вторым изученным способом. Не объявляйте первый допустимый вариант неправильным.\n\n## Reverse comprehension\n### 1\nTeacher: It’s a type of furniture.\n\nChoose:\nA. jacket  \nB. wardrobe\n\nAnswer: B\n\n### 2\nTeacher: It’s a kind of drink.\n\nChoose:\nA. tea  \nB. muffin\n\nAnswer: A\n\n## Success criteria\n- learner chooses a sensible category;\n- learner independently produces the complete pattern It’s a kind/type of ...;\n- both studied models are checked across the task;\n- furniture / clothing do not receive an extra article after of;\n- natural equivalent answers are accepted;\n- result without opened Help is marked as independent; with Help — supported."));
+l5.push(stage('Final · Speaking',5,kit.speaking({
+ id:'L5-M09',
+ title:'Help your new colleague',
+ image:null,
+ task:{text:'В вашем офисе появился новый сотрудник. В первый день его удивляют некоторые вещи вокруг, и он спрашивает, что это такое. Объясните ему, к какой категории относится каждая вещь.'},
+ use:[{words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...']}]
+})));
 
 // Previously prepared homework stays separate from the 30-minute class flow.
 l4.push(stage('Homework 1',0,W('L4-homework-1','Translate into English.',[['Какой он по характеру?','What is he like?'],['Он вежливый и отзывчивый.','He’s polite and helpful.'],['Как он выглядит?','What does he look like?'],['Он высокий, и у него короткие волосы.','He’s tall and has short hair.']],false,'Друг спрашивает о Бене.'),'Проверка по смыслу и конструкции. Полные формы и естественное разбиение последней реплики на два предложения допустимы.','self-study'));
@@ -97,7 +121,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
- if(lesson.id==='a1-2-w4-l4')lesson.contentVersion='v7_FINAL+opening-neighbors-2026-10-03';
+ lesson.contentVersion='v7_FINAL+approved-speaking-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }
