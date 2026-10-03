@@ -1,7 +1,8 @@
 (() => {
 'use strict';
-// Authoritative content: lesson-sources/a12-m4-l4-l5-v7-final.md.
-// Existing IDs retained; v7 scripts and authored tasks transcribed without new exercises.
+// Base content: lesson-sources/a12-m4-l4-l5-v7-final.md.
+// L4-M01 update: lesson-sources/a12-m4-l4-opening-neighbors-2026-10-03.md.
+// Existing IDs retained; remaining v7 scripts and exercises are unchanged.
 // Media scripts are ready; recordings remain explicitly pending.
 const kit=window.SpaceWhaleExerciseKit, registry=window.SpaceWhaleLessonMedia;
 const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
@@ -32,7 +33,11 @@ const words5=['food','drink','furniture','clothing','building','shop'];
 const phrases4='What is he like? / What is she like?\nWhat does he look like? / What does she look like?\nHe is … / She is …\nHe has … / She has …';
 const phrases5='It’s a kind of …\nIt’s a type of …\nWhat is …?';
 const l4=[];
-l4.push(stage('Test Task',2,P('L4-M01','Узнайте о человеке.',[T("преподаватель знает Алекса. Узнайте, какой он по характеру и как выглядит. Затем ответьте на такие же вопросы о Еве."),roleText('teacher','Alex\ntall · short straight hair · polite · helpful'),roleText('student','Eva\nyoung · long straight hair · friendly'),D('Useful phrases',phrases4,true),T('Words: tall · young · short hair · long hair · straight hair · friendly\npolite — вежливый\nhelpful — готовый помочь')]),"Round 1 — learner asks\nLearner: What is he like?  \nTeacher: He is polite and helpful.  \nLearner: What does he look like?  \nTeacher: He is tall. He has short straight hair.\n\nRound 2 — teacher asks\nTeacher: What is she like?  \nLearner: She is friendly.  \nTeacher: What does she look like?  \nLearner: She is young. She has long straight hair.\n\n## Teacher note\nЭто первая проба с готовыми опорами. Не считать новый язык освоенным. Дополнительные вопросы не добавляются ради количества."));
+l4.push(stage('Test',2,P('L4-M01',"Describe your neighbors",[
+ T("В ваш дом переехали новые соседи. Рассмотрите картинки и обсудите с преподавателем:\n• какие они по характеру;\n• как они выглядят.\n\nПо очереди задавайте вопросы о каждом соседе и отвечайте."),
+ {...T("Useful language:\nWhat is he/she like?\nHe/She is …\n\nWhat does he/she look like?\nHe/She is …\nHe/She has …"),highlights:['Useful language:']},
+ {...T("Words:\nhelpful — готовый помочь · noisy — шумный\npolite — вежливый · lazy — ленивый\nquiet — тихий · rude — грубый\n\nВнешность:\ntall · slim · short straight hair · long curly hair"),highlights:['Words:','Внешность:']}
+]),"Opening Speaking — короткая проба с открытыми опорами, около 2 минут. Обсудить двух соседей; ученик пробует задать оба целевых вопроса и ответить на них. Достаточно 1–2 качеств и одного описания внешности для каждого человека; перечисление всех слов не требуется. Новые вопросы и Words пока не считаются освоенными. Полноценное введение слов остаётся следующим этапом.\n\nДля What is he/she like? использовать качества, которые подтверждаются показанным поведением. Для What does he/she look like? использовать знакомые be + adjective / have-has + noun phrase. Не требовать ответа через looks like и не подменять внешность характером.\n\nАвторский замысел изображения: мужчина — tall, short straight hair; в разных сценах noisy, rude, lazy. Женщина — slim, long curly hair; в разных сценах polite, helpful, quiet. Для tall показать обоих взрослых в одном масштабе. Поведение описывать по действиям, не по лицу.\n\nИзображение автор подготовит отдельно. В текущей версии только текст и опоры; изображение и пустая рамка не выводятся. После получения рисунка показать его перед текстом задачи. Не выдавать работу без рисунка за проверку описания изображения."));
 const meanings4=[['polite','вежливый'],['rude','грубый'],['helpful','готовый помочь'],['lazy','ленивый'],['quiet','тихий'],['noisy','шумный']];
 l4.push(stage('Words · Matching',3,S('L4-M02','Соедините слова и переводы.',[M('L4-word-translation','Соедините слова и переводы.',meanings4,[5,2,3,0,4,1]),P('L4-word-context','Значения слов.',[T("- polite — говорит «пожалуйста» и «спасибо», вежливо просит.\n- rude — говорит с людьми грубо, например требует вместо вежливой просьбы.\n- helpful — предлагает помощь или помогает другому человеку.\n- lazy — может сделать простое дело, но не хочет и старается его избежать.\n- quiet — говорит мало или тихо, не шумит.\n- noisy — говорит или ведёт себя громко, создаёт много шума.")])],{requireCheckBeforeNext:true})));
 l4.push(stage('Listen & Repeat',2,repeat(4,'L4-M03',words4,["Our new neighbor is polite and friendly.", "He is rude to people at work.", "My friend is helpful at home.", "He is lazy and doesn’t help at home.", "Our neighbor is quiet in the evening.", "Our neighbors are noisy in the evening."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
@@ -84,6 +89,7 @@ for(const [i,lesson] of lessons.entries()){
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
  Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
+ if(lesson.id==='a1-2-w4-l4')lesson.contentVersion='v7_FINAL+opening-neighbors-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
 }

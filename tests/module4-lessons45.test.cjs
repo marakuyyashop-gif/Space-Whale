@@ -24,8 +24,8 @@ test('every exercise mounts, objective keys grade correctly and unrelated answer
  if(Object.keys(a).length){assert.ok(Object.values(kit.grade(d,a)).every(g=>g==='correct'),d.id);assert.ok(Object.values(kit.grade(d,bad)).every(g=>g==='retry'),d.id);}
  assert.equal(v.host.querySelector('audio[src]'),null);v.handle.destroy();});
 });
-test('role-card information is absent from the opposite rendered view and unknown roles',()=>{
- for(const id of ['L4-M01','L4-M11']){const d=find(id),teacherText=d.blocks.find(b=>b.audience==='teacher').text,studentText=d.blocks.find(b=>b.audience==='student').text;
+test('final role-card information is absent from the opposite rendered view and unknown roles',()=>{
+ for(const id of ['L4-M11']){const d=find(id),teacherText=d.blocks.find(b=>b.audience==='teacher').text,studentText=d.blocks.find(b=>b.audience==='student').text;
  for(const role of ['teacher','student','connecting']){const v=setup(app.SpaceWhaleLessonView(d,role));assert.equal(v.host.textContent.includes(teacherText),role==='teacher');assert.equal(v.host.textContent.includes(studentText),role==='student');v.handle.destroy();}}
 });
 test('teacher disclosure open/close synchronizes, learner cannot reopen it, reconnect restores it',()=>{
@@ -58,7 +58,12 @@ test('chat advances only by teacher arrow after review, collapse and reopening p
 });
 test('open production accepts alternatives for teacher review, with no visible full model before attempt',()=>{
  for(const id of ['L4-M10','L5-M07']){const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details'),null);assert.equal(v.host.textContent.includes('What is he like?'),false);assert.equal(v.host.textContent.includes('It’s a kind of food.'),false);assert.ok(Object.values(kit.grade(d,Object.fromEntries(d.items.map(i=>[i.id,'an alternative answer'])))).every(g=>g==='review'));v.handle.destroy();}
- const v=setup(find('L4-M01'));assert.equal(v.host.querySelector('details').open,true);v.handle.destroy();
+ const opening=find('L4-M01'),v=setup(opening);
+ assert.equal(v.host.querySelector('details'),null);
+ assert.equal(v.host.querySelector('img, .ek-image-pending'),null);
+ for(const text of ['Useful language:','What is he/she like?','What does he/she look like?','helpful','noisy','polite','lazy','quiet','rude'])assert.ok(v.host.textContent.includes(text));
+ assert.equal(opening.blocks.some(b=>b.audience),false);
+ v.handle.destroy();
 });
 
 test('v7 final scripts and objective choice items match the approved source',()=>{
