@@ -54,7 +54,20 @@ const addAudio=(n,id,script)=>{
  media[n][id]={type:'audio',src:repeatSrc||dialogueSrc,script};return id;
 };
 function repeat(n,id,words,examples){
- return E(id,'audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,items:words.map((text,i)=>{const code='L'+n+'-W'+String(i+1).padStart(2,'0');return {id:code,text,mediaRef:addAudio(n,code,text),example:examples[i],exampleMediaRef:addAudio(n,code+'-example',examples[i])};})});
+ const folder=courseAudioBase+'/a1-2/w4/l'+n+'/listen-repeat/';
+ const prefix='L'+n+'-W';
+ return E(id,'audio','Listen and repeat.',{
+  layout:'listen-repeat',
+  audioPending:false,
+  items:words.map((text,i)=>{
+   const code=prefix+String(i+1).padStart(2,'0');
+   const audio=folder+code+'.mp3?v=20261003-sarah-slow1-r3';
+   const exampleAudio=folder+code+'-example.mp3?v=20261003-sarah-slow1-r3';
+   media[n][code]={type:'audio',src:audio,script:text};
+   media[n][code+'-example']={type:'audio',src:exampleAudio,script:examples[i]};
+   return {id:code,text,audio,example:examples[i],exampleAudio};
+  })
+ });
 }
 // Role cards contain task information, not access-controlled personal data.
 // Filter them before mounting so the other participant's answers are absent from the UI.
@@ -285,7 +298,7 @@ for(const [i,lesson] of lessons.entries()){
  const slots=media[i+4],old=registry[lesson.id]||{};
  for(const [key,slot] of Object.entries(slots)){const existing=old[key];if(existing?.src&&existing.type===slot.type&&existing.script===slot.script&&existing.brief===slot.brief)slots[key]={...slot,...existing};}
  registry[lesson.id]={...old,...slots};
- Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'pending',showTeacherNotes:true,syncDisclosures:true});
+ Object.assign(lesson,{level:'A1.2',whale:4,grammar:'—',durationMinutes:30,plannedTeachingMinutes:30,contentVersion:'v7_FINAL',mediaStatus:'ready',showTeacherNotes:true,syncDisclosures:true});
  lesson.contentVersion=i===0?'approved-listening-flow-2026-10-03':'approved-l5-word-pic-f988-2026-10-03';
  attach(lesson,slots);lesson.stages.forEach(s=>kit.validate(s.exercise));
  const at=window.SpaceWhaleContent.findIndex(l=>l.id===lesson.id);if(at<0)window.SpaceWhaleContent.push(lesson);else window.SpaceWhaleContent[at]=lesson;
