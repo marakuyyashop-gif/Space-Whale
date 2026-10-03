@@ -85,3 +85,5 @@
 - Never render teacher notes in the workspace, including Listen & Repeat or other lessons. Author guidance may remain in source data only.
 
 - Latest appearance (2026-10-03 evening) supersedes orange/grey surfaces: all light-theme workspace control and content surfaces are white, including OK/arrows, sidebar selectors/session buttons, menus, answer fields, correction panels and audio-player surfaces. No orange fill or outline. Preserve shadows, readable text/icons, audio progress and correct/incorrect indicators. Dark-theme contrast remains supported.
+
+- Guided Discovery model examples must emphasize the target constructions in bold using shared text-block `highlights`. Include every construction needed to answer the discovery questions.
