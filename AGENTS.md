@@ -81,3 +81,5 @@
 - Writing uses `items[].multiline: true` for a short message/story; it is an opt-in textarea within the same Writing renderer and answer synchronization. Keep single-word and short sentence fields unchanged. Oral samples can be a separate teacher-revealed presentation containing a closed Possible answers disclosure; do not require an OK for an informational or oral block.
 
 - Workspace appearance (2026-10-03): light-mode lesson background is pure white and primary lesson text is black; retain muted supporting/correction text. Only OK (`.ek-check`) and up/down progression controls (`.ek-stage-toggle`) use the shared orange (#EE7C37) action tokens in `exercise-theme.css`. Sidebar surfaces are white in light mode. Preserve answer controls, audio, feedback colors, sizes and dark-theme readability. Do not reintroduce a canvas texture.
+
+- Never render teacher notes in the workspace, including Listen & Repeat or other lessons. Author guidance may remain in source data only.

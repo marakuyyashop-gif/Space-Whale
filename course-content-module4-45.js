@@ -19,7 +19,7 @@ const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{res
 const M=(id,title,rows,order)=>E(id,'matching',title,{items:rows.map(([text],i)=>({id:String(i+1),text,correctId:'o'+i})),options:order.map(i=>({id:'o'+i,text:rows[i][1]}))});
 const pictureWords=(id,lesson,words,order)=>E(id,'matching','Соедините картинки и слова.',{
  layout:'picture-word',
- items:words.map((word,i)=>({id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+i,image:`assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp`,imageWidth:480,imageHeight:600})),
+ items:words.map((word,i)=>({id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+i,image:`assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp${lesson===5&&word==='furniture'?'?v=20261003-restored':''}`,imageWidth:480,imageHeight:600})),
  options:order.map(i=>({id:'o'+i,text:words[i]}))
 });
 const S=(id,title,children,extra={})=>E(id,'stage',title,{progressive:true,exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
@@ -172,7 +172,7 @@ l5.push(stage('Speaking',2,kit.speaking({
 })));
 const meanings5=[['food','еда'],['drink','напиток'],['furniture','мебель'],['clothing','одежда'],['building','здание'],['shop','магазин']];
 l5.push(stage('Word Pick',2.5,S('L5-M02','Соедините картинки и слова.',[pictureWords('L5-word-translation',5,words5,[2,5,1,4,0,3])])));
-l5.push(stage('Listen & Repeat',2,repeat(5,'L5-M03',words5,["We need some food for the party.", "I’d like a drink, please.", "There is new furniture in the living room.", "This shop has clothing for men and women.", "The library is an old building.", "There is a small shop near my house."]),'Текст виден во время повторения. Аудиофайлы ожидаются; точные scripts закреплены в реестре.'));
+l5.push(stage('Listen & Repeat',2,repeat(5,'L5-M03',words5,["We need some food for the party.", "I’d like a drink, please.", "There is new furniture in the living room.", "This shop has clothing for men and women.", "The library is an old building.", "There is a small shop near my house."])));
 const groups5=E('L5-M04','matching','Посмотрите на шесть групп картинок. Соедините каждую группу с подходящим словом.',{layout:'picture-word',items:words5.map((word,i)=>({id:String(i+1),text:String.fromCharCode(65+i),alt:'Группа '+String.fromCharCode(65+i),correctId:'o'+i,imagePending:true,imageMediaRef:'L5-I'+String(i+1).padStart(2,'0')})),options:[5,2,0,4,1,3].map(i=>({id:'o'+i,text:words5[i]}))});
 const groupBriefs=["Изображения: muffin · rice · bread.\n\n", "Изображения: tea · juice · coffee.\n\n", "Изображения: sofa · wardrobe · armchair.\n\n", "Изображения: coat · jacket · hat.\n\n", "Изображения: house · hospital · library.\n\n", "Три отдельные сцены покупки:\n1. supermarket — полки с продуктами, корзина/тележка, касса, покупатель;\n2. магазин книг — стеллажи с книгами, ценники, касса, покупатель оплачивает книгу;\n3. магазин одежды — стойки/вешалки с одеждой, ценники, касса, покупатель выбирает или оплачивает вещь.\n\nДля сцен 2–3 не вводить новые английские названия магазинов. Эти авторские описания не показываются ученику."];
 groups5.items.forEach((item,i)=>{media[5][item.imageMediaRef]={type:'image',src:null,brief:groupBriefs[i].trim()};});

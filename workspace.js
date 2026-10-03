@@ -705,14 +705,7 @@
       }
     });
 
-    // Opt-in lesson guidance: never mount on a guest/student or unresolved live session.
-    if(!kit.isSpeaking(exercise) && selected.showTeacherNotes && stage.guide?.teacherNotes &&
-       (liveMode ? liveReady && liveRole === 'teacher' : window.SpaceWhaleIsTeacher === true)) {
-      const notes=document.createElement('details');notes.className='ek-disclosure';
-      const label=document.createElement('summary');label.textContent='Заметки преподавателя';
-      const copy=document.createElement('p');copy.className='ek-copy';copy.textContent=stage.guide.teacherNotes;
-      notes.append(label,copy);host.append(notes);
-    }
+    // Author guidance remains in source data; never display teacher notes in lessons.
 
     mounted.setViewState?.(route.exerciseView,false);lessonAudio?.refresh();
     updateMilestoneProgress(exercise,initialAnswers);
