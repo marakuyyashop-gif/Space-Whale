@@ -193,6 +193,7 @@
   }
 
   function stageSection(stage) { return stage.section || 'tasks'; }
+  const classStages = lesson => (lesson?.stages || []).filter(stage => stageSection(stage) !== 'self-study');
   function visibleStages(lesson, section) { return lesson.stages.filter(stage => stageSection(stage) === section); }
   function selectedLesson() {
     const lesson = catalog.topics(route).find(item => item.id === route.lesson);
@@ -310,8 +311,8 @@
   function toggleLessonCompletion(lesson){
     if(locked())return;
     const entry=journeys[lesson.id]||(journeys[lesson.id]={done:[],unmarked:[]});
-    const complete=journeys[lesson.id]?.status==='skipped'||journey(lesson).count===lesson.stages.length;
-    entry.done=complete?[]:lesson.stages.map(stage=>stage.exercise.id);entry.unmarked=[];entry.status=complete?'':'done';entry.closed=false;
+    const complete=journeys[lesson.id]?.status==='skipped'||journey(lesson).count===classStages(lesson).length;
+    entry.done=complete?[]:classStages(lesson).map(stage=>stage.exercise.id);entry.unmarked=[];entry.status=complete?'':'done';entry.closed=false;
     saveJourney();renderSidebar();renderMilestones();
   }
   function lessonBadge(lesson){
@@ -323,23 +324,23 @@
   }
   function saveJourney(){try{localStorage.setItem(journeyKey,JSON.stringify(journeys));}catch(_){} }
   function journey(lesson){
-    const total=lesson?.stages.length||0;
+    const total=classStages(lesson).length;
     if(!lesson)return {count:0,total:0,current:-1,done:[]};
     const entry=journeys[lesson.id]||(journeys[lesson.id]={done:[],unmarked:[]});
-    entry.done=(entry.done||[]).filter(id=>lesson.stages.some(stage=>stage.exercise.id===id));
+    entry.done=(entry.done||[]).filter(id=>classStages(lesson).some(stage=>stage.exercise.id===id));
     entry.unmarked=entry.unmarked||[];
-    const current=lesson.stages.findIndex(item=>item.exercise.id===route.exercise);
+    const current=classStages(lesson).findIndex(item=>item.exercise.id===route.exercise);
     if(current>=0)entry.last=route.exercise;
     saveJourney();return {...entry,count:entry.done.length,total,current};
   }
-  function lessonStatus(lesson){const entry=journeys[lesson.id];if(entry?.status==='skipped')return 'Skipped';const count=(entry?.done||[]).filter(id=>lesson.stages.some(stage=>stage.exercise.id===id)).length;return count&&lesson.stages.length?(count===lesson.stages.length?'Done':`${Math.round(count/lesson.stages.length*100)}%`):'';}
+  function lessonStatus(lesson){const entry=journeys[lesson.id];if(entry?.status==='skipped')return 'Skipped';const count=(entry?.done||[]).filter(id=>classStages(lesson).some(stage=>stage.exercise.id===id)).length;return count&&classStages(lesson).length?(count===classStages(lesson).length?'Done':`${Math.round(count/classStages(lesson).length*100)}%`):'';}
   function markLesson(action){
     const lesson=selectedLesson();if(!lesson||locked())return;
     journey(lesson);const entry=journeys[lesson.id];
     if(action==='reset'){entry.done=[];entry.unmarked=[];entry.status='';entry.closed=false;}
-    if(action==='done'){entry.done=lesson.stages.map(stage=>stage.exercise.id);entry.unmarked=[];entry.status='done';entry.closed=false;}
+    if(action==='done'){entry.done=classStages(lesson).map(stage=>stage.exercise.id);entry.unmarked=[];entry.status='done';entry.closed=false;}
     if(action==='skip'){entry.status='skipped';entry.closed=true;}
-    saveJourney();if(action==='reset'&&lesson.stages.length){const first=lesson.stages[0];go({...route,exercise:first.exercise.id,section:stageSection(first)});return;}renderSidebar();renderMilestones();host.hidden=Boolean(entry.closed);
+    saveJourney();if(action==='reset'&&classStages(lesson).length){const first=classStages(lesson)[0];go({...route,exercise:first.exercise.id,section:stageSection(first)});return;}renderSidebar();renderMilestones();host.hidden=Boolean(entry.closed);
   }
   function milestonePurpose(stage){
     const def=stage.exercise,text=[stage.purpose,stage.menu,stage.title,def.title,stage.guide?.aim].filter(Boolean).join(' ').toLowerCase();
@@ -362,7 +363,7 @@
       nav.replaceChildren();
       const {done,current,total,unmarked}=journey(lesson);
       const columns=total+1;
-      (lesson?.stages||[]).forEach((stage,index)=>{
+      classStages(lesson).forEach((stage,index)=>{
         const purpose=milestonePurpose(stage),active=index===current;
         const control=button('',()=>{
           if(locked())return;
@@ -372,7 +373,7 @@
             else{entry.done.push(stage.exercise.id);entry.unmarked=entry.unmarked.filter(id=>id!==stage.exercise.id);}
             saveJourney();renderSidebar();renderMilestones();host.hidden=false;
           }else{
-            const previous=lesson.stages[current]?.exercise.id;
+            const previous=classStages(lesson)[current]?.exercise.id;
             if(previous&&!entry.unmarked.includes(previous)&&!entry.done.includes(previous))entry.done.push(previous);
             saveJourney();go({...route,...lessonLocation(lesson),lesson:lesson.id,exercise:stage.exercise.id,section:stageSection(stage)});
           }
@@ -399,7 +400,7 @@
     const points=[...nav.querySelectorAll('.workspace-path-point')],length=path.getTotalLength();
     points.forEach((control,index)=>{const point=path.getPointAtLength(length*index/Math.max(1,count-1));control.style.left=`${point.x/240*100}%`;control.style.top=`${point.y}px`;});
     if(current>=0&&lesson){
-      const point=path.getPointAtLength(length*current/Math.max(1,count-1)),label=node('span',milestonePurpose(lesson.stages[current]).name,'workspace-snake-label');
+      const point=path.getPointAtLength(length*current/Math.max(1,count-1)),label=node('span',milestonePurpose(classStages(lesson)[current]).name,'workspace-snake-label');
       const lane=Math.min(rows-2,Math.floor((point.y-24)/gap)),middle=24+lane*gap+gap/2;
       label.style.top=`${point.y+(point.y<=middle?18:-30)}px`;
       if(point.x>120){label.style.right=`${(240-point.x+10)/240*100}%`;label.style.left='auto';label.style.textAlign='right';}
@@ -987,7 +988,22 @@
   tick();
   const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
   const personIcon=profileButton.innerHTML,returnIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>';
-  profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});
+  function renderHomeworkProfile(){
+    profile.replaceChildren();
+    const lesson=selectedLesson(),details=node('details','','ek-disclosure');
+    details.append(node('summary','Homework'));
+    const list=node('ol');
+    visibleStages(lesson||{stages:[]},'self-study').forEach((stage,index)=>{
+      const row=node('li'),control=button(`${index+1}. ${stage.exercise.title}`,()=>{
+        if(locked())return;
+        go({...route,lesson:lesson.id,exercise:stage.exercise.id,section:'self-study'});
+      },'workspace-dialog-button');
+      control.disabled=locked();row.append(control);list.append(row);
+    });
+    details.append(list);if(!list.children.length)details.append(node('p','В этом уроке пока нет Homework.'));
+    profile.append(details);
+  }
+  profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;if(open)renderHomeworkProfile();profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});
 
   window.addEventListener('popstate', () => {
     if (liveMode && liveReady && liveRole === 'student') {

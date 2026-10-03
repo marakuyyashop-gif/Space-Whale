@@ -205,6 +205,20 @@ const explanationGaps5=[
 l5.push(stage('Fill in the gaps',4,E('L5-explanation-gaps','gaps','Complete the sentences.',{
  inputMode:'text',items:explanationGaps5.map(([before,answers,after],i)=>({id:String(i+1),segments:[before,{id:'gap'+(i+1),answers},after]}))
 })));
+const dialogue5="Emma: This café is nice. There are so many drinks here.\n\nDaniel: Yes. I usually have tea, but I want to try something different today.\n\nEmma: What about bubble tea?\n\nDaniel: I don’t know it. What is it?\n\nEmma: It’s a type of drink. It’s like tea with milk.\n\nDaniel: Okay. How much is it?\n\nEmma: Four dollars.\n\nDaniel: Okay. And what do you want?\n\nEmma: I think I want juice. The bubble tea looks interesting, but it’s a little too sweet for me.\n\nDaniel: Okay then, juice for you, bubble tea for me.\n\nEmma: Good choice.";
+const listeningTitle5='Listen to the conversation and do the tasks.';
+l5.push(stage('Listening',4,S('L5-cafe-listening',listeningTitle5,[
+ E('L5-cafe-player','audio',listeningTitle5,{mediaRef:addAudio(5,'L5-CAFE-D01',dialogue5),audioPending:true}),
+ C('L5-cafe-place','Choose the correct answer.',[['Where are Emma and Daniel?',['At home.','At a café.','At a clothing shop.'],1]]),
+ M('L5-cafe-information','Match the information.',[
+ ['Daniel usually has','tea'],['Daniel wants','bubble tea'],['Emma wants','juice'],['Bubble tea costs','four dollars']
+ ],[2,0,3,1]),
+ E('L5-cafe-sequence','order','Put the events in the correct order.',{
+ tokens:[{id:'price',text:'Daniel asks about the price.'},{id:'choice',text:'Daniel wants bubble tea, and Emma wants juice.'},{id:'suggest',text:'Emma suggests bubble tea.'},{id:'explain',text:'Emma explains what bubble tea is.'}],correctOrder:['suggest','explain','price','choice']
+ }),
+ E('L5-cafe-hear','choice','Choose the sentences you hear.',{multiple:true,items:[{id:'heard',prompt:'Select all the correct answers.',options:[{id:'type',text:'It’s a type of drink.'},{id:'food',text:'It’s a kind of food.'},{id:'milk',text:'It’s like tea with milk.'},{id:'juice',text:'It’s like juice.'}],correctIds:['type','milk']}]}),
+ P('L5-cafe-script',listeningTitle5,[D('Script',dialogue5,false)])
+],{revealStops:[2,3,4,6],requireCheckBeforeNext:true})));
 l5.push(stage('Final · Speaking',5,kit.speaking({
  id:'L5-M09',
  title:'Help your new colleague',
