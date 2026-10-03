@@ -32,8 +32,8 @@ test('approved opening and final Speaking use the shared layout in teacher and l
    const v=setup(app.SpaceWhaleLessonView(d,role),{onSkip(){}});
    assert.equal(v.host.querySelector('button,details,input'),null);
    assert.equal(v.host.querySelector('.ek-speaking-use-title').textContent,'Use:');
-   assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,id.startsWith('L4')?2:1);
-   if(id.startsWith('L5'))assert.equal(v.host.querySelector('img'),null);
+   assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,2);
+   if(id==='L5-M09')assert.equal(v.host.querySelector('img'),null);
    else assert.ok(v.host.querySelector('img'));
    v.handle.destroy();
   }
