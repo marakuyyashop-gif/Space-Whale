@@ -176,10 +176,17 @@ l5.push(stage('Speaking',2,kit.speaking({
 const meanings5=[['food','еда'],['drink','напиток'],['furniture','мебель'],['clothing','одежда'],['building','здание'],['shop','магазин']];
 l5.push(stage('Word Pick',2.5,S('L5-M02','Соедините картинки и слова.',[pictureWords('L5-word-translation',5,words5,[2,5,1,4,0,3])])));
 l5.push(stage('Listen & Repeat',2,repeat(5,'L5-M03',words5,["We need some food for the party.", "I’d like a drink, please.", "There is new furniture in the living room.", "This shop has clothing for men and women.", "The library is an old building.", "There is a small shop near my house."])));
-const groups5=E('L5-M04','matching','Посмотрите на шесть групп картинок. Соедините каждую группу с подходящим словом.',{layout:'picture-word',items:words5.map((word,i)=>({id:String(i+1),text:String.fromCharCode(65+i),alt:'Группа '+String.fromCharCode(65+i),correctId:'o'+i,imagePending:true,imageMediaRef:'L5-I'+String(i+1).padStart(2,'0')})),options:[5,2,0,4,1,3].map(i=>({id:'o'+i,text:words5[i]}))});
-const groupBriefs=["Изображения: muffin · rice · bread.\n\n", "Изображения: tea · juice · coffee.\n\n", "Изображения: sofa · wardrobe · armchair.\n\n", "Изображения: coat · jacket · hat.\n\n", "Изображения: house · hospital · library.\n\n", "Три отдельные сцены покупки:\n1. supermarket — полки с продуктами, корзина/тележка, касса, покупатель;\n2. магазин книг — стеллажи с книгами, ценники, касса, покупатель оплачивает книгу;\n3. магазин одежды — стойки/вешалки с одеждой, ценники, касса, покупатель выбирает или оплачивает вещь.\n\nДля сцен 2–3 не вводить новые английские названия магазинов. Эти авторские описания не показываются ученику."];
-groups5.items.forEach((item,i)=>{media[5][item.imageMediaRef]={type:'image',src:null,brief:groupBriefs[i].trim()};});
-l5.push(stage('Match the groups',3,groups5,"Изображения пока ожидаются. Авторские описания не показываются ученику.\n### Group A\nИзображения: muffin · rice · bread.\n\n### Group B\nИзображения: tea · juice · coffee.\n\n### Group C\nИзображения: sofa · wardrobe · armchair.\n\n### Group D\nИзображения: coat · jacket · hat.\n\n### Group E\nИзображения: house · hospital · library.\n\n### Group F\nТри отдельные сцены покупки:\n1. supermarket — полки с продуктами, корзина/тележка, касса, покупатель;\n2. магазин книг — стеллажи с книгами, ценники, касса, покупатель оплачивает книгу;\n3. магазин одежды — стойки/вешалки с одеждой, ценники, касса, покупатель выбирает или оплачивает вещь.\n\nДля сцен 2–3 не вводить новые английские названия магазинов. Эти авторские описания не показываются ученику.\n- Group E показывает именно здания как объекты.\n- Group F считывается как место покупки за счёт кассы, покупателя, товаров и ценников.\n- Не использовать одну фотографию supermarket как закрытый выбор shop vs building.\n- На самих изображениях не писать готовые английские названия target-категорий."));
+const wordPractice5=[
+ ['The table is full of sandwiches, fruit and cake. All the ','food',' is ready for the party.'],
+ ['Tea, juice or water? Choose a ','drink','.'],
+ ['The new apartment is almost empty. There is no ','furniture',' in the living room yet.'],
+ ['This store has coats, sweaters and hats. It has a lot of warm ','clothing',' for winter.'],
+ ['The library is in a beautiful old ','building',' next to the park.'],
+ ['I usually buy bread and milk at the small ','shop',' near my house.']
+];
+l5.push(stage('Word Practice',3,E('L5-word-initial-gaps','gaps','Complete the sentences with the correct words.',{
+ inputMode:'text',items:wordPractice5.map(([before,answer,after],i)=>({id:String(i+1),segments:[before,{id:'word'+(i+1),answers:[answer],placeholder:answer[0]},after]}))
+})));
 l5.push(stage('Find the meaning',2,S('L5-M06','Read the examples. Choose the correct meaning.',[P('L5-kind-context','Read the examples.',[T('A muffin is a kind of food.\nTea is a type of drink.\nA sofa is a type of furniture.')]),C('L5-kind-meaning','Choose the correct meaning.',[['Что показывают a kind of / a type of в этих примерах?',['К какой общей категории относится предмет.','Что два предмета просто похожи внешне.'],0]])],{revealStops:[2]})));
 l5.push(stage('Language focus',2,E('L5-kind-rule','rule-page','Как объяснить незнакомую вещь',{blocks:[{type:'rule',text:"В английском языке незнакомую или необычную вещь можно объяснить двумя способами: сказать, к какой категории она относится, или сравнить её с чем-то знакомым.\n\n1. A kind of / a type of / a sort of\n\nИспользуйте a kind of, a type of или a sort of, чтобы сказать, к какой общей категории относится предмет.\n\nВ этом значении kind, type и sort означают практически одно и то же.\n\nIt’s a kind of furniture. — Это вид мебели.\nIt’s a type of drink. — Это вид напитка.\nIt’s a sort of building. — Это вид здания.\n\nПосле a kind of / a type of / a sort of называем общую категорию:\n\nfood · drink · furniture · clothing · building · shop\n\nОбратите внимание: в этой конструкции используется a:\n\na kind of · a type of · a sort of\n\n2. It’s like\n\nИспользуйте It’s like + noun, когда хотите сказать, на что похож предмет.\n\nIt’s like a big cushion. — Это похоже на большую подушку.\nIt’s like tea. — Это похоже на чай.\nIt’s like a small house. — Это похоже на маленький дом.\nIt’s like a bun. — Это похоже на булочку.\n\nСравните:\n\nIt’s a kind of furniture. — мы говорим, что это за категория.\nIt’s like a big cushion. — мы говорим, на что это похоже.\n\nТаким образом:\n\na kind of / a type of / a sort of → category\nlike → similarity",highlights:['A kind of / a type of / a sort of','a kind of','a type of','a sort of','It’s like','на что похож предмет','что это за категория','на что это похоже','like → similarity']}]})));
 const categorySentences5=[
@@ -213,9 +220,12 @@ const listeningTitle5='Listen to the conversation and do the tasks.';
 l5.push(stage('Listening',4,S('L5-cafe-listening',listeningTitle5,[
  E('L5-cafe-player','audio',listeningTitle5,{mediaRef:addAudio(5,'L5-CAFE-D01',dialogue5),audioPending:true}),
  C('L5-cafe-place','Choose the correct answer.',[['Where are Emma and Daniel?',['At home.','At a café.','At a clothing shop.'],1]]),
- M('L5-cafe-information','Match the information.',[
- ['Daniel usually has','tea'],['Daniel wants','bubble tea'],['Emma wants','juice'],['Bubble tea costs','four dollars']
- ],[2,0,3,1]),
+ E('L5-cafe-information','gaps','Choose the correct options.',{inputMode:'select',items:[
+ {id:'1',segments:['Daniel usually has ',{id:'usual',answers:['tea'],options:['coffee','juice','tea','water']},'.']},
+ {id:'2',segments:['Daniel wants ',{id:'daniel',answers:['bubble tea'],options:['juice','bubble tea','coffee','water']},'.']},
+ {id:'3',segments:['Emma wants ',{id:'emma',answers:['juice'],options:['tea','water','bubble tea','juice']},'.']},
+ {id:'4',segments:['Bubble tea costs ',{id:'price',answers:['four dollars'],options:['five dollars','four dollars','three dollars']},'.']}
+ ]}),
  E('L5-cafe-sequence','order','Put the events in the correct order.',{
  tokens:[{id:'price',text:'Daniel asks about the price.'},{id:'choice',text:'Daniel wants bubble tea, and Emma wants juice.'},{id:'suggest',text:'Emma suggests bubble tea.'},{id:'explain',text:'Emma explains what bubble tea is.'}],correctOrder:['suggest','explain','price','choice']
  }),

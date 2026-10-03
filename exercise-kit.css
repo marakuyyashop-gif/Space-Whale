@@ -1011,3 +1011,7 @@
 body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-match-slot,.ek-choice-trigger){background-color:#fff;background-image:none!important}
 body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-card,.ek-radio,.ek-token,.ek-option,.ek-inline-option,.ek-writing-input,.ek-typed-gap,.ek-status){background-color:#fff}
 body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter:none}
+
+/* Optional authored hints never become input values or answers. */
+.exercise-kit .ek-typed-gap::placeholder{color:var(--sw-exercise-muted);opacity:.45}
+.exercise-kit .ek-typed-gap:focus::placeholder{color:transparent;opacity:0}

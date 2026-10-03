@@ -284,6 +284,7 @@
         item.segments.forEach(segment => {
           if (typeof segment === 'string') return;
           safeId(segment?.id, 'gap id');
+          if (segment.placeholder != null) text(segment.placeholder, 'gap placeholder');
           if (used.has(segment.id)) fail(`Duplicate gap ID: ${segment.id}`);
           used.add(segment.id);
           if (segment.possibleAnswers) { array(segment.possibleAnswers, 'possibleAnswers'); segment.possibleAnswers.forEach(answer => text(answer, 'possible answer')); }
@@ -1236,6 +1237,7 @@
             field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false;
             field.setAttribute('aria-label', label);
             field.value = answers[segment.id] || '';
+            if(segment.placeholder) field.placeholder = segment.placeholder;
             const resize = () => { field.style.width = `${Math.max(5, Math.min(28, field.value.length + 2))}ch`; };
             resize();
             field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
