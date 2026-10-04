@@ -41,3 +41,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
 #homeworkCopyLink{font:inherit;font-size:14px;padding:10px 16px;border:1px solid #ddd;border-radius:12px;background:#fff;margin-top:10px;cursor:pointer}
 .homework-report .ek-stage-navigation,.homework-report .ek-reset{display:none}
 .ek-stage-section,.homework-comment{scroll-margin-top:44px}
+.homework-result[data-has-errors=true] .homework-result-summary{color:#9e302e}
+.homework-report .ek-picture-word-grid{max-width:620px}

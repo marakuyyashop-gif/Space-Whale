@@ -66,8 +66,8 @@ test('issue → perform → submit → open in a separate browser context preser
  }
  const input=doc.querySelector('#homeworkComment');input.value='Не поняла первое слово.';student.fire(input,'input');
  const finish=doc.querySelector('.homework-finish');assert.equal(finish.disabled,false);student.click(finish);await student.settle();await student.settle();
- const resultURL=student.ctx.copied;assert.ok(resultURL.includes('?result='));assert.ok(!resultURL.includes('edit='));assert.match(doc.querySelector('#homeworkStatus').textContent,/Теперь отправьте/);
- const reviewer=await page({url:resultURL,rpc:db.rpc});assert.ok(reviewer.document.querySelector('.homework-report'));assert.ok(reviewer.document.querySelector('.homework-result').open);assert.match(reviewer.document.body.textContent,/Не поняла первое слово/);
+ const resultURL=student.ctx.copied;assert.ok(resultURL.includes('?result='));assert.ok(!resultURL.includes('edit='));assert.match(doc.querySelector('#homeworkNoticeText').textContent,/Теперь отправьте/);
+ const reviewer=await page({url:resultURL,rpc:db.rpc});assert.ok(reviewer.document.querySelector('.homework-report'));assert.equal(reviewer.document.querySelector('.homework-result').open,false);reviewer.click(reviewer.document.querySelector('.homework-result summary'));assert.match(reviewer.document.body.textContent,/Не поняла первое слово/);
  assert.match(reviewer.document.querySelector('.homework-result-summary').textContent,/Верно: 4 из 6/);assert.ok(reviewer.document.querySelector('[data-feedback="retry"]'));assert.ok(reviewer.document.querySelector('.ek-correction'));
  assert.equal(reviewer.document.querySelector('.homework-finish'),null);assert.ok([...reviewer.document.querySelectorAll('.homework-report input,.homework-report textarea,.homework-report .ek-match-slot')].every(e=>e.disabled));
  const repeat=await page({url:editURL,rpc:db.rpc});assert.ok(repeat.document.querySelector('.homework-report'),'submitted editing link also opens result');
@@ -78,7 +78,7 @@ test('progress requires checked responses or explicit Skip; mistakes still count
  const p=packs[0],a={revealed:p.steps.length};for(const s of p.steps)if(Object.keys(kit.grade(s.exercise,{})).length)a[s.exercise.id]={__sw_skipped:true};assert.equal(model.progress(p,a,kit).complete,true);a.__seen=a.revealed;a.revealed=1;assert.equal(model.progress(p,a,kit).complete,true);delete a[p.steps[0].exercise.id];assert.equal(model.progress(p,a,kit).complete,false);
 });
 test('invalid result URLs never fall through to a blank learner assignment',async()=>{
- const db=backend(),p=await page({url:'https://example.test/homework.html?result=missing#key=bad',rpc:db.rpc});assert.match(p.document.querySelector('#homeworkStatus').textContent,/Работа не найдена/);assert.equal(p.document.querySelector('.ek-check'),null);p.close();
+ const db=backend(),p=await page({url:'https://example.test/homework.html?result=missing#key=bad',rpc:db.rpc});assert.match(p.document.querySelector('#homeworkNoticeText').textContent,/Работа не найдена/);assert.equal(p.document.querySelector('.ek-check'),null);p.close();
 });
 
 test('every published pack can complete every task through the shared UI and reopen the exact checked report',async()=>{

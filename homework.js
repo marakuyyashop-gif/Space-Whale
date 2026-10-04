@@ -7,7 +7,7 @@ let store=null, debounce=null, handle=null, pack=null, submitting=false;
 const node=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
 const button=(text,fn,target=actions)=>{const e=node('button',text);e.type='button';e.addEventListener('click',fn);target.append(e);return e;};
 const status=(text,error=false)=>{const el=$('homeworkStatus');el.textContent=text;el.dataset.error=String(error);};
-const notice=(text,error=false)=>{status(text,error);$('homeworkNoticeText').textContent=text;$('homeworkNotice').dataset.error=String(error);$('homeworkNotice').hidden=false;};
+const notice=(text,error=false)=>{$('homeworkNoticeText').textContent=text;$('homeworkNotice').dataset.error=String(error);$('homeworkNotice').hidden=false;};
 $('homeworkNoticeClose').addEventListener('click',()=>{$('homeworkNotice').hidden=true;});
 // Save status is separate: background autosave must never erase a copy/error notice.
 const saveStatus=(text,error=false)=>{const el=$('homeworkSaveStatus');if(el){el.textContent=text;el.dataset.error=String(error);}if(error)notice(text,true);};
@@ -20,9 +20,9 @@ const storageKey=id=>'space-whale:homework:attempt:'+id;
 function heading(p){$('homeworkLevel').textContent=p.level;$('homeworkTitle').textContent=p.title;document.title=p.title+' · Homework';}
 function showLink(url){$('homeworkLink').hidden=false;$('homeworkLinkField').value=url;}
 async function copyLink(url,finished=false){
- showLink(url);const ok=await links.copy(url);
+ const ok=await links.copy(url);$('homeworkLink').hidden=ok;
  notice(ok?(finished?'Ссылка скопирована. Теперь отправьте эту ссылку преподавателю на проверку.':'Ссылка скопирована. Отправьте её ученице.'):(finished?'Работа сохранена. Скопируйте ссылку из поля и отправьте преподавателю.':'Автоматическое копирование недоступно. Скопируйте ссылку из поля.'));
- if(!ok){$('homeworkLinkField').focus();$('homeworkLinkField').select();}
+ if(!ok){showLink(url);$('homeworkLinkField').focus();$('homeworkLinkField').select();}
 }
 $('homeworkCopyLink').addEventListener('click',()=>copyLink($('homeworkLinkField').value,params.has('result')||!store));
 function progress(answers,submitted=false){
@@ -38,7 +38,7 @@ function report(result){
  model.steps(pack).forEach((step,index)=>{
   const d=step.exercise,a=result.answers[d.id]||{},detail=node('details','','homework-result'),summary=node('summary');
   summary.append(node('span',`${index+1}. ${d.title}`),node('span',model.summary(d,a,kit),'homework-result-summary'));detail.append(summary);
-  const grades=Object.values(kit.grade(d,a));detail.open=Boolean(a.__sw_checked&&grades.some(v=>v==='retry'||v==='empty'));
+  const grades=Object.values(kit.grade(d,a));detail.open=false;detail.dataset.hasErrors=String(Boolean(a.__sw_checked&&grades.some(v=>v==='retry'||v==='empty')));
   const host=node('div');detail.append(host);content.append(detail);let mounted=false;
   const mount=()=>{if(mounted)return;mounted=true;kit.mount(host,d,{hideHeading:true,answers:a,syncChecks:true,readOnly:true,repeatAll:true});};
   if(detail.open)mount();detail.addEventListener('toggle',()=>{if(detail.open)mount();});summary.addEventListener('click',mount);
@@ -46,8 +46,7 @@ function report(result){
  if(result.answers.__comment?.trim()){const section=node('section','','homework-comment');section.append(node('h2','Комментарий преподавателю'),node('p',result.answers.__comment));content.append(section);}
 }
 function resultActions(url){
- showLink(url);button('Скопировать ссылку на результат',()=>copyLink(url,true));
- button('Скопировать ссылку на результат',()=>copyLink(url,true),footer);
+ button('Скопировать ссылку на результат',()=>copyLink(url,true));
 }
 function editable(result,record){
  clear();pack=result.definition;heading(pack);content.classList.remove('homework-report');
@@ -139,5 +138,5 @@ try{
    pending=pending||previous||links.fresh(lesson);await links.start(pending,rpc);const url=links.url(pending,'edit',location.href);history.replaceState(null,'',url);await openWork(pending.id,pending.edit,pending.read);
   }catch(_){notice('Не удалось открыть работу. Повторите попытку.',true);b.disabled=false;b.textContent='Начать домашку';}
  });status('Нажмите «Начать домашку». Ответы будут сохраняться автоматически.');
-}catch(error){notice(/Work unavailable|Invalid keys/.test(error.message)?'Работа не найдена. Проверьте, что ссылка скопирована полностью.':error.message||'Не удалось загрузить домашку.',true);button('Повторить загрузку',()=>location.reload());}
+}catch(error){status('');notice(/Work unavailable|Invalid keys/.test(error.message)?'Работа не найдена. Проверьте, что ссылка скопирована полностью.':error.message||'Не удалось загрузить домашку.',true);button('Повторить загрузку',()=>location.reload());}
 })();
