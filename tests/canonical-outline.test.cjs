@@ -12,7 +12,7 @@ function loadedContent() {
   const context = vm.createContext({window});
   const html = fs.readFileSync(path.join(root, 'classroom.html'), 'utf8');
   const scripts = [...html.matchAll(/<script src="([^"?]+)(?:\?[^\"]*)?"/g)]
-    .map(m => m[1]).filter(file => /^(template-gallery|lesson-draft-|course-content|whale1-content)/.test(file));
+    .map(m => m[1]).filter(file => /^(template-gallery|lesson-draft-|course-content|whale1-content|homework-a21)/.test(file));
   for (const file of scripts) vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context);
   return JSON.parse(JSON.stringify({lessons:window.SpaceWhaleContent,templates:window.SpaceWhaleTemplates}));
 }

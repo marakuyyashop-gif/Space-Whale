@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const {parseHTML}=require('linkedom');const kit=require('../exercise-kit.js');
-const app={SpaceWhaleExerciseKit:kit};
+const app={SpaceWhaleExerciseKit:kit,SpaceWhaleHomeworkA21:require('../homework-a21.js')};
 for(const name of ['course-content.js','course-content-smy-a21.js','course-content-directions-a21.js'])vm.runInNewContext(fs.readFileSync(require.resolve('../'+name),'utf8'),{window:app});
 const lesson=app.SpaceWhaleContent.find(l=>l.id==='a2-1-w1-smy-3');
 const homework=app.SpaceWhaleContent.find(l=>l.id===lesson.id+'-homework');
@@ -10,7 +10,7 @@ test('new route resolves; homework is separate from the 28+2 minute lesson',()=>
  const catalog=require('../workspace-catalog.js').createCatalog(app.SpaceWhaleContent,[]);
  const route=catalog.normalize({view:'library',level:'A2.1',whale:1,lesson:lesson.id,exercise:'A2_DIR_M01'});
  assert.equal(route.exercise,'A2_DIR_M01');assert.equal(lesson.stages.filter(s=>s.section==='tasks').reduce((n,s)=>n+parseFloat(s.guide.time),0)+lesson.feedback.minutes,30);
- assert.equal(lesson.stages.length,9);
+ assert.equal(lesson.stages.length,7);
  assert.ok(lesson.stages.every(s=>s.section==='tasks'));
  assert.equal(lesson.stages.at(-1).exercise.id,'A2_DIR_M07');
  assert.equal(homework.stages.length,2);
@@ -27,8 +27,8 @@ test('every stage mounts without exposing notes or requesting missing media',()=
  for(const audio of host.querySelectorAll('audio[src]'))assert.ok(fs.existsSync(require('node:path').join(__dirname,'..',audio.getAttribute('src'))));handle.destroy();}
 });
 test('closed tasks grade and provide complete corrections',()=>{
- for(const s of lesson.stages)walk(s.exercise,d=>{const a={};if(['choice','matching'].includes(d.kind))d.items.forEach(i=>a[i.id]=i.correctId);if(d.kind==='gaps')d.items.forEach(i=>i.segments.forEach(g=>{if(typeof g!=='string')a[g.id]=g.answers[0];}));if(Object.keys(a).length)assert.ok(Object.values(kit.grade(d,a)).every(v=>v==='correct'),d.id);});
- const d=lesson.stages.find(s=>s.exercise.id==='A2_DIR_M05').exercise;const {host,handle}=setup(d);const a={__sw_checked:true};d.items.forEach(i=>i.segments.forEach(g=>{if(typeof g!=='string')a[g.id]='incorrect';}));handle.setAnswers(a);assert.match(host.querySelector('.ek-answer-pairs').textContent,/Pass the café and stop at the cinema/);handle.destroy();
+ for(const s of lesson.stages)walk(s.exercise,d=>{const a={};if(['choice','matching'].includes(d.kind))d.items.forEach(i=>a[i.id]=i.correctIds||i.correctId);if(d.kind==='gaps')d.items.forEach(i=>i.segments.forEach(g=>{if(typeof g!=='string')a[g.id]=g.answers[0];}));if(Object.keys(a).length)assert.ok(Object.values(kit.grade(d,a)).every(v=>v==='correct'),d.id);});
+ const d=lesson.stages.find(s=>s.exercise.id==='A2_DIR_PRACTICE').exercise.exercises[0].exercise;const {host,handle}=setup(d);const a={__sw_checked:true};d.items.forEach(i=>i.segments.forEach(g=>{if(typeof g!=='string')a[g.id]='incorrect';}));handle.setAnswers(a);assert.match(host.querySelector('.ek-answer-pairs').textContent,/Pass the café and stop at the cinema/);handle.destroy();
 });
 test('transcript stays gated until all comprehension attempts',()=>{
  const d=lesson.stages.find(s=>s.exercise.id==='A2_DIR_M06').exercise;const {host,handle}=setup(d);const transcript=host.querySelector('details');assert.equal(transcript.hidden,true);
@@ -38,17 +38,20 @@ test('transcript stays gated until all comprehension attempts',()=>{
 
 test("all nine lesson audio sources resolve to revisioned MP3 files",()=>{const media=app.SpaceWhaleLessonMedia[lesson.id];assert.equal(Object.keys(media).length,9);for(const entry of Object.values(media)){assert.match(entry.src,/_r1\.mp3$/);assert.ok(fs.statSync(require("node:path").join(__dirname,"..",entry.src)).size>10000);}walk(lesson.stages.find(s=>s.exercise.id==="A2_DIR_M03").exercise,d=>assert.equal(d.items.length,8));});
 
-test('new practice precedes final speaking; writing source and field open together',()=>{
- const ids=lesson.stages.map(s=>s.exercise.id);
- assert.deepEqual(Array.from(ids.slice(-3)),['A2_DIR_M08','A2_DIR_M09','A2_DIR_M07']);
- const correction=lesson.stages.find(s=>s.exercise.id==='A2_DIR_M08').exercise;
- assert.equal(correction.responseMode,'open');
- assert.ok(correction.items.every(i=>!i.acceptedAnswers&&!i.promptHighlights));
- const writing=lesson.stages.find(s=>s.exercise.id==='A2_DIR_M09').exercise;
- const {host,handle}=setup(writing);
- assert.ok(host.querySelector('img[src$="test-route.svg"]'));
- const input=host.querySelector('textarea');assert.ok(input);
- let parent=input;while(parent){assert.ok(!parent.hidden,'writing field is hidden');parent=parent.parentElement;}
- assert.ok(!host.textContent.includes('Follow the path to the stairs and go down them.'));
- handle.destroy();
+test('practice reveals dropdown, multiple select, correction and mapped sequence in that order',()=>{
+ const practice=lesson.stages.find(s=>s.exercise.id==='A2_DIR_PRACTICE').exercise;
+ assert.deepEqual(Array.from(practice.revealStops),[1,2,3,5]);
+ assert.deepEqual(Array.from(practice.exercises,b=>b.exercise.kind),['gaps','choice','writing','presentation','order']);
+ assert.ok(!lesson.stages.some(s=>s.exercise.id==='A2_DIR_M09'));
+ const order=practice.exercises.at(-1).exercise;
+ assert.deepEqual(Array.from(order.correctOrder),['along','across','through','past','towards','down','straight']);
+ assert.ok(order.tokens.map(t=>t.id).join()!==order.correctOrder.join());
+ for(const block of practice.exercises)kit.validate(block.exercise);
+ assert.ok(homework.stages.every(s=>s.exercise.items.length===6&&s.exercise.responseMode==='accepted'));
+});
+test('discovery reveals one question at a time while report mode shows all',()=>{
+ let discovery;walk(lesson.stages.find(s=>s.exercise.id==='A2_DIR_M04').exercise,d=>{if(d.kind==='choice')discovery=d;});
+ assert.equal(discovery.progressiveQuestions,true);
+ const {host,handle}=setup(discovery);assert.equal(host.querySelectorAll('fieldset').length,1);handle.destroy();
+ const {document}=parseHTML('<html><body><main></main></body></html>');const report=document.querySelector('main');const h=kit.mount(report,discovery,{readOnly:true,showAllQuestions:true});assert.equal(report.querySelectorAll('fieldset').length,3);h.destroy();
 });

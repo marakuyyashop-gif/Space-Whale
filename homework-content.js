@@ -10,10 +10,10 @@ const mapping={
  5:{words:'L5-word-translation',repeat:'L5-M03',practice:['L5-explanation-gaps'],rules:['L5-kind-rule']},
  6:{words:'L3-M02',repeat:'L3-M03',practice:['L4-question-answer-match','L5-explanation-gaps'],rules:['a12w4l1-language-focus','L3-M07-rule','L3-M08-explanation','L4-question-rule','L5-kind-rule']}
 };
-function build(content,catalog,translations){
+function build(content,catalog,translations,a21){
  const all=new Map();function walk(d){all.set(d.id,d);d.exercises?.forEach(b=>walk(b.exercise));d.blocks?.forEach(b=>{if(b.exercise)walk(b.exercise);});}content.forEach(l=>l.stages.forEach(s=>walk(s.exercise)));
  const get=id=>{if(!all.has(id))throw Error('Missing homework source '+id);return copy(all.get(id));};
- return Object.entries(mapping).map(([number,source])=>{
+ const packs=Object.entries(mapping).map(([number,source])=>{
   const id=`a1-2-w4-l${number}`,steps=[];
   const add=(role,exercise)=>steps.push({role,exercise});
   add('words',get(source.words));add('listenRepeat',get(source.repeat));source.practice.forEach(id=>add('practice',get(id)));
@@ -22,6 +22,12 @@ function build(content,catalog,translations){
   tasks.forEach(d=>add('translation',d));
   return {id,version:'20261004-2',level:'A1.2',title:catalog.lessons.find(l=>l.id===id).title,steps,reference:copy(steps.find(s=>s.role==='rule').exercise),exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))};
  });
+ if(a21)for(const source of a21.mapping){
+  const lesson=content.find(l=>l.id===source.id);if(!lesson)throw Error('Missing A2 homework lesson '+source.id);
+  const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},...source.practice.map(id=>({role:'practice',exercise:get(id)})),...source.rules.map(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');d.id+='-homework-rule';return {role:'rule',exercise:d};}),...a21.build(source.key).map(exercise=>({role:'translation',exercise}))];
+  packs.push({id:source.id,version:'20261004-a21',level:'A2.1',title:lesson.topic,steps,reference:copy(steps.find(s=>s.role==='rule').exercise),exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
+ }
+ return packs;
 }
 if(typeof module!=='undefined')module.exports={build,mapping};else root.SpaceWhaleHomeworkContent={build,mapping};
 })(typeof window==='undefined'?globalThis:window);

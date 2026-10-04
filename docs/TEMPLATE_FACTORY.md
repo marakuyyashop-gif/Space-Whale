@@ -158,3 +158,10 @@ The light workspace canvas is solid white without a grid, with black primary les
 ## Independent homework sequences (2026-10-04)
 
 Homework uses the existing `stage` composition and all existing response templates. Mount options (off by default) are `repeatAll:true` (whole Listen & Repeat list, manual players, no phrase arrows), `allowMaterialSkip:true` (Skip on audio/presentation/rule materials), and `independentSteps:true` (audio is an independent homework step; it does not turn later tasks into source-listening questions). These flags propagate through the shared stage. Check or Skip enables progression; audio/rule forward arrows remain available. Existing classroom defaults are preserved. `taskFinished` is exported for shared progress calculation. Homework roles are authored content metadata, never inferred from Matching/Gap names.
+
+## Reviewed A2 homework and checked feedback (2026-10-04)
+
+- `homework-a21.js` owns the two movement/directions translation sets, shared by the catalog and the legacy Smy 3 homework route. Load it before `course-content-directions-a21.js`. Each set has two tasks of six single-line responses. Sequencers is excluded. Full rules/audio/word practice come from explicit source IDs.
+- Keyed writing can opt into `items[].normalization:'translation'`: ignore case, whitespace, normal sentence punctuation and normalize supported English contractions. Grading still compares authored alternatives; no semantic/AI checker is connected. Preserve tense, direction and negation. Show one canonical correction, keep accepted variants out of the question.
+- Choice can opt into `progressiveQuestions:true` to use the existing per-question OK/Next adapter. `showAllQuestions:true` renders the complete read-only homework report. Classroom defaults and stable item IDs remain unchanged.
+- Checked responses show explicit check/cross glyphs, including fieldset choices/multiple select; numbered fields retain their item number. Do not encode feedback only by color.

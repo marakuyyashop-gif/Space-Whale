@@ -4,6 +4,14 @@
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const normalizeEnglish = value => normalize(value).replace(/[‘’ʼ]/g, "'").replace(/\.$/, '').trim();
+  // Opt-in for keyed translations: typography and contractions do not change meaning.
+  // Vocabulary/word order/tense are still checked against authored alternatives.
+  const normalizeTranslation = value => normalize(value).replace(/[‘’ʼ]/g, "'")
+    .replace(/\b(can't|cannot)\b/g,'can not').replace(/\bwon't\b/g,'will not')
+    .replace(/\b(don't|doesn't|didn't|isn't|aren't|wasn't|weren't|couldn't|shouldn't|wouldn't|haven't|hasn't|hadn't)\b/g,word=>({"don't":"do not","doesn't":"does not","didn't":"did not","isn't":"is not","aren't":"are not","wasn't":"was not","weren't":"were not","couldn't":"could not","shouldn't":"should not","wouldn't":"would not","haven't":"have not","hasn't":"has not","hadn't":"had not"}[word]))
+    .replace(/\bi'm\b/g,'i am').replace(/\b(you|we|they)'re\b/g,'$1 are')
+    .replace(/\b(he|she|it|that|there)'s\b/g,'$1 is')
+    .replace(/[.,!?;:«»“”"–—]/g,' ').replace(/\s+/g,' ').trim();
   const orderSentence = (def, order) => {
     let text = (order || []).map(id => def.tokens.find(token => token.id === id).text).join(' ').replace(/\s+([,.!?;:])/g, '$1');
     if (def.sentenceCase) text = text.charAt(0).toUpperCase() + text.slice(1);
@@ -245,6 +253,7 @@
     }
     if (def.kind === 'choice') {
       if (def.layout != null && !['list', 'image-grid', 'dropdown'].includes(def.layout)) fail('Unsupported choice layout');
+      if(def.progressiveQuestions!=null&&typeof def.progressiveQuestions!=='boolean')fail('progressiveQuestions must be boolean');
       if (def.multiple != null && typeof def.multiple !== 'boolean') fail('multiple must be boolean');
       if (def.multiple && def.layout === 'dropdown') fail('Multiple choice needs visible checkboxes');
       def.items.forEach(item => {
@@ -265,6 +274,7 @@
     }
     if (def.kind === 'writing') def.items.forEach(item => {
       media(item); text(item.prompt,'prompt');
+      if(item.normalization!=null&&item.normalization!=='translation')fail('Unsupported writing normalization');
       if(item.hint!=null)text(item.hint,'hint');
       if(item.placeholder!=null)text(item.placeholder,'placeholder');
       if(item.multiline!=null&&typeof item.multiline!=='boolean')fail('multiline must be boolean');
@@ -324,7 +334,7 @@
           return;
         }
         const correct = def.kind === 'writing'
-          ? (item.acceptedAnswers ? item.acceptedAnswers.some(answer => normalize(answer) === normalize(value)) : null)
+          ? (item.acceptedAnswers ? item.acceptedAnswers.some(answer => (item.normalization==='translation'?normalizeTranslation(answer):normalize(answer)) === (item.normalization==='translation'?normalizeTranslation(value):normalize(value))) : null)
           : (item.correctId == null ? null : value === item.correctId);
         mark(item.id, value != null && String(value).trim() !== '', correct);
       });
@@ -413,7 +423,7 @@
       const handle=mount(host,stage,{...config,syncChecks:true,answers:unpack(config.answers),onChange:value=>config.onChange?.(pack(value))});
       return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>handle.setAnswers(unpack(value))};
     }
-    if(config.sequentialListening&&definition.kind==='choice'&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
+    if((config.sequentialListening||definition.progressiveQuestions)&&!config.showAllQuestions&&definition.kind==='choice'&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
     const def = clone(definition);
     // Independent tasks reveal in sequence; a reading/audio source stays with its task.
     const taskKinds = new Set(['matching','gaps','choice','image-label','order','sort','writing','rule-page']);
@@ -1388,9 +1398,9 @@
       lamps.clear();
       controls.forEach((control,id)=>{
         if(!['matching','gaps','choice'].includes(def.kind))return;
-        if(def.kind==='choice'&&control.tagName==='FIELDSET')return;
+        if(def.kind==='choice'&&control.tagName==='FIELDSET'){const legend=control.querySelector('legend');let badge=legend.querySelector('.ek-result-symbol');if(!badge){badge=node('span','ek-result-symbol');legend.prepend(badge);}badge.setAttribute('role','img');badge.setAttribute('aria-label','Not checked');lamps.set(id,badge);return;}
         const lamp=def.kind==='matching'?control.closest('.ek-card').querySelector('.ek-number'):(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number'));
-        if(!lamp)return;lamp.classList.add('ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
+        if(!lamp)return;lamp.dataset.number=lamp.dataset.number||lamp.textContent;lamp.classList.add('ek-result-lamp');lamp.setAttribute('role','img');lamp.setAttribute('aria-label','Not checked');
         if(def.kind==='matching'){ /* Reuse the number badge, without a second indicator. */ }
         else if(def.kind==='choice'){
           /* Discovery badge is already inside its field. */

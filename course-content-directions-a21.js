@@ -36,6 +36,7 @@ step('Phrase Input',4,S('A2_DIR_M02','Match the phrases with their meanings.',[
  E('A2_DIR_M02-match','matching','Match the phrases with their meanings.',{
  items:definitions.map(([id,text])=>({id,text,correctId:id})),
  options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][2]}))}),
+ P('A2_DIR_M02-visual','Look at the directions.',[{type:'image',image:root+'direction-support.svg',imageWidth:1120,imageHeight:640,alt:'Seven movement diagrams: beside a river, across a bridge, straight at a crossing, through a park, towards a fountain, past a bank, and down stairs.'},T('1. Go along the river.\n2. Walk across the bridge.\n3. Keep going straight at the crossing.\n4. Continue through the park.\n5. Head towards the fountain.\n6. Walk past the bank.\n7. Go down the stairs.')]),
  P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the bank = walk past the bank.\n\nThe bank is next to your route. You do not go inside; you keep walking.'),I('test-route.svg'),T('Look at the map again. Show a place you pass on your way to the café.')])
 ],{progressive:true,requireCheckBeforeNext:true}),'Цель: ввести все семь сочетаний и pass. Сначала дать ученику попытаться сопоставить значения, затем вместе проверить; это ввод с поддержкой, а не тест после объяснения. При необходимости показать участок карты. Не объявлять одну линию на карте однозначным изображением along / straight / towards. Down здесь — значение со stairs. Pass вводится и применяется в последней короткой реплике. Базовые go / walk знакомы; keep going, continue, head и pass изучаются в контексте, без второго искусственного словарного списка.');
 step('Pronunciation',2,E('A2_DIR_M03','audio','Listen and repeat.',{
@@ -43,10 +44,10 @@ step('Pronunciation',2,E('A2_DIR_M03','audio','Listen and repeat.',{
  items:repeatTexts.map((text,i)=>({id:'A2_DIR_P'+String(i+1).padStart(2,'0'),text,audio:root+'audio/A2_DIR_P'+String(i+1).padStart(2,'0')+'_r1.mp3'}))
 }),'Цель: произнести восемь осмысленных фраз. Преподаватель включает каждую запись; ученик слушает и повторяет. Работать целыми сочетаниями; не читать названия предлогов отдельно. Не засчитывать этот этап как Listening comprehension. Восемь отдельных записей Jessica, строго по видимым строкам.');
 step('Language Focus',3,S('A2_DIR_M04','Notice how the directions work.',[
- C('A2_DIR_M04-discovery','Notice how the directions work.',[
+ {...C('A2_DIR_M04-discovery','Notice how the directions work.',[
  Q('1','“Walk past the café.” / “Pass the café.”\nDo these directions describe the same movement?',['Yes, both take you beyond the café.','No, the second tells you to go inside.'],'A','Both directions tell you to go past the café.'),
  Q('2','“Head towards the bridge, but turn left before you reach it.”\nDo you need to reach the bridge?',['Yes.','No.'],'B','No. Turn left before you reach the bridge.'),
- Q('3','“Go along River Street. At the next crossing, keep going straight.”\nWhat does the second instruction add?',['Leave River Street.','Cross the river.','Do not turn at the crossing.'],'C','Do not turn at the crossing.')]),
+ Q('3','“Go along River Street. At the next crossing, keep going straight.”\nWhat does the second instruction add?',['Leave River Street.','Cross the river.','Do not turn at the crossing.'],'C','Do not turn at the crossing.')]),progressiveQuestions:true},
  E('A2_DIR_M04-rule','rule-page','How to give directions.',{blocks:[{type:'rule',title:'',text:rule,highlights:['Go along','Walk across','Continue through','Walk past','Pass the bank.','Head towards','Keep going straight','Go down the stairs','go down the street']}]})
 ],{progressive:true,requireCheckBeforeNext:true}),'Цель: после ввода значений вывести важные различия и форму; не повторять семипунктовое matching. Сначала три решения, затем правило через стрелку. Обязательно проговорить pass + объект без past; keep going, не keep go; towards не означает обязательного достижения. Не учить, что down всегда только вниз. Полный текст правила остаётся доступным, но преподаватель выделяет проблемные места вместо чтения всей страницы вслух.');
 const g=(id,before,options,answer,after)=>({id,segments:[before,{id:'A2_DIR_G'+id,options,answers:[answer]},after]});
@@ -72,31 +73,34 @@ step('Correction',2,W('A2_DIR_M08','Check the directions.',[
  {id:'2',prompt:'Pass past the bank and stop at the next building.',possibleAnswers:['Pass the bank and stop at the next building.','Walk past the bank and stop at the next building.']},
  {id:'3',prompt:'Head towards to the station.',possibleAnswers:['Head towards the station.','Head to the station.']}
 ],'Your friend wrote these directions. Correct one mistake in each sentence. Keep the same meaning.'),'Цель: самостоятельно исправить форму без вариантов ответа. Ученик вводит исправленные предложения. Проверка преподавателем; Possible answers после попытки, без автоматической оценки свободного текста. Принимать естественные исправления: Pass the bank / Walk past the bank; Head towards the station / Head to the station. Ошибка заранее не выделяется.');
-step('Guided Writing',3,S('A2_DIR_M09','Send your friend directions.',[
- P('A2_DIR_M09-map','Send your friend directions.',[
- T('Your friend is on the road just past the bank. You are waiting at the café.'),I('test-route.svg'),
- T('Look at the map. Write a short message to your friend. Explain how to get from the bank to the café.'),
- D('Useful phrases','Head towards…\nTurn… before…\nGo down…\nKeep going…\nThe café is…',true)]),
- W('A2_DIR_M09-message','Your message.',[{id:'1',prompt:'Write 3–4 sentences.',multiline:true,possibleAnswers:['Head towards the fountain, but turn left before you reach it. Turn left at the corner and go down the stairs. Keep going straight at the crossing. The café is in front of you.']}])
-],{progressive:true,revealStops:[2]}),'Цель: объединить изученные направления в коротком сообщении адресату перед Final Speaking. Карта, Useful phrases и поле сообщения доступны вместе. Старт после банка: не описывать заново путь от bus stop. Критерии: верное направление к фонтану и поворот до него, спуск по лестнице, прямо через пересечение к кафе; понятный порядок. Естественные варианты принимаются. Учитель проверяет содержание, образец после попытки; не оценивать буквальное совпадение.');
 step('Final Speaking',5,S('A2_DIR_M07','Help your friend get to the cinema.',[
  P('A2_DIR_M07-speaking','Help your friend get to the cinema.',[
  T('Your friend is at the station. You are waiting at the cinema. Explain how to get there.'),I('final-route.svg'),
  T('Look at the map. Follow the black line from START to FINISH. Tell your friend how to get there. Your friend asks one question about the way.'),D('Useful phrases',phrases,true)]),
  P('A2_DIR_M07-sample','Compare your directions.',[D('Possible answers','Walk past the shop and continue through the garden. Walk across the bridge. Then go along Garden Street and turn right at the end. Then turn right again. Keep going straight at the crossing. Go down the stairs and head towards the cinema.\n\nPartner: Do I turn at the crossing?\nYou: No, keep going straight.')])
 ],{progressive:true}),'Цель: то же умение, что в Test Task, на другом маршруте, без нового времени и придумывания истории. Карта общая; не называть это information gap. 1 минута на подготовку, 3 на объяснение и уточнение, 1 на исправление. Оценка: понятен порядок; направления соответствуют пути; сочетания выбраны по смыслу; собеседник может следовать указаниям. Не требовать все chunks и точного совпадения с sample. Along и straight могут совместно описывать участок. Useful phrases остаются открытыми. Образец только после попытки через стрелку и закрытое раскрытие.\n\nЕщё 2 минуты Feedback: сравнить начальную и итоговую попытки при одинаковых опорах; назвать один удачный участок и предложить исправить одну реально возникшую ошибку. Если времени мало, сократить повторные произнесения уже освоенных строк; не убирать Final.');
-const homework=[
- ['Выйдите из отеля и идите вдоль Ривер-стрит до входа в парк.','Leave the hotel and go along River Street until you reach the park entrance.'],
- ['Пройдите через парк к воротам на другой стороне.','Walk through the park to the gate on the other side.'],
- ['За воротами поверните направо и пройдите мимо банка.','After the gate, turn right and walk past the bank.'],
- ['Продолжайте идти прямо до лестницы. Спуститесь по ней; кафе справа внизу.','Keep going straight until you reach the stairs. Go down them; the café is at the bottom on your right.'],
- ['Мы у вокзала. Как нам пройти в кинотеатр?','We are at the station. How do we get to the cinema?'],
- ['Перейдите через площадь на другую сторону.','Walk across the square to the other side.'],
- ['Направляйтесь к фонтану, но поверните направо перед ним.','Head towards the fountain, but turn right before you reach it.'],
- ['Пройдите мимо магазина; кинотеатр — следующее здание.','Pass the shop; the cinema is the next building.']
-];
-const homeworkStages=[];
-for(let n=0;n<2;n++)homeworkStages.push({menu:'Homework '+(n+1),navigationTitle:'Homework '+(n+1),section:'self-study',guide:{teacherNotes:'Отдельно от 30 минут урока. Перевод по смыслу; образцы — возможные ответы, не exact-match ключ. Принимать естественные синонимы, отмечая освоение целевых сочетаний.'},exercise:W('A2_DIR_HW'+(n+1),n===0?'From the hotel to the café.':'From the station to the cinema.',homework.slice(n*4,n*4+4).map(([prompt,answer],i)=>({id:String(i+1),prompt,possibleAnswers:[answer]})),'Translate the directions into English.')});
+const multiple=E('A2_DIR_PRACTICE_multiple','choice','Which directions fit the situation?',{
+ multiple:true,progressiveQuestions:true,instruction:'Select all the correct answers.',items:[
+ {id:'1',prompt:'You follow River Street beside the river. At the crossing, you stay on this road without turning.',options:[{id:'A',text:'Walk across River Street.'},{id:'B',text:'Go along River Street.'},{id:'C',text:'Continue through River Street.'},{id:'D',text:'Keep going straight at the crossing.'}],correctIds:['B','D']},
+ {id:'2',prompt:'The bank is beside your route. You stay outside and continue beyond it.',options:[{id:'A',text:'Walk past the bank.'},{id:'B',text:'Continue through the bank.'},{id:'C',text:'Pass the bank.'},{id:'D',text:'Stop inside the bank.'}],correctIds:['A','C']},
+ {id:'3',prompt:'You enter the park at this gate and leave by the opposite gate. Then you move in the direction of the fountain.',options:[{id:'A',text:'Walk past the park without entering it.'},{id:'B',text:'Continue through the park.'},{id:'C',text:'Walk across the fountain.'},{id:'D',text:'Head towards the fountain.'}],correctIds:['B','D']},
+ {id:'4',prompt:'You are at the top of the stairs. The café is at the bottom. You move down to the café.',options:[{id:'A',text:'Head towards the café.'},{id:'B',text:'Go up the stairs.'},{id:'C',text:'Walk past the café and continue away from it.'},{id:'D',text:'Go down the stairs.'}],correctIds:['A','D']},
+ {id:'5',prompt:'The museum is on the opposite side of the square. You cross the square on your way to the museum.',options:[{id:'A',text:'Walk past the square without entering it.'},{id:'B',text:'Continue through the museum.'},{id:'C',text:'Walk across the square.'},{id:'D',text:'Head towards the museum.'}],correctIds:['C','D']}
+ ]});
+const routeOrder=E('A2_DIR_PRACTICE_order','order','Put the directions in the correct order.',{
+ instruction:'Follow the dotted route from START to FINISH.',tokens:[
+ {id:'straight',text:'Keep going straight at the crossing to reach the café.'},
+ {id:'past',text:'Walk past the bank.'},
+ {id:'down',text:'Go down the stairs to the lower path.'},
+ {id:'through',text:'Continue through the park.'},
+ {id:'along',text:'Go along River Street.'},
+ {id:'towards',text:'Head towards the fountain, but turn left before it.'},
+ {id:'across',text:'Walk across the bridge.'}],correctOrder:['along','across','through','past','towards','down','straight']});
+const controlled=stages.find(s=>s.exercise.id==='A2_DIR_M05'),correction=stages.find(s=>s.exercise.id==='A2_DIR_M08');
+const practice=S('A2_DIR_PRACTICE','Practice',[controlled.exercise,multiple,correction.exercise,P('A2_DIR_PRACTICE-map',routeOrder.title,[I('test-route.svg')]),routeOrder],{progressive:true,revealStops:[1,2,3,5],requireCheckBeforeNext:true});
+stages.splice(stages.indexOf(controlled),1,{...controlled,menu:'Practice',navigationTitle:'Practice',guide:{time:'8 min',teacherNotes:'Dropdown → Multiple Select → Error Correction → route map and Sequence Order. The order key follows the actual map: stairs before the final crossing. Retained exercise and answer IDs are unchanged.'},exercise:practice});
+stages.splice(stages.indexOf(correction),1);
+const homeworkStages=window.SpaceWhaleHomeworkA21.build('directions').map((exercise,n)=>({menu:'Homework '+(n+1),navigationTitle:'Homework '+(n+1),section:'self-study',exercise:{...exercise,id:'A2_DIR_HW'+(n+1)}}));
 const lesson={id,title:'Уроки для Smy 3',topic:'Подскажите, как пройти…',level:'A2.1',whale:1,summary:'Объясняем маршрут и уточняем направление. Карты, записи фраз и голосовое сообщение.',grammar:'Verbs of movement + prepositions of movement',constructions:chunks.join('; ')+'; pass + place',words:['go','walk','keep going','continue','head','pass'],durationMinutes:30,plannedTeachingMinutes:28,feedbackMinutes:2,source:'docs/lessons/smy-a21-directions-scenario.md',stages,feedback:{id:'A2_DIR_FEEDBACK',minutes:2,teacherNotes:'Один успех и одна самостоятельная коррекция по результатам Final.'},productionStatus:{content:'reviewed',maps:'schematic',audio:'recordings-published-auditory-review-pending'}};
 window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
 window.SpaceWhaleLessonMedia[id]=Object.fromEntries(repeatTexts.map((script,i)=>['A2_DIR_P'+String(i+1).padStart(2,'0'),{type:'audio',src:root+'audio/A2_DIR_P'+String(i+1).padStart(2,'0')+'_r1.mp3',script}]));

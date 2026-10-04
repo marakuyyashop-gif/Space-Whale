@@ -27,7 +27,7 @@ function report(result){
   const d=step.exercise,a=result.answers[d.id]||{},detail=node('details','','homework-result'),summary=node('summary');summary.append(node('span',`${index+1}. ${d.title}`),node('span',model.summary(d,a,kit),'homework-result-summary'));detail.append(summary);
   const grades=Object.values(kit.grade(d,a));detail.open=Boolean(a.__sw_checked&&grades.some(v=>v==='retry'||v==='empty'));
   const host=node('div');detail.append(host);content.append(detail);let mounted=false;
-  const mount=()=>{if(mounted)return;mounted=true;kit.mount(host,d,{hideHeading:true,answers:a,syncChecks:true,readOnly:true,repeatAll:true});};
+  const mount=()=>{if(mounted)return;mounted=true;kit.mount(host,d,{hideHeading:true,answers:a,syncChecks:true,readOnly:true,repeatAll:true,showAllQuestions:true});};
   if(detail.open)mount();detail.addEventListener('toggle',()=>{if(detail.open)mount();});summary.addEventListener('click',mount);
  });
  if(result.answers.__comment?.trim()){const section=node('section','','homework-comment');section.append(node('h2','Комментарий преподавателю'),node('p',result.answers.__comment));content.append(section);}
