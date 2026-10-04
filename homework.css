@@ -22,3 +22,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
 .homework-page .exercise-kit .ek-title{font-size:20px}
 [hidden]{display:none!important}
 @media(max-width:600px){.homework-page{padding:26px 18px 64px}h1{font-size:23px}.homework-actions button{width:100%}}
+.homework-progress{position:fixed;top:14px;left:28px;right:28px;height:3px;z-index:50;pointer-events:none;background:transparent}
+#homeworkProgressFill{display:block;height:100%;width:0;background:#EE7C37;border-radius:3px;transition:width .25s ease}
+#homeworkProgressCheck{position:absolute;right:-6px;top:-9px;width:22px;height:22px;border-radius:50%;background:#EE7C37;color:#fff;text-align:center;font-size:15px;line-height:22px}
+.homework-page{padding-top:52px}.homework-comment{width:100%;margin:26px 0 12px}.homework-comment label{display:block;margin-bottom:10px}.homework-comment textarea{width:100%;resize:vertical;border:1px solid #ddd;border-radius:14px;padding:14px;background:#fff;color:inherit;font:inherit}.homework-comment p{white-space:pre-wrap}.homework-comment h2{font-size:18px;font-weight:500}
+.homework-actions .homework-finish{background:#34363a;color:#fff;border-color:#34363a}.homework-result{padding:20px 0;border-bottom:1px solid #eee}.homework-result>summary{cursor:pointer;display:flex;justify-content:space-between;gap:18px;font-size:15px}.homework-result-summary{color:#686b70;font-size:13px}.homework-result>div{padding-top:24px}.homework-report .ek-actions{display:none}.homework-report .exercise-kit button:disabled{opacity:1;cursor:default}
+@media(max-width:600px){.homework-progress{left:18px;right:22px}.homework-result>summary{flex-direction:column;gap:4px}}

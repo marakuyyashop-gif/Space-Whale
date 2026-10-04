@@ -1,30 +1,33 @@
-# Homework links
+# Homework: issue, work, result
 
-Each published lesson has one template and a public URL:
-`homework.html?lesson=a1-2-w4-l4`.
-The teacher opens Homework in the workspace profile panel, previews the pack or copies its link. The standalone `homework.html` page lists published homework packs. No assignment, account, name or contact entry is required.
+Each lesson template has one catalog entry with level and title. `homework.html` lists the six published A1.2 M4 packs. The Workspace Homework panel provides preview and **Выдать задание**. Every issue creates an independent attempt; no name, contacts or account form is needed.
 
-The learner starts a separate attempt. The browser retains its random editing capability and automatically saves answers to Supabase after edits. Reopening the lesson link in the same browser resumes that attempt. Local drafts survive failed save requests and retry when online. Clearing browser storage loses editing access; a different browser starts another attempt.
+The issued learner URL is `homework.html?work=UUID#edit=CAPABILITY&view=READ_CAPABILITY`. It opens that same attempt in another browser, not a new lesson. Answers autosave remotely and drafts also persist locally by attempt ID. Use the full issued URL to resume. Separate attempts never share answers. Old `?lesson=...` links can still start a portable attempt; old result fragments remain readable.
 
-“Скопировать ссылку на мою работу” first flushes pending answers, then copies a read-only URL. The learner sends it to the teacher. There is no automated teacher notification. Anyone holding that result URL can view it. Links have no automatic expiry; availability depends on retaining the site and database.
+After all response tasks have been checked or explicitly skipped, the learner may add an optional comment and press **Домашнее задание выполнено ✓**. The controller flushes pending saves, atomically finalizes the attempt, and copies `homework.html?result=UUID#key=READ_CAPABILITY`. Clipboard failure displays the saved URL for manual copying; it never falsely announces success. There is no automated teacher notification.
 
-## Shared content and rendering
+The result route is a separate read-only report: compact summaries, expandable original exercises with saved answers and shared feedback, and the learner's comment. Incorrect checked exercises open expanded. No start/check/reset workflow is exposed to the reviewer. Opening the editing URL after submission also shows the result. Completed submissions are immutable, including through direct RPC requests. A new issue creates another attempt; it never replaces an old one. Links have no automatic expiry.
 
-`homework-content.js` builds L4/L5 packs from existing shared exercise definitions, including their current two self-study translations. It adds a compact words/rule reference and reuses picture matching and one practice task. No classroom answer state is imported. `homework.js` renders every task with `SpaceWhaleExerciseKit`; changes to that renderer apply to both classroom and homework.
+## Shared template and content
 
-Run `node scripts/build-homework-catalog.cjs --sql` to generate template upserts after an approved content change. Apply those upserts through the database deployment tools. Existing attempts keep their original definition snapshot, so subsequent template edits do not silently change an already-started assignment. Updating site source alone does not republish database templates.
+`homework-content.js` explicitly maps source exercises to `words`, `listenRepeat`, `practice`, `rule`, and `translation`. Matching keeps the source layout (picture, word/meaning, or translation). Complete rule blocks, including examples and highlights, are copied exactly, without summary text or a glossary. Current approved L4/L5 translations are reused; L1/L2/L3/L6 prompts come from Pasted text(20261004-084323).txt. L6 uses existing L1–L5 material for review because a separate L6 classroom body has not been published.
 
-## Persistence and access
+Known content discrepancy preserved for teacher review: the current L2 classroom content still teaches look/look like, whereas the newly approved L2 translations use intensifiers. This task does not silently rewrite the classroom rule. A future approved L2 content update should rebuild its homework template.
 
-The migration creates RLS-enabled private tables without anonymous/authenticated schema or table grants. Four explicitly granted, fixed-search-path SECURITY DEFINER RPCs form the intentional anonymous capability API: catalog/template read, idempotent attempt creation, capability-protected read, and edit-capability-protected save.
+`homework-flow.js` composes the existing shared `stage` renderer. It does not implement another set of exercise controls. The shared mount options `repeatAll`, `allowMaterialSkip`, and `independentSteps` expose the whole Listen & Repeat list, permit material skips, and keep homework tasks independent of the audio source. Classroom defaults and live synchronization remain unchanged. Previous tasks remain visible. Informational steps permit immediate forward navigation; response tasks require OK or Skip. Progress counts completion/explicit skips rather than correctness. Collapsing a viewed step does not erase its progress.
 
-Independent 256-bit editing and viewing keys are SHA-256 hashed on the server. Only the viewing key is placed in the result URL fragment. Editing credentials remain in local browser storage. RPC responses never expose hashes or keys. Saves use a row lock and expected revision to prevent another tab silently overwriting a newer response. Answer objects are capped at 128 KiB. A conflicting local draft is backed up locally before the latest saved version is loaded on refresh.
+All six packs use the same controller, stage and grading templates. Run `node scripts/build-homework-catalog.cjs --sql` to regenerate template upserts after an approved content change. Apply through the database deployment tools. Attempts snapshot the full pack, so updating a template cannot alter existing submitted work. Legacy `exercises`/`reference` fields are retained for old cached clients during rollout.
 
-Do not expose the private schema, add broad policies, include editing keys in share URLs, or replace these scoped functions with unrestricted table access. The security advisor's anonymous SECURITY DEFINER warning is expected for these deliberately public endpoints; validate capability isolation whenever they change.
+## Persistence and permissions
 
-## Verification (2026-10-04)
+Private tables have RLS enabled and no anonymous/authenticated schema or table grants. Explicit, fixed-search-path SECURITY DEFINER RPCs provide the intentionally anonymous, capability-scoped API. Independent random 256-bit editing and viewing keys are hashed on the server. Keys are supplied in URL fragments and RPC bodies, never returned by reads. Anyone holding a result link may view it; only the editing capability can save or submit, and neither can change a submitted result.
 
-- Homework and exercise-kit targeted tests: 30 passed.
-- Full suite: 246 passed, 35 failed; the same 35 failures reproduced on unchanged base commit 66827a3. No new failures.
-- Live anonymous RPC tests: catalog, idempotent start, independent attempts, save/read, denied wrong keys, denied saves with viewing key, stale revision conflict. Synthetic attempts removed after testing.
-- DOM checks cover resume, saved answer display, recovery listeners, share URL secrecy, and read-only results. Visual browser review was unavailable in this environment.
+Autosave serializes writes, retains local drafts on request failure, retries online, and uses row locks plus expected revision to avoid silently overwriting a different tab. Conflicting drafts are backed up locally. Submission is idempotent to support retry after a lost response. The answer object includes comment and reveal/check/skip state and is limited to 128 KiB.
+
+The database advisor flags intentional SECURITY DEFINER endpoints and private RLS tables without policies. These are not public table access: authorization is inside the narrow functions. Never add broad policies to silence those diagnostics.
+
+## Verification
+
+DOM end-to-end regression: issue in a teacher context, perform matching with two intentional mistakes in a separate learner context, reveal the entire repeat list, Skip remaining tasks, add a comment, submit, copy the actual result URL, reopen in a third empty-storage context, inspect mistakes/corrections/comment, and issue another independent attempt. Also checks submitted editing URLs render reports and invalid result URLs never show blank assignments.
+
+Shared kit regression tests preserve classroom behavior. Full suite after this change: 247 passed, 35 failed; all 35 also failed on the unchanged base. No new failures. Live anonymous RPC checks verify exact saved answers/comment, immutable submission, idempotent retry and denial of submission with a viewing key. Native visual browser verification is unavailable in this environment.

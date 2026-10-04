@@ -89,3 +89,5 @@
 - Guided Discovery model examples must emphasize the target constructions in bold using shared text-block `highlights`. Include every construction needed to answer the discovery questions.
 
 - Bold only the target grammar/construction in Discovery examples and rule prompts, never the following content nouns/adjectives (e.g. furniture, drink, clothing, big cushion). Gap prompts use item.highlights for the same emphasis.
+
+- Homework (2026-10-04): use one shared progressive stage for every lesson; preserve the lesson's Matching layout, then show Listen & Repeat fully, followed by practice, complete unchanged classroom rule(s), and translations. No initial glossary or shortened rule. All tasks support Skip; informational/audio forward navigation is immediately available. Use the Homework controller's common progress, comment, issue and immutable-result flow. Thin orange (#EE7C37) progress and a charcoal final button are explicit homework-only appearance exceptions. Do not infer pedagogical roles from response mechanics or silently rewrite classroom content while creating homework.

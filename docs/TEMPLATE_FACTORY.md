@@ -154,3 +154,7 @@ The light workspace canvas is solid white without a grid, with black primary les
 - Latest appearance (2026-10-03 evening) supersedes orange/grey surfaces: all light-theme workspace control and content surfaces are white, including OK/arrows, sidebar selectors/session buttons, menus, answer fields, correction panels and audio-player surfaces. No orange fill or outline. Preserve shadows, readable text/icons, audio progress and correct/incorrect indicators. Dark-theme contrast remains supported.
 
 - Typed gaps support optional `segments[].placeholder`: a muted hint inside an empty input, hidden on focus and while typing. It is never a prefilled value and does not affect grading.
+
+## Independent homework sequences (2026-10-04)
+
+Homework uses the existing `stage` composition and all existing response templates. Mount options (off by default) are `repeatAll:true` (whole Listen & Repeat list, manual players, no phrase arrows), `allowMaterialSkip:true` (Skip on audio/presentation/rule materials), and `independentSteps:true` (audio is an independent homework step; it does not turn later tasks into source-listening questions). These flags propagate through the shared stage. Check or Skip enables progression; audio/rule forward arrows remain available. Existing classroom defaults are preserved. `taskFinished` is exported for shared progress calculation. Homework roles are authored content metadata, never inferred from Matching/Gap names.

@@ -989,8 +989,8 @@
           if(def.progressive&&index>0&&!stageStops.includes(index))section.classList.add('ek-stage-linked');
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
-          const onSkip=['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { hideHeading:block.exercise.title===def.title, sequentialListening:def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
+          const handle = mount(child, block.exercise, { repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:block.exercise.title===def.title, sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1126,7 +1126,7 @@
           });
           let previousIndex=null;
           syncRepeat=(animate=false)=>{
-            repeatIndex=Math.min(steps.length-1,Math.max(0,repeatIndex));
+            repeatIndex=config.repeatAll?steps.length-1:Math.min(steps.length-1,Math.max(0,repeatIndex));
             if(previousIndex===repeatIndex)return;
             rows.forEach((row,index)=>{
               const hidden=index>repeatIndex;
@@ -1146,7 +1146,7 @@
             },'ek-button ek-stage-toggle ek-stage-'+direction);b.setAttribute('aria-label',label);const arrow=node('span','ek-stage-chevron');arrow.setAttribute('aria-hidden','true');b.append(arrow);b.hidden=Boolean(config.navigationReadOnly);navigation.append(b);};
             if(repeatIndex<steps.length-1)control('down',repeatIndex+1,'Next phrase');
             if(repeatIndex>0)control('up',repeatIndex-1,'Previous phrase');
-            navigation.hidden=Boolean(config.navigationReadOnly);
+            navigation.hidden=Boolean(config.navigationReadOnly||config.repeatAll);
             if(animate&&previousIndex!==null)centerSection(rows[repeatIndex],navigation.hidden?rows[repeatIndex]:navigation);
             previousIndex=repeatIndex;
           };
@@ -1535,7 +1535,7 @@
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
       centerSection(status,resultsBox.hidden?status:resultsBox,true);
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
-    if(['presentation','audio'].includes(def.kind)&&!isSpeaking(def)&&config.onSkip){
+    if((['presentation','audio'].includes(def.kind)||(def.kind==='rule-page'&&config.allowMaterialSkip))&&!isSpeaking(def)&&config.onSkip){
       const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;config.onChange?.(clone(answers));config.onSkip();},'ek-button ek-secondary ek-skip');
       skip.setAttribute('aria-label','Skip exercise');skip.hidden=Boolean(config.navigationReadOnly);actions.append(skip);
     }
@@ -1628,7 +1628,7 @@
       destroy: () => { disposed=true;if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
-  const api = { validate, grade, mount, speaking, isSpeaking, kinds, uiLabels, feedbackMessage, motion:{expand} };
+  const api = { validate, grade, mount, speaking, isSpeaking, taskFinished, kinds, uiLabels, feedbackMessage, motion:{expand} };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.SpaceWhaleExerciseKit = api;
 })(typeof window !== 'undefined' ? window : globalThis);
