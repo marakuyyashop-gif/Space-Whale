@@ -1778,7 +1778,7 @@ const lessons=[
         "section": "tasks",
         "guide": {
           "time": "3.5 min",
-          "teacherNotes": "№3 проверяет форму would/wouldn’t, а не оценку того, хорошо ли отказываться. После выбора попросить назвать отрицательную форму."
+          "teacherNotes": "Четыре вывода из видимых примеров: функция совета; смысл In your position; отрицательный совет, а не прогноз или собственный отказ; I’d = I would и базовая форма глагола. Каждый вопрос проверяется отдельно; стрелка открывает следующий, затем правило. Новая версия вопросов не использует ответы прежнего Discovery."
         },
         "exercise": {
           "version": 1,
@@ -1796,19 +1796,24 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "If I were you, I’d use that free hour to revise one topic.\nIn your place, I’d avoid checking messages during that hour.\nIf I were you, I wouldn’t agree immediately.",
+                    "text": "If I were you, I would use that free hour to revise one topic.\nIn your place, I’d avoid checking messages during that hour.\nIn your position, I’d prepare a few questions for the interview.\nIf I were you, I wouldn’t accept the job immediately.",
                     "highlights": [
-                      "If I were you", "I’d", "In your place", "avoid checking", "I wouldn’t"
+                      "If I were you",
+                      "I would",
+                      "In your place",
+                      "I’d",
+                      "In your position",
+                      "I wouldn’t"
                     ]
                   }
                 ]
               }
             },
             {
-              "id": "B1D2-M06-discover",
+              "id": "B1D2-M06-discover-v2",
               "exercise": {
                 "version": 1,
-                "id": "B1D2-M06-discover",
+                "id": "B1D2-M06-discover-v2",
                 "kind": "choice",
                 "progressiveQuestions": true,
                 "title": "How does the writer give advice?",
@@ -1819,48 +1824,75 @@ const lessons=[
                     "options": [
                       {
                         "id": "A",
-                        "text": "It describes the writer’s past life."
+                        "text": "It describes what the speaker did in the past."
                       },
                       {
                         "id": "B",
-                        "text": "It imagines being in Jamie’s situation to give advice."
+                        "text": "It imagines being in the other person’s situation to give advice."
                       },
                       {
                         "id": "C",
-                        "text": "It promises to do Jamie’s studying for him."
+                        "text": "It promises to do the other person’s work for them."
                       }
                     ],
                     "correctId": "B"
                   },
                   {
                     "id": "2",
-                    "prompt": "Which beginning can introduce the same kind of advice?",
+                    "prompt": "What does “In your position” mean in the third example?",
                     "options": [
                       {
                         "id": "A",
-                        "text": "In your position, I’d …"
+                        "text": "I have already experienced the same problem."
                       },
                       {
                         "id": "B",
-                        "text": "Yesterday, I …"
+                        "text": "I want to make this decision for you."
+                      },
+                      {
+                        "id": "C",
+                        "text": "I am imagining myself in your situation."
+                      }
+                    ],
+                    "correctId": "C"
+                  },
+                  {
+                    "id": "3",
+                    "prompt": "What does the speaker mean by “I wouldn’t accept the job immediately”?",
+                    "options": [
+                      {
+                        "id": "A",
+                        "text": "My advice is to wait before accepting."
+                      },
+                      {
+                        "id": "B",
+                        "text": "I predict that you will refuse the job."
+                      },
+                      {
+                        "id": "C",
+                        "text": "I am refusing a job that someone has offered me."
                       }
                     ],
                     "correctId": "A"
                   },
                   {
-                    "id": "3",
-                    "prompt": "Which sentence uses the negative form of would?",
+                    "id": "4",
+                    "prompt": "Compare “I would use”, “I’d prepare” and “I wouldn’t accept”. Which explanation fits these examples?",
                     "options": [
                       {
                         "id": "A",
-                        "text": "If I were you, I wouldn’t agree immediately."
+                        "text": "I’d means I had; the next verb describes a past action."
                       },
                       {
                         "id": "B",
-                        "text": "If I were you, I’d refuse."
+                        "text": "I’d means I would; would and wouldn’t are followed by the base verb without to."
+                      },
+                      {
+                        "id": "C",
+                        "text": "I’d means I would; would and wouldn’t are followed by to + verb."
                       }
                     ],
-                    "correctId": "A"
+                    "correctId": "B"
                   }
                 ]
               }
@@ -1877,7 +1909,22 @@ const lessons=[
                     "type": "rule",
                     "title": "Giving advice from someone else’s point of view",
                     "text": "When someone explains a problem, If I were you, I’d … helps you say what you recommend. You imagine being in that person’s situation and suggest an action. It is advice about now or the future, not a story about the past.\n\nIf I were you, I’d prepare a few questions.\nTo recommend not doing something, use If I were you, I wouldn’t …:\nIf I were you, I wouldn’t accept immediately.\n\nUse were in this advice pattern. I’d = I would, followed by the basic verb: I’d prepare, not I’d to prepare.\n\nYou can also say In your place, I’d …, In your position, I’d … or In your situation, I’d …. These are alternatives; you do not need to use all three in one conversation. The full form is also possible: If I were in your situation, I’d ….\n\nRemember the combinations from the Words section: concentrate on a task; avoid studying all night; consider asking for more time; refuse to share answers. Would does not change the pattern after the next verb.\n\nMake your advice specific. I’d prepare is very general. I’d prepare three questions about the working hours tells the other person what to do. Explain why it fits their situation, and respond when they give you new information.",
-                    "highlights": ["If I were you", "I’d", "I wouldn’t", "I would", "In your place", "In your position", "In your situation", "If I were in your situation", "would", "were", "concentrate on", "avoid studying", "consider asking", "refuse to share"]
+                    "highlights": [
+                      "If I were you",
+                      "I’d",
+                      "I wouldn’t",
+                      "I would",
+                      "In your place",
+                      "In your position",
+                      "In your situation",
+                      "If I were in your situation",
+                      "would",
+                      "were",
+                      "concentrate on",
+                      "avoid studying",
+                      "consider asking",
+                      "refuse to share"
+                    ]
                   }
                 ]
               }
@@ -1889,7 +1936,7 @@ const lessons=[
             2,
             3
           ],
-          "instruction": "Read the examples and choose the answers."
+          "instruction": "Read the examples and choose the correct answers."
         }
       },
       {

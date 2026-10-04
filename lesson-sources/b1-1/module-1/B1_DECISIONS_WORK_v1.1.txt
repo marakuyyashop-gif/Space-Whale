@@ -391,26 +391,39 @@ Key: 1 B; 2 A.
 Критерий: свободные утра/три свободных часа у него не заявлены. Оценка совета привязана к данным сообщения, не к универсальному мнению автора о режиме учёбы.
 
 ## B1D2-M06 · Notice the advice → Rule · 3,5 минуты
-Компоненты: Text + Choice → одно окно Rule.
+Согласованная правка владельца: 04.10.2026.
+Компоненты: Text + Choice → одно окно Rule. Вопросы открываются по одному: OK → стрелка; предыдущие остаются видны, между ними штатные разделители.
 Title: How does the writer give advice?
-Subtitle: Read the examples and choose the answers.
+Subtitle: Read the examples and choose the correct answers.
 Body:
-**If I were you, I’d use that free hour to revise one topic.**
-**In your place, I’d use your free mornings to revise for three hours.**
+**If I were you**, **I would** use that free hour to revise one topic.
+**In your place**, **I’d** avoid checking messages during that hour.
+**In your position**, **I’d** prepare a few questions for the interview.
+**If I were you**, **I wouldn’t** accept the job immediately.
 
 1. What does “If I were you” do here?
-A. It describes the writer’s past life.
-B. It imagines being in Jamie’s situation to give advice.
-C. It promises to do Jamie’s studying for him.
-2. Which beginning can introduce the same kind of advice?
-A. In your position, I’d …
-B. Yesterday, I …
-3. Which sentence uses the negative form of would?
-A. If I were you, I wouldn’t agree immediately.
-B. If I were you, I’d refuse.
-Key: 1 B; 2 A; 3 A.
-Преподавателю: №3 проверяет форму would/wouldn’t, а не оценку того, хорошо ли отказываться. После выбора попросить назвать отрицательную форму.
-После попытки → Rule.
+A. It describes what the speaker did in the past.
+B. It imagines being in the other person’s situation to give advice.
+C. It promises to do the other person’s work for them.
+
+2. What does “In your position” mean in the third example?
+A. I have already experienced the same problem.
+B. I want to make this decision for you.
+C. I am imagining myself in your situation.
+
+3. What does the speaker mean by “I wouldn’t accept the job immediately”?
+A. My advice is to wait before accepting.
+B. I predict that you will refuse the job.
+C. I am refusing a job that someone has offered me.
+
+4. Compare “I would use”, “I’d prepare” and “I wouldn’t accept”. Which explanation fits these examples?
+A. I’d means I had; the next verb describes a past action.
+B. I’d means I would; would and wouldn’t are followed by the base verb without to.
+C. I’d means I would; would and wouldn’t are followed by to + verb.
+
+Key: 1 B; 2 C; 3 A; 4 B.
+ID вопросов: B1D2-M06-discover-v2. Ответы предыдущей версии не переносятся в новый набор.
+После четвёртой попытки и стрелки → существующее полное Rule.
 Rule title: Giving advice from someone else’s point of view
 Rule body:
 When someone explains a problem, **If I were you, I’d …** helps you say what you recommend. You imagine being in that person’s situation and suggest an action. It is advice about now or the future, not a story about the past.

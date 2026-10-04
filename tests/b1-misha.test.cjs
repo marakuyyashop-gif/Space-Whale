@@ -62,7 +62,7 @@ test('dialogue scripts exactly match source, transcripts are collapsed beside ev
 test('discovery questions precede one full rule, revealed only by teacher arrow',()=>{
  for(const id of ['B1D1-M07','B1D2-M06']){
   const d=find(id),v=setup(d),q=d.exercises[1].exercise;
-  assert.equal(v.host.querySelector('.ek-rule-block'),null);assert.equal(q.items.length,3);
+  assert.equal(v.host.querySelector('.ek-rule-block'),null);assert.equal(q.items.length,id==='B1D2-M06'?4:3);
   assert.equal(v.host.querySelector('.ek-stage-down').disabled,true);
   v.handle.setAnswers({[q.id]:{...correct(q),__sw_checked:true,...(q.progressiveQuestions?{__sw_choice_revealed:q.items.length}:{})}});assert.equal(v.host.querySelector('.ek-rule-block'),null);
   v.click('Show next exercise');assert.equal(v.host.querySelectorAll('.ek-rule-block').length,1);
