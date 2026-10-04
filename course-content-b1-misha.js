@@ -1301,25 +1301,44 @@ const lessons=[
           "time": "1.5 min",
           "teacherNotes": "Короткая вводная диагностика: по одному совету и причине для каждой из двух бытовых ситуаций. Понять текущий способ дать совет; не требовать ещё не изученных конструкций или нового набора prepare, revise, concentrate, avoid, consider, refuse. Useful phrases — добровольная опора, а не обязательный список. При затруднении принять ответ знакомыми средствами. Устная работа без автоматической проверки и единственного правильного решения. Ориентир — около 45 секунд на ситуацию."
         },
-        "exercise": {
-          "version": 1,
+        "exercise": kit.speaking({
           "id": "B1D2-M01",
-          "kind": "presentation",
-          "title": "Give your friend some advice.",
-          "blocks": [
+          "title": "Give your friend some advice",
+          "image": {
+            "image": "Images/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
+            "alt": "Six situations: an interview, an exam and a party, noise while studying, a distraction, a long commute, and a job offer.",
+            "imageWidth": 1448,
+            "imageHeight": 1086
+          },
+          "task": {
+            "text": "Look at the six situations. Your friend asks you for advice.\n\nFor each situation:",
+            "bullets": [
+              "say what you think they should do;",
+              "explain why;",
+              "say what you would do in their place."
+            ]
+          },
+          "use": [
             {
-              "type": "text",
-              "text": "1. Your friend Sam says:\n“It’s 10 p.m. My job interview is tomorrow morning, but I’m not ready. I’m tired and don’t know what to do first.”\n\n2. Your friend Alex says:\n“My boss needs my report tomorrow morning. I left my laptop at the office, and all my notes are on it. I’m at home now.”"
-            },
-            {
-              "type": "disclosure",
-              "title": "Useful phrases",
-              "open": true,
-              "text": "If I were you, I’d …\nIn your place, I’d …\nI would … / I wouldn’t …\n… because …"
+              "words": [
+                "prepare",
+                "revise",
+                "concentrate",
+                "avoid",
+                "consider",
+                "refuse"
+              ],
+              "phrases": [
+                "If I were you, I’d ...",
+                "If I were you, I wouldn’t ...",
+                "In your place, I’d ...",
+                "In your situation, I’d ...",
+                "I would ... / I wouldn’t ...",
+                "... because ..."
+              ]
             }
-          ],
-          "instruction": "For each situation, say what you would do and explain why. You can use the phrases below."
-        }
+          ]
+        })
       },
       {
         "menu": "Words",
@@ -2244,8 +2263,10 @@ const lessons=[
           "id": "B1D2-M10",
           "title": "Give your friend some advice",
           "image": {
-            "imagePending": true,
-            "assetId": "B1D2_ADVICE_SIX_SITUATIONS"
+            "image": "Images/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
+            "alt": "Six situations: a deadline, extra work, a test, a flight, choosing an apartment, and a presentation.",
+            "imageWidth": 1448,
+            "imageHeight": 1086
           },
           "task": {
             "text": "Look at the six situations. Your friend asks you for advice.\n\nFor each situation:",
