@@ -988,20 +988,26 @@
   tick();
   const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
   const personIcon=profileButton.innerHTML,returnIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>';
-  function renderHomeworkProfile(){
+  async function renderHomeworkProfile(){
     profile.replaceChildren();
-    const lesson=selectedLesson(),details=node('details','','ek-disclosure');
-    details.append(node('summary','Homework'));
-    const list=node('ol');
-    visibleStages(lesson||{stages:[]},'self-study').forEach((stage,index)=>{
-      const row=node('li'),control=button(`${index+1}. ${stage.exercise.title}`,()=>{
-        if(locked())return;
-        go({...route,lesson:lesson.id,exercise:stage.exercise.id,section:'self-study'});
-      },'workspace-dialog-button');
-      control.disabled=locked();row.append(control);list.append(row);
-    });
-    details.append(list);if(!list.children.length)details.append(node('p','В этом уроке пока нет Homework.'));
-    profile.append(details);
+    const lesson=selectedLesson(),panel=node('div'),message=node('p','Загрузка…');
+    panel.append(node('h2','Homework'),message);profile.append(panel);
+    if(!lesson){message.textContent='Выберите урок.';return;}
+    try{
+      const {data:pack,error}=await window.spaceWhaleSupabase.rpc('homework_template',{p_lesson:lesson.id});
+      if(error)throw error;
+      if(!panel.isConnected)return;
+      if(!pack){message.textContent='Домашка для этого урока пока не готова.';return;}
+      message.textContent=pack.level;panel.append(node('h3',pack.title));
+      const url=new URL('homework.html',location.href);url.searchParams.set('lesson',lesson.id);
+      const preview=node('a','Посмотреть','workspace-dialog-button');preview.href=url.href+'&preview=1';preview.target='_blank';preview.rel='noopener';panel.append(preview);
+      const field=node('input');field.type='text';field.readOnly=true;field.value=url.href;field.hidden=true;field.setAttribute('aria-label','Ссылка на домашку');field.style.width='100%';
+      panel.append(button('Скопировать ссылку',async()=>{
+        field.hidden=false;
+        try{await navigator.clipboard.writeText(url.href);message.textContent='Ссылка скопирована.';}
+        catch(_){field.focus();field.select();message.textContent='Скопируйте ссылку из поля.';}
+      },'workspace-dialog-button'),field);
+    }catch(_){message.textContent='Не удалось загрузить домашку. Откройте Homework ещё раз.';}
   }
   profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;if(open)renderHomeworkProfile();profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});
 
