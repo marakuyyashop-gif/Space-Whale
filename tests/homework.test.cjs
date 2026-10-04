@@ -33,12 +33,13 @@ function backend(){const works=new Map();return {works,rpc:async(name,a)=>{
  if(w.submitted_at)throw Error('Work submitted');if(a.p_revision!==w.revision)throw Error('Revision conflict');
  if(name==='homework_save')w.answers=clone(a.p_answers);else if(name==='homework_submit')w.submitted_at='2026-10-04T10:00:00Z';w.revision++;return clone(w);
 }};}
-async function page({url='https://example.test/homework.html',storage=memory(),rpc}){
+async function page({url='https://example.test/homework.html',storage=memory(),rpc,clipboardFailure=false}){
  const dom=parseHTML(fs.readFileSync(require.resolve('../homework.html'),'utf8')),document=dom.document,window={Event:dom.window.Event};
- const createEl=document.createElement.bind(document);document.createElement=tag=>{const e=createEl(tag);if(tag==='dialog'){e.showModal=()=>{e.open=true;};e.close=()=>{e.open=false;e.dispatchEvent(new dom.window.Event('close'));};}if(tag==='audio'){e.paused=true;e.pause=()=>{e.paused=true;};e.play=async()=>{e.paused=false;};}return e;};
+ const createEl=document.createElement.bind(document);document.createElement=tag=>{const e=createEl(tag);if(tag==='input')e.select=()=>{};if(tag==='dialog'){e.showModal=()=>{e.open=true;};e.close=()=>{e.open=false;e.dispatchEvent(new dom.window.Event('close'));};}if(tag==='audio'){e.paused=true;e.pause=()=>{e.paused=true;};e.play=async()=>{e.paused=false;};}return e;};
  window.SpaceWhaleExerciseKit=kit;window.SpaceWhaleHomeworkStore={create};window.SpaceWhaleHomeworkFlow=model;window.SpaceWhaleHomeworkLinks=links;window.spaceWhaleSupabase={rpc:async(name,args)=>{try{return {data:await rpc(name,args),error:null};}catch(error){return {data:null,error};}}};
  const location=new URL(url),events={},intervals=[],timers=new Set();window.addEventListener=(type,fn)=>events[type]=fn;
- const ctx={window,document,location,URL,URLSearchParams,localStorage:storage,crypto:require('node:crypto').webcrypto,history:{replaceState:(_,__,url)=>{ctx.historyURL=url;}},navigator:{clipboard:{writeText:async value=>{ctx.copied=value;}}},setTimeout:(fn,n)=>{const t=setTimeout(fn,n);timers.add(t);return t;},clearTimeout,setInterval:fn=>intervals.push(fn)};
+ const ctx={window,document,location,URL,URLSearchParams,localStorage:storage,crypto:require('node:crypto').webcrypto,history:{replaceState:(_,__,url)=>{ctx.historyURL=url;}},navigator:{clipboard:{writeText:async value=>{if(clipboardFailure)throw Error('Clipboard denied');ctx.copied=value;}}},setTimeout:(fn,n)=>{const t=setTimeout(fn,n);timers.add(t);return t;},clearTimeout,setInterval:fn=>intervals.push(fn)};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../homework-links.js'),'utf8'),ctx);
  await vm.runInNewContext(fs.readFileSync(require.resolve('../homework.js'),'utf8'),ctx);
  const fire=(el,type)=>{assert.ok(el,'event target exists');el.dispatchEvent(new dom.window.Event(type,{bubbles:true,cancelable:true}));};
  const click=el=>fire(el,'click');const settle=()=>new Promise(setImmediate);
@@ -78,4 +79,94 @@ test('progress requires checked responses or explicit Skip; mistakes still count
 });
 test('invalid result URLs never fall through to a blank learner assignment',async()=>{
  const db=backend(),p=await page({url:'https://example.test/homework.html?result=missing#key=bad',rpc:db.rpc});assert.match(p.document.querySelector('#homeworkStatus').textContent,/Работа не найдена/);assert.equal(p.document.querySelector('.ek-check'),null);p.close();
+});
+
+test('every published pack can complete every task through the shared UI and reopen the exact checked report',async()=>{
+ for(const pack of packs){
+  const db=backend(),r=links.fresh(pack.id);await links.start(r,db.rpc);
+  const p=await page({url:links.url(r,'edit','https://example.test/'),rpc:db.rpc}),doc=p.document;
+  const type=(el,value)=>{el.value=value;p.fire(el,'input');};
+  for(let n=0;n<pack.steps.length;n++){
+   const d=pack.steps[n].exercise,section=doc.querySelectorAll('.ek-stage-section')[n];assert.ok(section,`${pack.id}: ${d.id}`);
+   assert.equal(section.hidden,false);
+   const next=()=>doc.querySelector('[aria-label="Show next exercise"]');
+   if(['audio','rule-page'].includes(d.kind)){
+    if(d.kind==='audio')assert.equal([...section.querySelectorAll('.ek-repeat-item')].filter(e=>!e.hidden).length,d.items.reduce((sum,i)=>sum+1+(i.example?1:0),0));
+    if(next())assert.equal(next().disabled,false);
+   }else{
+    if(next())assert.equal(next().disabled,true,`${d.id} waits for OK`);
+    if(d.kind==='matching')for(let i=0;i<d.items.length;i++){
+     p.click(section.querySelectorAll('.ek-match-slot')[i]);const text=d.options.find(o=>o.id===d.items[i].correctId).text;
+     p.click([...doc.querySelectorAll('dialog .ek-option')].find(o=>o.textContent===text));
+    }
+    if(d.kind==='gaps'){
+     const gaps=d.items.flatMap(i=>i.segments.filter(s=>typeof s!=='string'));
+     for(let i=0;i<gaps.length;i++){
+      const el=section.querySelectorAll(d.inputMode==='select'?'.ek-choice-trigger':'input.ek-gap')[i];
+      if(d.inputMode==='select'){p.click(el);p.click([...section.querySelectorAll('.ek-inline-choice')[i].querySelectorAll('.ek-inline-option')].find(e=>e.textContent===gaps[i].answers[0]));}
+      else type(el,gaps[i].answers[0]);
+     }
+    }
+    if(d.kind==='choice')for(const item of d.items){const el=[...section.querySelectorAll('input')].find(e=>e.name===`${d.id}-${item.id}`&&e.value===item.correctId);el.checked=true;p.fire(el,'change');}
+    if(d.kind==='writing')d.items.forEach((item,i)=>type(section.querySelectorAll('.ek-writing-input')[i],item.acceptedAnswers[0]));
+    const check=section.querySelector('.ek-check');assert.equal(check.hidden,false,`${d.id} exposes OK`);p.click(check);
+    assert.equal(section.querySelector('.ek-skip').hidden,true,'checked work is not erased by Skip');
+    assert.ok(!section.querySelector('[data-feedback="retry"]'),`${d.id} accepts canonical answers`);
+    if(next())assert.equal(next().disabled,false);
+   }
+   if(n<pack.steps.length-1)p.click(next());
+  }
+  assert.equal(doc.querySelector('.homework-finish').disabled,false,pack.id);
+  p.click(doc.querySelector('.homework-finish'));await p.settle();await p.settle();
+  assert.ok(p.ctx.copied?.includes('?result='));
+  const review=await page({url:p.ctx.copied,rpc:db.rpc});
+  assert.equal(review.document.querySelectorAll('.homework-result').length,pack.steps.length);
+  assert.ok(!review.document.body.textContent.includes('Не проверено'));
+  assert.ok(!review.document.body.textContent.includes('Пропущено'));
+  p.close();review.close();
+ }
+});
+test('copy failure is visible, repeat copy does not create a new assignment, notification can be closed',async()=>{
+ const db=backend(),p=await page({rpc:db.rpc,clipboardFailure:true});p.click(p.document.querySelector('.homework-issuer button'));await p.settle();await p.settle();
+ const issuer=p.document.querySelector('.homework-issuer'),url=issuer.querySelector('input').value;
+ assert.ok(url.includes('?work='));assert.match(issuer.textContent,/Автоматическое копирование недоступно/);
+ assert.equal(p.document.querySelector('#homeworkNotice').hidden,false);
+ p.ctx.navigator.clipboard.writeText=async value=>{p.ctx.copied=value;};
+ p.click(issuer.querySelectorAll('button')[1]);await p.settle();assert.equal(p.ctx.copied,url);assert.equal(db.works.size,1);
+ assert.match(p.document.querySelector('#homeworkNoticeText').textContent,/Ссылка скопирована/);
+ p.click(p.document.querySelector('#homeworkNoticeClose'));assert.equal(p.document.querySelector('#homeworkNotice').hidden,true);p.close();
+});
+test('browser storage failure still permits remote save',async()=>{
+ const s=create({storage:{setItem:()=>{throw Error('quota');}},key:'draft',record:record(),rpc:async(_,a)=>({revision:a.p_revision+1})});
+ s.update('one',{a:'answer'});await s.flush();assert.equal(s.state.dirty,false);assert.equal(s.state.revision,1);
+});
+
+test('editing an earlier answer does not trap navigation and unfinished work is explained at the finish',async()=>{
+ const db=backend(),r=links.fresh(packs[0].id);await links.start(r,db.rpc);const p=await page({url:links.url(r,'edit','https://example.test/'),rpc:db.rpc}),doc=p.document;
+ p.click(doc.querySelector('.ek-skip'));assert.equal(doc.querySelector('[aria-label="Show next exercise"]').disabled,false);
+ // Reset an earlier skipped exercise; audio still has an immediately active forward arrow.
+ p.click(doc.querySelector('.ek-reset'));
+ assert.equal(doc.querySelector('[aria-label="Show next exercise"]').disabled,false);
+ for(let i=1;i<packs[0].steps.length;i++)p.click(doc.querySelectorAll('.ek-stage-section')[i].querySelector('.ek-skip'));
+ assert.equal(doc.querySelector('.homework-finish').disabled,true);
+ assert.match(doc.querySelector('.homework-remaining').textContent,/Проверьте ответы/);
+ assert.equal(doc.querySelector('.homework-remaining').querySelectorAll('button').length,1);
+ p.click(doc.querySelectorAll('.ek-stage-section')[0].querySelector('.ek-skip'));
+ assert.equal(doc.querySelector('.homework-finish').disabled,false);p.close();
+});
+test('network failure preserves checked answers and resume restores them before submission',async()=>{
+ const db=backend(),r=links.fresh(packs[0].id),storage=memory();await links.start(r,db.rpc);let offline=true;
+ const p=await page({url:links.url(r,'edit','https://example.test/'),storage,rpc:async(name,a)=>{if(name==='homework_save'&&offline)throw Error('offline');return db.rpc(name,a);}});
+ p.click(p.document.querySelector('.ek-skip'));p.intervals[0]();await p.settle();
+ assert.match(p.document.querySelector('#homeworkNoticeText').textContent,/Не удалось сохранить/);
+ assert.equal(db.works.get(r.id).revision,0);offline=false;p.events.online();await p.settle();
+ assert.equal(db.works.get(r.id).answers[packs[0].steps[0].exercise.id].__sw_skipped,true);
+ const resumed=await page({url:links.url(r,'edit','https://example.test/'),rpc:db.rpc});
+ assert.equal(resumed.document.querySelectorAll('.ek-stage-section').length,2);
+ assert.equal(resumed.document.querySelector('[aria-label="Show next exercise"]').disabled,false);p.close();resumed.close();
+});
+test('all homework audio and image sources resolve to existing repository assets',()=>{
+ const path=require('node:path'),missing=[];
+ function walk(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){if(['image','audio','exampleAudio'].includes(key)&&typeof v==='string'&&v.startsWith('assets/')){if(!fs.existsSync(path.resolve(__dirname,'..',v)))missing.push(v);}else walk(v);}}
+ packs.forEach(walk);assert.deepEqual(missing,[]);
 });

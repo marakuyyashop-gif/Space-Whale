@@ -28,3 +28,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
 .homework-page{padding-top:52px}.homework-comment{width:100%;margin:26px 0 12px}.homework-comment label{display:block;margin-bottom:10px}.homework-comment textarea{width:100%;resize:vertical;border:1px solid #ddd;border-radius:14px;padding:14px;background:#fff;color:inherit;font:inherit}.homework-comment p{white-space:pre-wrap}.homework-comment h2{font-size:18px;font-weight:500}
 .homework-actions .homework-finish{background:#34363a;color:#fff;border-color:#34363a}.homework-result{padding:20px 0;border-bottom:1px solid #eee}.homework-result>summary{cursor:pointer;display:flex;justify-content:space-between;gap:18px;font-size:15px}.homework-result-summary{color:#686b70;font-size:13px}.homework-result>div{padding-top:24px}.homework-report .ek-actions{display:none}.homework-report .exercise-kit button:disabled{opacity:1;cursor:default}
 @media(max-width:600px){.homework-progress{left:18px;right:22px}.homework-result>summary{flex-direction:column;gap:4px}}
+.homework-issuer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-width:0;flex:1}
+.homework-issue-status{flex-basis:100%;margin:0;font-size:14px;overflow-wrap:anywhere}
+.homework-issue-status:empty{display:none}
+.homework-issuer input{width:100%;min-width:0;border:1px solid #ddd;border-radius:12px;padding:12px;font:inherit;font-size:14px}
+.homework-issue-status[data-error=true],.homework-save-status[data-error=true]{color:#9e302e}
+.homework-save-status{width:100%;font-size:14px;color:#686b70;margin:10px 0}
+.homework-remaining{width:100%;font-size:14px}.homework-remaining button{display:block;margin:8px 0;text-align:left}
+.homework-notice{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:min(580px,calc(100% - 32px));z-index:90;display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border-radius:16px;background:#34363a;color:#fff;box-shadow:0 4px 24px #0002}
+.homework-notice p{margin:0;flex:1;font-size:14px}.homework-notice button{flex-shrink:0;background:transparent;border:0;color:#fff;font:inherit;font-size:24px;line-height:1;min-width:32px;min-height:32px;cursor:pointer}
+.homework-page{padding-bottom:150px}.homework-card nav{align-items:flex-start}.homework-card nav>a{flex-shrink:0}
+#homeworkCopyLink{font:inherit;font-size:14px;padding:10px 16px;border:1px solid #ddd;border-radius:12px;background:#fff;margin-top:10px;cursor:pointer}
+.homework-report .ek-stage-navigation,.homework-report .ek-reset{display:none}
+.ek-stage-section,.homework-comment{scroll-margin-top:44px}

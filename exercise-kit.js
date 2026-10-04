@@ -1021,7 +1021,8 @@
             answers.revealed=stageStops.find(stop=>stop>visibleCount)||def.exercises.length;syncStage(answers.revealed,true);updateNavigation('down');viewChanged();
           });
           if(down && def.requireCheckBeforeNext){
-            const tasks=def.exercises.slice(0,visibleCount).filter(block=>['matching','gaps','choice','order','sort','writing'].includes(block.exercise.kind));
+            const candidates=config.independentSteps?def.exercises.slice(visibleCount-1,visibleCount):def.exercises.slice(0,visibleCount);
+            const tasks=candidates.filter(block=>['matching','gaps','choice','image-label','order','sort','writing'].includes(block.exercise.kind));
             down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>!taskFinished(block.exercise,answers[block.id]||{}));
           }
           if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
@@ -1538,12 +1539,12 @@
       const check=actions.querySelector('.ek-check');if(!check)return;
       const values=Object.values(grade(def,answers));
       check.hidden=!values.length||values.includes('empty');
-      const skip=actions.querySelector('.ek-skip');if(skip)skip.hidden=Boolean(config.navigationReadOnly||answers.__sw_skipped);
+      const skip=actions.querySelector('.ek-skip');if(skip)skip.hidden=Boolean(config.navigationReadOnly||answers.__sw_skipped||(config.independentSteps&&answers.__sw_checked));
     }
     if (!['presentation', 'audio', 'rule-page', 'stage'].includes(def.kind)) {const check=button(uiLabels.check, () => {
-      checkFeedback();
+      delete answers.__sw_skipped;checkFeedback();
       if (config.syncChecks) { answers.__sw_checked = true; config.onChange?.(clone(answers)); }
-      centerSection(status,resultsBox.hidden?status:resultsBox,true);
+      updateActions();centerSection(status,resultsBox.hidden?status:resultsBox,true);
     });check.classList.add('ek-check');check.setAttribute('aria-label','Check answers');actions.append(check);const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;delete answers.__sw_checked;clearFeedback();config.onChange?.(clone(answers));updateActions();announce('Skipped');config.onSkip?.();},'ek-button ek-secondary ek-skip');skip.setAttribute('aria-label','Skip exercise');actions.append(skip);}
     if((['presentation','audio'].includes(def.kind)||(def.kind==='rule-page'&&config.allowMaterialSkip))&&!isSpeaking(def)&&config.onSkip){
       const skip=button('Skip',()=>{if(config.navigationReadOnly||config.readOnly)return;answers.__sw_skipped=true;config.onChange?.(clone(answers));config.onSkip();},'ek-button ek-secondary ek-skip');

@@ -17,15 +17,20 @@ function build(content,catalog,translations,a21){
   const id=`a1-2-w4-l${number}`,steps=[];
   const add=(role,exercise)=>steps.push({role,exercise});
   add('words',get(source.words));add('listenRepeat',get(source.repeat));source.practice.forEach(id=>add('practice',get(id)));
-  source.rules.forEach(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');if(!d.blocks.length)throw Error('No full rule '+id);d.id+='-homework-rule';d.title=d.blocks[0].title||d.title;add('rule',d);});
+  source.rules.forEach(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');if(!d.blocks.length)throw Error('No full rule '+id);delete d.instruction;d.id+='-homework-rule';d.title=d.blocks[0].title||d.title;add('rule',d);});
   const tasks=['4','5'].includes(number)?content.find(l=>l.id===id).stages.filter(s=>s.section==='self-study').map(s=>copy(s.exercise)):translations.build(Number(number));
   tasks.forEach(d=>add('translation',d));
   return {id,version:'20261004-2',level:'A1.2',title:catalog.lessons.find(l=>l.id===id).title,steps,reference:copy(steps.find(s=>s.role==='rule').exercise),exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))};
  });
  if(a21)for(const source of a21.mapping){
   const lesson=content.find(l=>l.id===source.id);if(!lesson)throw Error('Missing A2 homework lesson '+source.id);
-  const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},...source.practice.map(id=>({role:'practice',exercise:get(id)})),...source.rules.map(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');d.id+='-homework-rule';return {role:'rule',exercise:d};}),...a21.build(source.key).map(exercise=>({role:'translation',exercise}))];
+  const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},...source.practice.map(id=>({role:'practice',exercise:get(id)})),...source.rules.map(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');delete d.instruction;d.id+='-homework-rule';return {role:'rule',exercise:d};}),...a21.build(source.key).map(exercise=>({role:'translation',exercise}))];
   packs.push({id:source.id,version:'20261004-a21',level:'A2.1',title:lesson.topic,steps,reference:copy(steps.find(s=>s.role==='rule').exercise),exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
+ }
+ for(const pack of packs){
+  pack.version='20261004-flow-3';
+  for(const step of pack.steps)if(step.role==='translation')for(const item of step.exercise.items)item.normalization='translation';
+  pack.exercises=pack.steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise));
  }
  return packs;
 }

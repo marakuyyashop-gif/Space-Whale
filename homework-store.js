@@ -3,7 +3,7 @@
  'use strict';
  function create({rpc,storage,key,record,onStatus=()=>{}}){
   let state=record,queue=null;
-  const persist=()=>storage.setItem(key,JSON.stringify(state));
+  const persist=()=>{try{storage.setItem(key,JSON.stringify(state));return true;}catch(_){onStatus('Черновик не сохраняется в этом браузере. Не закрывайте страницу до сохранения в интернете.',true);return false;}};
   function replace(answers){state.answers=answers;state.dirty=true;state.change=(state.change||0)+1;persist();onStatus('Есть несохранённые изменения.');}
   function update(id,answers){replace({...state.answers,[id]:answers});}
   async function flush(){

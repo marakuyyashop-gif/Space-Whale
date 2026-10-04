@@ -1001,19 +1001,8 @@
       message.textContent=pack.level;panel.append(node('h3',pack.title));
       const url=new URL('homework.html',location.href);url.searchParams.set('lesson',lesson.id);
       const preview=node('a','Посмотреть','workspace-dialog-button');preview.href=url.href+'&preview=1';preview.target='_blank';preview.rel='noopener';panel.append(preview);
-      const field=node('input');field.type='text';field.readOnly=true;field.value=url.href;field.hidden=true;field.setAttribute('aria-label','Ссылка на домашку');field.style.width='100%';
-      let pending=null;
-      const issue=button('Выдать задание',async()=>{
-        issue.disabled=true;message.textContent='Создаём отдельную работу…';
-        try{
-          pending=pending||window.SpaceWhaleHomeworkLinks.fresh(lesson.id);
-          await window.SpaceWhaleHomeworkLinks.start(pending,async(name,args)=>{const {data,error}=await window.spaceWhaleSupabase.rpc(name,args);if(error)throw error;return data;});
-          field.value=window.SpaceWhaleHomeworkLinks.url(pending,'edit',location.href);pending=null;field.hidden=false;
-          try{await Promise.race([navigator.clipboard.writeText(field.value),new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),1500))]);message.textContent='Ссылка скопирована. Отправьте её ученице.';}
-          catch(_){field.focus();field.select();message.textContent='Скопируйте ссылку из поля.';}
-        }catch(_){message.textContent='Не удалось выдать задание. Нажмите ещё раз.';}finally{issue.disabled=false;}
-      },'workspace-dialog-button');
-      panel.append(issue,field);
+      window.SpaceWhaleHomeworkLinks.mountIssuer(panel,{lesson:lesson.id,base:location.href,
+        rpc:async(name,args)=>{const {data,error}=await window.spaceWhaleSupabase.rpc(name,args);if(error)throw error;return data;}});
     }catch(_){message.textContent='Не удалось загрузить домашку. Откройте Homework ещё раз.';}
   }
   profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;if(open)renderHomeworkProfile();profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});

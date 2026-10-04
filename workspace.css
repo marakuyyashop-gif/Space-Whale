@@ -632,3 +632,9 @@ body.unified-workspace:not([data-theme=dark]) :is(.workspace-course-key,.workspa
 body.unified-workspace:not([data-theme=dark]) #startLesson::before{background:transparent}
 body.unified-workspace:not([data-theme=dark]) :is(.workspace-inline-options,.workspace-topic){background:#fff}
 body.unified-workspace:not([data-theme=dark]) :is(.theme-sky,.theme-orb){background:#fff}
+/* The same homework issuing component is used in the catalog and Workspace. */
+#workspaceStudentProfile .homework-issuer{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+#workspaceStudentProfile .homework-issuer button{font:inherit;font-size:14px;background:#fff;color:inherit;border:1px solid #ddd;border-radius:12px;padding:10px 14px;cursor:pointer}
+#workspaceStudentProfile .homework-issuer input{width:100%;min-width:0;font:inherit;font-size:13px;border:1px solid #ddd;border-radius:10px;padding:10px}
+#workspaceStudentProfile .homework-issue-status{width:100%;font-size:14px;margin:0}
+#workspaceStudentProfile .homework-issue-status[data-error=true]{color:#9e302e}
