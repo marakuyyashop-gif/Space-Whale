@@ -1301,25 +1301,44 @@ const lessons=[
           "time": "1.5 min",
           "teacherNotes": "Короткая вводная диагностика: по одному совету и причине для каждой из двух бытовых ситуаций. Понять текущий способ дать совет; не требовать ещё не изученных конструкций или нового набора prepare, revise, concentrate, avoid, consider, refuse. Useful phrases — добровольная опора, а не обязательный список. При затруднении принять ответ знакомыми средствами. Устная работа без автоматической проверки и единственного правильного решения. Ориентир — около 45 секунд на ситуацию."
         },
-        "exercise": {
-          "version": 1,
+        "exercise": kit.speaking({
           "id": "B1D2-M01",
-          "kind": "presentation",
-          "title": "Give your friend some advice.",
-          "blocks": [
+          "title": "Give your friend some advice",
+          "image": {
+            "image": "Images/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
+            "alt": "Six situations: an interview, an exam and a party, noise while studying, a distraction, a long commute, and a job offer.",
+            "imageWidth": 1448,
+            "imageHeight": 1086
+          },
+          "task": {
+            "text": "Look at the six situations. Your friend asks you for advice.\n\nFor each situation:",
+            "bullets": [
+              "say what you think they should do;",
+              "explain why;",
+              "say what you would do in their place."
+            ]
+          },
+          "use": [
             {
-              "type": "text",
-              "text": "1. Your friend Sam says:\n“It’s 10 p.m. My job interview is tomorrow morning, but I’m not ready. I’m tired and don’t know what to do first.”\n\n2. Your friend Alex says:\n“My boss needs my report tomorrow morning. I left my laptop at the office, and all my notes are on it. I’m at home now.”"
-            },
-            {
-              "type": "disclosure",
-              "title": "Useful phrases",
-              "open": true,
-              "text": "If I were you, I’d …\nIn your place, I’d …\nI would … / I wouldn’t …\n… because …"
+              "words": [
+                "prepare",
+                "revise",
+                "concentrate",
+                "avoid",
+                "consider",
+                "refuse"
+              ],
+              "phrases": [
+                "If I were you, I’d ...",
+                "If I were you, I wouldn’t ...",
+                "In your place, I’d ...",
+                "In your situation, I’d ...",
+                "I would ... / I wouldn’t ...",
+                "... because ..."
+              ]
             }
-          ],
-          "instruction": "For each situation, say what you would do and explain why. You can use the phrases below."
-        }
+          ]
+        })
       },
       {
         "menu": "Words",
@@ -2240,57 +2259,44 @@ const lessons=[
           "time": "6 min",
           "teacherNotes": "студент даёт конкретный совет с изучаемой формулой, учитывает факты, объясняет причину, задаёт/понимает уточнение и корректирует предложение. Не определять одну «правильную» рекомендацию. Поддержку Useful phrases не прятать автоматически."
         },
-        "exercise": {
-          "version": 1,
+        "exercise": kit.speaking({
           "id": "B1D2-M10",
-          "kind": "stage",
-          "title": "Give advice that fits the situation.",
-          "exercises": [
+          "title": "Give your friend some advice",
+          "image": {
+            "image": "Images/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
+            "alt": "Six situations: a deadline, extra work, a test, a flight, choosing an apartment, and a presentation.",
+            "imageWidth": 1448,
+            "imageHeight": 1086
+          },
+          "task": {
+            "text": "Look at the six situations. Your friend asks you for advice.\n\nFor each situation:",
+            "bullets": [
+              "say what you think they should do;",
+              "explain why;",
+              "say what you would do in their place."
+            ]
+          },
+          "use": [
             {
-              "id": "B1D2-M10-situations",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M10-situations",
-                "kind": "presentation",
-                "title": "Give advice that fits the situation.",
-                "blocks": [
-                  {
-                    "type": "image",
-                    "mediaRef": "B1D2_SCENES"
-                  },
-                  {
-                    "type": "text",
-                    "text": "A. Maya has an exam in three days. She knows the theory, but finds the practice questions difficult. She has two free hours this evening and keeps checking her phone.\n\nB. Daniel has an interesting job offer, but the evening and weekend hours are not clear. He needs to be home by six on two evenings a week. The company wants an answer today.\n\nC. Rory’s classmate wants him to do their part of a group project as well as his own. Rory’s own work is due on Friday. He wants to help, but he does not have time to do both parts.\n\nThe person with the problem: explain it and ask for advice.\nThe adviser: suggest a specific action, say what you wouldn’t do, and explain why.\nThen open the extra information. Adapt the advice and agree on a first step."
-                  },
-                  {
-                    "type": "disclosure",
-                    "title": "Useful phrases",
-                    "open": true,
-                    "text": "What would you do in my situation?\nIf I were you, I’d …\nIf I were you, I wouldn’t …\nIn your place / position / situation, I’d …\nI’d consider …\nThat could help, but …"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D2-M10-extra",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M10-extra",
-                "kind": "presentation",
-                "title": "Extra information",
-                "blocks": [
-                  {
-                    "type": "text",
-                    "text": "A. “I need my phone because all my notes are on it.”\nB. “They can give me one more day to decide.”\nC. “My classmate says they don’t understand their part.”"
-                  }
-                ]
-              }
+              "words": [
+                "prepare",
+                "revise",
+                "concentrate",
+                "avoid",
+                "consider",
+                "refuse"
+              ],
+              "phrases": [
+                "If I were you, I’d ...",
+                "If I were you, I wouldn’t ...",
+                "In your place, I’d ...",
+                "In your situation, I’d ...",
+                "I would ... / I wouldn’t ...",
+                "... because ..."
+              ]
             }
-          ],
-          "progressive": true,
-          "requireCheckBeforeNext": true,
-          "instruction": "Choose two situations. Take turns asking for and giving advice."
-        }
+          ]
+        })
       }
     ]
   }
