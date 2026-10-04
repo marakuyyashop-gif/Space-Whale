@@ -135,15 +135,15 @@ const typedGap4=E('L4-typed-gap','gaps','Complete the sentences.',{
 });
 l4.push(stage('Word Practice',4,S('L4-word-practice','Complete the sentences.',[dropdown4,typedGap4],{requireCheckBeforeNext:true})));
 const rule4=E('L4-question-rule','rule-page','Как спросить о человеке',{blocks:[{type:'rule',text:"В английском языке вопросы What is he/she like? и What does he/she look like? используются, когда мы хотим узнать разную информацию о человеке.\n\n1. What is he/she like?\n\nИспользуйте What is he/she like?, чтобы спросить, какой человек по характеру или поведению.\n\nWhat is she like? — Какая она?\nShe is polite and helpful. — Она вежливая и готовая помочь.\n\nВ ответе используйте be + adjective:\n\nHe is quiet.\nShe is rude.\n\n2. What does he/she look like?\n\nИспользуйте What does he/she look like?, чтобы спросить, как человек выглядит.\n\nWhat does she look like? — Как она выглядит?\nShe has long brown hair. — У неё длинные каштановые волосы.\n\nДля описания внешности можно использовать have/has + noun:\n\nHe has short straight hair.\nShe has long curly hair.\n\n3. What does he/she like?\n\nНе путайте What is she like? и What does she like?\n\nWhat does she like? означает «Что ей нравится?»\n\nWhat does she like? — Что ей нравится?\nShe likes music. — Ей нравится музыка.",highlights:['What is he/she like?','What does he/she look like?','What does he/she like?','What is she like?','What does she look like?','What does she like?','be + adjective','have/has + noun']}]});
-const discovery4=E('L4-complete-rule','gaps','Complete the rules.',{
+const discovery4=E('L4-complete-rule','gaps','Complete the rules.',{progressiveQuestions:true,
  inputMode:'select',instruction:'Choose the correct options.',items:[
   gap4('1','Используем What does she look like?, когда хотим узнать ','как она выглядит','.', ['какая она в общении','как она выглядит','что она любит']),
   gap4('2','Используем What is she like?, когда хотим узнать ','какая она в общении','.', ['как она выглядит','что она любит','какая она в общении'])
  ]
 });
 l4.push(stage('Complete the Rule',3,S('L4-discovery-rule','Complete the rules.',[
- P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),highlights:['look like?','like?']}]),
- discovery4,rule4
+ P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),highlights:['What does she look like?','What is she like?']}]),
+ {...discovery4,items:discovery4.items.map((item,i)=>({...item,highlights:[i===0?'What does she look like?':'What is she like?']}))},rule4
 ],{revealStops:[2,3],requireCheckBeforeNext:true})));
 const dialogue4='Ben: I want to invite our new neighbors for coffee. Do you know them?\n\nLisa: Yes. Their names are Nick and Emma.\n\nBen: What is Nick like?\n\nLisa: He’s really helpful. He often helps me with my bike.\n\nBen: What does he look like?\n\nLisa: He has short curly hair.\n\nBen: And Emma? What is she like?\n\nLisa: She’s polite and quiet.\n\nBen: What does she look like?\n\nLisa: She has long straight hair.\n\nBen: Do you have their phone number?\n\nLisa: Yes, I do. Here it is.\n\nBen: Great, thanks!';
 const listeningTitle4='Listen to the audio and answer the questions.';
@@ -247,7 +247,7 @@ l5.push(stage('Word Practice',3,E('L5-word-initial-gaps','gaps','Complete the se
 })));
 l5.push(stage('Complete the Rule',2,S('L5-M06','Complete the rules.',[
  P('L5-kind-context','Complete the rules.',[{type:'text',text:'It’s a kind of furniture.\nIt’s a type of drink.\nIt’s a sort of clothing.\nIt’s like a big cushion.',highlights:['a kind of','a type of','a sort of','It’s like']}]),
- E('L5-category-discovery','gaps','Complete the rules.',{inputMode:'select',instruction:'Choose the correct options.',items:[
+ E('L5-category-discovery','gaps','Complete the rules.',{progressiveQuestions:true,inputMode:'select',instruction:'Choose the correct options.',items:[
  {id:'1',highlights:['a kind of','a type of','a sort of'],segments:['Используйте a kind of, a type of или a sort of, когда хотите сказать ',{id:'category',answers:['к какой категории относится предмет'],options:['на что похож предмет','что человек добрый','к какой категории относится предмет']},'.']},
  {id:'2',highlights:['like'],segments:['Используйте like, когда хотите сказать ',{id:'similarity',answers:['на что похож предмет'],options:['что вам нравится','на что похож предмет','к какой категории относится предмет']},'.']},
  {id:'3',highlights:['kind of','type of','sort of'],segments:['Перед kind of, type of и sort of используйте ',{id:'article',answers:['a'],options:['the','a','—']},'.']}

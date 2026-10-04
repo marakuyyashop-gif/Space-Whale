@@ -97,6 +97,8 @@
     const selected=catalog.topics(route).find(lesson=>lesson.id===route.lesson)?.stages.find(stage=>stage.exercise.id===route.exercise);
     if(selected)route.section=stageSection(selected);
     try{route.exerciseView=JSON.parse(params.get('exercise_view')||'null');}catch(_){route.exerciseView=null;}
+    const legacyIndex=selected?.exerciseAliases?.indexOf(params.get('exercise'))??-1;
+    if(legacyIndex>=0)route.exerciseView={revealed:legacyIndex+1,children:{[selected.exerciseAliases[legacyIndex]]:route.exerciseView||{}}};
     return route;
   }
 
@@ -526,7 +528,7 @@
     if (attempts.has(key)) return attempts.get(key);
     try {
       const saved = JSON.parse(sessionStorage.getItem(key));
-      if (saved?.signature === signature && saved.answers && typeof saved.answers === 'object') return saved.answers;
+      if ((saved?.signature === signature || window.SpaceWhaleLessonStructure?.compatible(saved?.signature,signature)) && saved.answers && typeof saved.answers === 'object') return saved.answers;
     } catch (_) {}
     return {};
   }
@@ -574,6 +576,17 @@
     return true;
   }
 
+  function decodeStoredResponse(value){
+    if(value?.__sw_collab===1&&window.SpaceWhaleCollaboration){const reader=window.SpaceWhaleCollaboration.create('lesson-restore');reader.merge(value);return reader.answers();}
+    return value;
+  }
+  function loadSavedExercise(exerciseId){
+    const stage=catalog.lessons.flatMap(l=>l.stages).find(s=>s.exercise.id===exerciseId);
+    return stage?.legacySources&&window.SpaceWhaleLessonStructure
+      ?window.SpaceWhaleLessonStructure.loadResponse(stage,id=>classroom.loadExerciseResponse(id),decodeStoredResponse)
+      :classroom.loadExerciseResponse(exerciseId);
+  }
+
   async function hydrateLiveExercise(exerciseId, localAnswers) {
     if (!liveMode || !liveReady || !exerciseId || liveHydrated.has(exerciseId)) return;
     liveHydrated.add(exerciseId);
@@ -581,7 +594,7 @@
 
     if (liveRole === 'teacher' || collaborative()) {
       try {
-        const saved = await classroom.loadExerciseResponse(exerciseId);
+        const saved = await loadSavedExercise(exerciseId);
         if (saved?.response) {
           acceptLivePayload({
             exercise_id: exerciseId,
@@ -604,7 +617,7 @@
     if (liveRole === 'student' && !collaborative()) {
       const revision=liveSeenAt.get(exerciseId);
       try {
-        const saved=await classroom.loadExerciseResponse(exerciseId);
+        const saved=await loadSavedExercise(exerciseId);
         const pending=classroom.getPendingSnapshot?.(exerciseId);
         // Never overwrite typing that happened while the server response was loading.
         const answers=pending??(liveSeenAt.get(exerciseId)!==revision?liveAnswers.get(exerciseId):saved?.response??localAnswers);
@@ -657,11 +670,13 @@
         : `space-whale:workspace:v1:${selected.id}:${id}`;
     const storageKey = exerciseStorageKey(exercise.id);
     const signature = JSON.stringify(exercise);
-    const localAnswers = readAnswers(storageKey, signature);
+    const existingAnswers=readAnswers(storageKey, signature);
+    const localAnswers=window.SpaceWhaleLessonStructure?.restore(stage,existingAnswers,source=>decodeStoredResponse(readAnswers(exerciseStorageKey(source.id),source.signature)))||existingAnswers;
     mountedStorage = {key:storageKey, signature};
     if (collaborative()) {
       const r=replica(exercise.id);
       if (localAnswers.__sw_collab === 1) r.merge(localAnswers);
+      else if(stage.legacySources&&hasAnswers(localAnswers))r.update(localAnswers);
       liveAnswers.set(exercise.id,r.answers());
     }
     const initialAnswers = liveMode && (liveRole === 'teacher' || collaborative())

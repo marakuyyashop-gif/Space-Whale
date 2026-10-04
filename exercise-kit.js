@@ -85,13 +85,14 @@
       if (def.layout != null && !['separate', 'grouped'].includes(def.layout)) fail('Unsupported stage layout');
       if (def.layout === 'grouped' && def.progressive) fail('Grouped components cannot reveal as separate exercises');
       if (def.progressive != null && typeof def.progressive !== 'boolean') fail('progressive must be boolean');
+      if(def.unifiedProgression!=null&&typeof def.unifiedProgression!=='boolean')fail('unifiedProgression must be boolean');
       if(def.revealStops!=null){
         array(def.revealStops,'revealStops');
         if(!def.progressive || def.revealStops.some((n,i)=>!Number.isInteger(n)||n<1||n>def.exercises.length||(i>0&&n<=def.revealStops[i-1])) || def.revealStops[def.revealStops.length-1]!==def.exercises.length)fail('Invalid progressive reveal stops');
       }
       def.exercises.forEach(block => {
         if (block.id === 'revealed') fail('Reserved stage state key');
-        if (block.exercise?.kind === 'stage') fail('Stage containers cannot be nested');
+        if (block.exercise?.kind === 'stage'&&!def.unifiedProgression) fail('Stage containers cannot be nested');
         validate(block.exercise);
       });
       if (def.transcript != null) {
@@ -251,6 +252,7 @@
       });
       if (def.options.length < def.items.length) fail('Matching needs at least one option per card');
     }
+    if(def.progressiveQuestions!=null&&typeof def.progressiveQuestions!=='boolean')fail('progressiveQuestions must be boolean');
     if (def.kind === 'choice') {
       if (def.layout != null && !['list', 'image-grid', 'dropdown'].includes(def.layout)) fail('Unsupported choice layout');
       if(def.progressiveQuestions!=null&&typeof def.progressiveQuestions!=='boolean')fail('progressiveQuestions must be boolean');
@@ -367,10 +369,19 @@
   }
   function taskFinished(def, state) {
     if(state.__sw_skipped)return true;
+    if(def.kind==='stage')return def.exercises.filter(b=>hasTasks(b.exercise)).every(b=>taskFinished(b.exercise,state[b.id]||{}));
     const results=grade(def,state);
-    if(def.kind==='choice'&&Array.isArray(state.__sw_choice_checked))return def.items.every(item=>
-      state.__sw_choice_skipped?.includes(item.id)||(state.__sw_choice_checked.includes(item.id)&&results[item.id]!=='empty'));
+    if(['choice','gaps'].includes(def.kind)&&Array.isArray(state.__sw_choice_checked))return def.items.every(item=>
+      state.__sw_choice_skipped?.includes(item.id)||(state.__sw_choice_checked.includes(item.id)&&questionKeys(def,item).every(id=>results[id]!=='empty')));
     return state.__sw_checked===true&&Object.values(results).length>0&&!Object.values(results).includes('empty');
+  }
+  const hasTasks=def=>['choice','gaps','matching','writing','sort','order','image-label'].includes(def.kind)||def.kind==='stage'&&def.exercises.some(b=>hasTasks(b.exercise));
+  const questionKeys=(def,item)=>def.kind==='gaps'?item.segments.filter(s=>typeof s!=='string').map(s=>s.id):[item.id];
+  function pendingInner(def,state={}){
+    if(def.followUp)return (state.__sw_followup_revealed||1)<2;
+    if(def.progressiveQuestions&&def.items?.length>1)return (state.__sw_choice_revealed||1)<def.items.length;
+    if(def.kind==='stage'&&def.progressive){const count=state.revealed||def.revealStops?.[0]||1;return count<def.exercises.length||def.exercises.slice(0,count).some(b=>pendingInner(b.exercise,state[b.id]||{}));}
+    return false;
   }
   // Listening questions reuse the existing progressive stage, while preserving
   // the original flat item IDs for saved answers and realtime synchronization.
@@ -380,7 +391,7 @@
     const unpack=value=>{
       const state={revealed:value.__sw_choice_revealed||1};
       for(const item of items){
-        const answer={};if(value[item.id]!==undefined)answer[item.id]=clone(value[item.id]);
+        const answer={};for(const id of questionKeys(definition,item))if(value[id]!==undefined)answer[id]=clone(value[id]);
         if(value.__sw_checked||value.__sw_choice_checked?.includes(item.id))answer.__sw_checked=true;
         if(value.__sw_skipped||value.__sw_choice_skipped?.includes(item.id))answer.__sw_skipped=true;
         state[blockId(item)]=answer;
@@ -391,8 +402,7 @@
       const state={...saved},checked=[],skipped=[];
       delete state.__sw_checked;delete state.__sw_skipped;
       for(const item of items){
-        const answer=value[blockId(item)]||{};delete state[item.id];
-        if(answer[item.id]!==undefined)state[item.id]=clone(answer[item.id]);
+        const answer=value[blockId(item)]||{};for(const id of questionKeys(definition,item)){delete state[id];if(answer[id]!==undefined)state[id]=clone(answer[id]);}
         if(answer.__sw_checked)checked.push(item.id);
         if(answer.__sw_skipped)skipped.push(item.id);
       }
@@ -423,8 +433,9 @@
       const handle=mount(host,stage,{...config,syncChecks:true,answers:unpack(config.answers),onChange:value=>config.onChange?.(pack(value))});
       return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>handle.setAnswers(unpack(value))};
     }
-    if((config.sequentialListening||definition.progressiveQuestions)&&!config.showAllQuestions&&definition.kind==='choice'&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
+    if((definition.progressiveQuestions||config.sequentialListening&&definition.kind==='choice')&&!config.showAllQuestions&&['choice','gaps'].includes(definition.kind)&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
     const def = clone(definition);
+    if(def.unifiedProgression)config={...config,unifiedProgression:true};
     // Independent tasks reveal in sequence; a reading/audio source stays with its task.
     const taskKinds = new Set(['matching','gaps','choice','image-label','order','sort','writing','rule-page']);
     let stageStops = [];
@@ -1000,7 +1011,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:block.exercise.title===def.title||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:config.onViewChange?viewChanged:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:block.exercise.title===def.title||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1022,13 +1033,17 @@
           });
           if(down && def.requireCheckBeforeNext){
             const candidates=config.independentSteps?def.exercises.slice(visibleCount-1,visibleCount):def.exercises.slice(0,visibleCount);
-            const tasks=candidates.filter(block=>['matching','gaps','choice','image-label','order','sort','writing'].includes(block.exercise.kind));
+            const tasks=candidates.filter(block=>['matching','gaps','choice','image-label','order','sort','writing'].includes(block.exercise.kind)||(config.unifiedProgression&&hasTasks(block.exercise)));
             down.disabled=Boolean(config.readOnly||config.navigationReadOnly)||tasks.some(block=>!taskFinished(block.exercise,answers[block.id]||{}));
           }
           if (visibleCount > stageStops[0]) up = addControl('up', 'Свернуть задание', () => {
             if (config.readOnly||config.navigationReadOnly) return;
             answers.revealed=[...stageStops].reverse().find(stop=>stop<visibleCount)||stageStops[0];syncStage(answers.revealed,true);updateNavigation('up');viewChanged();
           });
+          if(config.unifiedProgression){
+            const last=def.exercises[visibleCount-1];const state=nestedMountsByBlock.get(last.id)?.getAnswers()||answers[last.id]||{};
+            navigation.hidden=Boolean(config.navigationReadOnly)||pendingInner(last.exercise,state);
+          }
           if (focusDirection) (focusDirection === 'up' ? up || down : down || up)?.focus({preventScroll:true});
         };
         syncStage=(count,animate=true)=>{
@@ -1048,7 +1063,7 @@
         };
         while (nestedMounts.length < visibleCount) reveal();
         body.append(stack);
-        if (def.progressive) { body.append(navigation); updateNavigation();navigation.hidden=Boolean(config.navigationReadOnly); }
+        if (def.progressive) { body.append(navigation); updateNavigation();if(!config.unifiedProgression)navigation.hidden=Boolean(config.navigationReadOnly); }
         if(transcript){body.append(transcript);syncTranscript();}
       }
       if (def.kind === 'rule-page') {

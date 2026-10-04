@@ -64,7 +64,7 @@ test('discovery questions precede one full rule, revealed only by teacher arrow'
   const d=find(id),v=setup(d),q=d.exercises[1].exercise;
   assert.equal(v.host.querySelector('.ek-rule-block'),null);assert.equal(q.items.length,3);
   assert.equal(v.host.querySelector('.ek-stage-down').disabled,true);
-  v.handle.setAnswers({[q.id]:{...correct(q),__sw_checked:true}});assert.equal(v.host.querySelector('.ek-rule-block'),null);
+  v.handle.setAnswers({[q.id]:{...correct(q),__sw_checked:true,...(q.progressiveQuestions?{__sw_choice_revealed:q.items.length}:{})}});assert.equal(v.host.querySelector('.ek-rule-block'),null);
   v.click('Show next exercise');assert.equal(v.host.querySelectorAll('.ek-rule-block').length,1);
   assert.ok(v.host.querySelector('.ek-rule-block').textContent.length>900);
  }
@@ -92,14 +92,11 @@ test('Multiple Select accepts either selection order and rejects extra answers',
  assert.equal(kit.grade(d,{'2':['A','B','C']})['2'],'retry');
  assert.equal(setup(d).host.querySelectorAll('input[type=checkbox]').length,4);
 });
-test('open writing uses a multiline field, preserves shared drafts and never grades against its hidden sample',()=>{
- const parent=find('B1D2-M09'),d=parent.exercises[1].exercise,v=setup(parent);
- assert.ok(v.host.querySelector('textarea'));assert.equal(v.host.querySelector('details'),null);
- const own='I would talk to my friends.\nI need to revise.';
- assert.equal(kit.grade(d,{reply:own}).reply,'review');
- v.handle.setAnswers({[d.id]:{reply:own,__sw_checked:true}});
- assert.equal(v.host.querySelector('textarea').value,own);
- assert.equal(v.host.querySelector('details'),null);assert.match(v.host.textContent,/Well done/);
+test('revised B1 advice correction uses six keyed sentence fields and retains canonical feedback',()=>{
+ const d=find('B1D2-M09'),v=setup(d);assert.equal(v.host.querySelectorAll('input.ek-writing-input').length,6);
+ const answers=Object.fromEntries(d.items.map(i=>[i.id,i.acceptedAnswers[0]]));v.handle.setAnswers({...answers,__sw_checked:true});
+ assert.ok(Object.values(kit.grade(d,answers)).every(x=>x==='correct'));
+ const first=d.items[0];v.handle.setAnswers({...answers,[first.id]:first.prompt,__sw_checked:true});assert.match(v.host.querySelector('.ek-answer-pairs').textContent,/If I were you/);v.handle.destroy();
 });
 test('lexical rules reveal outside feedback by teacher arrow and synchronize without losing flat answers',()=>{
  for(const id of ['B1D1-M02','B1D2-M02']){

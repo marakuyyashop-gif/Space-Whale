@@ -4,11 +4,12 @@
 :root {
   --sw-exercise-font: Onest, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --sw-exercise-text-size: 16px;
-  --sw-exercise-title-size: 20px;
-  --sw-exercise-compact-text-size: 16px;
-  --sw-exercise-compact-title-size: 18px;
-  --sw-exercise-mobile-text-size: 16px;
-  --sw-exercise-mobile-title-size: 20px;
+  --sw-control-scale: 1; /* All workspace controls; 1 keeps the approved size. */
+  --sw-exercise-title-size: calc(var(--sw-exercise-text-size) * 1.25);
+  --sw-exercise-compact-text-size: calc(var(--sw-exercise-text-size) * 1);
+  --sw-exercise-compact-title-size: calc(var(--sw-exercise-text-size) * 1.125);
+  --sw-exercise-mobile-text-size: calc(var(--sw-exercise-text-size) * 1);
+  --sw-exercise-mobile-title-size: calc(var(--sw-exercise-text-size) * 1.25);
   --sw-exercise-radius: 14px;
   --sw-exercise-ink: #292b2f;
   --sw-action-background: #fff;
@@ -18,12 +19,14 @@
   --sw-exercise-line: #dedfe2;
   --sw-exercise-surface: #fff;
   --sw-exercise-soft: #fff;
-  --sw-exercise-small-size: 14px;
-  --sw-exercise-caption-size: 13px;
+  --sw-exercise-small-size: calc(var(--sw-exercise-text-size) * 0.875);
+  --sw-exercise-caption-size: calc(var(--sw-exercise-text-size) * 0.8125);
   --sw-exercise-line-height: 1.65;
-  --sw-exercise-button-radius: 12px;
-  --sw-exercise-button-padding: 13px;
-  --sw-exercise-control-height: 40px;
+  --sw-exercise-button-radius: calc(12px * var(--sw-control-scale));
+  --sw-exercise-button-padding: calc(13px * var(--sw-control-scale));
+  --sw-action-size: calc(48px * var(--sw-control-scale));
+  --sw-navigation-size: calc(54px * var(--sw-control-scale));
+  --sw-exercise-control-height: calc(40px * var(--sw-control-scale));
   --sw-stage-gap: 48px;
   --sw-component-gap: 24px;
   --sw-audio-idle: #c5c7ce;

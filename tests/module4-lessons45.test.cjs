@@ -65,10 +65,10 @@ test('approved opening and final Speaking use the shared layout in teacher and l
 });
 test('discovery reveals its rule only after checking and a teacher arrow, synchronized to learner',()=>{
  const d=find('L4-discovery-rule'),t=setup(d),s=setup(d,{navigationReadOnly:true});
- assert.equal(t.host.querySelectorAll('.ek-choice-trigger').length,2);
+ assert.equal(t.host.querySelectorAll('.ek-choice-trigger').length,1);
  assert.equal(t.host.textContent.includes('Как спросить о человеке'),false);
  assert.equal(t.host.querySelector('.ek-stage-down').disabled,true);
- t.handle.setAnswers({'L4-complete-rule':{'1':'как она выглядит','2':'какая она в общении',__sw_checked:true}});
+ t.handle.setAnswers({'L4-complete-rule':{'1':'как она выглядит','2':'какая она в общении',__sw_checked:true,__sw_choice_revealed:2}});
  assert.equal(t.host.querySelector('.ek-stage-down').disabled,false);
  assert.equal(t.host.textContent.includes('Как спросить о человеке'),false);
  click(t,'.ek-stage-down');assert.ok(t.host.textContent.includes('Как спросить о человеке'));

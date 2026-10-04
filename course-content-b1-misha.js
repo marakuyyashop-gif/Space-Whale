@@ -1685,6 +1685,7 @@ const lessons=[
                 "version": 1,
                 "id": "B1D2-M05-questions",
                 "kind": "choice",
+                "progressiveQuestions": true,
                 "title": "Read Jamie’s message and the replies.",
                 "items": [
                   {
@@ -1795,10 +1796,9 @@ const lessons=[
                 "blocks": [
                   {
                     "type": "text",
-                    "text": "If I were you, I’d use that free hour to revise one topic.\nIn your place, I’d avoid checking messages during that hour.",
+                    "text": "If I were you, I’d use that free hour to revise one topic.\nIn your place, I’d avoid checking messages during that hour.\nIf I were you, I wouldn’t agree immediately.",
                     "highlights": [
-                      "If I were you, I’d use that free hour to revise one topic.",
-                      "In your place, I’d avoid checking messages during that hour."
+                      "If I were you", "I’d", "In your place", "avoid checking", "I wouldn’t"
                     ]
                   }
                 ]
@@ -1810,6 +1810,7 @@ const lessons=[
                 "version": 1,
                 "id": "B1D2-M06-discover",
                 "kind": "choice",
+                "progressiveQuestions": true,
                 "title": "How does the writer give advice?",
                 "items": [
                   {
@@ -1876,26 +1877,7 @@ const lessons=[
                     "type": "rule",
                     "title": "Giving advice from someone else’s point of view",
                     "text": "When someone explains a problem, If I were you, I’d … helps you say what you recommend. You imagine being in that person’s situation and suggest an action. It is advice about now or the future, not a story about the past.\n\nIf I were you, I’d prepare a few questions.\nTo recommend not doing something, use If I were you, I wouldn’t …:\nIf I were you, I wouldn’t accept immediately.\n\nUse were in this advice pattern. I’d = I would, followed by the basic verb: I’d prepare, not I’d to prepare.\n\nYou can also say In your place, I’d …, In your position, I’d … or In your situation, I’d …. These are alternatives; you do not need to use all three in one conversation. The full form is also possible: If I were in your situation, I’d ….\n\nRemember the combinations from the Words section: concentrate on a task; avoid studying all night; consider asking for more time; refuse to share answers. Would does not change the pattern after the next verb.\n\nMake your advice specific. I’d prepare is very general. I’d prepare three questions about the working hours tells the other person what to do. Explain why it fits their situation, and respond when they give you new information.",
-                    "highlights": [
-                      "If I were you, I’d …",
-                      "If I were you, I’d prepare a few questions.",
-                      "If I were you, I wouldn’t …",
-                      "If I were you, I wouldn’t accept immediately.",
-                      "were",
-                      "I’d = I would",
-                      "I’d prepare",
-                      "I’d to prepare",
-                      "In your place, I’d …",
-                      "In your position, I’d …",
-                      "In your situation, I’d …",
-                      "If I were in your situation, I’d …",
-                      "concentrate on",
-                      "avoid studying",
-                      "consider asking",
-                      "refuse to share",
-                      "I’d prepare",
-                      "I’d prepare three questions about the working hours"
-                    ]
+                    "highlights": ["If I were you", "I’d", "I wouldn’t", "I would", "In your place", "In your position", "In your situation", "If I were in your situation", "would", "were", "concentrate on", "avoid studying", "consider asking", "refuse to share"]
                   }
                 ]
               }
@@ -2197,58 +2179,66 @@ const lessons=[
         "exercise": {
           "version": 1,
           "id": "B1D2-M09",
-          "kind": "stage",
-          "title": "Write a reply to your friend.",
-          "exercises": [
+          "kind": "writing",
+          "title": "Correct the advice.",
+          "instruction": "There is one mistake in each sentence. Rewrite the sentence correctly.",
+          "responseMode": "accepted",
+          "items": [
             {
-              "id": "B1D2-M09-source",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M09-source",
-                "kind": "rule-page",
-                "title": "Write a reply to your friend.",
-                "blocks": [
-                  {
-                    "type": "text",
-                    "text": "“I said I’d help organise a party on Saturday, but I have an exam on Monday and I haven’t revised enough. I don’t want to disappoint everyone. What should I do?”\n\nUse If I were you … or In your place/position/situation ….\nChoose at least two useful verbs: prepare · revise · concentrate · avoid · consider · refuse.",
-                    "highlights": [
-                      "If I were you …",
-                      "In your place/position/situation …",
-                      "prepare · revise · concentrate · avoid · consider · refuse"
-                    ]
-                  }
-                ]
-              }
+              "id": "correction-1",
+              "prompt": "If I am you, I’d prepare for the interview tonight.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "If I were you, I’d prepare for the interview tonight.",
+                "If I were you, I would prepare for the interview tonight."
+              ]
             },
             {
-              "id": "B1D2-M09-reply",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M09-reply",
-                "kind": "writing",
-                "title": "Write a reply to your friend.",
-                "responseMode": "open",
-                "revealPossibleAnswers": true,
-                "items": [
-                  {
-                    "id": "reply",
-                    "prompt": "Your reply",
-                    "multiline": true,
-                    "rows": 5,
-                    "possibleAnswers": [
-                      "If I were you, I’d explain the problem to your friends today. I’d consider helping for an hour, but I wouldn’t stay all day. You need time to revise."
-                    ]
-                  }
-                ]
-              }
+              "id": "correction-2",
+              "prompt": "If I were you, I will revise before the exam.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "If I were you, I’d revise before the exam.",
+                "If I were you, I would revise before the exam."
+              ]
+            },
+            {
+              "id": "correction-3",
+              "prompt": "In your place, I’d to avoid checking my phone while I study.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "In your place, I’d avoid checking my phone while I study.",
+                "In your place, I would avoid checking my phone while I study."
+              ]
+            },
+            {
+              "id": "correction-4",
+              "prompt": "If I were you, I wouldn’t to accept the offer immediately.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "If I were you, I wouldn’t accept the offer immediately.",
+                "If I were you, I would not accept the offer immediately."
+              ]
+            },
+            {
+              "id": "correction-5",
+              "prompt": "In your situation, I’d consider to ask for more time.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "In your situation, I’d consider asking for more time.",
+                "In your situation, I would consider asking for more time."
+              ]
+            },
+            {
+              "id": "correction-6",
+              "prompt": "If I were you, I’d refuse working every weekend.",
+              "normalization": "translation",
+              "acceptedAnswers": [
+                "If I were you, I’d refuse to work every weekend.",
+                "If I were you, I would refuse to work every weekend."
+              ]
             }
-          ],
-          "progressive": true,
-          "requireCheckBeforeNext": true,
-          "revealStops": [
-            2
-          ],
-          "instruction": "Write three or four sentences. Give advice, a reason, and one thing not to do."
+          ]
         }
       },
       {

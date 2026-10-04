@@ -34,7 +34,7 @@ test('all loaded A1 lessons follow the single outline, not content metadata', ()
   for(const source of lessons) {
     const actual = catalog.lessons.find(l=>l.id===source.id);
     assert.ok(actual,source.id);
-    assert.deepEqual(actual.stages,source.stages,'Exercise content must remain intact: '+source.id);
+    assert.deepEqual(actual.stages,require('../lesson-structure.js').compose(require('../lesson-structure-content.js').apply([source])[0]).stages,'Exercise content must remain intact: '+source.id);
   }
 });
 

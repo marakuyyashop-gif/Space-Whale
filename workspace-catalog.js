@@ -90,6 +90,9 @@
   ));
 
   function createCatalog(lessons, templates) {
+    const structure=typeof module!=='undefined'&&module.exports?require('./lesson-structure.js'):root.SpaceWhaleLessonStructure;
+    const plans=typeof module!=='undefined'&&module.exports?require('./lesson-structure-content.js'):root.SpaceWhaleLessonStructureContent;
+    if(structure)lessons=(plans?plans.apply(lessons):lessons).map(structure.compose);
     // Course metadata belongs exclusively to the outline, never to exercises.
     const outlineById = new Map(outlineLessons.map(lesson => [lesson.id, lesson]));
     lessons = lessons.map(lesson => {
@@ -159,7 +162,7 @@
       if (lesson) {
         route.lesson = lesson.id;
         if (lesson.stages.length) {
-          route.exercise = (templateMatch?.stage || lesson.stages.find(stage => stage.exercise.id === requestedExercise) || lesson.stages[0]).exercise.id;
+          route.exercise = (templateMatch?.stage || lesson.stages.find(stage => stage.exercise.id === requestedExercise || stage.exerciseAliases?.includes(requestedExercise)) || lesson.stages[0]).exercise.id;
         }
       }
       return route;
