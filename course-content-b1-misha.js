@@ -2240,57 +2240,42 @@ const lessons=[
           "time": "6 min",
           "teacherNotes": "студент даёт конкретный совет с изучаемой формулой, учитывает факты, объясняет причину, задаёт/понимает уточнение и корректирует предложение. Не определять одну «правильную» рекомендацию. Поддержку Useful phrases не прятать автоматически."
         },
-        "exercise": {
-          "version": 1,
+        "exercise": kit.speaking({
           "id": "B1D2-M10",
-          "kind": "stage",
-          "title": "Give advice that fits the situation.",
-          "exercises": [
+          "title": "Give your friend some advice",
+          "image": {
+            "imagePending": true,
+            "assetId": "B1D2_ADVICE_SIX_SITUATIONS"
+          },
+          "task": {
+            "text": "Look at the six situations. Your friend asks you for advice.\n\nFor each situation:",
+            "bullets": [
+              "say what you think they should do;",
+              "explain why;",
+              "say what you would do in their place."
+            ]
+          },
+          "use": [
             {
-              "id": "B1D2-M10-situations",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M10-situations",
-                "kind": "presentation",
-                "title": "Give advice that fits the situation.",
-                "blocks": [
-                  {
-                    "type": "image",
-                    "mediaRef": "B1D2_SCENES"
-                  },
-                  {
-                    "type": "text",
-                    "text": "A. Maya has an exam in three days. She knows the theory, but finds the practice questions difficult. She has two free hours this evening and keeps checking her phone.\n\nB. Daniel has an interesting job offer, but the evening and weekend hours are not clear. He needs to be home by six on two evenings a week. The company wants an answer today.\n\nC. Rory’s classmate wants him to do their part of a group project as well as his own. Rory’s own work is due on Friday. He wants to help, but he does not have time to do both parts.\n\nThe person with the problem: explain it and ask for advice.\nThe adviser: suggest a specific action, say what you wouldn’t do, and explain why.\nThen open the extra information. Adapt the advice and agree on a first step."
-                  },
-                  {
-                    "type": "disclosure",
-                    "title": "Useful phrases",
-                    "open": true,
-                    "text": "What would you do in my situation?\nIf I were you, I’d …\nIf I were you, I wouldn’t …\nIn your place / position / situation, I’d …\nI’d consider …\nThat could help, but …"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "B1D2-M10-extra",
-              "exercise": {
-                "version": 1,
-                "id": "B1D2-M10-extra",
-                "kind": "presentation",
-                "title": "Extra information",
-                "blocks": [
-                  {
-                    "type": "text",
-                    "text": "A. “I need my phone because all my notes are on it.”\nB. “They can give me one more day to decide.”\nC. “My classmate says they don’t understand their part.”"
-                  }
-                ]
-              }
+              "words": [
+                "prepare",
+                "revise",
+                "concentrate",
+                "avoid",
+                "consider",
+                "refuse"
+              ],
+              "phrases": [
+                "If I were you, I’d ...",
+                "If I were you, I wouldn’t ...",
+                "In your place, I’d ...",
+                "In your situation, I’d ...",
+                "I would ... / I wouldn’t ...",
+                "... because ..."
+              ]
             }
-          ],
-          "progressive": true,
-          "requireCheckBeforeNext": true,
-          "instruction": "Choose two situations. Take turns asking for and giving advice."
-        }
+          ]
+        })
       }
     ]
   }

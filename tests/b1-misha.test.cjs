@@ -122,7 +122,7 @@ test('lexical rules reveal outside feedback by teacher arrow and synchronize wit
   assert.equal(saved.__sw_followup_revealed,2);assert.ok(setup(d,{answers:saved}).host.querySelector('.ek-rule-block'));
   const skipped=setup(d);skipped.click('Skip exercise');assert.ok(skipped.host.querySelector('.ek-rule-block'));
  }
- for(const id of ['B1D1-M10','B1D2-M10']){
+ for(const id of ['B1D1-M10']){
   const d=find(id),v=setup(d);assert.equal(v.host.querySelector('details').open,true);assert.ok(!v.host.textContent.includes('Extra information'));
   v.click('Show next exercise');assert.ok(v.host.textContent.includes('Extra information'));
  }
