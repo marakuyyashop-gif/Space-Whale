@@ -44,10 +44,20 @@ test('practice reveals dropdown, multiple select, correction and mapped sequence
  assert.deepEqual(Array.from(practice.exercises,b=>b.exercise.kind),['gaps','choice','writing','presentation','order']);
  assert.ok(!lesson.stages.some(s=>s.exercise.id==='A2_DIR_M09'));
  const order=practice.exercises.at(-1).exercise;
- assert.deepEqual(Array.from(order.correctOrder),['along','across','through','past','towards','down','straight']);
+ assert.deepEqual(Array.from(order.correctOrder),['along','across','through','past','towards','left-again','down','straight']);
  assert.ok(order.tokens.map(t=>t.id).join()!==order.correctOrder.join());
  for(const block of practice.exercises)kit.validate(block.exercise);
  assert.ok(homework.stages.every(s=>s.exercise.items.length===6&&s.exercise.responseMode==='accepted'));
+});
+test('error correction rejects nonsense and original mistakes, accepts valid variants and shows canonical corrections',()=>{
+ const d=lesson.stages.find(s=>s.exercise.id==='A2_DIR_PRACTICE').exercise.exercises.find(b=>b.id==='A2_DIR_M08').exercise;
+ for(const item of d.items){
+  assert.equal(kit.grade(d,{[item.id]:'random nonsense'})[item.id],'retry');
+  assert.equal(kit.grade(d,{[item.id]:item.prompt})[item.id],'retry');
+  for(const value of item.acceptedAnswers)assert.equal(kit.grade(d,{[item.id]:value.toUpperCase().replace(/\.$/,'')})[item.id],'correct');
+ }
+ const {host,handle}=setup(d);handle.setAnswers({'1':'random nonsense','2':'random nonsense','3':'random nonsense',__sw_checked:true});
+ const correction=host.querySelector('.ek-answer-pairs');assert.ok(correction);for(const item of d.items)assert.ok(correction.textContent.includes(item.acceptedAnswers[0]));assert.ok(!host.textContent.includes('Well done'));handle.destroy();
 });
 test('discovery reveals one question at a time while report mode shows all',()=>{
  let discovery;walk(lesson.stages.find(s=>s.exercise.id==='A2_DIR_M04').exercise,d=>{if(d.kind==='choice')discovery=d;});

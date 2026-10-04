@@ -3,6 +3,14 @@
 A2.1 · Module 1 · Уроки для Smy 3 · 29.09.2026
 После «Взбираемся на высоту». На урок — ориентировочно 30 минут; требуется проверка реальным проведением.
 
+## Уточнения владельца от 04.10.2026
+
+Актуальные секции задаёт общий `lesson-structure.js`: Speaking → Words → Language Focus → Practice → Listening → Final Speaking. В Words сразу после Phrase–Meaning Matching идёт Listen & Repeat. Прежние пояснения «Look at the directions», «One more way to say it» и вопрос о месте, мимо которого проходит маршрут, удалены.
+
+Семь значков из `direction-support.svg` используются в штатном Picture–Word Matching в начале Language Focus, перед тремя отдельными вопросами Discovery и правилом. Options — семь изучаемых сочетаний, перемешанные. За ним остаётся Practice: Dropdown → Multiple Select → проверяемый Error Correction → Sequence Order. В маршруте Order после «Head towards the fountain, but turn left before it» добавлено «Go straight and turn left again», затем лестница и последний перекрёсток. Карта Practice остаётся прежней.
+
+В первом Speaking установлена карта `e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png`, в последнем — `991d2dbd-554e-4a17-9112-d45c9d02a26c.png` из `Images/A2.1/module 1/`. По прямому указанию владельца все тексты Speaking сохранены. Известное расхождение: вторая карта заканчивается у karaoke, в прежнем тексте и образце остаются station/cinema и старые ориентиры. Для изменения этих текстов нужна отдельная просьба владельца.
+
 ## Основания и результат проверки
 
 Проверены: карточка и задания в www(1).pdf (7 страниц); переданный каркас; действующая LESSON beta2; «Изображения-сценарий.txt»; база directions в А1.txt; текущие компоненты и каталог сайта. Для функции итогового Speaking просмотрен A2-референс, стр. 12: конкретная ситуация, изображение, инструкция и доступный Useful language. В нашем уроке название — Useful phrases. Художественное содержание референса не переносится.
@@ -119,20 +127,7 @@ head towards → move in the direction of a place
 walk past → walk by a place and continue beyond it
 go down → move from a higher place to a lower place
 
-#### One more way to say it.
-
-ID: A2_DIR_M02-pass · presentation
-
-Pass the bank = walk past the bank.
-
-The bank is next to your route. You do not go inside; you keep walking.
-
-Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана в этом задании перед вопросом.
-
-Look at the map again. Show a place you pass on your way to the café.
-
-
-Раскрытие: последовательно стрелкой преподавателя; OK проверяет текущую попытку, но не открывает следующее самостоятельное задание.
+После OK следующая стрелка сразу открывает Listen & Repeat. Между ними нет дополнительных материалов.
 
 ## Pronunciation — 2 min
 
@@ -153,7 +148,7 @@ Walk past the bank.
 Go down the stairs.
 Pass the café.
 
-## Language Focus — 3 min
+## Language Focus — 5 min
 
 Преподавателю: Цель: после ввода значений вывести важные различия и форму; не повторять семипунктовое matching. Сначала три решения, затем правило через стрелку. Обязательно проговорить pass + объект без past; keep going, не keep go; towards не означает обязательного достижения. Не учить, что down всегда только вниз. Полный текст правила остаётся доступным, но преподаватель выделяет проблемные места вместо чтения всей страницы вслух.
 
@@ -296,7 +291,7 @@ Hi, Alex. I’m at the café by the river. From the station, go along King Stree
 
 ## Correction — 2 min
 
-ID: A2_DIR_M08 · writing, open response
+ID: A2_DIR_M08 · writing, accepted answers
 
 ### Check the directions.
 
@@ -306,7 +301,7 @@ Your friend wrote these directions. Correct one mistake in each sentence. Keep t
 2. Pass past the bank and stop at the next building.
 3. Head towards to the station.
 
-Преподавателю: ошибки заранее не выделены. Ученик вводит исправленные предложения без банка. Possible answers после попытки: Keep going straight at the crossing.; Pass the bank and stop at the next building. / Walk past the bank and stop at the next building.; Head towards the station. / Head to the station. Проверка по смыслу преподавателем, без exact-match.
+Ошибки заранее не выделены. Ученик вводит исправленные предложения без банка. OK проверяет принятые варианты с нормализацией регистра, пробелов и пунктуации. Канонические ответы: Keep going straight at the crossing.; Pass the bank and stop at the next building.; Head towards the station. Во втором также принимаются Walk past / Go past the bank and stop at the next building; в третьем — Head toward / Head to the station. При ошибке показывается один канонический ответ штатным компонентом исправлений.
 
 ## Guided Writing — 3 min
 

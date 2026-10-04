@@ -8,11 +8,12 @@ const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
 const T=text=>({type:'text',text});
 const D=(title,text,open=false)=>({type:'disclosure',title,text,open});
 const I=file=>({type:'image',image:root+file,imageWidth:1000,imageHeight:620,alt:file==='test-route.svg'?'A dotted route from a bus stop along River Street, across a bridge, through a park, past a bank, towards a fountain, then down stairs to a café.':'A different dotted route from a station past a shop, through a garden, across a bridge, along Garden Street, then down stairs to a cinema.'});
+const speakingImage=final=>({type:'image',image:'Images/A2.1/module 1/'+(final?'991d2dbd-554e-4a17-9112-d45c9d02a26c.png':'e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png'),imageWidth:1448,imageHeight:1086,alt:final?'A dotted route from START by a gym, through a park, down stairs and across a bridge to FINISH by karaoke.':'A dotted route from a bus stop, across a bridge, past a fountain and down stairs to a café.'});
 const P=(id,title,blocks)=>E(id,'presentation',title,{blocks});
 const S=(id,title,children,extra={})=>E(id,'stage',title,{exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
 const Q=(id,prompt,options,correctId,feedbackText)=>({id,prompt,options:options.map((text,i)=>({id:String.fromCharCode(65+i),text})),correctId,feedbackText});
 const C=(id,title,items)=>E(id,'choice',title,{items});
-const W=(id,title,items,instruction)=>E(id,'writing',title,{responseMode:'open',revealPossibleAnswers:true,items,instruction});
+const W=(id,title,items,instruction)=>E(id,'writing',title,{responseMode:'accepted',items:items.map(item=>({...item,normalization:'translation'})),instruction});
 const phrases='Go along…\nWalk across…\nKeep going straight.\nContinue through…\nHead towards…\nWalk past…\nGo down…\n\nTurn left / right.\nDo I turn here?\nNo, keep going…';
 const repeatTexts=['Go along River Street.','Walk across the bridge.','Keep going straight.','Continue through the park.','Head towards the fountain.','Walk past the bank.','Go down the stairs.','Pass the café.'];
 const script="Hi, Alex. I’m at the café by the river. From the station, go along King Street. Walk past the cinema — don’t turn there. Continue through the small park. When you come out, head towards the bridge, but don’t cross it. Turn left before the bridge and go down the stairs. The café is at the bottom, on your right. See you there!";
@@ -20,7 +21,7 @@ const rule='Чтобы объяснить дорогу, используйте �
 const stages=[];
 const step=(menu,time,exercise,notes)=>stages.push({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes:notes},exercise});
 step('Test Task',2,P('A2_DIR_M01','Help your friend find the café.',[
- T('Your friend is at the bus stop. You are at the café. Your friend calls you for directions.'),I('test-route.svg'),
+ T('Your friend is at the bus stop. You are at the café. Your friend calls you for directions.'),speakingImage(false),
  T('Explain the dotted route from START to FINISH. Your partner follows it and asks a question if anything is unclear.'),D('Useful phrases',phrases,true)
 ]),'Цель: диагностировать объяснение маршрута до обучения. 20–30 секунд на карту, затем короткий маршрут и одно уточнение в оставшееся время. Пунктир задаёт путь, но не английские предложения. Лестница дана сбоку: upper path → lower path. Допустимы cross / go past и другие естественные замены. Отметить: самостоятельно / с Useful phrases / с помощью преподавателя; не исправлять каждую реплику. Открытые опоры не дают готового ответа. Это совместная ролевая практика по общей карте, не information gap.');
 const definitions=[
@@ -32,18 +33,20 @@ const definitions=[
  ['past','walk past','walk by a place and continue beyond it'],
  ['down','go down','move from a higher place to a lower place']
 ];
-step('Phrase Input',4,S('A2_DIR_M02','Match the phrases with their meanings.',[
+step('Phrase Input',2,S('A2_DIR_M02','Match the phrases with their meanings.',[
  E('A2_DIR_M02-match','matching','Match the phrases with their meanings.',{
  items:definitions.map(([id,text])=>({id,text,correctId:id})),
- options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][2]}))}),
- P('A2_DIR_M02-visual','Look at the directions.',[{type:'image',image:root+'direction-support.svg',imageWidth:1120,imageHeight:640,alt:'Seven movement diagrams: beside a river, across a bridge, straight at a crossing, through a park, towards a fountain, past a bank, and down stairs.'},T('1. Go along the river.\n2. Walk across the bridge.\n3. Keep going straight at the crossing.\n4. Continue through the park.\n5. Head towards the fountain.\n6. Walk past the bank.\n7. Go down the stairs.')]),
- P('A2_DIR_M02-pass','One more way to say it.',[T('Pass the bank = walk past the bank.\n\nThe bank is next to your route. You do not go inside; you keep walking.'),I('test-route.svg'),T('Look at the map again. Show a place you pass on your way to the café.')])
-],{progressive:true,requireCheckBeforeNext:true}),'Цель: ввести все семь сочетаний и pass. Сначала дать ученику попытаться сопоставить значения, затем вместе проверить; это ввод с поддержкой, а не тест после объяснения. При необходимости показать участок карты. Не объявлять одну линию на карте однозначным изображением along / straight / towards. Down здесь — значение со stairs. Pass вводится и применяется в последней короткой реплике. Базовые go / walk знакомы; keep going, continue, head и pass изучаются в контексте, без второго искусственного словарного списка.');
+ options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][2]}))})
+],{progressive:true,requireCheckBeforeNext:true}),'Сопоставление семи сочетаний со значениями. После проверки следующая стрелка сразу открывает Listen & Repeat.');
 step('Pronunciation',2,E('A2_DIR_M03','audio','Listen and repeat.',{
  layout:'listen-repeat',instruction:'Listen and repeat each phrase.',
  items:repeatTexts.map((text,i)=>({id:'A2_DIR_P'+String(i+1).padStart(2,'0'),text,audio:root+'audio/A2_DIR_P'+String(i+1).padStart(2,'0')+'_r1.mp3'}))
 }),'Цель: произнести восемь осмысленных фраз. Преподаватель включает каждую запись; ученик слушает и повторяет. Работать целыми сочетаниями; не читать названия предлогов отдельно. Не засчитывать этот этап как Listening comprehension. Восемь отдельных записей Jessica, строго по видимым строкам.');
-step('Language Focus',3,S('A2_DIR_M04','Notice how the directions work.',[
+step('Language Focus',5,S('A2_DIR_M04','Language Focus',[
+ E('A2_DIR_M04-pictures','matching','Match the pictures with the phrases.',{
+ layout:'picture-word',
+ items:definitions.map(([id],i)=>({id,text:String(i+1),correctId:id,image:root+'direction-support.svg',imageWidth:1120,imageHeight:640,alt:'Direction diagram '+(i+1),crop:{x:(i%4)*25,y:i<4?0:50,w:25,h:50}})),
+ options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][1]}))}),
  {...C('A2_DIR_M04-discovery','Notice how the directions work.',[
  Q('1','“Walk past the café.” / “Pass the café.”\nDo these directions describe the same movement?',['Yes, both take you beyond the café.','No, the second tells you to go inside.'],'A','Both directions tell you to go past the café.'),
  Q('2','“Head towards the bridge, but turn left before you reach it.”\nDo you need to reach the bridge?',['Yes.','No.'],'B','No. Turn left before you reach the bridge.'),
@@ -69,13 +72,13 @@ step('Listening',4,S('A2_DIR_M06','Find the meeting place.',[
  Q('3','Where exactly is the café?',['At the top of the stairs, on the left.','At the bottom of the stairs, on the right.','Inside the park, by the entrance.'],'B','The café is at the bottom of the stairs, on the right.')])
 ],{progressive:true,revealStops:[2,3],requireCheckBeforeNext:true,transcript:script,transcriptTitle:'Transcript',transcriptAfter:['A2_DIR_M06-main','A2_DIR_M06-details']}),'Цель: понять голосовое сообщение и критические повороты. Это другой маршрут: не показывать карту Test Task как иллюстрацию записи. Первое прослушивание целиком — общий результат; второе — детали. Три вопроса открываются по одному штатными стрелками, источник доступен. Transcript закрыт до попыток всех вопросов. Запись доступна в плеере; текст только в teacher notes и закрытом Transcript.\n\nТОЧНЫЙ АУДИОСКРИПТ:\n'+script);
 step('Correction',2,W('A2_DIR_M08','Check the directions.',[
- {id:'1',prompt:'Keep go straight at the crossing.',possibleAnswers:['Keep going straight at the crossing.']},
- {id:'2',prompt:'Pass past the bank and stop at the next building.',possibleAnswers:['Pass the bank and stop at the next building.','Walk past the bank and stop at the next building.']},
- {id:'3',prompt:'Head towards to the station.',possibleAnswers:['Head towards the station.','Head to the station.']}
-],'Your friend wrote these directions. Correct one mistake in each sentence. Keep the same meaning.'),'Цель: самостоятельно исправить форму без вариантов ответа. Ученик вводит исправленные предложения. Проверка преподавателем; Possible answers после попытки, без автоматической оценки свободного текста. Принимать естественные исправления: Pass the bank / Walk past the bank; Head towards the station / Head to the station. Ошибка заранее не выделяется.');
+ {id:'1',prompt:'Keep go straight at the crossing.',acceptedAnswers:['Keep going straight at the crossing.']},
+ {id:'2',prompt:'Pass past the bank and stop at the next building.',acceptedAnswers:['Pass the bank and stop at the next building.','Walk past the bank and stop at the next building.','Go past the bank and stop at the next building.']},
+ {id:'3',prompt:'Head towards to the station.',acceptedAnswers:['Head towards the station.','Head toward the station.','Head to the station.']}
+],'Your friend wrote these directions. Correct one mistake in each sentence. Keep the same meaning.'),'Самостоятельное исправление с автоматической проверкой принятых вариантов. После ошибки показывается один канонический ответ. Регистр, пунктуация и тип апострофа не влияют на проверку.');
 step('Final Speaking',5,S('A2_DIR_M07','Help your friend get to the cinema.',[
  P('A2_DIR_M07-speaking','Help your friend get to the cinema.',[
- T('Your friend is at the station. You are waiting at the cinema. Explain how to get there.'),I('final-route.svg'),
+ T('Your friend is at the station. You are waiting at the cinema. Explain how to get there.'),speakingImage(true),
  T('Look at the map. Follow the black line from START to FINISH. Tell your friend how to get there. Your friend asks one question about the way.'),D('Useful phrases',phrases,true)]),
  P('A2_DIR_M07-sample','Compare your directions.',[D('Possible answers','Walk past the shop and continue through the garden. Walk across the bridge. Then go along Garden Street and turn right at the end. Then turn right again. Keep going straight at the crossing. Go down the stairs and head towards the cinema.\n\nPartner: Do I turn at the crossing?\nYou: No, keep going straight.')])
 ],{progressive:true}),'Цель: то же умение, что в Test Task, на другом маршруте, без нового времени и придумывания истории. Карта общая; не называть это information gap. 1 минута на подготовку, 3 на объяснение и уточнение, 1 на исправление. Оценка: понятен порядок; направления соответствуют пути; сочетания выбраны по смыслу; собеседник может следовать указаниям. Не требовать все chunks и точного совпадения с sample. Along и straight могут совместно описывать участок. Useful phrases остаются открытыми. Образец только после попытки через стрелку и закрытое раскрытие.\n\nЕщё 2 минуты Feedback: сравнить начальную и итоговую попытки при одинаковых опорах; назвать один удачный участок и предложить исправить одну реально возникшую ошибку. Если времени мало, сократить повторные произнесения уже освоенных строк; не убирать Final.');
@@ -93,9 +96,10 @@ const routeOrder=E('A2_DIR_PRACTICE_order','order','Put the directions in the co
  {id:'past',text:'Walk past the bank.'},
  {id:'down',text:'Go down the stairs to the lower path.'},
  {id:'through',text:'Continue through the park.'},
+ {id:'left-again',text:'Go straight and turn left again.'},
  {id:'along',text:'Go along River Street.'},
  {id:'towards',text:'Head towards the fountain, but turn left before it.'},
- {id:'across',text:'Walk across the bridge.'}],correctOrder:['along','across','through','past','towards','down','straight']});
+ {id:'across',text:'Walk across the bridge.'}],correctOrder:['along','across','through','past','towards','left-again','down','straight']});
 const controlled=stages.find(s=>s.exercise.id==='A2_DIR_M05'),correction=stages.find(s=>s.exercise.id==='A2_DIR_M08');
 const practice=S('A2_DIR_PRACTICE','Practice',[controlled.exercise,multiple,correction.exercise,P('A2_DIR_PRACTICE-map',routeOrder.title,[I('test-route.svg')]),routeOrder],{progressive:true,revealStops:[1,2,3,5],requireCheckBeforeNext:true});
 stages.splice(stages.indexOf(controlled),1,{...controlled,menu:'Practice',navigationTitle:'Practice',guide:{time:'8 min',teacherNotes:'Dropdown → Multiple Select → Error Correction → route map and Sequence Order. The order key follows the actual map: stairs before the final crossing. Retained exercise and answer IDs are unchanged.'},exercise:practice});

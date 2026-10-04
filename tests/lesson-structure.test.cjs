@@ -19,11 +19,23 @@ test('old exercise links resolve into the corresponding section, and old respons
 test('Discovery starts with one question; no outer arrow bypasses it; flat keys and peer view restore',()=>{
  for(const id of Object.keys(plans)){
   const def=byRole(id,'focus').exercise,v=setup(def),p=setup(def,{navigationReadOnly:true});
+  if(id==='a2-1-w1-smy-3'){
+   const pictures=def.exercises[0];assert.equal(pictures.exercise.layout,'picture-word');
+   assert.equal(v.query('fieldset').length,0);assert.equal(v.query('[aria-label="Show next exercise"]')[0].disabled,true);
+   v.handle.setAnswers({[pictures.id]:answer(pictures.exercise)});v.click(v.query('[aria-label="Show next exercise"]')[0]);
+  }
   assert.equal(v.query('fieldset').length+v.query('.ek-gap').length,1,id);
   assert.equal(v.query('[aria-label="Show next exercise"]').length,1,id+' single active sequence');
   assert.equal(v.query('[aria-label="Show next exercise"]')[0].disabled,true);
   v.handle.setAnswers(answer(def));p.handle.setAnswers(v.handle.getAnswers());p.handle.setViewState(v.handle.getViewState());assert.deepEqual(p.handle.getAnswers(),v.handle.getAnswers());assert.equal(p.query('[aria-label="Show next exercise"]').length,0);v.handle.destroy();p.handle.destroy();
  }
+});
+test('A2 Words moves directly from phrase matching to Listen & Repeat',()=>{
+ const def=byRole('a2-1-w1-smy-3','words').exercise,v=setup(def);
+ const phrases=def.exercises[0];assert.equal(phrases.exercise.exercises.length,1);
+ v.handle.setAnswers({[phrases.id]:answer(phrases.exercise)});v.click(v.query('[aria-label="Show next exercise"]')[0]);
+ assert.ok(v.host.textContent.includes('Listen and repeat.'));assert.ok(v.host.textContent.includes('Match the phrases with their meanings.'));
+ assert.ok(!v.host.textContent.includes('One more way to say it.'));assert.ok(!v.host.textContent.includes('Look at the directions.'));v.handle.destroy();
 });
 test('Reading retains its source while questions open individually; checking never advances automatically',()=>{
  const d=byRole('b1-1-w1-misha-2','reading').exercise,v=setup(d);assert.equal(v.query('fieldset').length,1);const source=v.host.querySelector('.ek-stage-section');
