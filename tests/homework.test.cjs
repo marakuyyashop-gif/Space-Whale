@@ -167,6 +167,6 @@ test('network failure preserves checked answers and resume restores them before 
 });
 test('all homework audio and image sources resolve to existing repository assets',()=>{
  const path=require('node:path'),missing=[];
- function walk(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){if(['image','audio','exampleAudio'].includes(key)&&typeof v==='string'&&v.startsWith('assets/')){if(!fs.existsSync(path.resolve(__dirname,'..',v)))missing.push(v);}else walk(v);}}
+ function walk(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){if(['image','audio','exampleAudio'].includes(key)&&typeof v==='string'&&!/^https?:/.test(v)){if(!fs.existsSync(path.resolve(__dirname,'..',v)))missing.push(v);}else walk(v);}}
  packs.forEach(walk);assert.deepEqual(missing,[]);
 });
