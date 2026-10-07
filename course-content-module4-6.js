@@ -19,25 +19,61 @@
   }));
   const talk = (id, title, task, use, assetId) => kit.speaking({id,title,
     image:assetId?{imagePending:true,assetId}:null,task:{text:task},use});
+  const multiple = (id, title, options, correctIds) => E(id, 'choice', title, {
+    multiple:true,
+    items:[{id:'1', prompt:'Отметь все подходящие фразы.', options:options.map((text,i)=>({id:String(i+1),text})), correctIds}]
+  });
   const blocks = [];
   blocks.push(stage('Вид и степень признака',8,seq('L6-review-appearance','Look and describe',[
-    match('L6-meaning','1 · Вид и степень признака — Match the sentences with their meanings.',[
-      ['The coat looks like a dress.','Пальто похоже на платье.'],
-      ['The coat looks really dark.','Пальто выглядит очень тёмным.'],
-      ['The coat looks a little dark.','Пальто выглядит немного тёмным.'],
-      ['The coat looks too dark for me.','Пальто выглядит слишком тёмным для меня.']],[3,2,0,1]),
-    write('L6-describe-clothes','How do they look?','Write sentences. Add look or looks.',[
-      ['the skirt / very / pretty','The skirt looks very pretty.'],
-      ['the bags / really / colorful','The bags look really colorful.'],
-      ['the scarf / so / pretty!','The scarf looks so pretty!'],
-      ['the hat / too / big / for me','The hat looks too big for me.'],
-      ['the tie / a little / strange','The tie looks a little strange.'],
-      ['the sweater / a bit / dark','The sweater looks a bit dark.']]),
-    talk('L6-talk-appearance','What do you think?',
-      'Посмотри на пальто и блузку. Как выглядит блузка? На что похоже пальто? Нравится ли тебе пальто? Почему?',
-      [{words:['coat','blouse','pretty','dark'],phrases:['How does the blouse look?','What does the coat look like?','Do you like the coat? Why?']}],
-      'A1M4L6_IMAGE_COAT_BLOUSE')
-  ]),'Для устной части нужна иллюстрация пальто с силуэтом платья и отдельной блузки.'));
+    select('L6-look-dropdown','Choose the correct option.','',[
+      ['This dress ','looks like',' my old dress.',['looks','look like','look','looks like']],
+      ['Your new blouse ','looks',' really expensive.',['look like','look','looks like','looks']],
+      ['These hats ','look like',' my father’s old hats.',['looks like','looks','look like','look']],
+      ['The black suit ','looks',' very new.',['look','looks like','looks','look like']],
+      ['My coat ','looks like',' a long dress.',['look like','looks','looks like','look']],
+      ['These sweaters ','look',' too big for me.',['looks like','look','look like','looks']],
+      ['The colorful bags ','look',' really pretty.',['looks','look like','look','looks like']],
+      ['This cap ','looks like',' my brother’s old hat.',['look','looks like','look like','looks']]
+    ]),
+    E('L6-picture-prompt','stage','Say what they look like.',{layout:'grouped',exercises:[
+      {id:'L6-look-picture',exercise:talk('L6-look-picture','Say what they look like.',
+        'Look at the picture. Say one sentence for each item.',
+        [{words:['look','looks','look like','looks like']}], 'A1M4L6_IMAGE_LOOK_ITEMS')},
+      {id:'L6-look-picture-answers',exercise:E('L6-look-picture-answers','presentation','Say what they look like.',{
+        blocks:[{type:'disclosure',title:'Possible answers',role:'possible-answers',text:[
+          '1. The coat looks like a dress.',
+          '2. The blouse looks expensive.',
+          '3. The hat looks like a cap.',
+          '4. The suits look new.'
+        ].join('\n')}]})}
+    ]}),
+    seq('L6-intensifiers','Very / really / so / too / a little / a bit',[
+      multiple('L6-intensifiers-positive','Где вещь описывают очень положительно?',[
+        'This skirt is very pretty.',
+        'Your blouse is really pretty.',
+        'That bag is so pretty!',
+        'This hat is too bright for me.',
+        'The sweater is a little dark.',
+        'His tie is a bit strange.'
+      ],['1','2','3']),
+      multiple('L6-intensifiers-too','Где какого-то качества слишком много и из-за этого вещь не подходит?',[
+        'This hat is too bright for me.',
+        'The bag is too colorful for me.',
+        'This sweater is really dark.',
+        'Her blouse is very pretty.',
+        'The coat is a bit strange.',
+        'These pants are too big for me.'
+      ],['1','2','6']),
+      multiple('L6-intensifiers-little','Где качество выражено немного?',[
+        'The sweater is a little dark.',
+        'This tie is a bit strange.',
+        'The blouse is very bright.',
+        'Her bag is really colorful.',
+        'The coat is a little big.',
+        'This skirt is so pretty!'
+      ],['1','2','5'])
+    ])
+  ]),'Для устной части нужна Image 1: пальто, похожее на платье, дорогая блузка, шляпа, похожая на кепку, и новые костюмы.'));
   blocks.push(stage('Выбор и причина',7,seq('L6-review-choice','Choose and explain',[
     match('L6-match-reasons','2 · Выбор и причина — Match the questions with the answers.',[
       ['Which one do you like?','The colorful cap.'],
@@ -88,14 +124,15 @@
   ])));
   const review=stage('Повторение',30,seq('L6-review','Review the module',blocks.flatMap(block=>block.exercise.exercises.map(item=>item.exercise))),
     'Четыре части: вид и степень признака; выбор и причина; описание человека; категория и сходство.');
+  review.exercise.unifiedProgression=true;
   const lesson = {id:'a1-2-w4-l6',level:'A1.2',whale:4,summary:'Повторяем описание вещей и людей, выбор, причины и объяснение незнакомых предметов.',
     grammar:'look/looks; be/have; question forms',constructions:'Which one(s)? · Why? · a kind/type/sort of · like',
-    durationMinutes:30,contentVersion:'review-preview-2026-10-07',stages:[review],
+    durationMinutes:30,contentVersion:'review-look-intensifiers-2026-10-07',stages:[review],
     structure:[{role:'practice',sources:['L6-review']}]};
   kit.validate(review.exercise);
   window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
   window.SpaceWhaleLessonMedia[lesson.id]={
-    A1M4L6_IMAGE_COAT_BLOUSE:{type:'image',src:null,brief:'Пальто с силуэтом платья и отдельная блузка'},
+    A1M4L6_IMAGE_LOOK_ITEMS:{type:'image',src:null,brief:'Image 1: пальто, похожее на платье; дорогая блузка; шляпа, похожая на кепку; новые костюмы'},
     A1M4L6_IMAGE_CAPS_BAGS:{type:'image',src:null,brief:'Две кепки и три сумки для свободного выбора'}
   };
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
