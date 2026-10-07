@@ -5,10 +5,37 @@
   const E=(name,kind,title,extra={})=>({version:1,id:'A22M4L12-'+name,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=name=>({imagePending:true,assetId:'A22M4L12_'+name});
-  const audio=(name,script)=>{const key='A22M4L12_'+name;media[key]={type:'audio',src:null,script};return {audioId:key,audioPending:true};};
-  const repeat=(name,phrases,examples)=>E(name,'audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,
-    items:phrases.map((text,i)=>({id:String(i+1),text,example:examples?.[i],audioId:'A22M4L12_'+name+'-WORD-'+(i+1),
-      ...(examples?.[i]?{exampleAudioId:'A22M4L12_'+name+'-EXAMPLE-'+(i+1)}:{})}))});
+  const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const audioVersion='20261007-sarah-v3-slow1-final';
+  const audio=(name,script)=>{
+    const key='A22M4L12_'+name;
+    const src=name==='LISTENING'
+      ?courseAudioBase+'/dialogues/a2-2-m4-l12-anna-leo-sarah-will-slow1.mp3?v='+audioVersion
+      :null;
+    media[key]={type:'audio',src,script};
+    return src?{audioId:key,audio:src,audioPending:false}:{audioId:key,audioPending:true};
+  };
+  const repeat=(name,phrases,examples)=>{
+    const folder=courseAudioBase+'/a2-2/w4/l12/listen-repeat/';
+    return E(name,'audio','Listen and repeat.',{
+      layout:'listen-repeat',
+      audioPending:false,
+      items:phrases.map((text,i)=>{
+        const n=i+1;
+        const wordKey='A22M4L12_'+name+'-WORD-'+n;
+        const wordSrc=folder+name+'-WORD-'+n+'.mp3?v='+audioVersion;
+        media[wordKey]={type:'audio',src:wordSrc,script:text};
+        const item={id:String(n),text,audioId:wordKey,audio:wordSrc};
+        if(examples?.[i]){
+          const exampleKey='A22M4L12_'+name+'-EXAMPLE-'+n;
+          const exampleSrc=folder+name+'-EXAMPLE-'+n+'.mp3?v='+audioVersion;
+          media[exampleKey]={type:'audio',src:exampleSrc,script:examples[i]};
+          Object.assign(item,{example:examples[i],exampleAudioId:exampleKey,exampleAudio:exampleSrc});
+        }
+        return item;
+      })
+    });
+  };
   const words=['catch the next train','change trains','get a taxi','return to the hotel','go a different way','wait for the next bus'];
   const examples=['We can catch the next train at 3:30.','We need to change trains in Rome.','We can get a taxi at the station.','We need to return to the hotel now.','We can go a different way to the station.','We can wait for the next bus here.'];
   const opening=kit.speaking({id:'A22M4L12-M01',title:'Choose a new plan',image:pending('OPENING'),
@@ -100,10 +127,6 @@
       {role:'practice',sources:[chat.id]},{role:'final',sources:[final.id]}]};
   media.A22M4L12_OPENING={type:'image',src:null,brief:'Отменённый поезд, следующий в 14:00, свободное такси; сейчас 12:00.'};
   media.A22M4L12_FINAL={type:'image',src:null,brief:'Шесть различимых сцен A–F с маршрутами и временами из финального задания.'};
-  for(const [name,rows,ex] of [['M03',words,examples],['M07',modelLines,null]])rows.forEach((text,i)=>{
-    media['A22M4L12_'+name+'-WORD-'+(i+1)]={type:'audio',src:null,script:text};
-    if(ex)media['A22M4L12_'+name+'-EXAMPLE-'+(i+1)]={type:'audio',src:null,script:ex[i]};
-  });
   stages.forEach(s=>kit.validate(s.exercise));
   window.SpaceWhaleLessonMedia={...(window.SpaceWhaleLessonMedia||{}),[id]:media};
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
