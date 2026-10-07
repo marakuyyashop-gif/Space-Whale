@@ -16,10 +16,9 @@
     items:words.map((word,i)=>({id:String(i+1),text:String(i+1),image:sheet,imageWidth:1536,imageHeight:1024,crop:crops[i],alt:'Picture '+(i+1),correctId:word})),
     options:['laugh','cry','smile','lie','sleep','stand'].map(word=>({id:word,text:word}))
   });
-  const opening=kit.speaking({id:'L1-M01',title:'Say what they are doing now',
+  const opening=kit.speaking({id:'L1-M01',title:'Tell your friend what is happening.',
     image:pending('A1M5L1_IMAGE_OPENING'),
-    task:{text:'Ты на видеозвонке. Скажи по одному предложению о женщине, которая стоит возле дивана, и мужчине, который улыбается.'},
-    use:[{words:['standing','smiling'],phrases:['She’s …','He’s …']}]});
+    task:{text:'Ты разговариваешь с другом по видеосвязи. Посмотри на картинку и скажи, что каждый человек делает сейчас.'}});
   const examples=['I need to sleep.','Smile, please.','Please don’t laugh.','Please stand here.','You can lie on the sofa.','I don’t want to cry.'];
   const repeat=E('L1-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:false,
     items:words.map((text,i)=>{
@@ -112,7 +111,7 @@
   const lesson={id:'a1-2-w5-l1',level:'A1.2',whale:5,
     summary:'Говорим о действиях, которые происходят прямо сейчас.',grammar:'Present Continuous: am/is/are + V-ing',
     constructions:'now · right now · at the moment',words,durationMinutes:30,
-    contentVersion:'video-call-preview-2026-10-07',stages,
+    contentVersion:'video-call-preview-2026-10-07-r2',stages,
     structure:[
       {role:'opening',sources:['L1-M01']},
       {role:'words',sources:['L1-M02','L1-M03']},
