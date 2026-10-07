@@ -2,53 +2,57 @@
   'use strict';
   const kit = window.SpaceWhaleExerciseKit;
   const E = (id, kind, title, extra = {}) => ({version:1, id, kind, title, ...extra});
-  const stage = (menu, time, exercise, teacherNotes = '') => ({menu, navigationTitle:menu, section:'tasks', guide:{time:time+' min', teacherNotes}, exercise});
-  const seq = (id, title, exercises) => E(id, 'stage', title, {progressive:true, requireCheckBeforeNext:true, exercises:exercises.map(exercise => ({id:exercise.id, exercise}))});
-  const match = (id, title, pairs, order) => E(id, 'matching', title, {
-    items:pairs.map((pair, i) => ({id:String(i+1), text:pair[0], correctId:'a'+i})),
-    options:order.map(i => ({id:'a'+i, text:pairs[i][1]}))
+  const seq = (id, title, exercises) => E(id, 'stage', title, {
+    progressive:true, requireCheckBeforeNext:true, unifiedProgression:true,
+    exercises:exercises.map(exercise => ({id:exercise.id, exercise}))
   });
-  const write = (id, title, instruction, items) => E(id, 'writing', title, {instruction, responseMode:'open',
-    items:items.map(([prompt, answer], i) => ({id:String(i+1), prompt, possibleAnswers:[answer]}))});
   const select = (id, title, instruction, rows) => E(id, 'gaps', title, {inputMode:'select', instruction,
     items:rows.map(([before, answer, after, options], i) => ({id:String(i+1), segments:[before,{id:'g'+(i+1),answers:[answer],options},after]}))});
-  const order = (id, title, rows) => rows.map((row,i) => E(id+'-'+(i+1),'order',title,{
-    sentenceCase:true,
-    tokens:(row.length===5?[2,0,4,1,3]:[2,0,3,1]).map(j=>({id:String(j),text:row[j]})),
-    correctOrder:row.map((_,j)=>String(j))
-  }));
-  const talk = (id, title, task, use, assetId) => kit.speaking({id,title,
-    image:assetId?{imagePending:true,assetId}:null,task:{text:task},use});
   const multiple = (id, title, options, correctIds) => E(id, 'choice', title, {
     multiple:true,
     items:[{id:'1', prompt:'Отметь все подходящие фразы.', options:options.map((text,i)=>({id:String(i+1),text})), correctIds}]
   });
-  const blocks = [];
-  blocks.push(stage('Вид и степень признака',8,seq('L6-review-appearance','Look and describe',[
-    select('L6-look-dropdown','Choose the correct option.','',[
-      ['This dress ','looks like',' my old dress.',['looks','look like','look','looks like']],
-      ['Your new blouse ','looks',' really expensive.',['look like','look','looks like','looks']],
-      ['These hats ','look like',' my father’s old hats.',['looks like','looks','look like','look']],
-      ['The black suit ','looks',' very new.',['look','looks like','looks','look like']],
-      ['My coat ','looks like',' a long dress.',['look like','looks','looks like','look']],
-      ['These sweaters ','look',' too big for me.',['looks like','look','look like','looks']],
-      ['The colorful bags ','look',' really pretty.',['looks','look like','look','looks like']],
-      ['This cap ','looks like',' my brother’s old hat.',['look','looks like','look like','looks']]
+  const talk = (id, title, text, use, assetId) => kit.speaking({id,title,
+    image:{imagePending:true,assetId},task:{text},use});
+  const imageTask = (id, title, instruction, assetId, exercise) => E(id,'stage',title,{
+    layout:'grouped',instruction,exercises:[
+      {id:id+'-image',exercise:E(id+'-image','presentation',title,{blocks:[{type:'image',imagePending:true,assetId}]})},
+      {id:exercise.id,exercise}
+    ]
+  });
+  const order = (id, bank, answer, punctuation='?') => E(id,'order','Make the sentences and questions.',{
+    sentenceCase:true,sentenceSuffix:punctuation,
+    tokens:bank.map((text,i)=>({id:String(i),text})),
+    correctOrder:answer.map(text=>String(bank.indexOf(text)))
+  });
+  const lookOptions=['look','looks','look like','looks like'];
+  const parts = [
+    seq('L6-review-appearance','Part 1 · Look / look like',[
+      select('L6-look-dropdown','Choose the correct option.','',[
+        ['This dress ','looks like',' my old dress.',lookOptions],
+        ['Your new blouse ','looks',' really expensive.',lookOptions],
+        ['These hats ','look like',' my father’s old hats.',lookOptions],
+        ['The black suit ','looks',' very new.',lookOptions],
+        ['My coat ','looks like',' a long dress.',lookOptions],
+        ['These sweaters ','look',' too big for me.',lookOptions],
+        ['The colorful bags ','look',' really pretty.',lookOptions],
+        ['This cap ','looks like',' my brother’s old hat.',lookOptions]
+      ]),
+      E('L6-picture-prompt','stage','Say what they look like.',{layout:'grouped',exercises:[
+        {id:'L6-look-picture',exercise:talk('L6-look-picture','Say what they look like.',
+          'Look at the picture. Say one sentence for each item.',
+          [{words:lookOptions}], 'A1M4L6_IMAGE_LOOK_ITEMS')},
+        {id:'L6-look-picture-answers',exercise:E('L6-look-picture-answers','presentation','Say what they look like.',{
+          blocks:[{type:'disclosure',title:'Possible answers',role:'possible-answers',text:[
+            '1. The coat looks like a dress.',
+            '2. The blouse looks expensive.',
+            '3. The hat looks like a cap.',
+            '4. The suits look new.'
+          ].join('\n')}]})}
+      ]})
     ]),
-    E('L6-picture-prompt','stage','Say what they look like.',{layout:'grouped',exercises:[
-      {id:'L6-look-picture',exercise:talk('L6-look-picture','Say what they look like.',
-        'Look at the picture. Say one sentence for each item.',
-        [{words:['look','looks','look like','looks like']}], 'A1M4L6_IMAGE_LOOK_ITEMS')},
-      {id:'L6-look-picture-answers',exercise:E('L6-look-picture-answers','presentation','Say what they look like.',{
-        blocks:[{type:'disclosure',title:'Possible answers',role:'possible-answers',text:[
-          '1. The coat looks like a dress.',
-          '2. The blouse looks expensive.',
-          '3. The hat looks like a cap.',
-          '4. The suits look new.'
-        ].join('\n')}]})}
-    ]}),
-    seq('L6-intensifiers','Very / really / so / too / a little / a bit',[
-      multiple('L6-intensifiers-positive','Где вещь описывают очень положительно?',[
+    seq('L6-intensifiers','Part 2 · Very / really / so / too / a little / a bit',[
+      multiple('L6-intensifiers-positive','Где качество предмета выражено сильно и положительно?',[
         'This skirt is very pretty.',
         'Your blouse is really pretty.',
         'That bag is so pretty!',
@@ -71,69 +75,99 @@
         'Her bag is really colorful.',
         'The coat is a little big.',
         'This skirt is so pretty!'
-      ],['1','2','5'])
+      ],['1','2','5']),
+      imageTask('L6-intensifiers-picture','Choose the correct option.',
+        'Look at the picture and complete the sentences.','A1M4L6_IMAGE_INTENSIFIERS',
+        select('L6-intensifiers-dropdown','Choose the correct option.','',[
+          ['This hat is ','too',' strange for me.',['a little','too','so']],
+          ['This blouse is ','so',' pretty!',['too','a bit','so']],
+          ['This sweater is ','a little',' dark.',['so','a little','too']],
+          ['This bag is ','really',' colorful.',['too','really','a bit']],
+          ['This coat is ','a bit',' big.',['a bit','so','too']],
+          ['This suit is ','very',' simple.',['too','a little','very']]
+        ]))
+    ]),
+    seq('L6-review-choice','Part 3 · Which / why · one / ones · it / them',[
+      select('L6-question-answer-dropdown','Choose the best answer.','',[
+        ['Which one do you like?\n','I like the black one.','',['Because it’s pretty.','I like the black one.','I like the black ones.']],
+        ['Which ones do you like?\n','I like the blue and red ones.','',['I like the blue and red ones.','Because they’re simple.','I like the blue one.']],
+        ['Why do you like it?\n','Because it’s simple.','',['I like this one.','Because they’re colorful.','Because it’s simple.']],
+        ['Why do you like them?\n','Because they’re colorful.','',['Because they’re colorful.','I like the colorful ones.','Because it’s colorful.']],
+        ['What do you think?\n','I think the bag looks pretty.','',['Because it’s pretty.','I think the bag looks pretty.','I like these ones.']],
+        ['Which one does Nina like?\n','She likes the black one.','',['Because she likes black.','She likes the black ones.','She likes the black one.']]
+      ]),
+      seq('L6-word-order','Make the sentences and questions.',[
+        order('L6-order-questions-1',['one','which','do','you','like'],['which','one','do','you','like']),
+        order('L6-order-why-it',['it','why','do','you','like'],['why','do','you','like','it']),
+        order('L6-order-which-mia',['ones','which','does','Mia','like'],['which','ones','does','Mia','like']),
+        order('L6-order-why-them',['them','why','does','she','like'],['why','does','she','like','them']),
+        order('L6-order-what-think',['do','what','you','think'],['what','do','you','think']),
+        order('L6-order-think-bag',['I','think','this','bag','looks','pretty'],['I','think','this','bag','looks','pretty'],'.')
+      ]),
+      talk('L6-bags-picture','Which bags do they like?',
+        'Look at the picture. Answer the questions.',[{phrases:[
+          '1. Which one does Nina like? Why?',
+          '2. Which one does Marta like? Why?',
+          '3. Which one does Eva like? Why?'
+        ]}],'A1M4L6_IMAGE_BAGS')
+    ]),
+    seq('L6-review-people','Part 4 · Character and appearance',[
+      select('L6-character-question-dropdown','Choose the correct question.','',[
+        ['Ты хочешь узнать, какая Nina по характеру.\n','What is Nina like?','',['What does Nina look like?','What is Nina like?','What does Nina like?']],
+        ['Ты хочешь узнать, как Leo выглядит.\n','What does Leo look like?','',['What is Leo like?','What does Leo like?','What does Leo look like?']],
+        ['Ты хочешь узнать, какая Eva по характеру.\n','What is Eva like?','',['What is Eva like?','What does Eva look like?','What does Eva like?']],
+        ['Ты хочешь узнать, как Max выглядит.\n','What does Max look like?','',['What does Max like?','What does Max look like?','What is Max like?']],
+        ['Ты хочешь узнать у человека, какой он по характеру.\n','What are you like?','',['What do you look like?','What do you like?','What are you like?']],
+        ['Ты хочешь узнать у человека, как он выглядит.\n','What do you look like?','',['What do you look like?','What are you like?','What do you like?']]
+      ]),
+      talk('L6-people-picture','Describe the people.',
+        'Look at the picture. Answer both questions about each person.',
+        ['Nina','Leo','Eva','Max'].map(name=>({words:[name],phrases:[`What is ${name} like?`,`What does ${name} look like?`]})),
+        'A1M4L6_IMAGE_PEOPLE')
+    ]),
+    seq('L6-review-category','Part 5 · Category or similarity',[
+      E('L6-category-typed','gaps','Complete the sentences.',{
+        inputMode:'text',instruction:'Впиши подходящую конструкцию: объясни, к какой категории относится предмет или на что он похож.',
+        items:[
+          ['A muffin is ',' food.'],['A sofa is ',' furniture.'],['A coat is ',' clothing.'],
+          ['A supermarket is ',' shop.'],['A house is ',' building.'],
+          ['A muffin is ',' a small cake.'],['A cap is ',' a hat.'],['A sofa is ',' a big armchair.']
+        ].map(([before,after],i)=>({id:String(i+1),segments:[before,{id:'g'+(i+1),answers:i<5?['a kind of','a type of','a sort of']:['like']},after]}))
+      }),
+      E('L6-category-correction','writing','Correct the mistakes.',{
+        instruction:'В каждом предложении одна ошибка.',responseMode:'accepted',
+        items:[
+          ['A sofa is kind of furniture.','A sofa is a kind of furniture.'],
+          ['Tea is a type drink.','Tea is a type of drink.'],
+          ['A coat is a sort of a clothing.','A coat is a sort of clothing.'],
+          ['A muffin is like small cake.','A muffin is like a small cake.'],
+          ['A house is a type of a building.','A house is a type of building.'],
+          ['A cap is like hat.','A cap is like a hat.']
+        ].map(([prompt,answer],i)=>({id:String(i+1),prompt,acceptedAnswers:[answer,answer.slice(0,-1)]}))
+      }),
+      E('L6-explain-short-answer','writing','Explain the words.',{
+        instruction:'Write a short answer.',responseMode:'open',
+        items:['What is a muffin?','What is tea?','What is a sofa?','What is a coat?','What is a house?','What is a supermarket?']
+          .map((prompt,i)=>({id:String(i+1),prompt}))
+      })
     ])
-  ]),'Для устной части нужна Image 1: пальто, похожее на платье, дорогая блузка, шляпа, похожая на кепку, и новые костюмы.'));
-  blocks.push(stage('Выбор и причина',7,seq('L6-review-choice','Choose and explain',[
-    match('L6-match-reasons','2 · Выбор и причина — Match the questions with the answers.',[
-      ['Which one do you like?','The colorful cap.'],
-      ['Which ones do you like?','These two bags.'],
-      ['Why do you like it?','Because it’s pretty.'],
-      ['Why do you like them?','Because they’re simple.']],[3,0,2,1]),
-    ...order('L6-order-questions','Put the words in order.',[
-      ['which','one','do','you','like'],
-      ['why','does','she','like','them'],
-      ['what','do','you','think'],
-      ['I think','the bag','looks','pretty']
-    ]),
-    talk('L6-talk-choice','Choose and explain',
-      'Выбери одну из двух кепок. Скажи, что ты о ней думаешь и почему она тебе нравится. Затем спроси преподавателя, какие две из трёх сумок ему нравятся и почему.',
-      [{words:['cap','bag','colorful','simple'],phrases:['Which one do you like?','Which ones do you like?','Why do you like them?','I think …','I like … because …']}],
-      'A1M4L6_IMAGE_CAPS_BAGS')
-  ]),'Две кепки и три сумки; ответ о выборе свободный.'));
-  blocks.push(stage('Описание человека',7,seq('L6-review-people','Describe people',[
-    select('L6-be-have','3 · Описание человека — Describe the people.','Choose the correct words.',[
-      ['My neighbors ','are',' quiet.',['have','are']],
-      ['Leo ','has',' black hair.',['has','is']],
-      ['I ','am',' helpful.',['have','am']],
-      ['Mia ','has',' brown hair.',['is','has']]
-    ]),
-    write('L6-write-people','Describe Eva and Max.','Write two sentences about each person.',[
-      ['Eva: polite / blonde hair','Eva is polite. She has blonde hair.'],
-      ['Max: noisy / black hair','Max is noisy. He has black hair.']]),
-    talk('L6-ask-people','Ask about Nina and Sam',
-      'Узнай у преподавателя, какая Nina по характеру и как она выглядит. Затем спроси то же самое о Sam. Ответь о себе на оба вопроса.',
-      [{phrases:['What is Nina like?','What does Nina look like?','What is Sam like?','What does Sam look like?','What are you like?','What do you look like?']}])
-  ]),'Только преподавателю: Nina — helpful, brown hair; Sam — quiet, red hair. Не показывать ответы ученице до вопросов.'));
-  blocks.push(stage('Категория и сходство',8,seq('L6-review-category','Explain the things',[
-    select('L6-category-choice','4 · Категория и сходство — Explain the things.','Choose the correct words.',[
-      ['A sofa is ','a sort of',' furniture.',['a sort','a sort of']],
-      ['A coat is a kind of ','clothing','.',['clothing','a clothing']],
-      ['Tea is a type ','of',' drink.',['of','to']],
-      ['A muffin is like ','a small cake','.',['small cake','a small cake']],
-      ['A supermarket is a sort ','of',' shop.',['of','like']]
-    ]),
-    write('L6-category-write','Explain the words.','Write a sentence. Use the word in brackets.',[
-      ['a pancake → food (kind)','A pancake is a kind of food.'],
-      ['juice → drink (type)','Juice is a type of drink.'],
-      ['an armchair → furniture (sort)','An armchair is a sort of furniture.'],
-      ['a muffin → a small cake (like)','A muffin is like a small cake.']]),
-    talk('L6-talk-category','Help me understand',
-      'Собеседник не знает эти слова. Объясни, что такое hotel, supermarket, coat и muffin через знакомую категорию. Для muffin добавь сходство.',
-      [{words:['hotel','supermarket','coat','muffin','building','shop','clothing','food'],phrases:['It’s a kind of …','It’s a type of …','It’s a sort of …','It’s like …']}])
-  ])));
-  const review=stage('Повторение',30,seq('L6-review','Review the module',blocks.flatMap(block=>block.exercise.exercises.map(item=>item.exercise))),
-    'Четыре части: вид и степень признака; выбор и причина; описание человека; категория и сходство.');
-  review.exercise.unifiedProgression=true;
-  const lesson = {id:'a1-2-w4-l6',level:'A1.2',whale:4,summary:'Повторяем описание вещей и людей, выбор, причины и объяснение незнакомых предметов.',
-    grammar:'look/looks; be/have; question forms',constructions:'Which one(s)? · Why? · a kind/type/sort of · like',
-    durationMinutes:30,contentVersion:'review-look-intensifiers-2026-10-07',stages:[review],
+  ];
+  const review={menu:'Повторение',navigationTitle:'Повторение',section:'tasks',
+    guide:{time:'30 min',teacherNotes:'Exercise 12: Accept a kind of / a type of / a sort of where the student explains a category. For muffin, It’s like a small cake. is also acceptable.'},
+    exercise:seq('L6-review','Review the module',parts)};
+  const lesson={id:'a1-2-w4-l6',level:'A1.2',whale:4,
+    summary:'Повторяем описание вещей и людей, выбор, причины и объяснение незнакомых предметов.',
+    grammar:'look / look like; very / really / so / too / a little / a bit; one / ones; it / them',
+    constructions:'Which / why · What is … like? · What does … look like? · a kind/type/sort of · like',
+    durationMinutes:30,contentVersion:'review-complete-2026-10-07',stages:[review],
     structure:[{role:'practice',sources:['L6-review']}]};
   kit.validate(review.exercise);
   window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
   window.SpaceWhaleLessonMedia[lesson.id]={
-    A1M4L6_IMAGE_LOOK_ITEMS:{type:'image',src:null,brief:'Image 1: пальто, похожее на платье; дорогая блузка; шляпа, похожая на кепку; новые костюмы'},
-    A1M4L6_IMAGE_CAPS_BAGS:{type:'image',src:null,brief:'Две кепки и три сумки для свободного выбора'}
+    A1M4L6_IMAGE_LOOK_ITEMS:{type:'image',src:null,brief:'Image 1 · Exercise 2: coat like a dress; expensive blouse; hat like a cap; new suits'},
+    A1M4L6_IMAGE_INTENSIFIERS:{type:'image',src:null,brief:'Image 2 · Exercise 4: hat too strange; blouse so pretty; sweater a little dark; bag really colorful; coat a bit big; suit very simple'},
+    A1M4L6_IMAGE_BAGS:{type:'image',src:null,brief:'Image 3 · Exercise 7: Nina, Marta, Eva and their bag preferences'},
+    A1M4L6_IMAGE_PEOPLE:{type:'image',src:null,brief:'Image 4 · Exercise 9: Nina, Leo, Eva, Max; character and appearance'}
   };
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
   const at=window.SpaceWhaleContent.findIndex(item=>item.id===lesson.id);
