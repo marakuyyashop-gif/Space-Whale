@@ -85,7 +85,7 @@
     ].map(([prompt,reply],i)=>({id:'message'+(i+1),exercise:E('M10-'+(i+1),'writing','Write your reply.',{responseMode:'open',items:[{id:'reply',prompt,possibleAnswers:[reply]}]})}))});
   const final=kit.speaking({id:'A22M4L12-M11',title:'Choose a Plan B with your friend',image:pending('FINAL'),
     task:{text:'Choose two scenes. Suggest a new plan, respond to your friend, and agree on what to do. Then change roles. Use both ways of suggesting across your two conversations.',
-      bullets:['A. The next train leaves in 15 minutes.','B. To reach city C, change trains in city B.','C. The bus is canceled; a taxi is available.','D. The train is canceled; the next one is tomorrow. Your hotel is two minutes away.','E. Roadwork closes the route to the hotel; another road is open.','F. The bus left; the next one arrives in eight minutes.']},
+      bullets:['A. The next train leaves in 15 minutes.','B. One train goes from A to B; another goes from B to C. You need to reach C.','C. The bus is canceled; a taxi is available.','D. The train is canceled; the next one is tomorrow. Your hotel is two minutes away.','E. Roadwork closes the route to the hotel; another road is open.','F. The bus left; the next one arrives in eight minutes.']},
     use:[{words,phrases:['We could … instead.','Why don’t we …?','That works for me.','Let’s do that.']}]});
   const stages=[stage('Opening Speaking',2,opening),stage('Words',3,wordInput),stage('Listen & Repeat',2,repeat('M03',words,examples)),
     stage('Words Practice',3,planGaps),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
