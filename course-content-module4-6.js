@@ -1,6 +1,13 @@
 (() => {
   'use strict';
   const kit = window.SpaceWhaleExerciseKit;
+  const imageBase='Images/A.1.2/Module 4/lesson 4 - sosed/';
+  const pictures={
+    A1M4L6_IMAGE_LOOK_ITEMS:{image:imageBase+'72d126d7-79c8-4a06-9808-1d1dfa46c50c.png',imageWidth:1448,imageHeight:1086,alt:'A coat and dress, a blouse and price tag, a hat and cap, and new suits'},
+    A1M4L6_IMAGE_INTENSIFIERS:{image:imageBase+'6ef96aae-171b-4fdb-9bcd-7fc09b50e839.png',imageWidth:1536,imageHeight:1024,alt:'A hat, blouse, sweater, colorful bag, coat and suit'},
+    A1M4L6_IMAGE_BAGS:{image:imageBase+'423dbafa-41e8-436c-b872-7e2033ed4ccf.png',imageWidth:1448,imageHeight:1086,alt:'Nina, Marta and Eva looking at four bags'}
+  };
+  const picture=assetId=>pictures[assetId]?{assetId,...pictures[assetId]}:{imagePending:true,assetId};
   const E = (id, kind, title, extra = {}) => ({version:1, id, kind, title, ...extra});
   const seq = (id, title, exercises) => E(id, 'stage', title, {
     progressive:true, requireCheckBeforeNext:true, unifiedProgression:true,
@@ -13,10 +20,10 @@
     items:[{id:'1', prompt:'Отметь все подходящие фразы.', options:options.map((text,i)=>({id:String(i+1),text})), correctIds}]
   });
   const talk = (id, title, text, use, assetId) => kit.speaking({id,title,
-    image:{imagePending:true,assetId},task:{text},use});
+    image:picture(assetId),task:{text},use});
   const imageTask = (id, title, instruction, assetId, exercise) => E(id,'stage',title,{
     layout:'grouped',instruction,exercises:[
-      {id:id+'-image',exercise:E(id+'-image','presentation',title,{blocks:[{type:'image',imagePending:true,assetId}]})},
+      {id:id+'-image',exercise:E(id+'-image','presentation',title,{blocks:[{type:'image',...picture(assetId)}]})},
       {id:exercise.id,exercise}
     ]
   });
@@ -105,7 +112,7 @@
         order('L6-order-think-bag',['I','think','this','bag','looks','pretty'],['I','think','this','bag','looks','pretty'],'.')
       ]),
       talk('L6-bags-picture','Which bags do they like?',
-        'Look at the picture. Answer the questions.',[{phrases:[
+        'Look at the picture. Answer the questions.\n\nNina — Pretty\nMarta — Colorful\nNina — Simple',[{phrases:[
           '1. Which one does Nina like? Why?',
           '2. Which one does Marta like? Why?',
           '3. Which one does Eva like? Why?'
@@ -159,14 +166,14 @@
     summary:'Повторяем описание вещей и людей, выбор, причины и объяснение незнакомых предметов.',
     grammar:'look / look like; very / really / so / too / a little / a bit; one / ones; it / them',
     constructions:'Which / why · What is … like? · What does … look like? · a kind/type/sort of · like',
-    durationMinutes:30,contentVersion:'review-complete-2026-10-07',stages:[review],
+    durationMinutes:30,contentVersion:'review-pictures-2026-10-07',stages:[review],
     structure:[{role:'practice',sources:['L6-review']}]};
   kit.validate(review.exercise);
   window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
   window.SpaceWhaleLessonMedia[lesson.id]={
-    A1M4L6_IMAGE_LOOK_ITEMS:{type:'image',src:null,brief:'Image 1 · Exercise 2: coat like a dress; expensive blouse; hat like a cap; new suits'},
-    A1M4L6_IMAGE_INTENSIFIERS:{type:'image',src:null,brief:'Image 2 · Exercise 4: hat too strange; blouse so pretty; sweater a little dark; bag really colorful; coat a bit big; suit very simple'},
-    A1M4L6_IMAGE_BAGS:{type:'image',src:null,brief:'Image 3 · Exercise 7: Nina, Marta, Eva and their bag preferences'},
+    A1M4L6_IMAGE_LOOK_ITEMS:{type:'image',src:pictures.A1M4L6_IMAGE_LOOK_ITEMS.image,width:pictures.A1M4L6_IMAGE_LOOK_ITEMS.imageWidth,height:pictures.A1M4L6_IMAGE_LOOK_ITEMS.imageHeight,brief:'Image 1 · Exercise 2: coat like a dress; expensive blouse; hat like a cap; new suits'},
+    A1M4L6_IMAGE_INTENSIFIERS:{type:'image',src:pictures.A1M4L6_IMAGE_INTENSIFIERS.image,width:pictures.A1M4L6_IMAGE_INTENSIFIERS.imageWidth,height:pictures.A1M4L6_IMAGE_INTENSIFIERS.imageHeight,brief:'Image 2 · Exercise 4: hat too strange; blouse so pretty; sweater a little dark; bag really colorful; coat a bit big; suit very simple'},
+    A1M4L6_IMAGE_BAGS:{type:'image',src:pictures.A1M4L6_IMAGE_BAGS.image,width:pictures.A1M4L6_IMAGE_BAGS.imageWidth,height:pictures.A1M4L6_IMAGE_BAGS.imageHeight,brief:'Image 3 · Exercise 7: Nina, Marta, Eva and their bag preferences'},
     A1M4L6_IMAGE_PEOPLE:{type:'image',src:null,brief:'Image 4 · Exercise 9: Nina, Leo, Eva, Max; character and appearance'}
   };
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];

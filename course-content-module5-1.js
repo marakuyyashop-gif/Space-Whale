@@ -16,9 +16,12 @@
     items:words.map((word,i)=>({id:String(i+1),text:String(i+1),image:sheet,imageWidth:1536,imageHeight:1024,crop:crops[i],alt:'Picture '+(i+1),correctId:word})),
     options:['laugh','cry','smile','lie','sleep','stand'].map(word=>({id:word,text:word}))
   });
-  const opening=kit.speaking({id:'L1-M01',title:'Tell your friend what is happening.',
-    image:pending('A1M5L1_IMAGE_OPENING'),
-    task:{text:'Ты разговариваешь с другом по видеосвязи. Посмотри на картинку и скажи, что каждый человек делает сейчас.'}});
+  const openingImage={image:'Images/A.1.2/Module 4/lesson 4 - sosed/2e841064-fbb7-43a3-8d5c-76c4c9ecc239.png',imageWidth:1448,imageHeight:1086,alt:'Six pictures of Mike and Sara sleeping, smiling, laughing, standing, lying and crying'};
+  const opening=E('L1-M01','presentation','Tell your friend what is happening.',{
+    blocks:[
+      {type:'image',...openingImage},
+      {type:'text',text:'Ты разговариваешь с другом по видеосвязи. Посмотри на картинку и скажи, что каждый человек делает сейчас.'}
+    ]});
   const examples=['I need to sleep.','Smile, please.','Please don’t laugh.','Please stand here.','You can lie on the sofa.','I don’t want to cry.'];
   const repeat=E('L1-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:false,
     items:words.map((text,i)=>{
@@ -124,7 +127,7 @@
   stages.forEach(s=>kit.validate(s.exercise));
   window.SpaceWhaleLessonMedia=window.SpaceWhaleLessonMedia||{};
   window.SpaceWhaleLessonMedia[lesson.id]={
-    A1M5L1_IMAGE_OPENING:{type:'image',src:null,brief:'Два кадра видеозвонка: женщина стоит, мужчина улыбается'},
+    A1M5L1_IMAGE_OPENING:{type:'image',src:openingImage.image,width:1448,height:1086,brief:'Шесть кадров с Mike и Sara: sleep, smile, laugh, stand, lie, cry'},
     A1M5L1_IMAGE_TOM_EMMA_DAN:{type:'image',src:null,brief:'Tom спит в кресле; Emma и Dan улыбаются'},
     A1M5L1_IMAGE_FINAL_THREE_FRAMES:{type:'image',src:null,brief:'Три кадра с шестью действиями из финальной задачи'},
     A1M5L1_DISCOVERY_01:{type:'image',src:null,brief:'I am smiling now'},
