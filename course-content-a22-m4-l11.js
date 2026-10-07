@@ -11,9 +11,10 @@
       ...(examples?.[i]?{exampleAudioId:'A22M4L11_'+name+'-EXAMPLE-'+(i+1)}:{})}))});
   const words=['traffic','flat tire','delay','accident','wrong turn','roadwork'];
   const wordExamples=["There’s a lot of traffic today.",'The car has a flat tire.',"There’s a delay at the station.",'The accident was near the hotel.','This was the wrong turn.',"There’s roadwork near the station."];
+  const problemUse=[{words,phrases:['What happened?','I missed the bus/train/flight.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.',"We’re stuck in traffic.",'The train is delayed.','The flight is canceled.',"There’s roadwork near the station."]}];
   const opening=kit.speaking({id:'A22M4L11-M01',title:'Tell your friend why you’re late',image:pending('OPENING'),
-    task:{text:'Your friend is waiting at the hotel. Choose two of the three scenes: a flat tire, traffic or a delayed train. Call your friend and explain each problem.'},
-    use:[{words:['a flat tire','traffic','delayed'],phrases:['We got …','We’re stuck in …','The train is …']}]});
+    task:{text:'Your friend is waiting at the hotel. Look at all six travel problems: traffic, a flat tire, a delay, an accident, a wrong turn and roadwork. Choose two pictures. Call your friend and explain what happened and what the situation is now.'},
+    use:problemUse});
   const wordMatch=E('M02','matching','What is the problem?',{layout:'picture-word',instruction:'Match the pictures and words.',
     items:[['A','flat tire'],['B','roadwork'],['C','wrong turn'],['D','traffic'],['E','delay'],['F','accident']].map(([label,answer])=>({id:label,text:label,alt:'Picture '+label,correctId:answer,...pending('WORD_'+label)})),
     options:['delay','wrong turn','accident','flat tire','traffic','roadwork'].map(text=>({id:text,text}))});
@@ -69,7 +70,7 @@
   const final=kit.speaking({id:'A22M4L11-M10',title:'Explain why you’re late',image:pending('FINAL'),
     task:{text:'Your friend is waiting for you. Choose two situations. Call and explain the problem. Then change roles and ask your friend what happened.',
       bullets:['A. The train left at 9:00; you arrived at 9:05.','B. You turned right instead of left and do not know where you are.','C. One tire is flat; you cannot drive.','D. There was an accident; your car is now in a long line of cars.','E. The train changes from 11:00 to 11:30.','F. Your flight will not leave today: CANCELED.']},
-    use:[{words:['flat tire','accident','traffic','delay'],phrases:['What happened?','I missed …','I got lost.','We got …','We took …','There was …','I’m stuck in …','The train is …','The flight is …']}]});
+    use:problemUse});
   const stages=[stage('Opening Speaking',3,opening),stage('Words',3,wordMatch),stage('Listen & Repeat',2,repeat('M03',words,wordExamples)),
     stage('Words Practice',3,wordPractice),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
     stage('Listen & Repeat',2,repeat('M07',lines)),stage('Write a message',4,practice,'After writing, say two messages aloud.'),
@@ -80,7 +81,7 @@
     structure:[{role:'opening',sources:[opening.id]},{role:'words',sources:[wordMatch.id,stages[2].exercise.id]},
       {role:'wordPractice',sources:[wordPractice.id]},{role:'focus',sources:[discovery.id,rule.id]},
       {role:'practice',sources:[stages[6].exercise.id,practice.id]},{role:'listening',sources:[listening.id]},{role:'final',sources:[final.id]}]};
-  const briefs={OPENING:'Три сцены: спущенное колесо, пробка, задержанный поезд.',FINAL:'Шесть сцен A–F из задания; табло 11:00 → 11:30 для E.',
+  const briefs={OPENING:'Шесть сцен со всеми словами урока: traffic, flat tire, delay, accident, wrong turn, roadwork.',FINAL:'Шесть сцен A–F из задания; табло 11:00 → 11:30 для E.',
     WORD_A:'Крупный вид спущенного колеса.',WORD_B:'Ремонт дороги с инструментами и ограждением.',WORD_C:'Схема неверного поворота.',WORD_D:'Пробка без аварии.',WORD_E:'Поезд и табло 10:00 → 10:30.',WORD_F:'Две столкнувшиеся машины без пострадавших.'};
   for(const [name,brief] of Object.entries(briefs))media['A22M4L11_'+name]={type:'image',src:null,brief};
   for(const [name,rows,examples] of [['M03',words,wordExamples],['M07',lines,null]])rows.forEach((text,i)=>{
