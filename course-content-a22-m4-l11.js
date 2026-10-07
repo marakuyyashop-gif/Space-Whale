@@ -5,10 +5,37 @@
   const E=(name,kind,title,extra={})=>({version:1,id:'A22M4L11-'+name,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=name=>({imagePending:true,assetId:'A22M4L11_'+name});
-  const audio=(name,script)=>{const key='A22M4L11_'+name;media[key]={type:'audio',src:null,script};return {audioId:key,audioPending:true};};
-  const repeat=(name,words,examples)=>E(name,'audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,
-    items:words.map((text,i)=>({id:String(i+1),text,example:examples?.[i],audioId:'A22M4L11_'+name+'-WORD-'+(i+1),
-      ...(examples?.[i]?{exampleAudioId:'A22M4L11_'+name+'-EXAMPLE-'+(i+1)}:{})}))});
+  const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const audioVersion='20261007-sarah-v3-slow1-final';
+  const audio=(name,script)=>{
+    const key='A22M4L11_'+name;
+    const src=name==='LISTENING'
+      ?courseAudioBase+'/dialogues/a2-2-m4-l11-nina-sam-sarah-will-slow1.mp3?v='+audioVersion
+      :null;
+    media[key]={type:'audio',src,script};
+    return src?{audioId:key,audio:src,audioPending:false}:{audioId:key,audioPending:true};
+  };
+  const repeat=(name,phrases,examples)=>{
+    const folder=courseAudioBase+'/a2-2/w4/l11/listen-repeat/';
+    return E(name,'audio','Listen and repeat.',{
+      layout:'listen-repeat',
+      audioPending:false,
+      items:phrases.map((text,i)=>{
+        const n=i+1;
+        const wordKey='A22M4L11_'+name+'-WORD-'+n;
+        const wordSrc=folder+name+'-WORD-'+n+'.mp3?v='+audioVersion;
+        media[wordKey]={type:'audio',src:wordSrc,script:text};
+        const item={id:String(n),text,audioId:wordKey,audio:wordSrc};
+        if(examples?.[i]){
+          const exampleKey='A22M4L11_'+name+'-EXAMPLE-'+n;
+          const exampleSrc=folder+name+'-EXAMPLE-'+n+'.mp3?v='+audioVersion;
+          media[exampleKey]={type:'audio',src:exampleSrc,script:examples[i]};
+          Object.assign(item,{example:examples[i],exampleAudioId:exampleKey,exampleAudio:exampleSrc});
+        }
+        return item;
+      })
+    });
+  };
   const words=['traffic','flat tire','delay','accident','wrong turn','roadwork'];
   const wordExamples=["There’s a lot of traffic today.",'The car has a flat tire.',"There’s a delay at the station.",'The accident was near the hotel.','This was the wrong turn.',"There’s roadwork near the station."];
   const problemUse=[{words,phrases:['What happened?','I missed the bus/train/flight.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.',"We’re stuck in traffic.",'The train is delayed.','The flight is canceled.',"There’s roadwork near the station."]}];
@@ -84,10 +111,6 @@
   const briefs={OPENING:'Шесть сцен со всеми словами урока: traffic, flat tire, delay, accident, wrong turn, roadwork.',FINAL:'Шесть сцен A–F из задания; табло 11:00 → 11:30 для E.',
     WORD_A:'Крупный вид спущенного колеса.',WORD_B:'Ремонт дороги с инструментами и ограждением.',WORD_C:'Схема неверного поворота.',WORD_D:'Пробка без аварии.',WORD_E:'Поезд и табло 10:00 → 10:30.',WORD_F:'Две столкнувшиеся машины без пострадавших.'};
   for(const [name,brief] of Object.entries(briefs))media['A22M4L11_'+name]={type:'image',src:null,brief};
-  for(const [name,rows,examples] of [['M03',words,wordExamples],['M07',lines,null]])rows.forEach((text,i)=>{
-    media['A22M4L11_'+name+'-WORD-'+(i+1)]={type:'audio',src:null,script:text};
-    if(examples)media['A22M4L11_'+name+'-EXAMPLE-'+(i+1)]={type:'audio',src:null,script:examples[i]};
-  });
   stages.forEach(s=>kit.validate(s.exercise));
   window.SpaceWhaleLessonMedia={...(window.SpaceWhaleLessonMedia||{}),[id]:media};
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
