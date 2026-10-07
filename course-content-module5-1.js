@@ -3,6 +3,9 @@
   const kit=window.SpaceWhaleExerciseKit;
   if(!kit)return;
   const words=['sleep','smile','laugh','stand','lie','cry'];
+  const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const lrAudioBase=courseAudioBase+'/a1-2/w5/l1/listen-repeat';
+  const lrAudioVersion='20261007-sarah-deliberate-s095-final';
   const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=assetId=>({imagePending:true,assetId});
@@ -18,9 +21,12 @@
     task:{text:'Ты на видеозвонке. Скажи по одному предложению о женщине, которая стоит возле дивана, и мужчине, который улыбается.'},
     use:[{words:['standing','smiling'],phrases:['She’s …','He’s …']}]});
   const examples=['I need to sleep.','Smile, please.','Please don’t laugh.','Please stand here.','You can lie on the sofa.','I don’t want to cry.'];
-  const repeat=E('L1-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,
-    items:words.map((text,i)=>({id:text,text,audioId:'A1M5L1_WORD_'+String(i+1).padStart(2,'0'),
-      example:examples[i],exampleAudioId:'A1M5L1_EXAMPLE_'+String(i+1).padStart(2,'0')}))});
+  const repeat=E('L1-M03','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:false,
+    items:words.map((text,i)=>{
+      const suffix=String(i+1).padStart(2,'0');
+      return {id:text,text,audioId:'A1M5L1_WORD_'+suffix,audio:lrAudioBase+'/A1M5L1_WORD_'+suffix+'.mp3?v='+lrAudioVersion,
+        example:examples[i],exampleAudioId:'A1M5L1_EXAMPLE_'+suffix,exampleAudio:lrAudioBase+'/A1M5L1_EXAMPLE_'+suffix+'.mp3?v='+lrAudioVersion};
+    })});
   const meaning=E('L1-M04','gaps','Choose the correct meaning.',{inputMode:'select',items:[
     ['lie','лежать',['спать','лежать','стоять']],
     ['laugh','смеяться',['смеяться','улыбаться','плакать']],
@@ -58,8 +64,11 @@
     'Lie здесь означает «лежать». Человек может лежать и не спать.',
     highlights:['Present Continuous','am','is','are','-ing','I am smiling','She is standing','They are laughing','I’m smiling','She’s standing','They’re laughing','sleeping','laughing','standing','smiling','lying','crying']}]});
   const modelLines=['I’m smiling now.','She’s crying right now.','He’s sleeping at the moment.','You’re standing near the sofa.','We’re laughing.','They’re lying on the carpet.'];
-  const modelRepeat=E('L1-M07','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:true,
-    items:modelLines.map((text,i)=>({id:'line'+(i+1),text,audioId:'A1M5L1_MODEL_'+String(i+1).padStart(2,'0')}))});
+  const modelRepeat=E('L1-M07','audio','Listen and repeat.',{layout:'listen-repeat',audioPending:false,
+    items:modelLines.map((text,i)=>{
+      const suffix=String(i+1).padStart(2,'0');
+      return {id:'line'+(i+1),text,audioId:'A1M5L1_MODEL_'+suffix,audio:lrAudioBase+'/A1M5L1_MODEL_'+suffix+'.mp3?v='+lrAudioVersion};
+    })});
   const fullForm=E('L1-M08','gaps','Say what is happening now.',{inputMode:'text',
     instruction:'Complete the sentences. Use am, is or are + -ing.',items:[
       ['I ','am smiling',' now. (smile)'],
@@ -130,9 +139,9 @@
   };
   for(let i=0;i<words.length;i++){
     const suffix=String(i+1).padStart(2,'0');
-    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_WORD_'+suffix]={type:'audio',src:null,script:words[i]};
-    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_EXAMPLE_'+suffix]={type:'audio',src:null,script:examples[i]};
-    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_MODEL_'+suffix]={type:'audio',src:null,script:modelLines[i]};
+    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_WORD_'+suffix]={type:'audio',src:lrAudioBase+'/A1M5L1_WORD_'+suffix+'.mp3?v='+lrAudioVersion,script:words[i]};
+    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_EXAMPLE_'+suffix]={type:'audio',src:lrAudioBase+'/A1M5L1_EXAMPLE_'+suffix+'.mp3?v='+lrAudioVersion,script:examples[i]};
+    window.SpaceWhaleLessonMedia[lesson.id]['A1M5L1_MODEL_'+suffix]={type:'audio',src:lrAudioBase+'/A1M5L1_MODEL_'+suffix+'.mp3?v='+lrAudioVersion,script:modelLines[i]};
   }
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
   const at=window.SpaceWhaleContent.findIndex(item=>item.id===lesson.id);
