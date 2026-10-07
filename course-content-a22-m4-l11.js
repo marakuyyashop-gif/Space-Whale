@@ -40,9 +40,9 @@
   };
   const words=['traffic','flat tire','delay','accident','wrong turn','roadwork'];
   const wordExamples=["There’s a lot of traffic today.",'The car has a flat tire.',"There’s a delay at the station.",'The accident was near the hotel.','This was the wrong turn.',"There’s roadwork near the station."];
-  const problemUse=[{words,phrases:['What happened?','I missed the bus/train/flight.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.',"We’re stuck in traffic.",'The train is delayed.','The flight is canceled.',"There’s roadwork near the station."]}];
+  const problemUse=[{words,phrases:['What happened?','I / We …','There was …','Now I’m / we’re …','There’s …','The train / flight is …']}];
   const opening=kit.speaking({id:'A22M4L11-M01',title:'Tell your friend why you’re late',image:{image:openingImage,alt:'Six travel problems: traffic, flat tire, delay, accident, wrong turn and roadwork'},
-    task:{text:'Your friend is waiting at the hotel. Look at all six travel problems: traffic, a flat tire, a delay, an accident, a wrong turn and roadwork. Choose two pictures. Call your friend and explain what happened and what the situation is now.'},
+    task:{text:'Your friend is waiting at the hotel. Choose one picture and explain the problem.'},
     use:problemUse});
   const wordMatch=E('M02','matching','What is the problem?',{layout:'picture-word',instruction:'Match the pictures and words.',
     items:[['A','flat tire',{x:33.34,y:0,w:33.33,h:50}],['B','roadwork',{x:66.67,y:50,w:33.33,h:50}],['C','wrong turn',{x:33.34,y:50,w:33.33,h:50}],['D','traffic',{x:0,y:0,w:33.33,h:50}],['E','delay',{x:66.67,y:0,w:33.33,h:50}],['F','accident',{x:0,y:50,w:33.33,h:50}]].map(([label,answer,crop])=>({id:label,text:label,alt:answer,correctId:answer,image:sixProblemsImage,crop})),
@@ -77,13 +77,13 @@
   const rule=E('M06','rule-page','Problem before and situation now',{blocks:[{type:'rule',text:ruleText,
     highlights:['Past Simple','What happened?','I missed the bus.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.','I’m stuck in traffic.','We’re stuck in traffic.','The train is delayed.','The flight is canceled.']}]});
   const lines=['What happened?','I missed the bus.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.','I’m stuck in traffic.','We’re stuck in traffic.','The train is delayed.','The flight is canceled.'];
-  const practice=E('M08','writing','Tell your friend about the problem.',{responseMode:'open',instruction:'Write a sentence. Use the words and the time information.',
+  const practice=E('M08','writing','Tell your friend about the problem.',{responseMode:'accepted',instruction:'Write a sentence. Use the words and the time information.',
     items:[
-      ['Five minutes ago: I / miss / the bus.','I missed the bus five minutes ago.'],
-      ['Ten minutes ago: we / get / a flat tire.','We got a flat tire ten minutes ago.'],
-      ['Now: the flight / be / canceled.','The flight is canceled.'],
-      ['Now: there / be / roadwork / near the hotel.',"There’s roadwork near the hotel."]
-    ].map(([prompt,answer],i)=>({id:String(i+1),prompt,possibleAnswers:[answer]}))});
+      {id:'1',prompt:'Five minutes ago: I / miss / the bus.',normalization:'translation',acceptedAnswers:['I missed the bus five minutes ago.','Five minutes ago, I missed the bus.']},
+      {id:'2',prompt:'Ten minutes ago: we / get / a flat tire.',normalization:'translation',acceptedAnswers:['We got a flat tire ten minutes ago.','Ten minutes ago, we got a flat tire.']},
+      {id:'3',prompt:'Now: the flight / be / canceled.',normalization:'translation',acceptedAnswers:['The flight is canceled.']},
+      {id:'4',prompt:'Now: there / be / roadwork / near the hotel.',normalization:'translation',acceptedAnswers:["There’s roadwork near the hotel."]}
+    ]});
   const script='Nina: Hi, Sam. Where are you?\nSam: Hi, Nina. We’re on the bus.\nNina: What happened?\nSam: There was an accident near the station. Now we’re stuck in traffic.\nNina: Are you OK?\nSam: Yes, we’re OK. But we’ll be late.\nNina: OK. I’m at the hotel.';
   const listening=E('M09','stage','Listen to Nina and Sam.',{layout:'grouped',transcript:script,transcriptAfter:['reason','lines'],
     exercises:[
@@ -97,7 +97,7 @@
       ]})}
     ]});
   const final=kit.speaking({id:'A22M4L11-M10',title:'Explain why you’re late',image:{image:sixProblemsImage,alt:'Six travel problems: traffic, flat tire, delay, accident, wrong turn and roadwork'},
-    task:{text:'Your friend is waiting for you. Look at all six pictures: traffic, a flat tire, a train delay, an accident, a wrong turn and roadwork. Choose two situations. Call and explain what happened and what the situation is now. Then change roles and ask your friend what happened.'},
+    task:{text:'Your friend is waiting for you. Choose two situations. Explain what happened and what the situation is now. Then change roles.'},
     use:problemUse});
   const stages=[stage('Opening Speaking',3,opening),stage('Words',3,wordMatch),stage('Listen & Repeat',2,repeat('M03',words,wordExamples)),
     stage('Words Practice',3,wordPractice),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
@@ -105,7 +105,7 @@
     stage('Listening',4,listening),stage('Final Speaking',3,final)];
   const lesson={id,level:'A2.2',whale:4,lessonNumber:11,title:'Проблемы',summary:'Сообщаем, что случилось в дороге и какова ситуация сейчас.',
     grammar:'Past Simple для события; be для текущего состояния',constructions:'What happened? · I missed … · I got lost. · We’re stuck in traffic. · The train is delayed.',
-    words,durationMinutes:30,contentVersion:'scenario-2026-10-07',stages,
+    words,durationMinutes:30,contentVersion:'scenario-2026-10-07-r2',stages,
     structure:[{role:'opening',sources:[opening.id]},{role:'words',sources:[wordMatch.id,stages[2].exercise.id]},
       {role:'wordPractice',sources:[wordPractice.id]},{role:'focus',sources:[discovery.id,rule.id]},
       {role:'practice',sources:[stages[6].exercise.id,practice.id]},{role:'listening',sources:[listening.id]},{role:'final',sources:[final.id]}]};
