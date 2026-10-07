@@ -39,10 +39,11 @@
   };
   const words=['catch the next train','change trains','get a taxi','return to the hotel','go a different way','wait for the next bus'];
   const examples=['We can catch the next train at 3:30.','We need to change trains in Rome.','We can get a taxi at the station.','We need to return to the hotel now.','We can go a different way to the station.','We can wait for the next bus here.'];
+  const openingUse=[{words,phrases:['We could …','Why don’t we …?']}];
   const planUse=[{words,phrases:['We could … instead.','Why don’t we …?','That works for me.',"Let’s do that."]}];
   const opening=kit.speaking({id:'A22M4L12-M01',title:'Choose a new plan',image:{image:planImage,alt:'Six travel situations with possible Plan B choices'},
-    task:{text:'Look at all six travel situations. Choose two pictures. For each one, suggest a new plan, answer your friend and agree on what to do. Use both ways of suggesting across your conversations.'},
-    use:planUse});
+    task:{text:'Choose one picture and suggest a new plan.'},
+    use:openingUse});
   const meanings=[
     ['go a different way','use another road to get to the same place'],
     ['catch the next train','be on time for the next train and take it'],
@@ -88,10 +89,10 @@
   const rule=E('M06','rule-page','Suggest and agree on a new plan',{blocks:[{type:'rule',text:ruleText,
     highlights:['We could + base verb','We could get a taxi instead.','could get','Why don’t we + base verb?','Why don’t we catch the next train?','That works for me.','Let’s do that.','return to','wait for']}]});
   const modelLines=['We could get a taxi instead.','We could go a different way instead.','We could return to the hotel instead.','Why don’t we catch the next train?','Why don’t we change trains in Rome?','Why don’t we wait for the next bus?','That works for me.','Let’s do that.'];
-  const production=E('M08','writing','Suggest a plan and answer your friend.',{responseMode:'open',instruction:'Write a sentence or a short reply.',items:[
-    {id:'1',prompt:'You and your friend missed the train. Suggest a taxi. Use could and instead. / get a taxi',possibleAnswers:['We could get a taxi instead.']},
-    {id:'2',prompt:'You and your friend missed the bus. Suggest waiting. Use Why don’t we. / wait for the next bus',possibleAnswers:['Why don’t we wait for the next bus?']},
-    {id:'3',prompt:'Your friend says, “We could return to the hotel instead.” Accept the idea and agree on the plan. Use both new replies.',possibleAnswers:['That works for me. Let’s do that.']}
+  const production=E('M08','writing','Suggest a plan and answer your friend.',{responseMode:'accepted',instruction:'Write a sentence or a short reply.',items:[
+    {id:'1',prompt:'You and your friend missed the train. Suggest a taxi. Use could and instead. / get a taxi',normalization:'translation',acceptedAnswers:['We could get a taxi instead.']},
+    {id:'2',prompt:'You and your friend missed the bus. Suggest waiting. Use Why don’t we. / wait for the next bus',normalization:'translation',acceptedAnswers:['Why don’t we wait for the next bus?']},
+    {id:'3',prompt:'Your friend says, “We could return to the hotel instead.” Accept the idea and agree on the plan. Use both new replies.',normalization:'translation',acceptedAnswers:['That works for me. Let’s do that.']}
   ]});
   const script='Anna: We missed the train. How can we get to the hotel?\nLeo: We could catch the next train instead.\nAnna: It leaves at six. I don’t want to wait three hours.\nLeo: Why don’t we get a taxi?\nAnna: That works for me. But there’s roadwork on King Street.\nLeo: We could go a different way.\nAnna: OK. Let’s do that.';
   const listening=E('M09','stage','Listen to Anna and Leo.',{layout:'grouped',transcript:script,transcriptAfter:['final-plan','suggestions'],
@@ -111,10 +112,9 @@
       ['Friend: We missed the bus. We could get a taxi instead.','That works for me.'],
       ['Friend: There’s roadwork on King Street. What can we do?','We could go a different way instead.'],
       ['Friend: That works for me.',"Let’s do that."]
-    ].map(([prompt,reply],i)=>({id:'message'+(i+1),exercise:E('M10-'+(i+1),'writing','Write your reply.',{responseMode:'open',items:[{id:'reply',prompt,possibleAnswers:[reply]}]})}))});
+    ].map(([prompt,reply],i)=>({id:'message'+(i+1),exercise:E('M10-'+(i+1),'writing','Write your reply.',{responseMode:'accepted',items:[{id:'reply',prompt,normalization:'translation',acceptedAnswers:[reply]}]})}))});
   const final=kit.speaking({id:'A22M4L12-M11',title:'Choose a Plan B with your friend',image:{image:planImage,alt:'Six travel situations with possible Plan B choices'},
-    task:{text:'Choose two scenes. Suggest a new plan, respond to your friend, and agree on what to do. Then change roles. Use both ways of suggesting across your two conversations.',
-      bullets:['A. The next train leaves in 15 minutes.','B. One train goes from A to B; another goes from B to C. You need to reach C.','C. The bus is canceled; a taxi is available.','D. The train is canceled; the next one is tomorrow. Your hotel is two minutes away.','E. Roadwork closes the route to the hotel; another road is open.','F. The bus left; the next one arrives in eight minutes.']},
+    task:{text:'Choose two pictures. Suggest a new plan, respond to your friend, and agree on what to do. Then change roles.'},
     use:planUse});
   const stages=[stage('Opening Speaking',2,opening),stage('Words',3,wordInput),stage('Listen & Repeat',2,repeat('M03',words,examples)),
     stage('Words Practice',3,planGaps),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
@@ -122,7 +122,7 @@
     stage('Listening',4,listening),stage('Messages',2,chat),stage('Final Speaking',3,final)];
   const lesson={id,level:'A2.2',whale:4,lessonNumber:12,title:'План Б',summary:'Предлагаем решение дорожной проблемы и договариваемся о новом плане.',
     grammar:'could + base verb; Why don’t we + base verb?',constructions:'We could … instead. · Why don’t we …? · That works for me. · Let’s do that.',
-    words,durationMinutes:30,contentVersion:'scenario-2026-10-07',stages,
+    words,durationMinutes:30,contentVersion:'scenario-2026-10-07-r2',stages,
     structure:[{role:'opening',sources:[opening.id]},{role:'words',sources:[wordInput.id,stages[2].exercise.id]},
       {role:'wordPractice',sources:[planGaps.id]},{role:'focus',sources:[discovery.id,rule.id]},
       {role:'practice',sources:[stages[6].exercise.id,production.id]},{role:'listening',sources:[listening.id]},
