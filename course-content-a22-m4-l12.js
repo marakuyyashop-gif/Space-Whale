@@ -5,6 +5,7 @@
   const E=(name,kind,title,extra={})=>({version:1,id:'A22M4L12-'+name,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=name=>({imagePending:true,assetId:'A22M4L12_'+name});
+  const planImage='assets/a22-m4-l12-plan-b.png';
   const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
   const audioVersion='20261007-sarah-v3-slow1-final';
   const audio=(name,script)=>{
@@ -38,9 +39,10 @@
   };
   const words=['catch the next train','change trains','get a taxi','return to the hotel','go a different way','wait for the next bus'];
   const examples=['We can catch the next train at 3:30.','We need to change trains in Rome.','We can get a taxi at the station.','We need to return to the hotel now.','We can go a different way to the station.','We can wait for the next bus here.'];
-  const opening=kit.speaking({id:'A22M4L12-M01',title:'Choose a new plan',image:pending('OPENING'),
-    task:{text:'Your train is canceled. You and your friend want to get to the hotel. The next train is at 14:00, and a taxi is available. Suggest one new plan.'},
-    use:[{words:['catch the next train','get a taxi'],phrases:['We could …','Why don’t we …?']}]});
+  const planUse=[{words,phrases:['We could … instead.','Why don’t we …?','That works for me.',"Let’s do that."]}];
+  const opening=kit.speaking({id:'A22M4L12-M01',title:'Choose a new plan',image:{image:planImage,alt:'Six travel situations with possible Plan B choices'},
+    task:{text:'Look at all six travel situations. Choose two pictures. For each one, suggest a new plan, answer your friend and agree on what to do. Use both ways of suggesting across your conversations.'},
+    use:planUse});
   const meanings=[
     ['go a different way','use another road to get to the same place'],
     ['catch the next train','be on time for the next train and take it'],
@@ -110,10 +112,10 @@
       ['Friend: There’s roadwork on King Street. What can we do?','We could go a different way instead.'],
       ['Friend: That works for me.',"Let’s do that."]
     ].map(([prompt,reply],i)=>({id:'message'+(i+1),exercise:E('M10-'+(i+1),'writing','Write your reply.',{responseMode:'open',items:[{id:'reply',prompt,possibleAnswers:[reply]}]})}))});
-  const final=kit.speaking({id:'A22M4L12-M11',title:'Choose a Plan B with your friend',image:pending('FINAL'),
+  const final=kit.speaking({id:'A22M4L12-M11',title:'Choose a Plan B with your friend',image:{image:planImage,alt:'Six travel situations with possible Plan B choices'},
     task:{text:'Choose two scenes. Suggest a new plan, respond to your friend, and agree on what to do. Then change roles. Use both ways of suggesting across your two conversations.',
       bullets:['A. The next train leaves in 15 minutes.','B. One train goes from A to B; another goes from B to C. You need to reach C.','C. The bus is canceled; a taxi is available.','D. The train is canceled; the next one is tomorrow. Your hotel is two minutes away.','E. Roadwork closes the route to the hotel; another road is open.','F. The bus left; the next one arrives in eight minutes.']},
-    use:[{words,phrases:['We could … instead.','Why don’t we …?','That works for me.','Let’s do that.']}]});
+    use:planUse});
   const stages=[stage('Opening Speaking',2,opening),stage('Words',3,wordInput),stage('Listen & Repeat',2,repeat('M03',words,examples)),
     stage('Words Practice',3,planGaps),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
     stage('Listen & Repeat',2,repeat('M07',modelLines)),stage('Suggest and reply',3,production),
@@ -125,8 +127,8 @@
       {role:'wordPractice',sources:[planGaps.id]},{role:'focus',sources:[discovery.id,rule.id]},
       {role:'practice',sources:[stages[6].exercise.id,production.id]},{role:'listening',sources:[listening.id]},
       {role:'practice',sources:[chat.id]},{role:'final',sources:[final.id]}]};
-  media.A22M4L12_OPENING={type:'image',src:null,brief:'Отменённый поезд, следующий в 14:00, свободное такси; сейчас 12:00.'};
-  media.A22M4L12_FINAL={type:'image',src:null,brief:'Шесть различимых сцен A–F с маршрутами и временами из финального задания.'};
+  media.A22M4L12_OPENING={type:'image',src:planImage,brief:'Шесть сцен с вариантами нового плана, как в финальном Speaking.'};
+  media.A22M4L12_FINAL={type:'image',src:planImage,brief:'Шесть различимых сцен A–F с маршрутами и временами из финального задания.'};
   stages.forEach(s=>kit.validate(s.exercise));
   window.SpaceWhaleLessonMedia={...(window.SpaceWhaleLessonMedia||{}),[id]:media};
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];

@@ -5,6 +5,8 @@
   const E=(name,kind,title,extra={})=>({version:1,id:'A22M4L11-'+name,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=name=>({imagePending:true,assetId:'A22M4L11_'+name});
+  const openingImage='assets/a22-m4-l11-opening.png';
+  const sixProblemsImage='assets/a22-m4-l11-six-problems.png';
   const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
   const audioVersion='20261007-sarah-v3-slow1-final';
   const audio=(name,script)=>{
@@ -39,11 +41,11 @@
   const words=['traffic','flat tire','delay','accident','wrong turn','roadwork'];
   const wordExamples=["There’s a lot of traffic today.",'The car has a flat tire.',"There’s a delay at the station.",'The accident was near the hotel.','This was the wrong turn.',"There’s roadwork near the station."];
   const problemUse=[{words,phrases:['What happened?','I missed the bus/train/flight.','I got lost.','We got a flat tire.','We took a wrong turn.','There was an accident.',"We’re stuck in traffic.",'The train is delayed.','The flight is canceled.',"There’s roadwork near the station."]}];
-  const opening=kit.speaking({id:'A22M4L11-M01',title:'Tell your friend why you’re late',image:pending('OPENING'),
+  const opening=kit.speaking({id:'A22M4L11-M01',title:'Tell your friend why you’re late',image:{image:openingImage,alt:'Six travel problems: traffic, flat tire, delay, accident, wrong turn and roadwork'},
     task:{text:'Your friend is waiting at the hotel. Look at all six travel problems: traffic, a flat tire, a delay, an accident, a wrong turn and roadwork. Choose two pictures. Call your friend and explain what happened and what the situation is now.'},
     use:problemUse});
   const wordMatch=E('M02','matching','What is the problem?',{layout:'picture-word',instruction:'Match the pictures and words.',
-    items:[['A','flat tire'],['B','roadwork'],['C','wrong turn'],['D','traffic'],['E','delay'],['F','accident']].map(([label,answer])=>({id:label,text:label,alt:'Picture '+label,correctId:answer,...pending('WORD_'+label)})),
+    items:[['A','flat tire',{x:33.34,y:0,w:33.33,h:50}],['B','roadwork',{x:66.67,y:50,w:33.33,h:50}],['C','wrong turn',{x:33.34,y:50,w:33.33,h:50}],['D','traffic',{x:0,y:0,w:33.33,h:50}],['E','delay',{x:66.67,y:0,w:33.33,h:50}],['F','accident',{x:0,y:50,w:33.33,h:50}]].map(([label,answer,crop])=>({id:label,text:label,alt:answer,correctId:answer,image:sixProblemsImage,crop})),
     options:['delay','wrong turn','accident','flat tire','traffic','roadwork'].map(text=>({id:text,text}))});
   const wordPractice=E('M04','matching','Which problem does each person describe?',{instruction:'Match the situations and words.',
     items:[
@@ -94,9 +96,8 @@
         {id:'3',segments:['Sam: Now we’re ',{id:'stuck',answers:['stuck in traffic']},'.']}
       ]})}
     ]});
-  const final=kit.speaking({id:'A22M4L11-M10',title:'Explain why you’re late',image:pending('FINAL'),
-    task:{text:'Your friend is waiting for you. Choose two situations. Call and explain the problem. Then change roles and ask your friend what happened.',
-      bullets:['A. The train left at 9:00; you arrived at 9:05.','B. You turned right instead of left and do not know where you are.','C. One tire is flat; you cannot drive.','D. There was an accident; your car is now in a long line of cars.','E. The train changes from 11:00 to 11:30.','F. Your flight will not leave today: CANCELED.']},
+  const final=kit.speaking({id:'A22M4L11-M10',title:'Explain why you’re late',image:{image:sixProblemsImage,alt:'Six travel problems: traffic, flat tire, delay, accident, wrong turn and roadwork'},
+    task:{text:'Your friend is waiting for you. Look at all six pictures: traffic, a flat tire, a train delay, an accident, a wrong turn and roadwork. Choose two situations. Call and explain what happened and what the situation is now. Then change roles and ask your friend what happened.'},
     use:problemUse});
   const stages=[stage('Opening Speaking',3,opening),stage('Words',3,wordMatch),stage('Listen & Repeat',2,repeat('M03',words,wordExamples)),
     stage('Words Practice',3,wordPractice),stage('Guided Discovery',4,discovery),stage('Rule',2,rule),
@@ -108,9 +109,9 @@
     structure:[{role:'opening',sources:[opening.id]},{role:'words',sources:[wordMatch.id,stages[2].exercise.id]},
       {role:'wordPractice',sources:[wordPractice.id]},{role:'focus',sources:[discovery.id,rule.id]},
       {role:'practice',sources:[stages[6].exercise.id,practice.id]},{role:'listening',sources:[listening.id]},{role:'final',sources:[final.id]}]};
-  const briefs={OPENING:'Шесть сцен со всеми словами урока: traffic, flat tire, delay, accident, wrong turn, roadwork.',FINAL:'Шесть сцен A–F из задания; табло 11:00 → 11:30 для E.',
+  const briefs={OPENING:'Шесть сцен со всеми словами урока: traffic, flat tire, delay, accident, wrong turn, roadwork.',FINAL:'Шесть сцен со всеми словами урока: traffic, flat tire, delay, accident, wrong turn, roadwork.',
     WORD_A:'Крупный вид спущенного колеса.',WORD_B:'Ремонт дороги с инструментами и ограждением.',WORD_C:'Схема неверного поворота.',WORD_D:'Пробка без аварии.',WORD_E:'Поезд и табло 10:00 → 10:30.',WORD_F:'Две столкнувшиеся машины без пострадавших.'};
-  for(const [name,brief] of Object.entries(briefs))media['A22M4L11_'+name]={type:'image',src:null,brief};
+  for(const [name,brief] of Object.entries(briefs))media['A22M4L11_'+name]={type:'image',src:name==='OPENING'?openingImage:sixProblemsImage,brief};
   stages.forEach(s=>kit.validate(s.exercise));
   window.SpaceWhaleLessonMedia={...(window.SpaceWhaleLessonMedia||{}),[id]:media};
   window.SpaceWhaleContent=window.SpaceWhaleContent||[];
