@@ -22,10 +22,13 @@ test('all loaded A1 lessons follow the single outline, not content metadata', ()
   const catalog = createCatalog(lessons,templates);
   let count = 0;
   for(const level of courseOutline.filter(level=>level.id.startsWith('A1.'))) {
+    assert.ok(level.description?.trim(), 'Level description: '+level.id);
     for(const module of level.whales) {
+      assert.ok(module.description?.trim(), 'Module description: '+level.id+'/'+module.id);
       const actual = catalog.topics({view:'library',level:level.id,whale:module.id});
       assert.deepEqual(actual.map(l=>l.title),module.topics);
       assert.deepEqual(actual.map(l=>l.lessonNumber),module.topics.map((_,i)=>i+1));
+      assert.ok(actual.every(lesson=>lesson.summary?.trim()), 'Every lesson has a short description');
       count += actual.length;
     }
   }
@@ -57,6 +60,29 @@ test('stale content title and placement cannot override the canonical lesson',()
   const {lessons,templates}=loadedContent();
   const source=lessons.find(l=>l.id==='a1-1-w1-l5');
   source.title='OLD TITLE'; source.level='A1.2'; source.whale=6;
+  source.summary='OLD SUMMARY'; source.goal='OLD GOAL';
   const actual=createCatalog(lessons,templates).lessons.find(l=>l.id===source.id);
   assert.equal(actual.title,'Контакты'); assert.equal(actual.level,'A1.1'); assert.equal(actual.whale,1);
+  assert.equal(actual.summary,'Передаём номер телефона и электронный адрес, проверяем запись и исправляем ошибки.');
+  assert.equal(actual.goal,actual.summary);
+});
+
+test('time module follows the current source order without reassigning lesson identities',()=>{
+  const {lessons,templates}=loadedContent();
+  const catalog=createCatalog(lessons,templates);
+  const time=catalog.topics({view:'library',level:'A1.1',whale:7});
+  assert.deepEqual(time.map(lesson=>[lesson.lessonNumber,lesson.id,lesson.title]),[
+    [1,'a1-1-w7-l1','Расписание'],
+    [2,'a1-1-w7-l2','Неделя'],
+    [3,'a1-1-w7-l4','Календарь'],
+    [4,'a1-1-w7-l5','Праздники'],
+    [5,'a1-1-w7-l3','Порядок'],
+    [6,'a1-1-w7-l6','Дата'],
+    [7,'a1-1-w7-l7','Договорились · Повторение']
+  ]);
+  for(const lesson of time){
+    const route=catalog.normalize('?view=library&level=A1.1&whale=7&lesson='+lesson.id);
+    assert.equal(catalog.topics(route).find(item=>item.id===route.lesson).title,lesson.title);
+    assert.equal(route.exercise,'');
+  }
 });

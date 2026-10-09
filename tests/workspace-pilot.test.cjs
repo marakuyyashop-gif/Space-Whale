@@ -30,6 +30,26 @@ test('actual workspace renders the current sidebar and creates an isolated invit
  assert.equal(new URL(s.copied[0]).searchParams.get('guest'),'new-token');
  assert.equal(new URL(s.location.href).searchParams.get('room'),'new-token');assert.equal(new URL(s.location.href).searchParams.has('completed_stages'),false);
 });
+test('course pickers and lesson overview show the short source descriptions',()=>{
+ const s=fixture(),catalog=require('../workspace-catalog.js').createCatalog([],[]);
+ const descriptions=()=>[...s.document.querySelectorAll('#workspaceLessonInfo .workspace-picker-option small')].map(el=>el.textContent);
+ const select=(label)=>s.click(s.document.querySelector(`.workspace-console-selector[aria-label="${label}"]`));
+ const a11=catalog.levels.find(level=>level.id==='A1.1');
+ select('Level');
+ assert.ok(descriptions().includes(a11.description));
+ assert.ok(descriptions().includes(catalog.levels.find(level=>level.id==='A1.2').description));
+ select('Module');
+ assert.deepEqual(descriptions(),a11.whales.map(module=>module.description));
+ select('Lesson');
+ const lessons=catalog.topics({view:'library',level:'A1.1',whale:1});
+ assert.deepEqual(descriptions(),lessons.map(lesson=>lesson.summary));
+ assert.equal(s.document.querySelector('.workspace-lesson-overview .workspace-info-copy').textContent,lessons[1].summary);
+ const numberLesson=[...s.document.querySelectorAll('#workspaceLessonInfo .workspace-picker-option')].find(el=>el.querySelector('strong')?.textContent==='Числа');
+ s.click(numberLesson);
+ assert.equal(new URLSearchParams(s.location.search).get('lesson'),'a1-1-w1-lnumbers');
+ assert.equal(s.document.querySelector('.workspace-lesson-title').textContent,'Числа');
+ assert.equal(s.document.querySelector('.workspace-lesson-overview .workspace-info-copy').textContent,lessons[4].summary);
+});
 test('existing invitation is copied unchanged; replacement requires a separate explicit action',async()=>{
  const s=fixture(true);await settled();s.click(s.document.querySelector('#inviteStudent'));await settled();assert.equal(s.copied[0],'https://example.test/classroom.html?guest=old-token');
  assert.equal(s.calls.filter(c=>c.name==='create_guest_workspace').length,0);
