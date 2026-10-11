@@ -5,10 +5,27 @@
   const id = 'a1-2-w5-l5', prefix = 'A1M5L5', media = {};
   const E = (name, kind, title, extra = {}) => ({version: 1, id: prefix + '-' + name, kind, title, ...extra});
   const stage = (menu, time, exercise, teacherNotes = '') => ({menu, navigationTitle: menu, section: 'tasks', guide: {time: time + ' min', teacherNotes}, exercise});
+  const uploadedImages = {
+  "W01_A": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+  "W01_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+  "W01_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+  "W01_D": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+  "W01_E": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+  "W01_F": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+  "E04A_1": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+  "E04A_2": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+  "E04A_3": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+  "E04A_4": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+  "E04A_5": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+  "E04A_6": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+  "L03_Q1_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+  "L03_Q1_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png"
+};
   const pendingImage = (name, brief) => {
     const assetId = prefix + '_' + name;
-    media[assetId] = {type: 'image', src: null, brief};
-    return {imagePending: true, assetId};
+    const image = uploadedImages[name];
+    media[assetId] = {type: 'image', src: image || null, brief};
+    return image ? {image, assetId, imageWidth: 512, imageHeight: 512, alt: 'Picture'} : {imagePending: true, assetId};
   };
   const pendingAudio = (name, script) => {
     const audioId = prefix + '_' + name;
