@@ -35,10 +35,19 @@
     media[assetId] = {type: 'image', src: image || null, brief};
     return image ? {image, assetId, imageWidth: /^(L03_|E11A_)/.test(name) ? 496 : 512, imageHeight: /^(L03_|E11A_)/.test(name) ? 368 : 512, alt: 'Picture'} : {imagePending: true, assetId};
   };
+  const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const audioVersion = '20261011-uploaded-master-final';
+  const audioSrc = name => {
+    if (/^P01_(?:WORD|EXAMPLE)_[1-6]$/.test(name)) {
+      return courseAudioBase + '/a1-2/w5/l5/listen-repeat/' + name + '.mp3?v=' + audioVersion;
+    }
+    return null;
+  };
   const pendingAudio = (name, script) => {
     const audioId = prefix + '_' + name;
-    media[audioId] = {type: 'audio', src: null, script};
-    return {audioPending: true, audioId};
+    const src = audioSrc(name);
+    media[audioId] = {type: 'audio', src, script};
+    return src ? {audioPending: false, audioId, audio: src} : {audioPending: true, audioId};
   };
   // Speaking content is deferred by the owner. Only the existing hidden image
   // slot is reserved; no scenario, language scaffold or artwork brief is carried over.
@@ -235,11 +244,11 @@
     'Your necklace is really pretty.'
   ];
   const wordRepeat = E('P01', 'audio', 'Listen and repeat.', {
-    layout: 'listen-repeat', audioPending: true,
+    layout: 'listen-repeat', audioPending: false,
     items: words.map((text, i) => {
       const word = pendingAudio('P01_WORD_' + (i + 1), text);
       const example = pendingAudio('P01_EXAMPLE_' + (i + 1), examples[i]);
-      return {id: String(i + 1), text, audioId: word.audioId, example: examples[i], exampleAudioId: example.audioId};
+      return {id: String(i + 1), text, audioId: word.audioId, audio: word.audio, example: examples[i], exampleAudioId: example.audioId, exampleAudio: example.audio};
     })
   });
   const wordPractice = E('E04A', 'gaps', 'Complete the sentences.', {
@@ -347,7 +356,7 @@
     summary: 'Описываем потерянный аксессуар, сообщаем о поиске и находим вещь по уточнениям собеседника.',
     grammar: 'Present Continuous в ситуации поиска',
     constructions: 'I’m looking for … · What are you looking for? · Are you looking for …? · I can’t find … · Can you see …?',
-    words, durationMinutes: 30, contentVersion: 'approved-content-speaking-deferred-2026-10-11', stages,
+    words, durationMinutes: 30, contentVersion: 'approved-content-speaking-deferred-2026-10-11-p01-audio', stages,
     structure: [
       {role: 'opening', sources: [opening.id]},
       {role: 'words', sources: [wordMatch.id, wordRepeat.id]},
