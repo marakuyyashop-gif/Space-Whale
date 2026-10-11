@@ -362,7 +362,15 @@
     },
     {
       id: 'A2.2',
-      whales: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Whale ${i + 1}`, topics: [] }))
+      whales: Array.from({ length: 8 }, (_, i) => i === 5 ? {
+        id: 6,
+        title: 'Module 6 · Сервис',
+        description: 'Неисправность или ошибка заказа: объяснить проблему и согласовать решение.',
+        topics: ['Что-то не работает'],
+        lessonDescriptions: {
+          'Что-то не работает': 'Уточнить, что нужно, имеется или не работает.'
+        }
+      } : { id: i + 1, title: `Whale ${i + 1}`, topics: [] })
     },
     {
       id: 'B1.1',
