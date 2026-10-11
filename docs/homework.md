@@ -42,3 +42,9 @@ Shared kit regression tests preserve classroom behavior. Full suite after this c
 - Regression coverage completes every response in all eight published packs through actual DOM controls, including picture and text matching, dropdowns, typed gaps, choices and translations. It covers separate-context result reopening, mistakes/corrections/comment, clipboard refusal/retry, skipped work, changed earlier answers, offline retry/resume, local quota failure and asset existence. The full suite retains the same 35 pre-existing failures; no new failing test names.
 
 The original `Clothes.png` is restored from repository history: L2 classroom crops and already-issued homework snapshots still reference it. Build validation checks every relative media URL, including root-level files. All 74 distinct remote homework recordings returned HTTP 200 during the release check.
+
+## A2.2 Module 6 — 2026-10-11
+
+The two packs `a2-2-w6-l1` and `a2-2-w6-l2` reuse each lesson's six-picture Matching, complete Listen & Repeat, typed word practice, unchanged rule page, and dropdown grammar practice. Fifteen separate translation steps follow, in the teacher's three blocks of five. Each shows one Russian sentence and one checked input; the shared arrow opens the next step after OK or Skip. Every translation uses the opt-in translation normalizer and a list of authored, natural variants. This remains exact-answer checking, so an unlisted paraphrase may require teacher review.
+
+Build these two packs with `node scripts/build-homework-catalog.cjs --a22 --sql`. The matching upserts are stored in `supabase/seeds/homework-a22-m6-20261011.sql`; they were applied to the existing private templates table. The Workspace Homework panel and `homework.html?lesson=...` now expose both lessons through the common issue, save, submit, and result-link flow. Already-issued attempt snapshots do not change.

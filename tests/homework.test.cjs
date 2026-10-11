@@ -3,8 +3,8 @@ const {create}=require('../homework-store.js'),kit=require('../exercise-kit.js')
 const packs=JSON.parse(execFileSync(process.execPath,['scripts/build-homework-catalog.cjs'],{cwd:require('node:path').resolve(__dirname,'..'),encoding:'utf8'}));
 const memory=()=>{const data=new Map();return {getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v)};};
 const record=()=>({id:'attempt',edit:'edit-secret',read:'read-secret',answers:{},revision:0,change:0,dirty:false});
-test('six homework packs retain matching, complete audio, full classroom rules and two approved translations',()=>{
- assert.equal(packs.length,8);
+test('published homework packs retain matching, complete audio, full classroom rules and approved translations',()=>{
+ assert.equal(packs.length,10);
  const app={SpaceWhaleExerciseKit:kit};for(const f of ['course-content.js','course-content-module4-34.js','course-content-module4-45.js'])vm.runInNewContext(fs.readFileSync(require('node:path').resolve(__dirname,'..',f),'utf8'),{window:app});const lessons=app.SpaceWhaleContent;
  const all=[];function walk(d){all.push(d);d.exercises?.forEach(b=>walk(b.exercise));d.blocks?.forEach(b=>{if(b.exercise)walk(b.exercise);});}lessons.forEach(l=>l.stages.forEach(s=>walk(s.exercise)));
  for(const p of packs.filter(p=>p.level==='A1.2')){assert.equal(p.level,'A1.2');assert.equal(p.steps[0].role,'words');assert.equal(p.steps[0].exercise.kind,'matching');assert.equal(p.steps[1].role,'listenRepeat');assert.ok(p.steps[1].exercise.items.every(i=>i.audio&&i.exampleAudio));assert.deepEqual(p.steps.slice(-2).map(s=>s.role),['translation','translation']);
