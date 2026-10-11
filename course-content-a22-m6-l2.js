@@ -6,10 +6,16 @@
   const E = (name, kind, title, extra = {}) => ({version: 1, id: prefix + '-' + name, kind, title, ...extra});
   const stage = (menu, time, exercise, teacherNotes = '') => ({menu, navigationTitle: menu, section: 'tasks', guide: {time: time + ' min', teacherNotes}, exercise});
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
-  const audioVersion = '20261011-uploaded-master-final';
+  const audioVersion = '20261011-all-audio-final';
   const audioSrc = name => {
     if (/^M03-(?:WORD|EXAMPLE)-[1-6]$/.test(name)) {
       return courseAudioBase + '/a2-2/w6/l2/listen-repeat/' + name + '.mp3?v=' + audioVersion;
+    }
+    if (name === 'LISTENING') {
+      return courseAudioBase + '/a2-2/w6/l2/listening/a-busy-day.mp3?v=' + audioVersion;
+    }
+    if (/^LISTENING-CLIP-[1-4]$/.test(name)) {
+      return courseAudioBase + '/a2-2/w6/l2/listening/' + name + '.mp3?v=' + audioVersion;
     }
     return null;
   };
@@ -184,7 +190,7 @@
     summary: 'Найти место, где можно получить нужную услугу.',
     grammar: 'somewhere / anywhere / everywhere / nowhere; nowhere и not + anywhere; somewhere / anywhere / nowhere + to + verb',
     constructions: 'Is there anywhere to …? · I know somewhere to … · I looked everywhere … · There’s nowhere to … · I can’t find anywhere to …',
-    words, durationMinutes: 30, contentVersion: 'approved-scenario-picture-words-speaking-deferred-2026-10-11-lr-audio', stages,
+    words, durationMinutes: 30, contentVersion: 'approved-scenario-picture-words-speaking-deferred-2026-10-11-all-audio', stages,
     structure: [
       {role: 'opening', sources: [opening.id]},
       {role: 'words', sources: [wordMatch.id, repeat.id]},
