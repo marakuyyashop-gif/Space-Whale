@@ -10,7 +10,7 @@ const mapping={
  5:{words:'L5-word-translation',repeat:'L5-M03',practice:['L5-explanation-gaps'],rules:['L5-kind-rule']},
  6:{words:'L3-M02',repeat:'L3-M03',practice:['L4-question-answer-match','L5-explanation-gaps'],rules:['a12w4l1-language-focus','L3-M07-rule','L3-M08-explanation','L4-question-rule','L5-kind-rule']}
 };
-function build(content,catalog,translations,a21){
+function build(content,catalog,translations,a21,a22){
  const all=new Map();function walk(d){all.set(d.id,d);d.exercises?.forEach(b=>walk(b.exercise));d.blocks?.forEach(b=>{if(b.exercise)walk(b.exercise);});}content.forEach(l=>l.stages.forEach(s=>walk(s.exercise)));
  const get=id=>{if(!all.has(id))throw Error('Missing homework source '+id);return copy(all.get(id));};
  const packs=Object.entries(mapping).map(([number,source])=>{
@@ -27,8 +27,19 @@ function build(content,catalog,translations,a21){
   const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},...source.practice.map(id=>({role:'practice',exercise:get(id)})),...source.rules.map(id=>{const d=get(id);d.blocks=d.blocks.filter(b=>b.type==='rule');delete d.instruction;d.id+='-homework-rule';return {role:'rule',exercise:d};}),...a21.build(source.key).map(exercise=>({role:'translation',exercise}))];
   packs.push({id:source.id,version:'20261004-a21',level:'A2.1',title:lesson.topic,steps,reference:copy(steps.find(s=>s.role==='rule').exercise),exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
  }
+ if(a22)for(const source of a22.mapping){
+  const lesson=content.find(l=>l.id===source.id);if(!lesson)throw Error('Missing A2.2 homework lesson '+source.id);
+  const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},
+   ...source.practice.map(id=>({role:'practice',exercise:get(id)})),
+   ...source.rules.map(id=>({role:'rule',exercise:get(id)})),
+   ...source.grammar.map(id=>({role:'practice',exercise:get(id)})),
+   ...a22.build(source.key).map(exercise=>({role:'translation',exercise}))];
+  packs.push({id:source.id,version:'20261011-a22-m6',level:'A2.2',title:lesson.title,steps,
+   reference:copy(steps.find(s=>s.role==='rule').exercise),
+   exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
+ }
  for(const pack of packs){
-  pack.version='20261004-flow-3';
+  if(pack.level!=='A2.2')pack.version='20261004-flow-3';
   for(const step of pack.steps)if(step.role==='translation')for(const item of step.exercise.items)item.normalization='translation';
   pack.exercises=pack.steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise));
  }
