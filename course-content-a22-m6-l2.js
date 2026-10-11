@@ -25,14 +25,27 @@
     media[audioId] = {type: 'audio', src, script};
     return src ? {audioId, audio: src, audioPending: false} : {audioId, audioPending: true};
   };
-  // The owner deferred both Speaking tasks. Reserve only the existing image slot:
-  // no task, language scaffolds, scenario or artwork brief is carried over.
-  const emptySlot = (name, title) => E(name, 'presentation', title, {
-    blocks: [{type: 'image', imagePending: true, assetId: prefix + '_' + name + '_DEFERRED'}]
-  });
-  const opening = emptySlot('M01', 'Speaking');
-  const final = emptySlot('M11', 'Speaking');
   const words = ['send a package', 'buy an envelope', 'buy medicine', 'rent a car', 'book an appointment', 'make a photocopy'];
+  const speaking = {
+    title: 'Help each other find a place.', image: null,
+    task: {text: 'Ask where you can do these things. Use the notes to answer your partner. Take turns.', bullets: [
+      'Send a package: post office near the station.',
+      'Buy an envelope: checked every shop in this street; no envelopes.',
+      'Buy medicine: pharmacy next to the supermarket.',
+      'Rent a car: all car rental offices in town are closed today.',
+      'Book an appointment: clinic across the street.',
+      'Make a photocopy: not at the hotel; a shop near the station can help.'
+    ]},
+    use: [
+      {words},
+      {words: ['somewhere', 'anywhere', 'everywhere', 'nowhere'], phrases: [
+        'Is there … to …?', 'I know … to … .', 'There’s … to … .',
+        'I can’t find … to … .', 'I looked … .'
+      ]}
+    ]
+  };
+  const opening = kit.speaking({id: prefix + '-M01', ...speaking});
+  const final = kit.speaking({id: prefix + '-M11', ...speaking});
   const wordExamples = [
     'Ben needs to send a package to his sister.',
     'Can we buy an envelope here?',
@@ -174,7 +187,7 @@
     ].map((prompt, i) => ({id: String(i + 1), prompt}))
   });
   const stages = [
-    stage('Opening Speaking', 1, opening, 'Reserved time; Speaking content is deferred by the owner.'),
+    stage('Opening Speaking', 1, opening, 'Repeat the same Speaking task at the beginning and end of the lesson.'),
     stage('Words', 2, wordMatch),
     stage('Listen & Repeat', 1.5, repeat, 'Adult natural AmE voice; phrase, then example. Audio is pending.'),
     stage('Word Practice', 2, wordPractice),
@@ -183,7 +196,7 @@
     stage('Listening', 6, listening, 'First listening: question 1. Second listening: questions 2–3. The script stays locked until all three answers are submitted. M08 uses four exact clips from this recording. The approved dialogue does not include book an appointment.'),
     stage('Practice', 2, dropdownPractice),
     stage('Writing', 4, writing, 'Open answers require teacher review. Approved cues are preserved. Examples: Is there anywhere to rent a car near here? / Do you know anywhere to rent a car near here?; I know somewhere to buy an envelope.; Yesterday I looked everywhere in the hotel.; There’s nowhere to make a photocopy here.; There isn’t anywhere to buy medicine near here. / I can’t find anywhere to buy medicine near here.'),
-    stage('Final Speaking', 7, final, 'Reserved time; Speaking content is deferred by the owner.')
+    stage('Final Speaking', 7, final, 'Repeat the same Speaking task at the beginning and end of the lesson.')
   ];
   const lesson = {
     id, level: 'A2.2', whale: 6, lessonNumber: 2, title: 'Где это найти',
