@@ -36,7 +36,7 @@
     return image ? {image, assetId, imageWidth: /^(L03_|E11A_)/.test(name) ? 496 : 512, imageHeight: /^(L03_|E11A_)/.test(name) ? 368 : 512, alt: 'Picture'} : {imagePending: true, assetId};
   };
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
-  const audioVersion = '20261011-uploaded-masters-final';
+  const audioVersion = '20261011-p02-recut-r2';
   const audioSrc = name => {
     if (/^P01_(?:WORD|EXAMPLE)_[1-6]$/.test(name)) {
       return courseAudioBase + '/a1-2/w5/l5/listen-repeat/' + name + '.mp3?v=' + audioVersion;
