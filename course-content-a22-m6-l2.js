@@ -41,7 +41,7 @@
     ['C', 'book an appointment', 'biba_boba_booking_a_doctors_appointment_close-up_of_a_smartp_fefe4f54-4102-41fc-a264-e2b70def47df_11.png'],
     ['D', 'make a photocopy', 'biba_boba_making_a_photocopy_an_adult_hand_pressing_a_button_eaae9a15-99e5-49aa-aa45-7d983f63eaa3_14.png'],
     ['E', 'buy medicine', 'biba_boba_buying_medicine_at_a_pharmacy_an_adult_customer_ta_9a2cd5d8-9e77-46fe-a5d4-1a8d2a3ca574_15.png'],
-    ['F', 'buy an envelope', '0_0.png']
+    ['F', 'buy an envelope', 'buy-an-envelope.png']
   ];
   const wordMatch = E('M02', 'matching', 'Words', {
     layout: 'picture-word', instruction: 'Match the pictures with the phrases.',

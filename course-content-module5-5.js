@@ -221,7 +221,7 @@
 
   const speaking = {
     title: 'Help each other find your things.',
-    image: {imagePending: true, assetId: prefix + '_SPEAKING'},
+    image: {image: 'Images/A2.1/0_0.png?v=20261011-room', alt: 'A room with accessories to find.', imageWidth: 2544, imageHeight: 1904, assetId: prefix + '_SPEAKING'},
     task: {text: 'Вы с другом ищете свои вещи в комнате.', bullets: [
       'По очереди выбирайте вещь и говорите, что ищете. Уточняйте, какую вещь ищет собеседник.',
       'Спрашивайте, видит ли он её. Когда увидите вещь, покажите её. Найдите все шесть вещей.'
@@ -232,7 +232,7 @@
       'Can you see my …?', 'I can see it. / I can’t see it.', 'Here it is!'
     ]}]
   };
-  media[prefix + '_SPEAKING'] = {type: 'image', src: null, brief: 'Approved room with six accessories, shared by opening and final Speaking.'};
+  media[prefix + '_SPEAKING'] = {type: 'image', src: 'Images/A2.1/0_0.png?v=20261011-room', brief: 'Uploaded accessory room, shared by opening and final Speaking.', imageWidth: 2544, imageHeight: 1904};
   const opening = kit.speaking({id: prefix + '-SPEAKING_OPENING', ...speaking});
   const final = kit.speaking({id: prefix + '-SPEAKING_FINAL', ...speaking});
   const words = ['ring', 'bracelet', 'earring', 'hair tie', 'hair clip', 'necklace'];
