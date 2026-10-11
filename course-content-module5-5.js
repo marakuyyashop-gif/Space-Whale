@@ -18,14 +18,22 @@
   "E04A_4": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
   "E04A_5": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
   "E04A_6": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
-  "L03_Q1_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
-  "L03_Q1_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png"
+  "L03_Q1_B": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18.png",
+  "L03_Q1_C": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1.png",
+  "L03_Q1_A": "Images/A.1.2/Module 4/lesson 4 - sosed/0_4.png",
+  "L03_Q2_A": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_lying_on_top_of_a_neatly_spr_47e471e0-8e75-427e-a5a4-6590c28e50a7_4.png",
+  "L03_Q2_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_resting_inside_an_open_handb_ff630770-7f85-44b8-9fca-fb82ff393bfa_4.png",
+  "L03_Q2_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_partly_hidden_underneath_th_df227c55-c6f6-4578-b6de-cfb56198b492_13.png",
+  "E11A_A": "Images/A.1.2/Module 4/lesson 4 - sosed/0_12.png",
+  "E11A_B": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18 (1).png",
+  "E11A_C": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1 (1).png",
+  "E11A_D": "Images/A.1.2/Module 4/lesson 4 - sosed/0_20.png"
 };
   const pendingImage = (name, brief) => {
     const assetId = prefix + '_' + name;
     const image = uploadedImages[name];
     media[assetId] = {type: 'image', src: image || null, brief};
-    return image ? {image, assetId, imageWidth: 512, imageHeight: 512, alt: 'Picture'} : {imagePending: true, assetId};
+    return image ? {image, assetId, imageWidth: /^(L03_|E11A_)/.test(name) ? 496 : 512, imageHeight: /^(L03_|E11A_)/.test(name) ? 368 : 512, alt: 'Picture'} : {imagePending: true, assetId};
   };
   const pendingAudio = (name, script) => {
     const audioId = prefix + '_' + name;
