@@ -9,9 +9,9 @@ Fill `window.SpaceWhaleLessonMedia['a1-2-w4-l3']` / `['a1-2-w4-l4']` slots in th
 
 - `L1_SPEAKING_REUSE`: existing Lesson 1 shared clothes composition, reused without modification.
 - `L3_IMG_01` scarf; `02` belt; `03` gloves; `04` cap; `05` tie; `06` sunglasses. Reused by Matching, word practice and recall.
-- `L3_SPEAKING`: the complete selected accessory sheet with a non-generative alpha mask, `lesson-3/media/speaking-cutout.webp` (1536 × 1024). Original upload remains `assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png`.
+- `L3_SPEAKING`: the complete selected accessory sheet with a non-generative alpha mask, `lesson-3/media/speaking-cutout.webp` (1536 × 1024). Original upload remains `Images/Текущие/assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png`.
 - `L4_PEOPLE`: `lesson-4/media/people-abc.webp` (1020 × 388), used in Listening. A = original person 1 / Rosa; B = original person 3 / Ella; C = original person 2 / Nora (long curly hair, green eyes). The image only labels A/B/C, without names. Key remains C.
-- `L4_SPEAKING`: `lesson-4/media/speaking-ab.webp` (680 × 388), only Rosa and Ella with the existing behavioral notes. Personality is given by words/notes, never inferred from appearance. The untouched source sheet is `assets/lesson-media/a1-2/module-4/lesson-4-people.png`.
+- `L4_SPEAKING`: `lesson-4/media/speaking-ab.webp` (680 × 388), only Rosa and Ella with the existing behavioral notes. Personality is given by words/notes, never inferred from appearance. The untouched source sheet is `Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4-people.png`.
 - `L3_W01`…`L3_W06` and `L3_E01`…`L3_E06`: separate word/example clips. Exact display text and pronunciation script are taken from WORK.
 - `L4_W01`…`L4_W06` and `L4_E01`…`L4_E06`: same structure.
 - `L3_DIALOGUE`, `L4_DIALOGUE`: original full recordings, pending. No audio generated.

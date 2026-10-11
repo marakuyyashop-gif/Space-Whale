@@ -25,7 +25,7 @@ SHEETS = {
 
 def build():
     for lesson, (filename, boxes) in SHEETS.items():
-        output = ROOT / f'assets/lesson-media/a1-2/module-4/lesson-{lesson}/word-pick'
+        output = ROOT / f'Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-{lesson}/word-pick'
         output.mkdir(parents=True, exist_ok=True)
         with Image.open(SOURCE / filename) as source:
             for word, box in boxes.items():

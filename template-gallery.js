@@ -4,7 +4,7 @@
   const kit = window.SpaceWhaleExerciseKit;
   const speaking = id => kit.speaking({id,title:'[Speaking title]',image:image(1),task:{text:'[Situation and task]',bullets:['[What to say or find out]']},use:[{words:['[Word 1]','[Word 2]'],phrases:['[Target phrase]','[Response pattern]']}]});
   const base = (id, kind, title, data = {}) => ({version:1,id,kind,title,...data});
-  const image = number => ({image:`assets/factory/image-${number}.svg`,alt:`[Image ${number}]`});
+  const image = number => ({image:`Images/Текущие/assets/factory/image-${number}.svg`,alt:`[Image ${number}]`});
   const option = (id, text) => ({id,text});
   const sound = 'assets/factory/test-tone.wav';
   const matching = (id, layout = 'cards') => base(id,'matching',layout === 'word-definition' ? 'Word–Definition' : layout === 'picture-word' ? 'Picture–Word' : 'Match the Halves', {

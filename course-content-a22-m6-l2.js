@@ -65,7 +65,7 @@
   const wordMatch = E('M02', 'matching', 'Words', {
     layout: 'picture-word', instruction: 'Match the pictures with the phrases.',
     items: wordPictures.map(([label, answer, filename]) => {
-      const assetId = prefix + '_WORD_' + label, image = 'Images/A2.1/' + filename;
+      const assetId = prefix + '_WORD_' + label, image = 'Images/Текущие/A2.1/' + filename;
       media[assetId] = {type: 'image', src: image, imageWidth: 496, imageHeight: 368};
       return {id: label, text: label, correctId: answer, assetId, image, alt: answer, imageWidth: 496, imageHeight: 368};
     }),

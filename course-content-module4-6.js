@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const kit = window.SpaceWhaleExerciseKit;
-  const imageBase='Images/A.1.2/Module 4/lesson 4 - sosed/';
+  const imageBase='Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/';
   const pictures={
     A1M4L6_IMAGE_LOOK_ITEMS:{image:imageBase+'72d126d7-79c8-4a06-9808-1d1dfa46c50c.png',imageWidth:1448,imageHeight:1086,alt:'A coat and dress, a blouse and price tag, a hat and cap, and new suits'},
     A1M4L6_IMAGE_INTENSIFIERS:{image:imageBase+'6ef96aae-171b-4fdb-9bcd-7fc09b50e839.png',imageWidth:1536,imageHeight:1024,alt:'A hat, blouse, sweater, colorful bag, coat and suit'},

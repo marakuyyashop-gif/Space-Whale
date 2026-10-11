@@ -5,7 +5,7 @@
   const E=(name,kind,title,extra={})=>({version:1,id:'A22M4L12-'+name,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=name=>({imagePending:true,assetId:'A22M4L12_'+name});
-  const planImage='assets/a22-m4-l12-plan-b.png';
+  const planImage='Images/Текущие/assets/a22-m4-l12-plan-b.png';
   const courseAudioBase='https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
   const audioVersion='20261007-sarah-v3-slow1-final';
   const audio=(name,script)=>{

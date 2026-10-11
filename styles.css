@@ -1966,7 +1966,7 @@ button{font:inherit;color:inherit}
 .app-sidebar{
   color:var(--sidebar-text) !important;
   background-color:var(--sidebar-bg) !important;
-  background-image:url("Sidebar.png") !important;
+  background-image:url("Images/Текущие/Sidebar.png") !important;
   background-position:center bottom !important;
   background-size:cover !important;
   background-repeat:no-repeat !important;

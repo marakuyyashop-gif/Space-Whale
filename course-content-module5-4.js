@@ -1035,7 +1035,7 @@
   // Identical approved opening and final Speaking; artwork will be attached later.
   const speaking = {
     title: 'Talk about your usual day and today.',
-    image: {image: 'assets/lesson-media/a1-2-m5/study-speaking.svg', alt: 'Four pairs of usual activities and activities today.', imageWidth: 1024, imageHeight: 768, assetId: 'A1M5L4_SPEAKING'},
+    image: {image: 'Images/Текущие/assets/lesson-media/a1-2-m5/study-speaking.svg', alt: 'Four pairs of usual activities and activities today.', imageWidth: 1024, imageHeight: 768, assetId: 'A1M5L4_SPEAKING'},
     task: {text: 'Представьте, что на картинках вы. Расскажите, что вы делаете обычно и что происходит сейчас. Сравните занятия на четырёх картинках и по двум подсказкам:', bullets: [
       'review a lesson: usually at home / today in the park',
       'take notes: usually in a notebook / at the moment on your phone'
@@ -1055,7 +1055,7 @@
     }
   }
   lesson.contentVersion = 'approved-speaking-and-audio-2026-10-11';
-  window.SpaceWhaleLessonMedia[lesson.id].A1M5L4_SPEAKING = {type: 'image', src: 'assets/lesson-media/a1-2-m5/study-speaking.svg', brief: 'Four supplied pairs: study, learn, teach, practice. Review and take notes images are still pending.', imageWidth: 1024, imageHeight: 768};
+  window.SpaceWhaleLessonMedia[lesson.id].A1M5L4_SPEAKING = {type: 'image', src: 'Images/Текущие/assets/lesson-media/a1-2-m5/study-speaking.svg', brief: 'Four supplied pairs: study, learn, teach, practice. Review and take notes images are still pending.', imageWidth: 1024, imageHeight: 768};
   const lessonMedia = window.SpaceWhaleLessonMedia[lesson.id];
   for (let i = 0; i < 6; i++) {
     const suffix = String(i + 1).padStart(2, '0');

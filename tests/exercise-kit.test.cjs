@@ -79,7 +79,7 @@ test('image-label validates coordinates and grades each target', () => {
     id: 'image-label',
     title: 'Label the picture',
     kind: 'image-label',
-    image: '/assets/image-label-demo.svg',
+    image: '/Images/Текущие/assets/image-label-demo.svg',
     alt: 'Study desk',
     options: [
       { id: 'lamp', text: 'lamp' },
@@ -101,7 +101,7 @@ test('image-label validates coordinates and grades each target', () => {
 test('choice image-grid layout is validated', () => {
   const def = copy(choice);
   def.layout = 'image-grid';
-  def.items[0].options[0].image = '/assets/choice-hiking.svg';
+  def.items[0].options[0].image = '/Images/Текущие/assets/choice-hiking.svg';
   def.items[0].options[0].alt = 'Hiking';
   assert.equal(validate(def), def);
   def.layout = 'giant-cards';
@@ -116,8 +116,8 @@ test('picture ordering accepts image tokens and rejects unsupported layout', () 
     kind: 'order',
     layout: 'image-grid',
     tokens: [
-      { id: 'a', text: 'A', image: '/assets/choice-hiking.svg', alt: 'Hiking' },
-      { id: 'b', text: 'B', image: '/assets/choice-reading.svg', alt: 'Reading' }
+      { id: 'a', text: 'A', image: '/Images/Текущие/assets/choice-hiking.svg', alt: 'Hiking' },
+      { id: 'b', text: 'B', image: '/Images/Текущие/assets/choice-reading.svg', alt: 'Reading' }
     ],
     correctOrder: ['a', 'b']
   };
@@ -153,8 +153,8 @@ test('picture-word matching requires images and grades through shared matching l
     kind: 'matching',
     layout: 'picture-word',
     items: [
-      { id: 'i1', text: 'Reading picture', image: '/assets/choice-reading.svg', alt: 'Reading', correctId: 'reading' },
-      { id: 'i2', text: 'Hiking picture', image: '/assets/choice-hiking.svg', alt: 'Hiking', correctId: 'hiking' }
+      { id: 'i1', text: 'Reading picture', image: '/Images/Текущие/assets/choice-reading.svg', alt: 'Reading', correctId: 'reading' },
+      { id: 'i2', text: 'Hiking picture', image: '/Images/Текущие/assets/choice-hiking.svg', alt: 'Hiking', correctId: 'hiking' }
     ],
     options: [
       { id: 'hiking', text: 'hiking' },
@@ -205,7 +205,7 @@ test('rule-page accepts optional ordered content and nested discovery exercises'
         }
       },
       { type: 'rule', title: 'Rule', formula: 'It is + adjective + to + base form', examples: ['It is easy to get there.'] },
-      { type: 'image', image: '/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }
+      { type: 'image', image: '/Images/Текущие/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }
     ]
   };
   assert.equal(validate(def), def);
@@ -215,7 +215,7 @@ test('rule-page accepts optional ordered content and nested discovery exercises'
     id: 'rule-image-only',
     title: 'Visual',
     kind: 'rule-page',
-    blocks: [{ type: 'image', image: '/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }]
+    blocks: [{ type: 'image', image: '/Images/Текущие/assets/rule-visual-it-is-was.svg', alt: 'Grammar map' }]
   };
   assert.equal(validate(imageOnly), imageOnly);
   const nested = copy(def);

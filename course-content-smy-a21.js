@@ -69,11 +69,11 @@ for(const prefix of Object.keys(lessonIds)){
  slots[`${prefix}_STORY`]={type:'audio',src:audioRoots[prefix]+'/listening/'+prefix+'_STORY.mp3?v=20260927-ready',script:stories[prefix],transcriptId:`${prefix}_STORY_TEXT`};
  slots[`${prefix}_STORY_TEXT`]={type:'text',text:stories[prefix]};
  if(prefix==='A2_SEQ'){
-  slots.A2_SEQ_OPENING={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Six scenes of a girl waking up, having breakfast, packing her bag, going to school, writing in class and reading at home'};
-  slots.A2_SEQ_DAY={type:'image',src:'assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png',width:1448,height:1086,alt:'Six numbered scenes: making the bed, getting dressed, taking a bus, having lunch, working on a laptop and sleeping'};
+  slots.A2_SEQ_OPENING={type:'image',src:'Images/Текущие/assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp',width:1448,height:1086,alt:'Six scenes of a girl waking up, having breakfast, packing her bag, going to school, writing in class and reading at home'};
+  slots.A2_SEQ_DAY={type:'image',src:'Images/Текущие/assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png',width:1448,height:1086,alt:'Six numbered scenes: making the bed, getting dressed, taking a bus, having lunch, working on a laptop and sleeping'};
  }
  else{
-  const imageRoot='assets/lesson-media/a2-1/module-1/smy-2/images/';
+  const imageRoot='Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/';
   slots.A2_MOVE_SHEET={type:'image',src:imageRoot+'movement-sheet.webp',width:1120,height:888,alt:'Six numbered scenes showing movement'};
   slots.A2_MOVE_ROUTES={type:'image',src:imageRoot+'activity-park-routes.webp',width:1310,height:1200,alt:'Two rows of activity-park scenes. Top row: a climbing wall, a log and a large round obstacle. Bottom row: a low platform, a tunnel entrance and a tunnel exit.'};
   slots.A2_MOVE_FILM={type:'image',src:imageRoot+'film-action-scenes.webp',width:1536,height:1024,alt:'Six action-scene ideas for an adventure film: a ladder, a puddle, a parked van, a low box, entering a garage and leaving a garage.'};

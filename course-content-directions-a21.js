@@ -7,8 +7,8 @@ const chunks=['go along','walk across','keep going straight','continue through',
 const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
 const T=text=>({type:'text',text});
 const D=(title,text,open=false)=>({type:'disclosure',title,text,open});
-const I=file=>({type:'image',image:root+file,imageWidth:1000,imageHeight:620,alt:file==='test-route.svg'?'A dotted route from a bus stop along River Street, across a bridge, through a park, past a bank, towards a fountain, then down stairs to a café.':'A different dotted route from a station past a shop, through a garden, across a bridge, along Garden Street, then down stairs to a cinema.'});
-const speakingImage=final=>({type:'image',image:'Images/A2.1/module 1/'+(final?'991d2dbd-554e-4a17-9112-d45c9d02a26c.png':'e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png'),imageWidth:1448,imageHeight:1086,alt:final?'A dotted route from START by a gym, through a park, down stairs and across a bridge to FINISH by karaoke.':'A dotted route from a bus stop, across a bridge, past a fountain and down stairs to a café.'});
+const I=file=>({type:'image',image:'Images/Текущие/'+root+file,imageWidth:1000,imageHeight:620,alt:file==='test-route.svg'?'A dotted route from a bus stop along River Street, across a bridge, through a park, past a bank, towards a fountain, then down stairs to a café.':'A different dotted route from a station past a shop, through a garden, across a bridge, along Garden Street, then down stairs to a cinema.'});
+const speakingImage=final=>({type:'image',image:'Images/Текущие/A2.1/module 1/'+(final?'991d2dbd-554e-4a17-9112-d45c9d02a26c.png':'e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png'),imageWidth:1448,imageHeight:1086,alt:final?'A dotted route from START by a gym, through a park, down stairs and across a bridge to FINISH by karaoke.':'A dotted route from a bus stop, across a bridge, past a fountain and down stairs to a café.'});
 const P=(id,title,blocks)=>E(id,'presentation',title,{blocks});
 const S=(id,title,children,extra={})=>E(id,'stage',title,{exercises:children.map(exercise=>({id:exercise.id,exercise})),...extra});
 const Q=(id,prompt,options,correctId,feedbackText)=>({id,prompt,options:options.map((text,i)=>({id:String.fromCharCode(65+i),text})),correctId,feedbackText});
@@ -45,7 +45,7 @@ step('Pronunciation',2,E('A2_DIR_M03','audio','Listen and repeat.',{
 step('Language Focus',5,S('A2_DIR_M04','Language Focus',[
  E('A2_DIR_M04-pictures','matching','Match the pictures with the phrases.',{
  layout:'picture-word',
- items:definitions.map(([id],i)=>({id,text:String(i+1),correctId:id,image:root+'direction-support.svg',imageWidth:1120,imageHeight:640,alt:'Direction diagram '+(i+1),crop:{x:(i%4)*25,y:i<4?0:50,w:25,h:50}})),
+ items:definitions.map(([id],i)=>({id,text:String(i+1),correctId:id,image:'Images/Текущие/'+root+'direction-support.svg',imageWidth:1120,imageHeight:640,alt:'Direction diagram '+(i+1),crop:{x:(i%4)*25,y:i<4?0:50,w:25,h:50}})),
  options:[4,1,6,0,5,2,3].map(i=>({id:definitions[i][0],text:definitions[i][1]}))}),
  {...C('A2_DIR_M04-discovery','Notice how the directions work.',[
  Q('1','“Walk past the café.” / “Pass the café.”\nDo these directions describe the same movement?',['Yes, both take you beyond the café.','No, the second tells you to go inside.'],'A','Both directions tell you to go past the café.'),

@@ -135,7 +135,7 @@
         blocks: [
           {
             type: 'image',
-            image: 'assets/draft-first-day-speaking.webp',
+            image: 'Images/Текущие/assets/draft-first-day-speaking.webp',
             alt: 'Six school scenes: reception, directions, teacher, principal, classmate and class'
           },
           {

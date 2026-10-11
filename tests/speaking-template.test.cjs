@@ -15,7 +15,7 @@ function mount(def, config = {}) {
 
 test('Speaking preserves fixed order and open support with no controls in any viewing role', () => {
   for (const config of [{onSkip(){}},{navigationReadOnly:true,onSkip(){}},{readOnly:true,syncDisclosures:true}]) {
-    const definition = kit.speaking({...input(),image:{image:'assets/factory/image-1.svg',alt:'Neighbors'}});
+    const definition = kit.speaking({...input(),image:{image:'Images/Текущие/assets/factory/image-1.svg',alt:'Neighbors'}});
     const {host,handle} = mount(definition,config);
     assert.equal(host.querySelector('h2').textContent,definition.title);
     assert.deepEqual([...host.querySelector('.ek-body').children].map(el=>el.className),

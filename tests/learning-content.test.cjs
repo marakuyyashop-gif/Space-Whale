@@ -88,7 +88,7 @@ test('A1.2 clothing appearance lesson keeps look and look like targets and split
 
   const vocab = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-picture-word').exercise;
   assert.equal(vocab.layout, 'picture-word');
-  assert.ok(vocab.items.every(item => item.image === 'Clothes.png' && item.crop));
+  assert.ok(vocab.items.every(item => item.image === 'Images/Текущие/Clothes.png' && item.crop));
   assert.deepEqual(Array.from(vocab.options, option => option.text), ['suit','coat','hat','blouse','sweater','skirt']);
 
   const pronunciation = lesson.stages.find(stage => stage.exercise.id === 'a12w4l2-pronunciation').exercise;
@@ -130,5 +130,5 @@ test('lesson one reserves new visuals while lesson two retains its existing imag
     assert.equal(block.imagePending,true);assert.equal(block.image,undefined);
   }
   const block=lesson2.stages.find(stage=>stage.exercise.id==='a12w4l2-final-speaking').exercise.blocks[0];
-  assert.equal(block.image,'Clothes.png');assert.ok(block.crop);
+  assert.equal(block.image,'Images/Текущие/Clothes.png');assert.ok(block.crop);
 });

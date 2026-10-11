@@ -10,7 +10,7 @@ test('A2.2 M6 homework reuses the lesson pictures, recordings, word work, comple
   assert.deepEqual(pack.steps.map(s=>s.role).slice(0,5),['words','listenRepeat','practice','rule','practice']);
   assert.ok(pack.steps.slice(5).every(s=>s.role==='translation'&&s.exercise.items.length===1));
   assert.equal(pack.steps[0].exercise.id,prefix+'-M02');
-  assert.ok(pack.steps[0].exercise.items.every(i=>i.image.startsWith('Images/A2.1/')));
+  assert.ok(pack.steps[0].exercise.items.every(i=>i.image.startsWith('Images/Текущие/A2.1/')));
   assert.equal(pack.steps[1].exercise.id,prefix+'-M03');
   assert.ok(pack.steps[1].exercise.items.every(i=>i.audio&&i.exampleAudio));
   assert.equal(pack.steps[2].exercise.id,prefix+'-M04');

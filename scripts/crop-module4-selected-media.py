@@ -3,7 +3,7 @@ from pathlib import Path
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = Path(__file__).resolve().parents[1] / 'assets/lesson-media/a1-2/module-4'
+ROOT = Path(__file__).resolve().parents[1] / 'Images/Текущие/assets/lesson-media/a1-2/module-4'
 ACCESSORIES = ROOT / '863e7675-68cb-4d75-ab3c-854fb1b037f4.png'
 PEOPLE = ROOT / 'lesson-4-people.png'
 BOXES = {

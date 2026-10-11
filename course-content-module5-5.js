@@ -6,28 +6,28 @@
   const E = (name, kind, title, extra = {}) => ({version: 1, id: prefix + '-' + name, kind, title, ...extra});
   const stage = (menu, time, exercise, teacherNotes = '') => ({menu, navigationTitle: menu, section: 'tasks', guide: {time: time + ' min', teacherNotes}, exercise});
   const uploadedImages = {
-  "W01_A": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
-  "W01_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
-  "W01_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
-  "W01_D": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
-  "W01_E": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
-  "W01_F": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
-  "E04A_1": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
-  "E04A_2": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
-  "E04A_3": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
-  "E04A_4": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
-  "E04A_5": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
-  "E04A_6": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
-  "L03_Q1_B": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18.png",
-  "L03_Q1_C": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1.png",
-  "L03_Q1_A": "Images/A.1.2/Module 4/lesson 4 - sosed/0_4.png",
-  "L03_Q2_A": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_lying_on_top_of_a_neatly_spr_47e471e0-8e75-427e-a5a4-6590c28e50a7_4.png",
-  "L03_Q2_B": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_resting_inside_an_open_handb_ff630770-7f85-44b8-9fca-fb82ff393bfa_4.png",
-  "L03_Q2_C": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_partly_hidden_underneath_th_df227c55-c6f6-4578-b6de-cfb56198b492_13.png",
-  "E11A_A": "Images/A.1.2/Module 4/lesson 4 - sosed/0_12.png",
-  "E11A_B": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18 (1).png",
-  "E11A_C": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1 (1).png",
-  "E11A_D": "Images/A.1.2/Module 4/lesson 4 - sosed/0_20.png"
+  "W01_A": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+  "W01_B": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+  "W01_C": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+  "W01_D": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+  "W01_E": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+  "W01_F": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+  "E04A_1": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+  "E04A_2": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+  "E04A_3": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+  "E04A_4": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+  "E04A_5": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+  "E04A_6": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+  "L03_Q1_B": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_18.png",
+  "L03_Q1_C": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_1.png",
+  "L03_Q1_A": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_4.png",
+  "L03_Q2_A": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_lying_on_top_of_a_neatly_spr_47e471e0-8e75-427e-a5a4-6590c28e50a7_4.png",
+  "L03_Q2_B": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_resting_inside_an_open_handb_ff630770-7f85-44b8-9fca-fb82ff393bfa_4.png",
+  "L03_Q2_C": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_partly_hidden_underneath_th_df227c55-c6f6-4578-b6de-cfb56198b492_13.png",
+  "E11A_A": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_12.png",
+  "E11A_B": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_18 (1).png",
+  "E11A_C": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_1 (1).png",
+  "E11A_D": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_20.png"
 };
   const pendingImage = (name, brief) => {
     const assetId = prefix + '_' + name;
@@ -221,7 +221,7 @@
 
   const speaking = {
     title: 'Help each other find your things.',
-    image: {image: 'Images/A2.1/0_0.png?v=20261011-room', alt: 'A room with accessories to find.', imageWidth: 2544, imageHeight: 1904, assetId: prefix + '_SPEAKING'},
+    image: {image: 'Images/Текущие/A2.1/0_0.png?v=20261011-room', alt: 'A room with accessories to find.', imageWidth: 2544, imageHeight: 1904, assetId: prefix + '_SPEAKING'},
     task: {text: 'Вы с другом ищете свои вещи в комнате.', bullets: [
       'По очереди выбирайте вещь и говорите, что ищете. Уточняйте, какую вещь ищет собеседник.',
       'Спрашивайте, видит ли он её. Когда увидите вещь, покажите её. Найдите все шесть вещей.'
@@ -232,7 +232,7 @@
       'Can you see my …?', 'I can see it. / I can’t see it.', 'Here it is!'
     ]}]
   };
-  media[prefix + '_SPEAKING'] = {type: 'image', src: 'Images/A2.1/0_0.png?v=20261011-room', brief: 'Uploaded accessory room, shared by opening and final Speaking.', imageWidth: 2544, imageHeight: 1904};
+  media[prefix + '_SPEAKING'] = {type: 'image', src: 'Images/Текущие/A2.1/0_0.png?v=20261011-room', brief: 'Uploaded accessory room, shared by opening and final Speaking.', imageWidth: 2544, imageHeight: 1904};
   const opening = kit.speaking({id: prefix + '-SPEAKING_OPENING', ...speaking});
   const final = kit.speaking({id: prefix + '-SPEAKING_FINAL', ...speaking});
   const words = ['ring', 'bracelet', 'earring', 'hair tie', 'hair clip', 'necklace'];

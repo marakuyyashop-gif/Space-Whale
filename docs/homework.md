@@ -41,7 +41,7 @@ Shared kit regression tests preserve classroom behavior. Full suite after this c
 - Full rule blocks are unchanged; discovery-only instructions are removed from the rule wrapper. All translation items opt into the existing translation normalizer, accepting punctuation/typographic and contraction equivalents without loosening word, tense or meaning checks. This applies only to newly issued packs; saved work snapshots remain unchanged.
 - Regression coverage completes every response in all eight published packs through actual DOM controls, including picture and text matching, dropdowns, typed gaps, choices and translations. It covers separate-context result reopening, mistakes/corrections/comment, clipboard refusal/retry, skipped work, changed earlier answers, offline retry/resume, local quota failure and asset existence. The full suite retains the same 35 pre-existing failures; no new failing test names.
 
-The original `Clothes.png` is restored from repository history: L2 classroom crops and already-issued homework snapshots still reference it. Build validation checks every relative media URL, including root-level files. All 74 distinct remote homework recordings returned HTTP 200 during the release check.
+The original `Images/Текущие/Clothes.png` is restored from repository history: L2 classroom crops and already-issued homework snapshots still reference it. Build validation checks every relative media URL, including root-level files. All 74 distinct remote homework recordings returned HTTP 200 during the release check.
 
 ## A2.2 Module 6 — 2026-10-11
 

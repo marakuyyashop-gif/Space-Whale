@@ -32,7 +32,7 @@
     'Her keyboard is next to the laptop.',
     'This mouse doesn’t work.'
   ];
-  const speakingImage = {image: 'Images/0_23.png', alt: 'Six scenes showing screens, a remote control, a damaged cable, a keyboard and a working computer.', imageWidth: 496, imageHeight: 368, assetId: prefix + '_SPEAKING'};
+  const speakingImage = {image: 'Images/Текущие/0_23.png', alt: 'Six scenes showing screens, a remote control, a damaged cable, a keyboard and a working computer.', imageWidth: 496, imageHeight: 368, assetId: prefix + '_SPEAKING'};
   media[prefix + '_SPEAKING'] = {type: 'image', src: speakingImage.image, imageWidth: 496, imageHeight: 368};
   const speaking = {
     title: 'Find out what is wrong.', image: speakingImage,
@@ -60,7 +60,7 @@
   const wordMatch = E('M02', 'matching', 'Words', {
     layout: 'picture-word', instruction: 'Match the pictures with the words.',
     items: wordPictures.map(([label, answer, filename]) => {
-      const assetId = prefix + '_WORD_' + label, image = 'Images/A2.1/' + filename;
+      const assetId = prefix + '_WORD_' + label, image = 'Images/Текущие/A2.1/' + filename;
       media[assetId] = {type: 'image', src: image, brief: answer, imageWidth: 496, imageHeight: 368};
       return {id: label, text: label, correctId: answer, assetId, image, alt: answer, imageWidth: 496, imageHeight: 368};
     }),

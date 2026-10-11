@@ -14,7 +14,7 @@ No MEDIA file or recordings were supplied. Do not invent the listening text, pro
 
 ## Selected image and crops
 
-Source: user-uploaded `assets/lesson-media/image (2).png` (1254 × 1254), retained untouched. All six scenes match the WORK keys. Matching uses `images/movement-01.webp` through `movement-06.webp`; Opening uses their combined numbered sheet. Images are not used as the listening storyboard.
+Source: user-uploaded `Images/Текущие/assets/lesson-media/image (2).png` (1254 × 1254), retained untouched. All six scenes match the WORK keys. Matching uses `images/movement-01.webp` through `movement-06.webp`; Opening uses their combined numbered sheet. Images are not used as the listening storyboard.
 
 Each crop is 352 × 420 pixels, with top-left coordinates in source pixels:
 

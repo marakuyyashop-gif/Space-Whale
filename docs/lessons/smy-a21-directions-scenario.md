@@ -69,7 +69,7 @@ ID: A2_DIR_M01 · presentation
 
 Your friend is at the bus stop. You are at the café. Your friend calls you for directions.
 
-Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg
+Визуальная опора: Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/test-route.svg
 
 Explain the dotted route from START to FINISH. Your partner follows it and asks a question if anything is unclear.
 
@@ -311,7 +311,7 @@ ID: A2_DIR_M09 · stage; карта и поле ввода открываютс�
 
 Your friend is on the road just past the bank. You are waiting at the café.
 
-Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана рядом с заданием.
+Визуальная опора: Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/test-route.svg — повторно показана рядом с заданием.
 
 Look at the map. Write a short message to your friend. Explain how to get from the bank to the café.
 
@@ -347,7 +347,7 @@ ID: A2_DIR_M07-speaking · presentation
 
 Your friend is at the station. You are waiting at the cinema. Explain how to get there.
 
-Визуальная опора: assets/lesson-media/a2-1/module-1/smy-3/final-route.svg
+Визуальная опора: Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/final-route.svg
 
 Look at the map. Follow the black line from START to FINISH. Tell your friend how to get there. Your friend asks one question about the way.
 

@@ -1,0 +1,1680 @@
+{
+  "source": "A1_САМЫЙ_САМЫЙ.md",
+  "lessons": [
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 1,
+      "title": "Встреча",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 01. Встреча"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 2,
+      "title": "Вежливость",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 02. Вежливость"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 3,
+      "title": "Алфавит",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 03. Алфавит"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 4,
+      "title": "Анкета",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 04. Анкета"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 5,
+      "title": "Числа",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 05. Числа"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 6,
+      "title": "Десятки",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 06. Десятки"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 7,
+      "title": "Контакты",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 07. Контакты"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 8,
+      "title": "Погода",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 08. Погода"
+    },
+    {
+      "level": "A1.1",
+      "module": 1,
+      "lesson": 9,
+      "title": "Разговор · Повторение",
+      "path": "Images/A1.1/Модуль 01. Общение/Урок 09. Разговор · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 1,
+      "title": "Знакомые",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 01. Знакомые"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 2,
+      "title": "Предметы",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 02. Предметы"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 3,
+      "title": "Состояние",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 03. Состояние"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 4,
+      "title": "Количество",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 04. Количество"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 5,
+      "title": "Вещи",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 05. Вещи"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 6,
+      "title": "Компания",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 06. Компания"
+    },
+    {
+      "level": "A1.1",
+      "module": 2,
+      "lesson": 7,
+      "title": "Люди · Повторение",
+      "path": "Images/A1.1/Модуль 02. Знакомство/Урок 07. Люди · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 1,
+      "title": "Путаница",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 01. Путаница"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 2,
+      "title": "Портрет",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 02. Портрет"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 3,
+      "title": "Места",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 03. Места"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 4,
+      "title": "Карта",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 04. Карта"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 5,
+      "title": "Умения",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 05. Умения"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 6,
+      "title": "Помощник",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 06. Помощник"
+    },
+    {
+      "level": "A1.1",
+      "module": 3,
+      "lesson": 7,
+      "title": "Команда · Повторение",
+      "path": "Images/A1.1/Модуль 03. Команда/Урок 07. Команда · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 1,
+      "title": "Утро",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 01. Утро"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 2,
+      "title": "Вечер",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 02. Вечер"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 3,
+      "title": "Привычки",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 03. Привычки"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 4,
+      "title": "Распорядок",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 04. Распорядок"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 5,
+      "title": "Предложение",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 05. Предложение"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 6,
+      "title": "Факты",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 06. Факты"
+    },
+    {
+      "level": "A1.1",
+      "module": 4,
+      "lesson": 7,
+      "title": "День · Повторение",
+      "path": "Images/A1.1/Модуль 04. Рутина/Урок 07. День · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 1,
+      "title": "Интересы",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 01. Интересы"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 2,
+      "title": "Знакомство",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 02. Знакомство"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 3,
+      "title": "Связь",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 03. Связь"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 4,
+      "title": "Внешность",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 04. Внешность"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 5,
+      "title": "Занятие",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 05. Занятие"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 6,
+      "title": "Досуг",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 06. Досуг"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 7,
+      "title": "Прогулка",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 07. Прогулка"
+    },
+    {
+      "level": "A1.1",
+      "module": 5,
+      "lesson": 8,
+      "title": "Встреча · Повторение",
+      "path": "Images/A1.1/Модуль 05. Собеседники/Урок 08. Встреча · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 1,
+      "title": "Помощь",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 01. Помощь"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 2,
+      "title": "Спорт",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 02. Спорт"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 3,
+      "title": "Вкусы",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 03. Вкусы"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 4,
+      "title": "Множественное число",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 04. Множественное число"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 5,
+      "title": "Эти и те",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 05. Эти и те"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 6,
+      "title": "Гардероб",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 06. Гардероб"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 7,
+      "title": "Семья",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 07. Семья"
+    },
+    {
+      "level": "A1.1",
+      "module": 6,
+      "lesson": 8,
+      "title": "Близкие · Повторение",
+      "path": "Images/A1.1/Модуль 06. Окружение/Урок 08. Близкие · Повторение"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 1,
+      "title": "Расписание",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 01. Расписание"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 2,
+      "title": "Неделя",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 02. Неделя"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 3,
+      "title": "Календарь",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 03. Календарь"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 4,
+      "title": "Праздники",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 04. Праздники"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 5,
+      "title": "Порядок",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 05. Порядок"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 6,
+      "title": "Дата",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 06. Дата"
+    },
+    {
+      "level": "A1.1",
+      "module": 7,
+      "lesson": 7,
+      "title": "Договорились · Повторение",
+      "path": "Images/A1.1/Модуль 07. Время/Урок 07. Договорились · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 1,
+      "title": "Комната",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 01. Комната"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 2,
+      "title": "Обстановка",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 02. Обстановка"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 3,
+      "title": "Квартира",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 03. Квартира"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 4,
+      "title": "Перестановка",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 04. Перестановка"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 5,
+      "title": "Ванная",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 05. Ванная"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 6,
+      "title": "Переезд",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 06. Переезд"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 7,
+      "title": "Запреты",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 07. Запреты"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 8,
+      "title": "Маршрут",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 08. Маршрут"
+    },
+    {
+      "level": "A1.2",
+      "module": 1,
+      "lesson": 9,
+      "title": "Новоселье · Повторение",
+      "path": "Images/A1.2/Модуль 01. Дом/Урок 09. Новоселье · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 1,
+      "title": "Услуги",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 01. Услуги"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 2,
+      "title": "Разрешение",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 02. Разрешение"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 3,
+      "title": "Просьбы",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 03. Просьбы"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 4,
+      "title": "Помощь",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 04. Помощь"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 5,
+      "title": "Звонок",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 05. Звонок"
+    },
+    {
+      "level": "A1.2",
+      "module": 2,
+      "lesson": 6,
+      "title": "Поездка · Повторение",
+      "path": "Images/A1.2/Модуль 02. Поездка/Урок 06. Поездка · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 1,
+      "title": "Завтрак",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 01. Завтрак"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 2,
+      "title": "Готовка",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 02. Готовка"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 3,
+      "title": "Покупки",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 03. Покупки"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 4,
+      "title": "Ценник",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 04. Ценник"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 5,
+      "title": "Кафе",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 05. Кафе"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 6,
+      "title": "Угощение",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 06. Угощение"
+    },
+    {
+      "level": "A1.2",
+      "module": 3,
+      "lesson": 7,
+      "title": "Обед · Повторение",
+      "path": "Images/A1.2/Модуль 03. Еда/Урок 07. Обед · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 1,
+      "title": "Примерочная",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 01. Примерочная"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 2,
+      "title": "Оценка",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 02. Оценка"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 3,
+      "title": "Выбор",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 03. Выбор"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 4,
+      "title": "Сосед",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 04. Сосед"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 5,
+      "title": "Категории",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 05. Категории"
+    },
+    {
+      "level": "A1.2",
+      "module": 4,
+      "lesson": 6,
+      "title": "Решение · Повторение",
+      "path": "Images/A1.2/Модуль 04. Выбор/Урок 06. Решение · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 1,
+      "title": "Видеозвонок",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 01. Видеозвонок"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 2,
+      "title": "Уборка",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 02. Уборка"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 3,
+      "title": "Парк",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 03. Парк"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 4,
+      "title": "Учёба",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 04. Учёба"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 5,
+      "title": "Пропажа",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 05. Пропажа"
+    },
+    {
+      "level": "A1.2",
+      "module": 5,
+      "lesson": 6,
+      "title": "Сейчас · Повторение",
+      "path": "Images/A1.2/Модуль 05. Сейчас/Урок 06. Сейчас · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 1,
+      "title": "Отпуск",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 01. Отпуск"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 2,
+      "title": "Прогнозы",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 02. Прогнозы"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 3,
+      "title": "Досуг",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 03. Досуг"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 4,
+      "title": "Гости",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 04. Гости"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 5,
+      "title": "Выходные",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 05. Выходные"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 6,
+      "title": "Перемены",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 06. Перемены"
+    },
+    {
+      "level": "A1.2",
+      "module": 6,
+      "lesson": 7,
+      "title": "Завтра · Повторение",
+      "path": "Images/A1.2/Модуль 06. Будущее/Урок 07. Завтра · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 7,
+      "lesson": 1,
+      "title": "Знакомство · Повторение",
+      "path": "Images/A1.2/Модуль 07. Практика/Урок 01. Знакомство · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 7,
+      "lesson": 2,
+      "title": "Неделя · Повторение",
+      "path": "Images/A1.2/Модуль 07. Практика/Урок 02. Неделя · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 7,
+      "lesson": 3,
+      "title": "Быт · Повторение",
+      "path": "Images/A1.2/Модуль 07. Практика/Урок 03. Быт · Повторение"
+    },
+    {
+      "level": "A1.2",
+      "module": 7,
+      "lesson": 4,
+      "title": "Итог · Повторение",
+      "path": "Images/A1.2/Модуль 07. Практика/Урок 04. Итог · Повторение"
+    }
+  ],
+  "images": [
+    {
+      "old": "Clothes.png",
+      "new": "Images/Текущие/Clothes.png",
+      "legacyCopy": true,
+      "blob": "6985a101b24563ca6cb3c1e14c87b449a6ac441c",
+      "sha256": "2fdaf8dec1c4e1a3517ab307f8f1bcb35a6bf7bd5d338a91a63a552e1962c16f"
+    },
+    {
+      "old": "Images/0_23.png",
+      "new": "Images/Текущие/0_23.png",
+      "legacyCopy": false,
+      "blob": "f1832043017a8dfd4541880542cbde23ca223bcb",
+      "sha256": "1eb491f28b9e7fad256697af1fdb339b0effadf26f132dc26ae0e098e707b990"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/04470db6-bc5f-48d0-84bf-4a87f0f6d53a.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/04470db6-bc5f-48d0-84bf-4a87f0f6d53a.png",
+      "legacyCopy": false,
+      "blob": "12545c9ddb0f1053f2e5474c3bc83b5e8d072268",
+      "sha256": "4782d995c8f9229f40a9dc89f2e24d28e5261940102f4c4552d1bf060dbaea87"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1 (1).png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_1 (1).png",
+      "legacyCopy": false,
+      "blob": "1659793ae10870639187ce160e75d073311b46de",
+      "sha256": "0a49c44801db3c5c9cee2f5c95f209f3937ef092c603af13a7c567a348590189"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_1.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_1.png",
+      "legacyCopy": false,
+      "blob": "935ce2606f7f8020282d11d4c4f85ebd075c8db4",
+      "sha256": "a547dbd621bdc3b3962b7741fa743ed33c6c592eedd56b28cc8977b03dee9cf3"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_12.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_12.png",
+      "legacyCopy": false,
+      "blob": "8607edd1153f18c7f797dfc38710fc9bbc18e36c",
+      "sha256": "6ccf378de14c6cc99c90b6d0f96254378e369e857a59a7dc3b88e3e860775811"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18 (1).png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_18 (1).png",
+      "legacyCopy": false,
+      "blob": "b8da9f1b935f20b2eada14f6152edbb0452199cb",
+      "sha256": "74ad6b7bbc79cb346b50db8ac96df618bb88b570fdc25b6eaacc37d5db600ce6"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_18.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_18.png",
+      "legacyCopy": false,
+      "blob": "e37b6bd4bc2c71cd88975b372d3a4f012eb1a952",
+      "sha256": "3db72b7f6bececf744f77642751237c845b701dae6a73fdd500bce92c4a16e8e"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_20.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_20.png",
+      "legacyCopy": false,
+      "blob": "7724b194f4ccc17dfec0077e74e5c2f466e96bca",
+      "sha256": "5b2a9d5db11eff7918e82480f14aeafdb255b15a59ca765837375adce7995c46"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/0_4.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/0_4.png",
+      "legacyCopy": false,
+      "blob": "14c69f4c5a0009651d8dc6206eadc00d5100477f",
+      "sha256": "b24f63c8083687f7e3b52b56fd5a0b25e7cca4914678fe21827e3e5b7aead453"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/26d89984-db65-4db8-83af-532d3782ee5e.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/26d89984-db65-4db8-83af-532d3782ee5e.png",
+      "legacyCopy": false,
+      "blob": "60eac4e6cec35cae76ccf46c15942cc217d260d7",
+      "sha256": "88090b2af50ce44f0aaf595015d15384f8b19a6422274ec82219cb678050996b"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/2e841064-fbb7-43a3-8d5c-76c4c9ecc239.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/2e841064-fbb7-43a3-8d5c-76c4c9ecc239.png",
+      "legacyCopy": false,
+      "blob": "f20c73d22840c03d91a1980656dd72a3117d5993",
+      "sha256": "934953a7149e0e7fb853196d39901e5e9e9a8226085e6702888bb9120188abb9"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/423dbafa-41e8-436c-b872-7e2033ed4ccf.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/423dbafa-41e8-436c-b872-7e2033ed4ccf.png",
+      "legacyCopy": false,
+      "blob": "3aba341d5b626aeb47b00532512e8ae8638f09d6",
+      "sha256": "3d2b983c59e471fa6328a3eaf7a45df47d623aa75b2e704e16e4bafac27abbc6"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/4ebce181-0d97-4783-903a-db13ce05549d.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/4ebce181-0d97-4783-903a-db13ce05549d.png",
+      "legacyCopy": false,
+      "blob": "d77a36fc52f6f032f88d5d80873873baca6fd1b0",
+      "sha256": "20b561fea1ce99a5727c24268ee17d5e3c46f6ea35e98ad8e70338d6f03469b3"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/57bfed79-3834-4204-837e-d9471e979322.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/57bfed79-3834-4204-837e-d9471e979322.png",
+      "legacyCopy": false,
+      "blob": "cdeb8e46865236bd5c78943baed29e8b27e244b3",
+      "sha256": "fdaf2552601cfb69b10498f641f6e2f5eb2d622418d711cf3107e3652312bd88"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/6ef96aae-171b-4fdb-9bcd-7fc09b50e839.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/6ef96aae-171b-4fdb-9bcd-7fc09b50e839.png",
+      "legacyCopy": false,
+      "blob": "48a9635e47be80f4a9a8191cfee1e084fbf02f1a",
+      "sha256": "319bda1132e4f5559ee00dc9b2e6f6af84c039a12b8d7d70c9c78abc54f6a4bc"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/72d126d7-79c8-4a06-9808-1d1dfa46c50c.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/72d126d7-79c8-4a06-9808-1d1dfa46c50c.png",
+      "legacyCopy": false,
+      "blob": "9251b996e6de2d20fea2f13134291318026688a5",
+      "sha256": "c6d081392ec43f2c8df85305c8aa4f9b33dab25792fb7282a9546c2729b384ad"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
+      "legacyCopy": false,
+      "blob": "05fe55fae1bf80fdb1c1a0bb4353a35bf6d702b9",
+      "sha256": "cc84d89123571d0c81cf8e33bcc428fc62d3e2e637e618ca453ac1610bd8bcc2"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
+      "legacyCopy": false,
+      "blob": "cf85d391dcbefc98109612995a49c1a73764818a",
+      "sha256": "ffc49e58a4f51f08f788a2d67cf5e7f86dca6680896c5c018594dd7b07798351"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
+      "legacyCopy": false,
+      "blob": "175b0176a98f666668eb59f1a1acb6f16adf8b67",
+      "sha256": "5e99f89c2bea2f5c2e3070cfbadc90fd82a19eed346e207cdbe9a8865c8593c6"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_lying_on_top_of_a_neatly_spr_47e471e0-8e75-427e-a5a4-6590c28e50a7_4.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_lying_on_top_of_a_neatly_spr_47e471e0-8e75-427e-a5a4-6590c28e50a7_4.png",
+      "legacyCopy": false,
+      "blob": "24cfc0d6afa6a10cc4b550d0dcbfa20c52e61c0f",
+      "sha256": "afe801f538a13ca61fd5729279881214050df7e03082ff019269e02f13080a86"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_partly_hidden_underneath_th_df227c55-c6f6-4578-b6de-cfb56198b492_13.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_partly_hidden_underneath_th_df227c55-c6f6-4578-b6de-cfb56198b492_13.png",
+      "legacyCopy": false,
+      "blob": "19c0f789436ae2708d4b105861c955b2d272128b",
+      "sha256": "d01231d2fa9973e93df27d8d22e7873b20aeb4a81bb71778af8a57fe13cb1ecc"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_resting_inside_an_open_handb_ff630770-7f85-44b8-9fca-fb82ff393bfa_4.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_large_hoop_earring_resting_inside_an_open_handb_ff630770-7f85-44b8-9fca-fb82ff393bfa_4.png",
+      "legacyCopy": false,
+      "blob": "d76fe8b79a67d1370d3a79a87f2a4e88c756acc4",
+      "sha256": "517198a971f6e158c1d87e25b418dc3a92776bcf1556e06325c157667f181a5c"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
+      "legacyCopy": false,
+      "blob": "fa7f63be530e0af3f3e881ecf9c4531bd6ffe935",
+      "sha256": "2d04205517aab760fe98b7143e79765d7b4a630e312b8e5dfe3d2fc84974c5ff"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
+      "legacyCopy": false,
+      "blob": "455140f4a0ad64eefa0b4d0b7a731fd2f0a10d10",
+      "sha256": "64919b2c23949243f545c703a1aedea9f4390c383c7e6b7fad4b697b5ffe86b3"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
+      "legacyCopy": false,
+      "blob": "59d60336c3c49da436f519b5a535a3ae9a51b1f9",
+      "sha256": "90fe5c0e2a3d48d83a988c4fe345183ee863a85d4ac1e8dc4990df7c6bece27a"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/c204a53b-43de-4d12-ae0d-11a1e43b65db.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/c204a53b-43de-4d12-ae0d-11a1e43b65db.png",
+      "legacyCopy": false,
+      "blob": "345480631148cae7e3540a628535a40fce345ac5",
+      "sha256": "72bc62a1cb35c5d29b8c95964b6373c6f19586ad590e2cd025b9ab9e2a72f19e"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png",
+      "legacyCopy": true,
+      "blob": "9a8798c9f82150fea35ee08bdf20c03053c4d118",
+      "sha256": "51c702df2b0196e1085f5a42089a2aa9fe1736b2e46af30ee4b5d1150cdc280d"
+    },
+    {
+      "old": "Images/A.1.2/Module 4/lesson 4 - sosed/f55b31c3-30bd-4e45-9485-3a020903c8df.png",
+      "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/f55b31c3-30bd-4e45-9485-3a020903c8df.png",
+      "legacyCopy": false,
+      "blob": "1588891ce3048b97b81972ad914ec3fdb9de0bf2",
+      "sha256": "8ff0e17c9c86c3a6705c959c8d3ad3fb6157521ac002fc4e7c4c9eaa52cb85f8"
+    },
+    {
+      "old": "Images/A2.1/0_0.png",
+      "new": "Images/Текущие/A2.1/0_0.png",
+      "legacyCopy": false,
+      "blob": "8692682ebeebc31d63d09611b3dee85668e10101",
+      "sha256": "6aeb311bc550839c79adbb53b42559d2ab1f7b2e879d78c4282ef1f79805b2d2"
+    },
+    {
+      "old": "Images/A2.1/0_17.png",
+      "new": "Images/Текущие/A2.1/0_17.png",
+      "legacyCopy": false,
+      "blob": "cb61163e4fe44220dd6d265291577542c243d4af",
+      "sha256": "43616a251348aef398d79ea87a55862221c10854cceafd9b637fb0b5e773e905"
+    },
+    {
+      "old": "Images/A2.1/0_21.png",
+      "new": "Images/Текущие/A2.1/0_21.png",
+      "legacyCopy": false,
+      "blob": "7242c6b666175f676981c67716123e4a7a16f822",
+      "sha256": "4aa472db9dfa1802002e38c8814a360fc9c662ad2ba77c0d2da9fbba92f71c1a"
+    },
+    {
+      "old": "Images/A2.1/0_22.png",
+      "new": "Images/Текущие/A2.1/0_22.png",
+      "legacyCopy": false,
+      "blob": "d0c043419d9ec90a5a527bddce5d7051bcd2e216",
+      "sha256": "206999b1f9ccf342e2f1b0027744ca4092d35e6b6d190cf95ab5adebe42b4984"
+    },
+    {
+      "old": "Images/A2.1/0_6.png",
+      "new": "Images/Текущие/A2.1/0_6.png",
+      "legacyCopy": false,
+      "blob": "515ae0bca319e215f67c8d0e7d3c99fa10cc9697",
+      "sha256": "50762a5d3f0d56b779110431e968d6bd6ff8d97274ae3a92a04a06377d9015d0"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_TV_remote_control_an_adult_hand_holding_a_slim_rec_8e676fe3-7857-4250-a653-6b04f87a06e0_21.png",
+      "new": "Images/Текущие/A2.1/biba_boba_TV_remote_control_an_adult_hand_holding_a_slim_rec_8e676fe3-7857-4250-a653-6b04f87a06e0_21.png",
+      "legacyCopy": true,
+      "blob": "7a9ac2b8760585679b8b8da7d0414820dfe05954",
+      "sha256": "e8c31d8532ce53c54de3f7861e3ae0768c14315d0431658133c765653ebca8a3"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_USB_cable_a_flexible_cord_arranged_in_a_loose_curve_3e68d658-7430-4cfc-93f2-fc1d50f62020_9.png",
+      "new": "Images/Текущие/A2.1/biba_boba_USB_cable_a_flexible_cord_arranged_in_a_loose_curve_3e68d658-7430-4cfc-93f2-fc1d50f62020_9.png",
+      "legacyCopy": true,
+      "blob": "7614cc870efec5bf3f7ec99a9caa8cf199659443",
+      "sha256": "fae057696b734558e4b249a5aeb4526a073ae119c16b025cd13d69c8ff3b8f89"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_booking_a_doctors_appointment_close-up_of_a_smartp_fefe4f54-4102-41fc-a264-e2b70def47df_11.png",
+      "new": "Images/Текущие/A2.1/biba_boba_booking_a_doctors_appointment_close-up_of_a_smartp_fefe4f54-4102-41fc-a264-e2b70def47df_11.png",
+      "legacyCopy": false,
+      "blob": "e4d57ea5abfae794cc3a1fc97e77f8ae33636977",
+      "sha256": "c00bdc167522e547b084c5bad9443519986d20e1038aebf22c6bf1ea38864f01"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_button_an_adult_fingertip_pressing_the_edge_of_a_r_50bc609d-64fd-4f8f-895c-2ca8cfc7f6bd_23.png",
+      "new": "Images/Текущие/A2.1/biba_boba_button_an_adult_fingertip_pressing_the_edge_of_a_r_50bc609d-64fd-4f8f-895c-2ca8cfc7f6bd_23.png",
+      "legacyCopy": true,
+      "blob": "755669a8c7bad19aec8013a00770ae93363b640a",
+      "sha256": "a0d5d608eb9c13a72982e612db0cd4bb25ed5908731f0cd2c402478b6f358fc8"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_buying_medicine_at_a_pharmacy_an_adult_customer_ta_9a2cd5d8-9e77-46fe-a5d4-1a8d2a3ca574_15.png",
+      "new": "Images/Текущие/A2.1/biba_boba_buying_medicine_at_a_pharmacy_an_adult_customer_ta_9a2cd5d8-9e77-46fe-a5d4-1a8d2a3ca574_15.png",
+      "legacyCopy": false,
+      "blob": "13992dbd515a9cbb064ceb4a96b63bee642139cf",
+      "sha256": "29b56592017038d26d7f4e982bdc7dba1f28bd3e7f70388a7b67abd34ce2a281"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_computer_keyboard_a_single_slim_desktop_keyboard_w_5cd54683-33cb-4329-a7a5-0fd8e603729c_13.png",
+      "new": "Images/Текущие/A2.1/biba_boba_computer_keyboard_a_single_slim_desktop_keyboard_w_5cd54683-33cb-4329-a7a5-0fd8e603729c_13.png",
+      "legacyCopy": true,
+      "blob": "4c110ea5673ca3b4c77d4cdde1dfff7ea04d1434",
+      "sha256": "39d51c66b9a60931236408befe5880c5f590d61f86e36f98639f32fde16d17c2"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_computer_mouse_a_simple_oval_computer_mouse_with_t_4e11da6e-50b9-4886-92a7-7e7b925234d8_17.png",
+      "new": "Images/Текущие/A2.1/biba_boba_computer_mouse_a_simple_oval_computer_mouse_with_t_4e11da6e-50b9-4886-92a7-7e7b925234d8_17.png",
+      "legacyCopy": true,
+      "blob": "cb53e3db68acf76fd4a8e33f083e2613fafcd911",
+      "sha256": "28bbf9cf33a02356c223cebe34ac45e95625dacc46a96f8bbcae2ec4e0c4a9d7"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_computer_screen_an_adult_fingertip_pointing_to_the_a1945b42-9ee0-470e-b24b-3debf06846df_14.png",
+      "new": "Images/Текущие/A2.1/biba_boba_computer_screen_an_adult_fingertip_pointing_to_the_a1945b42-9ee0-470e-b24b-3debf06846df_14.png",
+      "legacyCopy": true,
+      "blob": "a9e2d7174237515a167c1b43e37af38844c2f9f4",
+      "sha256": "de7c95100c6d90347395c39fc4329245fefdaf27e0e8b2efcb3457720e128d9e"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_making_a_photocopy_an_adult_hand_pressing_a_button_eaae9a15-99e5-49aa-aa45-7d983f63eaa3_14.png",
+      "new": "Images/Текущие/A2.1/biba_boba_making_a_photocopy_an_adult_hand_pressing_a_button_eaae9a15-99e5-49aa-aa45-7d983f63eaa3_14.png",
+      "legacyCopy": false,
+      "blob": "b9a0cb1374312e3191e78d122c65392a5fbedabb",
+      "sha256": "0227760f3015d090ed0fabd3e84216504482c27884d01623b5f7a695dd3706cf"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_renting_a_car_an_adult_customer_signing_a_short-ter_56664542-f809-437f-a844-d8e196f0da0d_2.png",
+      "new": "Images/Текущие/A2.1/biba_boba_renting_a_car_an_adult_customer_signing_a_short-ter_56664542-f809-437f-a844-d8e196f0da0d_2.png",
+      "legacyCopy": false,
+      "blob": "ab74d2c00b667ef956b2b22620e64dff65237d41",
+      "sha256": "0e3b44444331a1403a6512ba48c9b1ee17d74ab77c2b64986ef2422b54ffe1e1"
+    },
+    {
+      "old": "Images/A2.1/biba_boba_sending_a_package_an_adult_customer_placing_a_seale_91e0ce23-ed90-4b3b-a3bd-877e6e9f6533_0.png",
+      "new": "Images/Текущие/A2.1/biba_boba_sending_a_package_an_adult_customer_placing_a_seale_91e0ce23-ed90-4b3b-a3bd-877e6e9f6533_0.png",
+      "legacyCopy": false,
+      "blob": "92aa5508a0be2b36790723b8420dc3d80680879f",
+      "sha256": "d6f59de3fecea656336152e0dd0db858f02f6d23004e15ebfc88a4c7b290d4a4"
+    },
+    {
+      "old": "Images/A2.1/buy-an-envelope.png",
+      "new": "Images/Текущие/A2.1/buy-an-envelope.png",
+      "legacyCopy": false,
+      "blob": "b8158cfa7c838154fe765ec6c905125823c8275a",
+      "sha256": "71e89377b8aa86ed8a8a29cd76690401283af07b4bd139953a048c7101166762"
+    },
+    {
+      "old": "Images/A2.1/module 1/83909f1b-e813-4f7f-bbce-a5441ce30d24.png",
+      "new": "Images/Текущие/A2.1/module 1/83909f1b-e813-4f7f-bbce-a5441ce30d24.png",
+      "legacyCopy": false,
+      "blob": "9daea1d98e0a5c06d9095f83ff8cd8917fbd7bb9",
+      "sha256": "d585d58d3c5ce607f6b89d4eb467f3c017b5723c45813720b710b037bb1a4bee"
+    },
+    {
+      "old": "Images/A2.1/module 1/87e19d16-0c69-4fc9-a5d6-88953e718a01.png",
+      "new": "Images/Текущие/A2.1/module 1/87e19d16-0c69-4fc9-a5d6-88953e718a01.png",
+      "legacyCopy": false,
+      "blob": "cf937c1e2f9755d03e629d7662800ac6722dd083",
+      "sha256": "bc66eeb6ae0471e695bf6acac5f694c8fe0479c91b8dd2d75d5d10d6ca7622dd"
+    },
+    {
+      "old": "Images/A2.1/module 1/991d2dbd-554e-4a17-9112-d45c9d02a26c.png",
+      "new": "Images/Текущие/A2.1/module 1/991d2dbd-554e-4a17-9112-d45c9d02a26c.png",
+      "legacyCopy": false,
+      "blob": "77cd2b661f69947edf5a74c5fb53dbb6146ea972",
+      "sha256": "e87d33841009459d9683a1a6f3218ad1a181ecd88f9d81c61ff03f872395d322"
+    },
+    {
+      "old": "Images/A2.1/module 1/9ee44c84-2602-4437-b0bd-49aaf6a9bdd6.png",
+      "new": "Images/Текущие/A2.1/module 1/9ee44c84-2602-4437-b0bd-49aaf6a9bdd6.png",
+      "legacyCopy": false,
+      "blob": "b820e59f06d3e88aed333b53cbc29fe8d06ea205",
+      "sha256": "07d7e0c6c49538524a0e9348e104df6b9e238ad48fcd7e7768ea293877fd6a3d"
+    },
+    {
+      "old": "Images/A2.1/module 1/e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png",
+      "new": "Images/Текущие/A2.1/module 1/e3a03c7a-7e20-4080-8e28-fe8c582b2a16.png",
+      "legacyCopy": false,
+      "blob": "3f408cd517737903ca25d8ad7d994bd6f3f51477",
+      "sha256": "845255f55d1c3f3193d56547a0bd92f3f9c0643b2a4f7abb8732646ffcf84821"
+    },
+    {
+      "old": "Images/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
+      "new": "Images/Текущие/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
+      "legacyCopy": false,
+      "blob": "a736e0b1857f60cd84338e6a78a3b718a3db18c5",
+      "sha256": "c78deef7fc1f97e2ddaa572039fc1b9645110e6768cabd9a33e8dc98c86c1d77"
+    },
+    {
+      "old": "Images/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
+      "new": "Images/Текущие/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
+      "legacyCopy": false,
+      "blob": "4bb4913cce7c02bb7642209804d5771fb9647473",
+      "sha256": "3c945685485cdb65480bd2511a1ce3f914c2317c1d2e2240363b147beaa0cdad"
+    },
+    {
+      "old": "Sidebar.png",
+      "new": "Images/Текущие/Sidebar.png",
+      "legacyCopy": false,
+      "blob": "5638f4eba5ddc7f5a1b897a96b4b2f2903e59cb7",
+      "sha256": "99989d514a86c21c0034ec70e236f4f09e04f62b8a9824d5abc2dd998be19e03"
+    },
+    {
+      "old": "assets/a22-m4-l11-opening.png",
+      "new": "Images/Текущие/assets/a22-m4-l11-opening.png",
+      "legacyCopy": false,
+      "blob": "9daea1d98e0a5c06d9095f83ff8cd8917fbd7bb9",
+      "sha256": "d585d58d3c5ce607f6b89d4eb467f3c017b5723c45813720b710b037bb1a4bee"
+    },
+    {
+      "old": "assets/a22-m4-l11-six-problems.png",
+      "new": "Images/Текущие/assets/a22-m4-l11-six-problems.png",
+      "legacyCopy": false,
+      "blob": "cf937c1e2f9755d03e629d7662800ac6722dd083",
+      "sha256": "bc66eeb6ae0471e695bf6acac5f694c8fe0479c91b8dd2d75d5d10d6ca7622dd"
+    },
+    {
+      "old": "assets/a22-m4-l12-plan-b.png",
+      "new": "Images/Текущие/assets/a22-m4-l12-plan-b.png",
+      "legacyCopy": false,
+      "blob": "b820e59f06d3e88aed333b53cbc29fe8d06ea205",
+      "sha256": "07d7e0c6c49538524a0e9348e104df6b9e238ad48fcd7e7768ea293877fd6a3d"
+    },
+    {
+      "old": "assets/choice-cooking.svg",
+      "new": "Images/Текущие/assets/choice-cooking.svg",
+      "legacyCopy": false,
+      "blob": "ab3c06a263f8aa47b108ad217a6eb0cd8e612357",
+      "sha256": "7951c1d9b599c445968e0be9416d79a96d76cfd86ba9e9283dc91da5a9df72d6"
+    },
+    {
+      "old": "assets/choice-cycling.svg",
+      "new": "Images/Текущие/assets/choice-cycling.svg",
+      "legacyCopy": false,
+      "blob": "887df987f2b9f4af92a87921df6e6a4376561339",
+      "sha256": "676745ac52c3588ede571f338c9665dc5fb7882f99e8dd5249bd0ac36cc8c784"
+    },
+    {
+      "old": "assets/choice-gardening.svg",
+      "new": "Images/Текущие/assets/choice-gardening.svg",
+      "legacyCopy": false,
+      "blob": "725d311435c01522bba7677804168fa8b3cc098a",
+      "sha256": "8d6ceaae7e43f18f16bb41ffd9b3e0afd4a8d1dd9f0ac1ce04909a04b9decd51"
+    },
+    {
+      "old": "assets/choice-hiking.svg",
+      "new": "Images/Текущие/assets/choice-hiking.svg",
+      "legacyCopy": false,
+      "blob": "8bba328bb24b2dc95211c796dc7a22fc5f2f5378",
+      "sha256": "5887e04afda540fd4e684e8bd0352459ea3eb98e45841d680f35d655e2378364"
+    },
+    {
+      "old": "assets/choice-laptop.svg",
+      "new": "Images/Текущие/assets/choice-laptop.svg",
+      "legacyCopy": false,
+      "blob": "c292263d0eaa349f75150a34b955553fff2bce33",
+      "sha256": "c0ea42b8e7ce2335104cbc8eb2c29b4b1a7ff78c0e66abdb0c7d7bbede44ef53"
+    },
+    {
+      "old": "assets/choice-reading.svg",
+      "new": "Images/Текущие/assets/choice-reading.svg",
+      "legacyCopy": false,
+      "blob": "6553e70ac62f3a51b7e0af0cb4f2df6e6daf0b4f",
+      "sha256": "12fe86c7db3062434a173565a4b102ecb11dd9652f3d1cb0bd70bdd4b33e52fc"
+    },
+    {
+      "old": "assets/draft-first-day-speaking.webp",
+      "new": "Images/Текущие/assets/draft-first-day-speaking.webp",
+      "legacyCopy": false,
+      "blob": "a883ac520ab19c76ec8d8a838a49e014372b76dc",
+      "sha256": "bfff919e23c5fc0355da109c29f1c281ffef66274f900a4ac77ea1ca1e2201a9"
+    },
+    {
+      "old": "assets/draft-school-fair-speaking.webp",
+      "new": "Images/Текущие/assets/draft-school-fair-speaking.webp",
+      "legacyCopy": false,
+      "blob": "275ac13c25990db783ac22964463a44e7b4f4f73",
+      "sha256": "1ca65fcd0903164e53668ec33030854b252d41c54a1aff00b9e44b24e7df45ce"
+    },
+    {
+      "old": "assets/draft-school-fair-vocab.jpg",
+      "new": "Images/Текущие/assets/draft-school-fair-vocab.jpg",
+      "legacyCopy": false,
+      "blob": "2aa234fef305036ce5fc492b939a0d8e81759f82",
+      "sha256": "0b313e90ebb9bdb4cdedcca61821e40d58f98e6107d07ffa23ccd13d60c80980"
+    },
+    {
+      "old": "assets/factory/image-1.svg",
+      "new": "Images/Текущие/assets/factory/image-1.svg",
+      "legacyCopy": false,
+      "blob": "1ddffbd3bc02eea1bb344ddfb27bec4ebeee3b84",
+      "sha256": "7d167154e20693dcf92188ab952d6e82dfd0c8706c99ac54fcc32834c6e810bf"
+    },
+    {
+      "old": "assets/factory/image-2.svg",
+      "new": "Images/Текущие/assets/factory/image-2.svg",
+      "legacyCopy": false,
+      "blob": "cbce4cc1f590c876fb1a4cc4fa6ccdd665c5107e",
+      "sha256": "12e945472ebaff52f723c7653c14e1e55c54f9755853df62a66f83c0b531e969"
+    },
+    {
+      "old": "assets/factory/image-3.svg",
+      "new": "Images/Текущие/assets/factory/image-3.svg",
+      "legacyCopy": false,
+      "blob": "b866730b0cbb9210862977257848556c97a29efd",
+      "sha256": "a6704b0d34d6bedf9403fbda6402bda523ecb58bcbdd3e8e794cb32e6ff1a1cc"
+    },
+    {
+      "old": "assets/image-label-demo.svg",
+      "new": "Images/Текущие/assets/image-label-demo.svg",
+      "legacyCopy": false,
+      "blob": "f865397171c16045edf12be2378679c20dfcfe29",
+      "sha256": "e70d5a02bf4fa5934cb468be193060a9c5e5093873b55a836d20fbaa71397af3"
+    },
+    {
+      "old": "assets/lesson-media/a1-2-m5/study-speaking.svg",
+      "new": "Images/Текущие/assets/lesson-media/a1-2-m5/study-speaking.svg",
+      "legacyCopy": false,
+      "blob": "a2f36beadbf0150a7b8e895fd53437f39d32c38d",
+      "sha256": "69f4a7b2146ae967f24c61ac0c2be1840e961f9f3b45a171eb8cc7d7f6ff1f7c"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/863e7675-68cb-4d75-ab3c-854fb1b037f4.png",
+      "legacyCopy": false,
+      "blob": "fd12785dc9444759303b32076c5366fc3228132a",
+      "sha256": "0e5adf5ae0e8edf70faf034fa2e43a9a8634a6e386a1a71ccd81803548eb757d"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/be5e62d5-0bd1-4d7f-b1b4-ba6a55ae7b83.png",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/be5e62d5-0bd1-4d7f-b1b4-ba6a55ae7b83.png",
+      "legacyCopy": false,
+      "blob": "0826ff4845785d42c81038b69b820c6579988efb",
+      "sha256": "27a72c8f75ce2bb60e7766c41989ed8333f98f7d66fd96adefbdebfb988feeaf"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/blouse-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/blouse-cutout.webp",
+      "legacyCopy": true,
+      "blob": "673ff122396a22e28dab503b81b8a71dd1abf2b6",
+      "sha256": "72200f1f121e0ad6c5c3d330152c4ee6e62e3b307c37c8a3122ecd2173f93b0b"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/blouse.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/blouse.webp",
+      "legacyCopy": false,
+      "blob": "1045a674e5c0b4e9f6b186ea54abe72f363181bc",
+      "sha256": "ae30d5f1024cd1e2320a5a09e3a7fd4df9f02504bd218de60e56216258b77737"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/coat-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/coat-cutout.webp",
+      "legacyCopy": true,
+      "blob": "d12ebf98483d49285c0e6cecadefc9637f1c65e0",
+      "sha256": "33e866322597efa1ad676c046e7503251ba7c733fd701e3c944a3250e59e13ca"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/coat.webp",
+      "legacyCopy": false,
+      "blob": "46a560ef9ee6793b01b616bfbb5804fb71ef8bf3",
+      "sha256": "f9f792f17091877f33c115142d12027103a47cb097e1a92f5d3ce940606ae309"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/hat-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/hat-cutout.webp",
+      "legacyCopy": true,
+      "blob": "6d96a1ab0f72732444050c9abc7c48ebaf3ed34f",
+      "sha256": "b484558fef21ef2474223a9f2cfe0eafdb1df85c5f708a81634d38ccf1968462"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/hat.webp",
+      "legacyCopy": false,
+      "blob": "83931150abc6777f300ee32c7de50f908e562ec4",
+      "sha256": "d45269b6135a17228b33000d049ce061c2073aa9409840723751c927b589a837"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/skirt-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/skirt-cutout.webp",
+      "legacyCopy": true,
+      "blob": "15912187131ec222d99b4b580b988560742df718",
+      "sha256": "e2148e82a69a7bf5d04ae42400de4b4c221a82c46d7bffc924a64658390e4bcd"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/skirt.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/skirt.webp",
+      "legacyCopy": false,
+      "blob": "df19018aa482d087183ee6f5d5bfe04d30cad7eb",
+      "sha256": "5c90f0b1b9dce42723edbf4427365ce2e2dc316ee299111d599a017aa87258ff"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/speaking-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/speaking-cutout.webp",
+      "legacyCopy": false,
+      "blob": "faac6eb7b64b58a55ad06ca6305c1feb0f400557",
+      "sha256": "10cfa59e6489d3b939736423e16b69d9a40444c74be872b5141fdae123fc7dfc"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/speaking.webp",
+      "legacyCopy": false,
+      "blob": "cf3985cb7e9b14cc758a25cd237bc0563c55482c",
+      "sha256": "54d4b2afa6eb0ba15596ee615da9afe4ab745ffed2e01f2fce1c68ccf26872e1"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/suit-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/suit-cutout.webp",
+      "legacyCopy": true,
+      "blob": "9f138599f4beaf432219423a9205304b52524b0b",
+      "sha256": "ef178ab81a5ca6ffb949cdfd534f4f5d4cfb57867fe4180537bd87f97cee2844"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/suit.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/suit.webp",
+      "legacyCopy": false,
+      "blob": "179e716217ee622bf55b803176f800950fd5ceda",
+      "sha256": "ebcd540bbd99ee9963ea2eeb118a3b810b7edf4218151c86b887b6ab4ec0d20f"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/sweater-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/sweater-cutout.webp",
+      "legacyCopy": true,
+      "blob": "8493c435191b419a3886cc4e9ecabc87b2178fd8",
+      "sha256": "5457abf6924869eb50f034cc37aa31d9a69871905946da59b2e3e3df0f882f8c"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-1/images/sweater.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/sweater.webp",
+      "legacyCopy": false,
+      "blob": "397d4f5df3b8bcb6e2059427e041e31fd17b7e6f",
+      "sha256": "c7b77ca3fed1f46f3ad3f3041ac96e1b3252fa5ab444eb9a7c0fe9064da6b1c1"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/belt-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/belt-cutout.webp",
+      "legacyCopy": true,
+      "blob": "87bb5eadb21a0ffd322735efcae1c1ec828f941e",
+      "sha256": "9a1f5a5f5f25f62cbd2b629a37a07fe3a6088cb6399f7e7dc78713095c277472"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/belt.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/belt.webp",
+      "legacyCopy": false,
+      "blob": "c8a82d7e2c2bbf8f2e9050c7127f45387259bc87",
+      "sha256": "0062f1a20672f2ebbb9759c4be19d65e4e0499014222a8faf56f5e5f7a52c99c"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/cap-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/cap-cutout.webp",
+      "legacyCopy": true,
+      "blob": "636f20f69841c9fd4acc657c831dadddd6afa07a",
+      "sha256": "be3547097a417be2a856becc923da899d468bd3ef29730dc8c674a8f6d923daa"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/cap.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/cap.webp",
+      "legacyCopy": false,
+      "blob": "152870b44bedade070881fd9ab0aa98e7da66281",
+      "sha256": "fa1b976adfdfecf4094b1a2a27f7e9ff33b2d160e6820da72f814943c0ec0192"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/cc652bcc-5afa-41b2-aebc-8bfd2f692fba (1).png",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/cc652bcc-5afa-41b2-aebc-8bfd2f692fba (1).png",
+      "legacyCopy": false,
+      "blob": "e474f75f04c6fb69cdc0b6a4edcbe0e39ae1a335",
+      "sha256": "f6bfa0b452e560e5524a902b49faf07992078a80475bd0085f9164a76ad2e1dc"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/gloves-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/gloves-cutout.webp",
+      "legacyCopy": true,
+      "blob": "a24d28ba6089de61ccb5b1b015bab5c400febb0b",
+      "sha256": "4ddb8eefc63b1201c4573c2b42e0362fbee578d8b253b2816f9d2cf5a25cb32f"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/gloves.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/gloves.webp",
+      "legacyCopy": false,
+      "blob": "6eba77c4e4b97055059af81824292a4e5312d4be",
+      "sha256": "d9d918eaeccbadf1e76de564bc04c4be0d6138e4b27d4f440e92c24dafe62123"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/scarf-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/scarf-cutout.webp",
+      "legacyCopy": true,
+      "blob": "7476800dfe284ba6c94d4e6f35d2607202264b55",
+      "sha256": "58cc1cf82b97f8ba4bb859063a2e8d48fdbdd00898c4c67d2029027ffa4af35b"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/scarf.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/scarf.webp",
+      "legacyCopy": false,
+      "blob": "9ccb8207f692e97a6956ae7ee4334f006936585a",
+      "sha256": "750ade03f53c20853c973703887fad54dc624158aebba04cb1d1ca024ad64a09"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/speaking-accessories.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/speaking-accessories.webp",
+      "legacyCopy": false,
+      "blob": "f8856a6013c218fe9a9819910e78fbc6650f8299",
+      "sha256": "8f0e03b511199270b2ead7247e500890cd64a50dae63e8967a007991781bd214"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/speaking-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/speaking-cutout.webp",
+      "legacyCopy": false,
+      "blob": "5b4b020ebd44a1d7a9584de326b6741de94958b2",
+      "sha256": "c21342566edd767828f2753eccff73c013fe57c01eb01f46a5410566e8fe3f1f"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/sunglasses-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/sunglasses-cutout.webp",
+      "legacyCopy": true,
+      "blob": "f6e4431d892b1f23a75ea2fe954ef01050521f9e",
+      "sha256": "888331889221bcadb1119edfe36193cf648093ff88fc01e20d8c94412c4ea0ca"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/sunglasses.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/sunglasses.webp",
+      "legacyCopy": false,
+      "blob": "eb853c42e6bbbaa82388ad83c53b6cb4e3f1d34a",
+      "sha256": "0d127f7e715da320c371b816f9ad13e69b336e969becbdcc0f19e07e19512f44"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/tie-cutout.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/tie-cutout.webp",
+      "legacyCopy": true,
+      "blob": "34542788a1a294e0e01b66da88d44a414e3f21c8",
+      "sha256": "ee811c3bf24591db951794b1f8a17b326bb3a580fc8c1f9135cc7610538d856b"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-3/media/tie.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-3/media/tie.webp",
+      "legacyCopy": false,
+      "blob": "b0fc1430119ee4f64d04a0e81ae075e9e5d2174e",
+      "sha256": "dcda21b76f19533f34a84ef6eadb44d10c866853cb8d8429eff9d0071eaba74b"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4-people.png",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4-people.png",
+      "legacyCopy": false,
+      "blob": "01ad34eefb8340c661b9c7afd48f58984723c99a",
+      "sha256": "ebbdea368e496d6af1f96be5191e6a907cceafd329ba0918ce47bbfbf1dc6f01"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/media/people-abc.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/media/people-abc.webp",
+      "legacyCopy": false,
+      "blob": "08c5bf286d005d7711b452334dfa1597c7e490ab",
+      "sha256": "c67aafb2cdcbf9d8683702d70bc80ceb8efa1b292ecf0fcad7aee868b853100e"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/media/speaking-ab.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/media/speaking-ab.webp",
+      "legacyCopy": false,
+      "blob": "a2d84bb4ab46dd68e3ee97106c85c390a6dc47ee",
+      "sha256": "82541a0ece0ac0bd5408226b0edb0be72699e5d7d50f579ccc382188717721bf"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/helpful.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/helpful.webp",
+      "legacyCopy": true,
+      "blob": "3606dbf22aec818dd0b5872ebb3cd3fee8eb0975",
+      "sha256": "485f0fe7144dcb21853b1f90233347f603d20cfd0a3109297cb64bea09c56cd3"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/lazy.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/lazy.webp",
+      "legacyCopy": true,
+      "blob": "d014a9d94ece94427037a190004278c85b9ea29e",
+      "sha256": "ea5e8d19955d7f4966b788f9888b48c1f4052c5eaad837e1620b57e9e03f244f"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/noisy.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/noisy.webp",
+      "legacyCopy": true,
+      "blob": "6b151054dab430734c5a2670758c6ac58a54b236",
+      "sha256": "b0c6614c40d698b73bf5e815285eacd01656b552e8874a856ef4dd244ec9d4a5"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/polite.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/polite.webp",
+      "legacyCopy": true,
+      "blob": "47b6a77b14a2eb67d3d318a627a9fe2fb39abb4c",
+      "sha256": "adbd2dfbab336d6158b0e22f2fa3070aa604bd3c154cacdaf8c4e3dd7ae1b469"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/quiet.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/quiet.webp",
+      "legacyCopy": true,
+      "blob": "31f4b3427c37c84e63644927c3cb169986d125b1",
+      "sha256": "2ec56a7c339e1c867320ffa013217f13bf82aad55b7bcf9095f28d69450e8be5"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-4/word-pick/rude.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/rude.webp",
+      "legacyCopy": true,
+      "blob": "9d67edbfddc9b511563cde443d8f57d29ae4b05d",
+      "sha256": "50a4cede951c7a26d6c4d0c1b971a75d15761f9d226e54902f6f8a5dca1cd730"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/building.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/building.webp",
+      "legacyCopy": false,
+      "blob": "edf010ed69cb0dbfd408c63d7a002b333cd62469",
+      "sha256": "ee767671d939b56c1fbfc90a64425f6a494a92b3027adeed0adf7999c04ad39a"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/clothing.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/clothing.webp",
+      "legacyCopy": false,
+      "blob": "6115613b895ee34cf319a013b84268866027a0ba",
+      "sha256": "968d97cd130774d1b6e2e8baf4ef51d4ca12b43799debd56cbffc024f047abb9"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/drink.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/drink.webp",
+      "legacyCopy": false,
+      "blob": "4e5e018a5625fac1d675a6437b8084660740c799",
+      "sha256": "165091a8f1594b74e30ff74d09bc1f588fab904fe308a23700b438c4136d68b4"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/food.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/food.webp",
+      "legacyCopy": false,
+      "blob": "fa970eea95ea08c5fdb83ec2a427173d74e2042f",
+      "sha256": "c0c918651bb234bf25be04a366dd3e3d52fcfce0d053e6db207403f1538faefb"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/furniture.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/furniture.webp",
+      "legacyCopy": false,
+      "blob": "55175e32730859fa3e2ab9d198f7f7bf08d0c6ef",
+      "sha256": "c867c1fd1ed8c502a4945339c3c1c6fa68b62ed8bac7868ecd8c7b0180a1bce6"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-4/lesson-5/word-pick/shop.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-5/word-pick/shop.webp",
+      "legacyCopy": false,
+      "blob": "a0a8bf4c8c711183fa9204b8834961b89e763872",
+      "sha256": "96dcf5a9151c08c2a41e3f5abd18d3ff3ff5af08fc78e9694d009a0fb95a68b7"
+    },
+    {
+      "old": "assets/lesson-media/a1-2/module-5/lesson-1/actions-sheet.webp",
+      "new": "Images/Текущие/assets/lesson-media/a1-2/module-5/lesson-1/actions-sheet.webp",
+      "legacyCopy": false,
+      "blob": "8c92b2caa359eb386e8aec3e4ff0bb3d92b3fa48",
+      "sha256": "a48fd8190364e93ea15440b782fbe6c1cbc6d7bf9acac2a3180a33403da8fa0c"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-1/images/a_day_in_six_cozy_scenes.png",
+      "legacyCopy": false,
+      "blob": "e474f75f04c6fb69cdc0b6a4edcbe0e39ae1a335",
+      "sha256": "f6bfa0b452e560e5524a902b49faf07992078a80475bd0085f9164a76ad2e1dc"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-1/images/day-story.webp",
+      "legacyCopy": false,
+      "blob": "efc76667115aa2e0631000a3ec83cccf60433263",
+      "sha256": "6aa24d9b9937eb5fbae398b40df498475d4ea7e235258de7fb6242740aeec1e3"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/activity-park-routes.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/activity-park-routes.webp",
+      "legacyCopy": false,
+      "blob": "80e0100d0c24eb0629bc3a52e1e1fe5f1b9cfe83",
+      "sha256": "28e0f972e76cf541a7c4f60e89dc00382fc5c3cbfe2e21f9e76aeadb26427bd0"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/film-action-scenes.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/film-action-scenes.webp",
+      "legacyCopy": false,
+      "blob": "2664c12d32648290feba9c0e3494bb3fa06585cd",
+      "sha256": "c2cf808c2afd71a557d71444ded20e720be30756fc2f218a18ec3f1f9115245f"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-01.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-01.webp",
+      "legacyCopy": true,
+      "blob": "107e830da123debfe77b97ce990228791f99b753",
+      "sha256": "b90902379ffd8390054853d57ffbf1341084a554617050201fc63605a2b43701"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-02.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-02.webp",
+      "legacyCopy": true,
+      "blob": "bc2bdb5bb5d32072a275e642d046c99175998c08",
+      "sha256": "e0e3350a45714e029a87ef53916482a74ef1499f94253857814aa8a6117bffe5"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-03.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-03.webp",
+      "legacyCopy": true,
+      "blob": "dba7548668d77e017bb37451a5433e71f29cce2d",
+      "sha256": "8ef5ade1800a39ccef17020b235574bd7bcd50fb1a19dcf11d6ff084c6bad31a"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-04.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-04.webp",
+      "legacyCopy": true,
+      "blob": "fa5df160c36c30bd65594b54f8de31c45731bfae",
+      "sha256": "dc7cb0b38e8be905d3727861d2da13b65b5c56766a558f32540a3d5198a64628"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-05.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-05.webp",
+      "legacyCopy": true,
+      "blob": "d3f6e5182023a614c5f0161139ae96f68e01b954",
+      "sha256": "1cc56fbc058ad004c60c3f15c6008f1bf58afd2917fb31b5e95c59e5be4ea27d"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-06.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-06.webp",
+      "legacyCopy": true,
+      "blob": "d6db093d9e6d646e7ef46cdae1774998b83c402d",
+      "sha256": "a54f9244b39207f96e9946d78af5d781d09623112bd63fc9573f83528c28ee4e"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/movement-sheet.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/movement-sheet.webp",
+      "legacyCopy": false,
+      "blob": "1c3b4a949b5435698ac6216615a9f00410ff42f3",
+      "sha256": "9a64c41aa006b2263f21e64937f6169e652f64880a78727eb04fbca986b4191c"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-2/images/outdoor-adventure-routes.webp",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-2/images/outdoor-adventure-routes.webp",
+      "legacyCopy": false,
+      "blob": "0366147ea72ef4c195a91d509e2da83f78d3212a",
+      "sha256": "74e19a22dd1f5fe4fedfe7b2c4bfcfdbea89e90a1476dd5c6c35660f564b75e3"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-3/direction-support.svg",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/direction-support.svg",
+      "legacyCopy": false,
+      "blob": "aeed3dfd47789f76d00ac9146a24ac9e141a421b",
+      "sha256": "79b961bd1d60705b3f7fe42b28f3d472901441ccac07ffbb796827edc4cf1a15"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-3/final-route.svg",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/final-route.svg",
+      "legacyCopy": false,
+      "blob": "df109ef94c2181b5d6f10e7e80e9dde721c273ab",
+      "sha256": "d9fbba5213d406cb3a9a53b4744aa0ffcbd4df36bcdce4c4819192bcfb042edc"
+    },
+    {
+      "old": "assets/lesson-media/a2-1/module-1/smy-3/test-route.svg",
+      "new": "Images/Текущие/assets/lesson-media/a2-1/module-1/smy-3/test-route.svg",
+      "legacyCopy": false,
+      "blob": "2c75a132a63cf1782d81038921226169f2885a6b",
+      "sha256": "ac78cc54262e10c444fc2c5604b1893752a77b16c147a2192dc8bbee6e091ecc"
+    },
+    {
+      "old": "assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg",
+      "new": "Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg",
+      "legacyCopy": false,
+      "blob": "f35152c30b59a27d4ecac3fe9b049450738da5c4",
+      "sha256": "2e8dc65067584df79c6a483f61f5a3be44361d2ca8515a5451f6b92a9d4e7163"
+    },
+    {
+      "old": "assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg",
+      "new": "Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg",
+      "legacyCopy": false,
+      "blob": "ea5063bf83936a13b5697db75bdd53679d3602de",
+      "sha256": "75bb9310ffc21fc4637557c114474ee7fbe1e5efdd0307482509f04c01266436"
+    },
+    {
+      "old": "assets/lesson-media/image (1).png",
+      "new": "Images/Текущие/assets/lesson-media/image (1).png",
+      "legacyCopy": false,
+      "blob": "19f18cfa3d0efffcc818a847c4787aadac02275f",
+      "sha256": "530b94fbb5bb01fd4e40a2fb206c2902f0a2a8218f9ba90bbae07118d0008555"
+    },
+    {
+      "old": "assets/lesson-media/image (2).png",
+      "new": "Images/Текущие/assets/lesson-media/image (2).png",
+      "legacyCopy": false,
+      "blob": "930e911f93e4a41af6e14985df41a6bf66dc3e6f",
+      "sha256": "aaf83f24f9046ffa238093cb800875dbbb534fcd87fad544a7232b73f1e6d50d"
+    },
+    {
+      "old": "assets/lesson-media/image.png",
+      "new": "Images/Текущие/assets/lesson-media/image.png",
+      "legacyCopy": false,
+      "blob": "a84a33bc8bf6bdb8e7eb92cd7cdec1a04e846165",
+      "sha256": "2a6026c186a16dbcbd30a2288cc6e3eaa6a330dd9e5fa4eb78479c48647362d1"
+    },
+    {
+      "old": "assets/lesson-media/image_png.png",
+      "new": "Images/Текущие/assets/lesson-media/image_png.png",
+      "legacyCopy": false,
+      "blob": "e077df5c8e20d59422d4ec62a6b61a005a5455da",
+      "sha256": "b8f3f04c636c7126cd89c32ee37c17f448ff60583700d7bacc4fb577cabe38b8"
+    },
+    {
+      "old": "assets/rule-visual-it-is-was.svg",
+      "new": "Images/Текущие/assets/rule-visual-it-is-was.svg",
+      "legacyCopy": false,
+      "blob": "0eb91636171b053580987fd2cba38e8c99653569",
+      "sha256": "1cf7b1aa5634825f1f8c529c97a9e51b981c5b5c8f1b2b7fe6a32e312bea79df"
+    },
+    {
+      "old": "assets/sidebar-space.jpg",
+      "new": "Images/Текущие/assets/sidebar-space.jpg",
+      "legacyCopy": false,
+      "blob": "b87cc59a793b87f00657d4915d14b6b421b73480",
+      "sha256": "7d68af41dd1f6572b8bcb239dee78a7718bf83d48dc349ea1128b2e46424e234"
+    }
+  ]
+}

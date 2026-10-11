@@ -18,7 +18,7 @@ What would you choose? Обсуждаем воображаемый выбор, �
 
 Choose one situation. You can answer for an imaginary person.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
 
 A. You spend an hour travelling to work each morning. You can rent an apartment ten minutes from work, but it costs more. You need to decide whether to move.
 
@@ -313,7 +313,7 @@ Ask your partner the question you have built. Answer your partner’s question a
 
 Discuss two situations. Explain your choices and ask follow-up questions.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc)
 
 A. A quiet apartment is close to your work, but it costs €150 more per month than your current home.
 Would you rent it? What would make you change your mind?
@@ -624,7 +624,7 @@ Your reply
 
 Choose two situations. Take turns asking for and giving advice.
 
-![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc)
+![Лист ситуаций](https://raw.githubusercontent.com/marakuyyashop-gif/Space-Whale/main/Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc)
 
 A. Maya has an exam in three days. She knows the theory, but finds the practice questions difficult. She has two free hours this evening and keeps checking her phone.
 

@@ -17,7 +17,7 @@ const R=(id,text)=>E(id,'rule-page','Language focus',{blocks:[{type:'rule',text}
 const C=(id,title,rows)=>E(id,'choice',title,{items:rows.map(([prompt,options,key],i)=>({id:String(i+1),prompt,options:options.map((text,j)=>({id:String(j),text})),correctId:String(key)}))});
 const W=(id,title,rows,accepted=false,instruction='')=>E(id,'writing',title,{responseMode:accepted?'accepted':'open',revealPossibleAnswers:!accepted,instruction,items:rows.map(([prompt,answers,hint,placeholder],i)=>({id:String(i+1),prompt,...(hint?{hint}:{}),...(placeholder?{placeholder}:{}),[accepted?'acceptedAnswers':'possibleAnswers']:Array.isArray(answers)?answers:[answers]}))});
 const M=(id,title,rows,order)=>E(id,'matching',title,{items:rows.map(([text],i)=>({id:String(i+1),text,correctId:'o'+i})),options:order.map(i=>({id:'o'+i,text:rows[i][1]}))});
-const l5WordPicSheet='Images/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png';
+const l5WordPicSheet='Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png';
 const l5WordPicOrder=['furniture','drink','clothing','building','food','shop'];
 const l5WordPicCrops=[
  {x:0,y:0,w:33.333,h:50},
@@ -33,7 +33,7 @@ const pictureWords=(id,lesson,words,order)=>E(id,'matching','Соедините 
   const sheetCrop=lesson===5?l5WordPicCrops[i]:null;
   const wordIndex=words.indexOf(word);
   return {id:String(i+1),text:String(i+1),alt:'Картинка '+(i+1),correctId:'o'+wordIndex,
-   image:sheetCrop?l5WordPicSheet:`assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp`,
+   image:sheetCrop?l5WordPicSheet:`Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-${lesson}/word-pick/${word}.webp`,
    ...(sheetCrop?{crop:sheetCrop}:{imageWidth:480,imageHeight:600})
   };
  }),
@@ -86,7 +86,7 @@ const l4=[];
 l4.push(stage('Speaking',2,kit.speaking({
  id:'L4-M01',
  title:'Describe your new neighbors',
- image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/4ebce181-0d97-4783-903a-db13ce05549d.png',alt:'Два соседа в шести бытовых ситуациях.',imageWidth:1448,imageHeight:1086},
+ image:{image:'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/4ebce181-0d97-4783-903a-db13ce05549d.png',alt:'Два соседа в шести бытовых ситуациях.',imageWidth:1448,imageHeight:1086},
  task:{
   text:'В ваш район переехали новые соседи. Вы уже с ними познакомились, и ваш друг расспрашивает вас о них. Расскажите ему:',
   bullets:['какие они;','как они выглядят.']
@@ -124,7 +124,7 @@ const typed4=[
 ];
 typed4.forEach((item,i)=>{
  const ref='L4-TYPED-I'+String(i+1).padStart(2,'0');
- media[4][ref]={type:'image',src:`assets/lesson-media/a1-2/module-4/lesson-4/word-pick/${['helpful','lazy','noisy','rude'][i]}.webp`,brief:[
+ media[4][ref]={type:'image',src:`Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/word-pick/${['helpful','lazy','noisy','rude'][i]}.webp`,brief:[
   'Anna helps carry boxes.', 'Max does not want to help at home.',
   'People are making too much noise to hear a conversation.', 'Ben pushes another person.'
  ][i]};
@@ -184,7 +184,7 @@ l4.push(stage('Write the questions',3,W('L4-questions-for-answers','Write the qu
 l4.push(stage('Final · Speaking',5,kit.speaking({
  id:'L4-M11',
  title:'Describe the new students',
- image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/f55b31c3-30bd-4e45-9485-3a020903c8df.png',alt:'Две новые ученицы и ситуации, показывающие их характер и поведение.',imageWidth:1448,imageHeight:1086},
+ image:{image:'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/f55b31c3-30bd-4e45-9485-3a020903c8df.png',alt:'Две новые ученицы и ситуации, показывающие их характер и поведение.',imageWidth:1448,imageHeight:1086},
  task:{
   text:'В ваш класс пришли два новых ученика. Вы уже с ними познакомились, и ваш одноклассник расспрашивает вас о них. Расскажите ему:',
   bullets:['какие они;','как они выглядят.']
@@ -224,7 +224,7 @@ const l5=[];
 l5.push(stage('Speaking',2,kit.speaking({
  id:'L5-M01',
  title:'Explain the unusual things',
- image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/57bfed79-3834-4204-837e-d9471e979322.png',alt:'Шесть необычных вещей для объяснения категории и сходства.',imageWidth:1448,imageHeight:1086},
+ image:{image:'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/57bfed79-3834-4204-837e-d9471e979322.png',alt:'Шесть необычных вещей для объяснения категории и сходства.',imageWidth:1448,imageHeight:1086},
  task:{text:'Ваш друг рассматривает фотографии необычных вещей и спрашивает, что это такое. Объясните ему:',bullets:['к какой категории относится каждая вещь;','на что она похожа.']},
  use:[
   {words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...','It’s a sort of ...']},
@@ -300,7 +300,7 @@ l5.push(stage('Listening',4,S('L5-cafe-listening',listeningTitle5,[
 l5.push(stage('Final · Speaking',5,kit.speaking({
  id:'L5-M09',
  title:'Help your new colleague',
- image:{image:'Images/A.1.2/Module 4/lesson 4 - sosed/04470db6-bc5f-48d0-84bf-4a87f0f6d53a.png',alt:'Шесть необычных вещей для объяснения категории и сходства.',imageWidth:1448,imageHeight:1086},
+ image:{image:'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/04470db6-bc5f-48d0-84bf-4a87f0f6d53a.png',alt:'Шесть необычных вещей для объяснения категории и сходства.',imageWidth:1448,imageHeight:1086},
  task:{text:'В вашем офисе появился новый сотрудник. В первый день его удивляют некоторые вещи вокруг, и он спрашивает, что это такое. Объясните ему:',bullets:['к какой категории относится каждая вещь;','на что она похожа.']},
  use:[
   {words:['food','drink','furniture','clothing','building','shop'],phrases:['It’s a kind of ...','It’s a type of ...','It’s a sort of ...']},

@@ -4,7 +4,7 @@
   const kit = window.SpaceWhaleExerciseKit;
   if (!kit) throw new Error('SpaceWhaleExerciseKit is required.');
 
-  const vocabSheet = 'assets/draft-school-fair-vocab.jpg';
+  const vocabSheet = 'Images/Текущие/assets/draft-school-fair-vocab.jpg';
   const crop = (x, y, w, h) => ({ x, y, w, h });
 
   const stages = [
@@ -207,7 +207,7 @@
         title: 'Speak.',
         instruction: 'Look at the pictures. Imagine that you are preparing a school fair.',
         blocks: [
-          { type:'image', image:'assets/draft-school-fair-speaking.webp', alt:'Six scenes showing students preparing a school fair' },
+          { type:'image', image:'Images/Текущие/assets/draft-school-fair-speaking.webp', alt:'Six scenes showing students preparing a school fair' },
           { type:'text', text:'For each picture, make one sentence about what you need to do. Use: We need to …' }
         ]
       }

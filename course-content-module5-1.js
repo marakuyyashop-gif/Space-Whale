@@ -9,14 +9,14 @@
   const E=(id,kind,title,extra={})=>({version:1,id,kind,title,...extra});
   const stage=(menu,time,exercise,teacherNotes='')=>({menu,navigationTitle:menu,section:'tasks',guide:{time:time+' min',teacherNotes},exercise});
   const pending=assetId=>({imagePending:true,assetId});
-  const sheet='Images/A.1.2/Module 4/lesson 4 - sosed/26d89984-db65-4db8-83af-532d3782ee5e.png';
+  const sheet='Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/26d89984-db65-4db8-83af-532d3782ee5e.png';
   const crops=[{x:0,y:0,w:33.333,h:50},{x:33.333,y:0,w:33.333,h:50},{x:66.666,y:0,w:33.334,h:50},{x:0,y:50,w:33.333,h:50},{x:33.333,y:50,w:33.333,h:50},{x:66.666,y:50,w:33.334,h:50}];
   const wordMatch=E('L1-M02','matching','Match the pictures with the words.',{
     instruction:'Match the pictures and words.',layout:'picture-word',
     items:words.map((word,i)=>({id:String(i+1),text:String(i+1),image:sheet,imageWidth:1536,imageHeight:1024,crop:crops[i],alt:'Picture '+(i+1),correctId:word})),
     options:['laugh','cry','smile','lie','sleep','stand'].map(word=>({id:word,text:word}))
   });
-  const openingImage={image:'Images/A.1.2/Module 4/lesson 4 - sosed/2e841064-fbb7-43a3-8d5c-76c4c9ecc239.png',imageWidth:1448,imageHeight:1086,alt:'Six pictures of Mike and Sara sleeping, smiling, laughing, standing, lying and crying'};
+  const openingImage={image:'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/2e841064-fbb7-43a3-8d5c-76c4c9ecc239.png',imageWidth:1448,imageHeight:1086,alt:'Six pictures of Mike and Sara sleeping, smiling, laughing, standing, lying and crying'};
   const opening=E('L1-M01','presentation','Tell your friend what is happening.',{
     blocks:[
       {type:'image',...openingImage},

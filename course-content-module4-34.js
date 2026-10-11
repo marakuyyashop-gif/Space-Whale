@@ -21,7 +21,7 @@ for(const [n,words,examples] of [[3,words3,examples3],[4,words4,examples4]]){
 }
 media[3].L3_DIALOGUE.script="Nina: I need a scarf for my sister.\nLeo: Which one do you like?\nNina: This one. What do you think?\nLeo: I think it looks good. How much is it?\nNina: Twenty euros.\nLeo: Why do you like it?\nNina: Because it looks warm. My sister walks to work, and it’s cold in the morning.\nLeo: Does she need gloves too?\nNina: No, she has some.";
 media[3].L3_DIALOGUE_TEXT.text=media[3].L3_DIALOGUE.script;
-const mediaRoot='assets/lesson-media/a1-2/module-4/';
+const mediaRoot='Images/Текущие/assets/lesson-media/a1-2/module-4/';
 const accessorySizes=[[482,486],[494,275],[416,480],[501,371],[311,488],[522,249]];
 words3.forEach((word,i)=>{media[3]['L3_IMG_'+String(i+1).padStart(2,'0')]={type:'image',src:mediaRoot+'lesson-3/media/'+word+'-cutout.webp',width:accessorySizes[i][0],height:accessorySizes[i][1],alt:'Picture '+(i+1),target:word};});
 media[3].L3_SPEAKING={type:'image',src:mediaRoot+'lesson-3/media/speaking-accessories.webp',width:1448,height:1086,alt:'A scarf, belt, gloves, cap, tie and sunglasses'};

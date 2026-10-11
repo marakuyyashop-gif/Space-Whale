@@ -19,7 +19,7 @@ const media={
     },
     "B1D1_SCENES": {
       "type": "image",
-      "src": "assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc",
+      "src": "Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D1_SCENES.jpg?v=20260927-abc",
       "alt": "Three situations to discuss",
       "width": 1440,
       "height": 420
@@ -98,7 +98,7 @@ const media={
     },
     "B1D2_SCENES": {
       "type": "image",
-      "src": "assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc",
+      "src": "Images/Текущие/assets/lesson-media/b1-1/module-1/images/B1D2_SCENES.jpg?v=20260927-abc",
       "alt": "Three situations to discuss",
       "width": 1440,
       "height": 420
@@ -1305,7 +1305,7 @@ const lessons=[
           "id": "B1D2-M01",
           "title": "Give your friend some advice",
           "image": {
-            "image": "Images/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
+            "image": "Images/Текущие/B1/module 1/163d83b9-c748-479c-89c2-af23929115a6.png",
             "alt": "Six situations: an interview, an exam and a party, noise while studying, a distraction, a long commute, and a job offer.",
             "imageWidth": 1448,
             "imageHeight": 1086
@@ -2300,7 +2300,7 @@ const lessons=[
           "id": "B1D2-M10",
           "title": "Give your friend some advice",
           "image": {
-            "image": "Images/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
+            "image": "Images/Текущие/B1/module 1/8ce2d684-e14c-41c2-97d9-75a9f92496f9.png",
             "alt": "Six situations: a deadline, extra work, a test, a flight, choosing an apartment, and a presentation.",
             "imageWidth": 1448,
             "imageHeight": 1086
