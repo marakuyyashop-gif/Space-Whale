@@ -945,6 +945,24 @@
     }
   ]
 };
+  const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const audioVersion = '20261011-approved-final';
+  const repeatStage = lesson.stages.find(stage => stage.exercise.id === 'A1M5L4_REPEAT')?.exercise;
+  if (repeatStage) {
+    repeatStage.audioPending = false;
+    repeatStage.items.forEach((item, i) => {
+      const suffix = String(i + 1).padStart(2, '0');
+      item.audio = courseAudioBase + '/a1-2/w5/l4/listen-repeat/WORD_' + suffix + '.mp3?v=' + audioVersion;
+      item.exampleAudio = courseAudioBase + '/a1-2/w5/l4/listen-repeat/EXAMPLE_' + suffix + '.mp3?v=' + audioVersion;
+    });
+  }
+  const listeningStage = lesson.stages.find(stage => stage.exercise.id === 'A1M5L4_LISTENING')?.exercise;
+  const listeningPlayer = listeningStage?.exercises?.find(part => part.id === 'player')?.exercise;
+  if (listeningPlayer) {
+    listeningPlayer.audioPending = false;
+    listeningPlayer.audio = courseAudioBase + '/a1-2/w5/l4/listening/a-place-to-study.mp3?v=' + audioVersion;
+  }
+  lesson.contentVersion = 'approved-content-speaking-deferred-2026-10-11-audio';
   lesson.stages.forEach(stage => kit.validate(stage.exercise));
   window.SpaceWhaleLessonMedia = window.SpaceWhaleLessonMedia || {};
   window.SpaceWhaleLessonMedia[lesson.id] = {
@@ -1014,6 +1032,13 @@
     "script": "My sister takes notes on her phone."
   }
 };
+  const lessonMedia = window.SpaceWhaleLessonMedia[lesson.id];
+  for (let i = 0; i < 6; i++) {
+    const suffix = String(i + 1).padStart(2, '0');
+    lessonMedia['A1M5L4_WORD_' + suffix].src = courseAudioBase + '/a1-2/w5/l4/listen-repeat/WORD_' + suffix + '.mp3?v=' + audioVersion;
+    lessonMedia['A1M5L4_EXAMPLE_' + suffix].src = courseAudioBase + '/a1-2/w5/l4/listen-repeat/EXAMPLE_' + suffix + '.mp3?v=' + audioVersion;
+  }
+  lessonMedia.A1M5L4_LISTENING.src = courseAudioBase + '/a1-2/w5/l4/listening/a-place-to-study.mp3?v=' + audioVersion;
   window.SpaceWhaleContent = window.SpaceWhaleContent || [];
   const at = window.SpaceWhaleContent.findIndex(item => item.id === lesson.id);
   if (at < 0) window.SpaceWhaleContent.push(lesson);
