@@ -10,7 +10,7 @@ const mapping={
  5:{words:'L5-word-translation',repeat:'L5-M03',practice:['L5-explanation-gaps'],rules:['L5-kind-rule']},
  6:{words:'L3-M02',repeat:'L3-M03',practice:['L4-question-answer-match','L5-explanation-gaps'],rules:['a12w4l1-language-focus','L3-M07-rule','L3-M08-explanation','L4-question-rule','L5-kind-rule']}
 };
-function build(content,catalog,translations,a21,a22){
+function build(content,catalog,translations,a21,a22,a12m5){
  const all=new Map();function walk(d){all.set(d.id,d);d.exercises?.forEach(b=>walk(b.exercise));d.blocks?.forEach(b=>{if(b.exercise)walk(b.exercise);});}content.forEach(l=>l.stages.forEach(s=>walk(s.exercise)));
  const get=id=>{if(!all.has(id))throw Error('Missing homework source '+id);return copy(all.get(id));};
  const packs=Object.entries(mapping).map(([number,source])=>{
@@ -38,8 +38,19 @@ function build(content,catalog,translations,a21,a22){
    reference:copy(steps.find(s=>s.role==='rule').exercise),
    exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
  }
+ if(a12m5)for(const source of a12m5.mapping){
+  const lesson=content.find(l=>l.id===source.id);if(!lesson)throw Error('Missing A1.2 homework lesson '+source.id);
+  const steps=[{role:'words',exercise:get(source.words)},{role:'listenRepeat',exercise:get(source.repeat)},
+   ...source.practice.map(id=>({role:'practice',exercise:get(id)})),
+   ...source.rules.map(id=>({role:'rule',exercise:get(id)})),
+   ...source.grammar.map(id=>({role:'practice',exercise:get(id)})),
+   ...a12m5.build(source.key).map(exercise=>({role:'translation',exercise}))];
+  packs.push({id:source.id,version:'20261012-a12-m5',level:'A1.2',title:catalog.lessons.find(l=>l.id===source.id).title,steps,
+   reference:copy(steps.find(s=>s.role==='rule').exercise),
+   exercises:steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise))});
+ }
  for(const pack of packs){
-  if(pack.level!=='A2.2')pack.version='20261004-flow-3';
+  if(pack.level!=='A2.2'&&!a12m5?.mapping.some(s=>s.id===pack.id))pack.version='20261004-flow-3';
   for(const step of pack.steps)if(step.role==='translation')for(const item of step.exercise.items)item.normalization='translation';
   pack.exercises=pack.steps.filter(s=>!['rule','listenRepeat'].includes(s.role)).map(s=>copy(s.exercise));
  }

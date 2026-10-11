@@ -1,10 +1,11 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const root=path.resolve(__dirname,'..'),kit=require('../exercise-kit.js'),app={SpaceWhaleExerciseKit:kit,SpaceWhaleHomeworkA21:require('../homework-a21.js')};
-for(const file of ['course-content.js','course-content-module4-34.js','course-content-module4-45.js','course-content-smy-a21.js','course-content-directions-a21.js','course-content-a22-m6-l1.js','course-content-a22-m6-l2.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),{window:app});
+for(const file of ['course-content.js','course-content-module4-34.js','course-content-module4-45.js','course-content-smy-a21.js','course-content-directions-a21.js','course-content-a22-m6-l1.js','course-content-a22-m6-l2.js','course-content-module5-4.js','course-content-module5-5.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),{window:app});
 const catalog=require('../workspace-catalog.js').createCatalog(app.SpaceWhaleContent,[]);
-let packs=require('../homework-content.js').build(app.SpaceWhaleContent,catalog,require('../homework-translations.js'),require('../homework-a21.js'),require('../homework-a22-m6.js'));
+let packs=require('../homework-content.js').build(app.SpaceWhaleContent,catalog,require('../homework-translations.js'),require('../homework-a21.js'),require('../homework-a22-m6.js'),require('../homework-a12-m5.js'));
 if(process.argv.includes('--a21'))packs=packs.filter(p=>p.level==='A2.1');
 if(process.argv.includes('--a22'))packs=packs.filter(p=>p.level==='A2.2');
+if(process.argv.includes('--a12-m5'))packs=packs.filter(p=>/^a1-2-w5-l[45]$/.test(p.id));
 function validateMedia(value){
  if(!value||typeof value!=='object')return;
  for(const [key,entry] of Object.entries(value)){

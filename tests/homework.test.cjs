@@ -4,12 +4,36 @@ const packs=JSON.parse(execFileSync(process.execPath,['scripts/build-homework-ca
 const memory=()=>{const data=new Map();return {getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v)};};
 const record=()=>({id:'attempt',edit:'edit-secret',read:'read-secret',answers:{},revision:0,change:0,dirty:false});
 test('published homework packs retain matching, complete audio, full classroom rules and approved translations',()=>{
- assert.equal(packs.length,10);
+ assert.equal(packs.length,12);
  const app={SpaceWhaleExerciseKit:kit};for(const f of ['course-content.js','course-content-module4-34.js','course-content-module4-45.js'])vm.runInNewContext(fs.readFileSync(require('node:path').resolve(__dirname,'..',f),'utf8'),{window:app});const lessons=app.SpaceWhaleContent;
  const all=[];function walk(d){all.push(d);d.exercises?.forEach(b=>walk(b.exercise));d.blocks?.forEach(b=>{if(b.exercise)walk(b.exercise);});}lessons.forEach(l=>l.stages.forEach(s=>walk(s.exercise)));
- for(const p of packs.filter(p=>p.level==='A1.2')){assert.equal(p.level,'A1.2');assert.equal(p.steps[0].role,'words');assert.equal(p.steps[0].exercise.kind,'matching');assert.equal(p.steps[1].role,'listenRepeat');assert.ok(p.steps[1].exercise.items.every(i=>i.audio&&i.exampleAudio));assert.deepEqual(p.steps.slice(-2).map(s=>s.role),['translation','translation']);
+ for(const p of packs.filter(p=>p.id.startsWith('a1-2-w4-'))){assert.equal(p.level,'A1.2');assert.equal(p.steps[0].role,'words');assert.equal(p.steps[0].exercise.kind,'matching');assert.equal(p.steps[1].role,'listenRepeat');assert.ok(p.steps[1].exercise.items.every(i=>i.audio&&i.exampleAudio));assert.deepEqual(p.steps.slice(-2).map(s=>s.role),['translation','translation']);
  for(const step of p.steps){kit.validate(step.exercise);if(step.role==='rule'){const original=all.find(d=>d.id===step.exercise.id.replace(/-homework-rule$/,''));assert.deepEqual(step.exercise.blocks,clone(original.blocks.filter(b=>b.type==='rule')));}}
  }
+});
+test('A1.2 Module 5 keeps the full lesson rule and checks each approved translation separately',()=>{
+ const app={SpaceWhaleExerciseKit:kit};
+ for(const f of ['course-content-module5-4.js','course-content-module5-5.js'])vm.runInNewContext(fs.readFileSync(require('node:path').resolve(__dirname,'..',f),'utf8'),{window:app});
+ const ids=['a1-2-w5-l4','a1-2-w5-l5'],sources=require('../homework-a12-m5.js');
+ for(const [n,id] of ids.entries()){
+  const pack=packs.find(p=>p.id===id),lesson=app.SpaceWhaleContent.find(l=>l.id===id),source=sources.mapping[n];
+  assert.equal(pack.level,'A1.2');assert.equal(pack.steps.length,15);
+  assert.deepEqual(pack.steps.slice(0,5).map(s=>s.role),['words','listenRepeat','practice','rule','practice']);
+  assert.deepEqual(pack.steps[3].exercise,clone(lesson.stages.find(s=>s.exercise.id===source.rules[0]).exercise));
+  const translations=pack.steps.slice(5);assert.equal(translations.length,10);
+  for(const {exercise:d} of translations){
+   assert.equal(d.items.length,1);assert.ok(d.items[0].acceptedAnswers.length>1);
+   for(const answer of d.items[0].acceptedAnswers)assert.equal(kit.grade(d,{'1':answer})['1'],'correct',answer);
+   assert.equal(kit.grade(d,{'1':'This is an unrelated answer.'})['1'],'retry');
+  }
+ }
+ const study=sources.build('l4'),lost=sources.build('l5');
+ assert.equal(kit.grade(study[0],{'1':"I usually study English in the evening, but now I'm reviewing the lesson."})['1'],'correct');
+ assert.equal(kit.grade(study[0],{'1':'I usually study English in the evening, but now I review the lesson.'})['1'],'retry');
+ assert.equal(kit.grade(study[8],{'1':'She usually reviews the lesson in the evening, but now she is needing to finish her homework.'})['1'],'retry');
+ assert.equal(kit.grade(lost[0],{'1':"I'm looking for my ring. I can't find it."})['1'],'correct');
+ assert.equal(kit.grade(lost[0],{'1':'I found my ring. I can find it.'})['1'],'retry');
+ assert.equal(kit.grade(lost[5],{'1':'My sister is looking for my necklace now.'})['1'],'retry');
 });
 test('autosave serializes in-flight changes and persists revision without dropping a newer answer',async()=>{
  const storage=memory(),calls=[],pending=[];const s=create({storage,key:'draft',record:record(),rpc:(_,args)=>{calls.push(args);return new Promise(resolve=>pending.push(resolve));}});
