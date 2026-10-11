@@ -9,10 +9,19 @@
     media[assetId] = {type: 'image', src: null, brief};
     return {imagePending: true, assetId};
   };
+  const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
+  const audioVersion = '20261011-approved-final';
+  const audioSrc = name => {
+    if (name === 'LISTENING') return courseAudioBase + '/a2-2/w6/l1/listening/the-meeting-starts-soon.mp3?v=' + audioVersion;
+    if (/^LISTENING-CLIP-[1-4]$/.test(name)) return courseAudioBase + '/a2-2/w6/l1/listening/' + name + '.mp3?v=' + audioVersion;
+    if (/^M03-(?:WORD|EXAMPLE)-[1-6]$/.test(name)) return courseAudioBase + '/a2-2/w6/l1/listen-repeat/' + name + '.mp3?v=' + audioVersion;
+    return null;
+  };
   const pendingAudio = (name, script) => {
     const audioId = prefix + '_' + name;
-    media[audioId] = {type: 'audio', src: null, script};
-    return {audioId, audioPending: true};
+    const src = audioSrc(name);
+    media[audioId] = {type: 'audio', src, script};
+    return src ? {audioId, audio: src, audioPending: false} : {audioId, audioPending: true};
   };
   const words = ['screen', 'button', 'cable', 'remote control', 'keyboard', 'mouse'];
   const wordExamples = [
@@ -49,11 +58,11 @@
     options: ['keyboard', 'cable', 'mouse', 'screen', 'remote control', 'button'].map(text => ({id: text, text}))
   });
   const repeat = E('M03', 'audio', 'Listen and repeat', {
-    layout: 'listen-repeat', audioPending: true,
+    layout: 'listen-repeat', audioPending: false,
     items: words.map((text, i) => {
       const word = pendingAudio('M03-WORD-' + (i + 1), text);
       const example = pendingAudio('M03-EXAMPLE-' + (i + 1), wordExamples[i]);
-      return {id: String(i + 1), text, audioId: word.audioId, example: wordExamples[i], exampleAudioId: example.audioId};
+      return {id: String(i + 1), text, audioId: word.audioId, audio: word.audio, example: wordExamples[i], exampleAudioId: example.audioId, exampleAudio: example.audio};
     })
   });
   const wordPractice = E('M04', 'gaps', 'Complete the sentences.', {
@@ -185,7 +194,7 @@
     summary: 'Уточнить, что нужно, имеется или не работает.',
     grammar: 'something / anything / everything / nothing; единственное число; nothing и not + anything',
     constructions: 'There’s something … · Is there anything …? · There isn’t anything … · Nothing happens when … · Does everything work?',
-    words, durationMinutes: 30, contentVersion: 'approved-scenario-2026-10-11', stages,
+    words, durationMinutes: 30, contentVersion: 'approved-scenario-2026-10-11-audio', stages,
     structure: [
       {role: 'opening', sources: [opening.id]},
       {role: 'words', sources: [wordMatch.id, repeat.id]},
