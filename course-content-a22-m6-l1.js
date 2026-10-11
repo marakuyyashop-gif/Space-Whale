@@ -32,14 +32,23 @@
     'Her keyboard is next to the laptop.',
     'This mouse doesn’t work.'
   ];
-  const speakingBrief = 'Один коллаж 3×2, взрослые персонажи, современная бытовая среда. A: неопределённый объект/пятно поверх изображения на включённом экране. B: палец нажимает кнопку пульта, телевизор остаётся чёрным; два состояния показывают отсутствие реакции. C: ноутбук и экран нужно соединить, рядом явно повреждённый кабель. D: пустой экран, взрослый с пультом и знакомый спрашивает о результате. E: экран, клавиатура и мышь проверены и исправны; краткие отметки проверки всех трёх. F: человек двигает одну мышь, но указатель остаётся на месте; два состояния показывают результат. Без готовых ответов, перевода и правил; короткие фактические отметки только там, где результат иначе неясен.';
-  const speakingImage = pendingImage('SPEAKING', speakingBrief);
-  const opening = kit.speaking({
-    id: prefix + '-M01', title: 'Speaking',
-    image: {...speakingImage, crop: {x: 33.333, y: 0, w: 33.333, h: 50}},
-    task: {text: 'Explain the problem and ask for help.'},
-    use: [{phrases: ['When I press …, nothing …', 'There isn’t anything …', 'Can you help me, please?']}]
-  });
+  const speakingImage = {image: 'Images/0_23.png', alt: 'Six scenes showing screens, a remote control, a damaged cable, a keyboard and a working computer.', imageWidth: 496, imageHeight: 368, assetId: prefix + '_SPEAKING'};
+  media[prefix + '_SPEAKING'] = {type: 'image', src: speakingImage.image, imageWidth: 496, imageHeight: 368};
+  const speaking = {
+    title: 'Find out what is wrong.', image: speakingImage,
+    task: {text: 'You and your friend are checking a computer and a TV.', bullets: [
+      'Discuss all six pictures. Ask what your friend can see and what happens when they press a button.',
+      'Explain the problems. Say what works at the end.'
+    ]},
+    use: [
+      {words: ['screen', 'button', 'cable', 'remote control', 'keyboard', 'mouse']},
+      {words: ['something', 'anything', 'nothing', 'everything'], phrases: [
+        'Is there …?', 'There’s … / There isn’t … .', '… wrong with … .',
+        '… happens when … .', 'Does … work?', '… works.'
+      ]}
+    ]
+  };
+  const opening = kit.speaking({id: prefix + '-M01', ...speaking});
   const wordPictures = [
     ['A', 'screen', 'biba_boba_computer_screen_an_adult_fingertip_pointing_to_the_a1945b42-9ee0-470e-b24b-3debf06846df_14.png'],
     ['B', 'cable', 'biba_boba_USB_cable_a_flexible_cord_arranged_in_a_loose_curve_3e68d658-7430-4cfc-93f2-fc1d50f62020_9.png'],
@@ -172,11 +181,7 @@
       'I / not / see / anything / on the screen'
     ].map((prompt, i) => ({id: String(i + 1), prompt}))
   });
-  const final = kit.speaking({
-    id: prefix + '-M11', title: 'Speaking', image: speakingImage,
-    task: {text: 'Ask and answer questions about the pictures. Explain what works, what doesn’t work and what you need.'},
-    use: [{phrases: ['There’s something …', 'Is there anything …?', 'There isn’t anything …', 'Nothing happens when …', 'Does everything …?', 'Everything …', 'I need …', 'Can you help me …?']}]
-  });
+  const final = kit.speaking({id: prefix + '-M11', ...speaking});
   const stages = [
     stage('Opening Speaking', 1, opening),
     stage('Words', 2, wordMatch),
