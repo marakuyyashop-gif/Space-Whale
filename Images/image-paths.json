@@ -811,21 +811,21 @@
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_a_claw_hair_clip_holding_twisted_hair_at_the_back__2b76a7ce-8697-4fa0-89f0-69429806fd69_10.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "05fe55fae1bf80fdb1c1a0bb4353a35bf6d702b9",
       "sha256": "cc84d89123571d0c81cf8e33bcc428fc62d3e2e637e618ca453ac1610bd8bcc2"
     },
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_fabric_hair_tie_isolated_object_soft_irregular__907f6b9b-1c1d-4a44-ad13-483a2c80674e_3.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "cf85d391dcbefc98109612995a49c1a73764818a",
       "sha256": "ffc49e58a4f51f08f788a2d67cf5e7f86dca6680896c5c018594dd7b07798351"
     },
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_hanging_earring_isolated_object_clear_hook_and_91388a1e-2d06-487a-a7c7-58e3ac052a85_21.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "175b0176a98f666668eb59f1a1acb6f16adf8b67",
       "sha256": "5e99f89c2bea2f5c2e3070cfbadc90fd82a19eed346e207cdbe9a8865c8593c6"
     },
@@ -853,21 +853,21 @@
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_bracelet_isolated_object_slightly_irreg_eb029336-ab4e-48ce-a3d7-53dd0c5fe574_14.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "fa7f63be530e0af3f3e881ecf9c4531bd6ffe935",
       "sha256": "2d04205517aab760fe98b7143e79765d7b4a630e312b8e5dfe3d2fc84974c5ff"
     },
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_necklace_isolated_object_loosely_curved__957d6f40-bfaa-4abc-afbf-e2f27c1282ec_3.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "455140f4a0ad64eefa0b4d0b7a731fd2f0a10d10",
       "sha256": "64919b2c23949243f545c703a1aedea9f4390c383c7e6b7fad4b697b5ffe86b3"
     },
     {
       "old": "Images/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
       "new": "Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/biba_boba_one_simple_ring_isolated_object_three-quarter_view__84e6a664-01bd-4020-9779-dd7cde51ab40_9.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "59d60336c3c49da436f519b5a535a3ae9a51b1f9",
       "sha256": "90fe5c0e2a3d48d83a988c4fe345183ee863a85d4ac1e8dc4990df7c6bece27a"
     },
@@ -944,7 +944,7 @@
     {
       "old": "Images/A2.1/biba_boba_booking_a_doctors_appointment_close-up_of_a_smartp_fefe4f54-4102-41fc-a264-e2b70def47df_11.png",
       "new": "Images/Текущие/A2.1/biba_boba_booking_a_doctors_appointment_close-up_of_a_smartp_fefe4f54-4102-41fc-a264-e2b70def47df_11.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "e4d57ea5abfae794cc3a1fc97e77f8ae33636977",
       "sha256": "c00bdc167522e547b084c5bad9443519986d20e1038aebf22c6bf1ea38864f01"
     },
@@ -958,7 +958,7 @@
     {
       "old": "Images/A2.1/biba_boba_buying_medicine_at_a_pharmacy_an_adult_customer_ta_9a2cd5d8-9e77-46fe-a5d4-1a8d2a3ca574_15.png",
       "new": "Images/Текущие/A2.1/biba_boba_buying_medicine_at_a_pharmacy_an_adult_customer_ta_9a2cd5d8-9e77-46fe-a5d4-1a8d2a3ca574_15.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "13992dbd515a9cbb064ceb4a96b63bee642139cf",
       "sha256": "29b56592017038d26d7f4e982bdc7dba1f28bd3e7f70388a7b67abd34ce2a281"
     },
@@ -986,28 +986,28 @@
     {
       "old": "Images/A2.1/biba_boba_making_a_photocopy_an_adult_hand_pressing_a_button_eaae9a15-99e5-49aa-aa45-7d983f63eaa3_14.png",
       "new": "Images/Текущие/A2.1/biba_boba_making_a_photocopy_an_adult_hand_pressing_a_button_eaae9a15-99e5-49aa-aa45-7d983f63eaa3_14.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "b9a0cb1374312e3191e78d122c65392a5fbedabb",
       "sha256": "0227760f3015d090ed0fabd3e84216504482c27884d01623b5f7a695dd3706cf"
     },
     {
       "old": "Images/A2.1/biba_boba_renting_a_car_an_adult_customer_signing_a_short-ter_56664542-f809-437f-a844-d8e196f0da0d_2.png",
       "new": "Images/Текущие/A2.1/biba_boba_renting_a_car_an_adult_customer_signing_a_short-ter_56664542-f809-437f-a844-d8e196f0da0d_2.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "ab74d2c00b667ef956b2b22620e64dff65237d41",
       "sha256": "0e3b44444331a1403a6512ba48c9b1ee17d74ab77c2b64986ef2422b54ffe1e1"
     },
     {
       "old": "Images/A2.1/biba_boba_sending_a_package_an_adult_customer_placing_a_seale_91e0ce23-ed90-4b3b-a3bd-877e6e9f6533_0.png",
       "new": "Images/Текущие/A2.1/biba_boba_sending_a_package_an_adult_customer_placing_a_seale_91e0ce23-ed90-4b3b-a3bd-877e6e9f6533_0.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "92aa5508a0be2b36790723b8420dc3d80680879f",
       "sha256": "d6f59de3fecea656336152e0dd0db858f02f6d23004e15ebfc88a4c7b290d4a4"
     },
     {
       "old": "Images/A2.1/buy-an-envelope.png",
       "new": "Images/Текущие/A2.1/buy-an-envelope.png",
-      "legacyCopy": false,
+      "legacyCopy": true,
       "blob": "b8158cfa7c838154fe765ec6c905125823c8275a",
       "sha256": "71e89377b8aa86ed8a8a29cd76690401283af07b4bd139953a048c7101166762"
     },
