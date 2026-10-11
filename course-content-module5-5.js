@@ -55,11 +55,6 @@
     media[audioId] = {type: 'audio', src, script};
     return src ? {audioPending: false, audioId, audio: src} : {audioPending: true, audioId};
   };
-  // Speaking content is deferred by the owner. Only the existing hidden image
-  // slot is reserved; no scenario, language scaffold or artwork brief is carried over.
-  const emptySlot = (name, title) => E(name, 'presentation', title, {
-    blocks: [{type: 'image', imagePending: true, assetId: prefix + '_' + name + '_DEFERRED'}]
-  });
   const ruleBlocks = [
     {
       "type": "text",
@@ -224,8 +219,22 @@
     ]
   ];
 
-  const opening = emptySlot('SPEAKING_OPENING', 'Speaking');
-  const final = emptySlot('SPEAKING_FINAL', 'Final Speaking');
+  const speaking = {
+    title: 'Help each other find your things.',
+    image: {imagePending: true, assetId: prefix + '_SPEAKING'},
+    task: {text: 'Вы с другом ищете свои вещи в комнате.', bullets: [
+      'По очереди выбирайте вещь и говорите, что ищете. Уточняйте, какую вещь ищет собеседник.',
+      'Спрашивайте, видит ли он её. Когда увидите вещь, покажите её. Найдите все шесть вещей.'
+    ]},
+    use: [{words: ['ring', 'bracelet', 'earring', 'hair tie', 'hair clip', 'necklace'], phrases: [
+      'What are you looking for?', 'I’m looking for my … .', 'I can’t find it.',
+      'Are you looking for your …?', 'Yes, I am. / No, I’m looking for my … .',
+      'Can you see my …?', 'I can see it. / I can’t see it.', 'Here it is!'
+    ]}]
+  };
+  media[prefix + '_SPEAKING'] = {type: 'image', src: null, brief: 'Approved room with six accessories, shared by opening and final Speaking.'};
+  const opening = kit.speaking({id: prefix + '-SPEAKING_OPENING', ...speaking});
+  const final = kit.speaking({id: prefix + '-SPEAKING_FINAL', ...speaking});
   const words = ['ring', 'bracelet', 'earring', 'hair tie', 'hair clip', 'necklace'];
   const wordCards = [
     ['A', 'hair clip', 'A clearly hinged hair clip.'],
@@ -347,7 +356,7 @@
       ]})}))
   });
   const stages = [
-    stage('Speaking', 3, opening, 'Speaking content is deferred. Reserve this opening slot without task text or a scenario.'),
+    stage('Speaking', 3, opening, 'First attempt at the same task used in final Speaking.'),
     stage('Words', 2, wordMatch),
     stage('Listen & Repeat', 2, wordRepeat, 'Two passes: word and example, with time to repeat. Adult natural AmE recordings remain pending.'),
     stage('Word Practice', 2, wordPractice, 'Type each complete accessory word or phrase. The picture identifies the intended accessory; the first letter is only a placeholder. Familiar background language does not introduce the new search expressions.'),
@@ -357,14 +366,14 @@
     stage('Listening', 3, listening, 'Two adult female AmE voices. First listen: question 1 only. After checking or skipping, show question 2 and listen again. Keep its pictures hidden at first because they reveal the sought object. Script remains locked until both questions have submitted non-empty answers.'),
     stage('Writing', 3, writing),
     stage('Practice', 1.5, controlledPractice, 'Controlled oral completion, not a free Speaking task. Accept natural equivalents. Possible completions: ' + oralExamples.map(parts => parts.join(' / ')).join(' | ')),
-    stage('Final Speaking', 7.5, final, 'Reserve 6 minutes for deferred final Speaking and 1.5 minutes for teacher feedback. Both remain empty until the Speaking tasks are agreed.')
+    stage('Final Speaking', 7.5, final, 'Repeat the opening task: 6 minutes Speaking and 1.5 minutes feedback.')
   ];
   const lesson = {
     id, level: 'A1.2', whale: 5,
     summary: 'Описываем потерянный аксессуар, сообщаем о поиске и находим вещь по уточнениям собеседника.',
     grammar: 'Present Continuous в ситуации поиска',
     constructions: 'I’m looking for … · What are you looking for? · Are you looking for …? · I can’t find … · Can you see …?',
-    words, durationMinutes: 30, contentVersion: 'approved-content-speaking-deferred-2026-10-11-all-audio', stages,
+    words, durationMinutes: 30, contentVersion: 'approved-speaking-and-all-audio-2026-10-11', stages,
     structure: [
       {role: 'opening', sources: [opening.id]},
       {role: 'words', sources: [wordMatch.id, wordRepeat.id]},

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
-  // Approved A1.2 M5 L4 text. Opening/final Speaking are intentionally deferred.
-  // Only the existing shared templates are filled; recordings remain pending.
+  // Approved A1.2 M5 L4 text, with identical opening/final Speaking.
+  // Existing shared templates and approved recordings.
   const kit = window.SpaceWhaleExerciseKit;
   if (!kit) return;
   const lesson = {
@@ -1032,6 +1032,27 @@
     "script": "My sister takes notes on her phone."
   }
 };
+  // Identical approved opening and final Speaking; artwork will be attached later.
+  const speaking = {
+    title: 'Talk about your usual day and today.',
+    image: {imagePending: true, assetId: 'A1M5L4_SPEAKING'},
+    task: {text: 'Представьте, что на картинках вы. Расскажите, что вы делаете обычно и что происходит сейчас. Сравните занятия в каждой из шести пар.'},
+    use: [{words: ['study', 'learn', 'teach', 'practice', 'review', 'take notes'], phrases: [
+      'I usually …, but today I’m … .',
+      'On Mondays / On Fridays, I …, but now I’m … .',
+      'Every …, I …, but today I’m … .',
+      'I usually …, but this week I’m … .',
+      'At the moment, I’m … .'
+    ]}]
+  };
+  for (const item of lesson.stages) {
+    if (['A1M5L4_OPENING', 'A1M5L4_FINAL'].includes(item.exercise.id)) {
+      item.exercise = kit.speaking({id: item.exercise.id, ...speaking});
+      kit.validate(item.exercise);
+    }
+  }
+  lesson.contentVersion = 'approved-speaking-and-audio-2026-10-11';
+  window.SpaceWhaleLessonMedia[lesson.id].A1M5L4_SPEAKING = {type: 'image', src: null, brief: 'Approved six usual/today picture pairs, shared by opening and final Speaking.'};
   const lessonMedia = window.SpaceWhaleLessonMedia[lesson.id];
   for (let i = 0; i < 6; i++) {
     const suffix = String(i + 1).padStart(2, '0');
