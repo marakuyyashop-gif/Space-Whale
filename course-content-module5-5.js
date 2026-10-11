@@ -36,10 +36,16 @@
     return image ? {image, assetId, imageWidth: /^(L03_|E11A_)/.test(name) ? 496 : 512, imageHeight: /^(L03_|E11A_)/.test(name) ? 368 : 512, alt: 'Picture'} : {imagePending: true, assetId};
   };
   const courseAudioBase = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio';
-  const audioVersion = '20261011-uploaded-master-final';
+  const audioVersion = '20261011-uploaded-masters-final';
   const audioSrc = name => {
     if (/^P01_(?:WORD|EXAMPLE)_[1-6]$/.test(name)) {
       return courseAudioBase + '/a1-2/w5/l5/listen-repeat/' + name + '.mp3?v=' + audioVersion;
+    }
+    if (/^P02_LINE_[1-8]$/.test(name)) {
+      return courseAudioBase + '/a1-2/w5/l5/listen-repeat/' + name + '.mp3?v=' + audioVersion;
+    }
+    if (name === 'L03_AUDIO') {
+      return courseAudioBase + '/a1-2/w5/l5/listening/kate-needs-help.mp3?v=' + audioVersion;
     }
     return null;
   };
@@ -285,9 +291,11 @@
     'Here it is!'
   ];
   const searchRepeat = E('P02', 'audio', 'Listen and repeat.', {
-    layout: 'listen-repeat', audioPending: true,
-    items: searchLines.map((text, i) => ({id: String(i + 1), text,
-      audioId: pendingAudio('P02_LINE_' + (i + 1), text).audioId}))
+    layout: 'listen-repeat', audioPending: false,
+    items: searchLines.map((text, i) => {
+      const line = pendingAudio('P02_LINE_' + (i + 1), text);
+      return {id: String(i + 1), text, audioId: line.audioId, audio: line.audio};
+    })
   });
   const listeningOptions = [
     [
@@ -356,7 +364,7 @@
     summary: 'Описываем потерянный аксессуар, сообщаем о поиске и находим вещь по уточнениям собеседника.',
     grammar: 'Present Continuous в ситуации поиска',
     constructions: 'I’m looking for … · What are you looking for? · Are you looking for …? · I can’t find … · Can you see …?',
-    words, durationMinutes: 30, contentVersion: 'approved-content-speaking-deferred-2026-10-11-p01-audio', stages,
+    words, durationMinutes: 30, contentVersion: 'approved-content-speaking-deferred-2026-10-11-all-audio', stages,
     structure: [
       {role: 'opening', sources: [opening.id]},
       {role: 'words', sources: [wordMatch.id, wordRepeat.id]},
