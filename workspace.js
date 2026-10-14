@@ -27,13 +27,9 @@
   const sessionHeading = document.querySelector('.workspace-session-heading a');
 
   const sidebar=document.getElementById('workspaceSidebar');
-  const sidebarToggle=document.getElementById('workspaceSidebarToggle');
-  sidebarToggle?.addEventListener('click',()=>{
-    const closed=sidebarToggle.getAttribute('aria-expanded')==='true';
-    document.querySelector('.reference-app').classList.toggle('workspace-sidebar-closed',closed);
-    sidebar.inert=closed;sidebarToggle.setAttribute('aria-expanded',String(!closed));
-    sidebarToggle.setAttribute('aria-label',closed?'Открыть меню':'Свернуть меню');
-  });
+  let menuPanel=null;
+  const menu=document.getElementById('workspaceMenuPanel');
+  document.getElementById('workspaceMenuClose')?.addEventListener('click',()=>setMenuPanel(null,true));
   const themeToggle=document.getElementById('workspaceThemeToggle');
   themeToggle?.addEventListener('click',()=>{
     const dark=document.body.dataset.theme!=='dark';
@@ -98,6 +94,12 @@
     const selected=lesson?.stages.find(stage=>stage.exercise.id===route.exercise);
     if(selected)route.section=stageSection(selected);
     if(lesson?.blocks)route.block=lesson.blocks.find(block=>block.stageIds.includes(route.exercise))?.id || route.block || 'opening';
+    route.selection=params.get('selection')||(!hasCourseRoute?'none':'');
+    if(['none','level','module'].includes(route.selection)){
+      route.lesson='';route.exercise='';route.block='';
+      if(route.selection!=='module')route.whale=0;
+      if(route.selection==='none')route.level='';
+    }
     try{route.exerciseView=JSON.parse(params.get('exercise_view')||'null');}catch(_){route.exerciseView=null;}
     const legacyIndex=selected?.exerciseAliases?.indexOf(params.get('exercise'))??-1;
     if(legacyIndex>=0)route.exerciseView={revealed:legacyIndex+1,children:{[selected.exerciseAliases[legacyIndex]]:route.exerciseView||{}}};
@@ -114,6 +116,7 @@
     params.set('panel', next.panel || 'library');
     params.set('section', next.section || 'tasks');
     if(next.exerciseView)params.set('exercise_view',JSON.stringify(next.exerciseView));
+    if(next.selection)params.set('selection',next.selection);
     params.set('completed_stages',[...completedStages].join(','));
     if (sessionId) params.set('session', sessionId);
     if (guestToken) params.set(teacherRoom || liveRole==='teacher' || window.SpaceWhaleIsTeacher===true ? 'room':'guest', guestToken);
@@ -135,7 +138,8 @@
         panel: 'class',
         lesson: lesson.id,
         section: stageSection(stage),
-        exercise: exerciseId
+        exercise: exerciseId,
+        selection:''
       }));
     }
     return null;
@@ -380,91 +384,143 @@
     expanded.clear();tree.scrollTop=0;
     go({...next,lesson:lessons[0]?.id||'',exercise:'',section:'tasks'});
   }
-  function renderSidebar() {
+  function setMenuPanel(name,restoreFocus=false){
+    const previous=menuPanel;menuPanel=name;
+    dismissSidebarOverlays();renderSidebar();
+    if(restoreFocus){
+      const owner=previous==='profile'?document.getElementById('workspaceProfileButton'):document.querySelector(`.selector-${previous==='levels'?'level':previous==='modules'?'module':'lesson'}`);
+      owner?.focus?.();
+    }
+  }
+  function chooseLesson(lesson){
+    if(journeys[lesson.id])journeys[lesson.id].closed=false;saveJourney();
+    go({...route,...lessonLocation(lesson),selection:'',lesson:lesson.id,exercise:'',exerciseView:null,block:'opening',section:'tasks'});
+  }
+  function renderSidebar(){
     dismissSidebarOverlays();tree.replaceChildren();
-    const controls=document.getElementById('workspaceCourseControls');controls.replaceChildren();
+    const controls=document.getElementById('workspaceCourseControls'),blocks=document.getElementById('workspaceBlockControls');
+    controls.replaceChildren();blocks.replaceChildren();
     const studentLocked=locked(),inClass=route.panel==='class';
     panels.forEach(panel=>document.getElementById(`${panel}Tab`).setAttribute('aria-pressed',String(route.panel===panel)));
-    document.getElementById('workspaceClockPanel').hidden=false;start.disabled=studentLocked;paintTimer();
+    start.disabled=studentLocked;paintTimer();
     const levels=catalog.levels.filter(level=>!guestAllowedLessons||availableWhales(level).length);
-    const level=levels.find(item=>item.id===route.level)||levels[0];
-    const whales=level?availableWhales(level):[],whale=whales.find(item=>item.id===route.whale)||whales[0];
+    const level=levels.find(item=>item.id===route.level);
+    const whales=level?availableWhales(level):[],whale=whales.find(item=>item.id===route.whale);
     const loose=catalog.lessons.filter(lesson=>lesson.level===null&&permitted(lesson)&&(!inClass||hasClassLesson(lesson)));
     const view=route.view==='templates'&&!inClass&&!guestAllowedLessons?'templates':route.view==='unassigned'?'unassigned':'library';
     const topics=view==='templates'?catalog.topics({view:'templates'}):view==='unassigned'?loose:whale?catalog.topics({view:'library',level:level.id,whale:whale.id}).filter(permitted):[];
-    const lesson=selectedLesson(),stageIndex=topics.findIndex(item=>item.id===lesson?.id);
-    const levelOptions=levels.map(item=>({label:item.id,number:'LEVEL',tags:item.whales.length?`${item.whales.length} modules`:'',status:collectionStatus(`level:${item.id}`,catalog.lessons.filter(l=>l.level===item.id)),mark:()=>toggleCollection(`level:${item.id}`,catalog.lessons.filter(l=>l.level===item.id)),selected:item.id===route.level,action:()=>chooseCollection({...route,view:'library',level:item.id,whale:availableWhales(item)[0]?.id||0})}));
-    if(loose.length)levelOptions.push({label:'Отдельные уроки',action:()=>chooseCollection({...route,view:'unassigned'})});
-    if(!inClass&&!guestAllowedLessons)levelOptions.push({label:'Шаблоны упражнений',action:()=>chooseCollection({...route,view:'templates'})},{label:'Управление материалами',href:'library-manage.html'});
-    const moduleOptions=whales.map(item=>{
-      const lessons=catalog.topics({view:'library',level:level.id,whale:item.id}).filter(permitted);
-      return {label:item.title.replace(/^Whale\s*\d+\s*[·:—-]?\s*/i,''),number:String(item.id).padStart(2,'0'),tags:`${lessons.length} lessons`,status:collectionStatus(`module:${level.id}:${item.id}`,lessons),mark:()=>toggleCollection(`module:${level.id}:${item.id}`,lessons),selected:item.id===whale?.id,action:()=>chooseCollection({...route,view:'library',level:level.id,whale:item.id})};
-    });
-    const lessonOptions=topics.map((item,index)=>({label:item.title,number:String(index+1).padStart(2,'0'),tags:item.teacherInfo?.goal||'',status:lessonStatus(item),mark:()=>toggleLessonCompletion(item),selected:item.id===lesson?.id,action:()=>{if(journeys[item.id])journeys[item.id].closed=false;saveJourney();go({...route,...lessonLocation(item),lesson:item.id,exercise:'',section:'tasks'});}}));
-    const selector=(label,title,options,size)=>{
-      const control=button(label,()=>openSidebarPicker?.(control,title,options),`workspace-console-selector selector-${size}`);
-      control.disabled=studentLocked;control.setAttribute('aria-label',title);control.setAttribute('data-tooltip',title);control.setAttribute('aria-haspopup','dialog');control.setAttribute('aria-expanded','false');controls.append(control);
+    const lesson=selectedLesson(),lessonIndex=topics.findIndex(item=>item.id===lesson?.id);
+    const selector=(label,title,name,size)=>{
+      const control=button(label,()=>setMenuPanel(menuPanel===name?null:name),`workspace-rail-control workspace-console-selector selector-${size}`);
+      control.disabled=studentLocked;control.setAttribute('aria-label',title);control.setAttribute('data-tooltip',title);
+      control.setAttribute('aria-controls',menu.id);control.setAttribute('aria-expanded',String(menuPanel===name));controls.append(control);
     };
-    selector(view==='library'?level?.id||'Level':view==='templates'?'TPL':'Level','Level',levelOptions,'level');
-    selector(view==='templates'?'TPL':view==='library'&&whale?`M${whale.id}`:'Module',view==='templates'?'Template group':'Module',view==='templates'?lessonOptions:moduleOptions,'module');
-    selector(stageIndex>=0?`L${stageIndex+1}`:'Lesson',view==='templates'?'Template group':'Lesson',lessonOptions,'lesson');
+    selector(view==='templates'?'TPL':level?.id||'A','Level','levels','level');
+    selector(view==='library'&&whale?`M${whale.id}`:'M','Module','modules','module');
+    selector(lessonIndex>=0?`L${lessonIndex+1}`:'L','Lesson','lesson','lesson');
+    if(lesson?.blocks&&route.section!=='self-study')lesson.blocks.forEach(block=>{
+      const control=button('',()=>{
+        if(journeys[lesson.id])journeys[lesson.id].closed=false;
+        const stage=lesson.stages.find(stage=>block.stageIds.includes(stage.exercise.id));
+        go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
+      },'workspace-rail-control workspace-block-icon');
+      control.dataset.block=block.id;control.disabled=studentLocked;
+      control.setAttribute('aria-label',block.id==='opening'?'Opening Speaking':block.id==='final'?'Final Speaking':block.title);
+      control.setAttribute('data-tooltip',block.title);
+      if(route.block===block.id)control.setAttribute('aria-current','step');
+      if(block.id==='words'||block.id==='language')control.append(node('span',block.id==='words'?'W':'G','workspace-rail-letter'));
+      else control.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H9l-6 3V7a3 3 0 0 1 3-3Z"/><circle cx="8" cy="11" r=".65"/><circle cx="12" cy="11" r=".65"/><circle cx="16" cy="11" r=".65"/></svg>';
+      blocks.append(control);
+    });
+    blocks.hidden=!blocks.childElementCount;
+    blocks.previousElementSibling.hidden=blocks.hidden;
+    menu.hidden=!menuPanel;menu.dataset.panel=menuPanel||'';
+    document.querySelector('.workspace-sidebar-shell').dataset.panelOpen=String(Boolean(menuPanel));
+    document.querySelector('.reference-app').classList.toggle('workspace-menu-open',Boolean(menuPanel));
+    const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
+    profile.hidden=menuPanel!=='profile';tree.hidden=menuPanel==='profile';
+    profileButton.setAttribute('aria-controls',menu.id);profileButton.setAttribute('aria-expanded',String(menuPanel==='profile'));
+    if(!menuPanel||menuPanel==='profile')return;
+    const title=node('h2',menuPanel==='levels'?'Levels':menuPanel==='modules'?'Modules':'Lesson','workspace-panel-title');tree.append(title);
+    const teacher=window.SpaceWhaleLessonTeacherInfo;
+    const option=(label,description,selected,action,href)=>{
+      const control=href?node('a','','workspace-panel-option'):button('',action,'workspace-panel-option');
+      if(href)control.href=href;else{control.disabled=studentLocked;control.setAttribute('aria-pressed',String(selected));}
+      if(selected)control.classList.add('is-selected');
+      control.append(node('strong',label));if(description)control.append(node('small',description));return control;
+    };
+    if(menuPanel==='levels'){
+      const list=node('div','','workspace-panel-list');
+      levels.forEach(item=>list.append(option(item.id,teacher?.levelOverview?.(item)||'',item.id===route.level,()=>go({...route,view:'library',selection:'level',level:item.id,whale:0,lesson:'',exercise:'',block:'',section:'tasks'}))));
+      tree.append(list);
+      if(loose.length)tree.append(option('Other lessons','',view==='unassigned',()=>chooseCollection({...route,view:'unassigned',selection:''})));
+      if(!inClass&&!guestAllowedLessons){
+        tree.append(option('Exercise templates','',view==='templates',()=>{menuPanel='lesson';chooseCollection({...route,view:'templates',selection:''});}));
+        tree.append(option('Manage materials','',false,null,'library-manage.html'));
+      }
+      return;
+    }
+    if(menuPanel==='modules'){
+      const list=node('div','','workspace-panel-list');
+      whales.forEach(item=>{
+        const lessons=catalog.topics({view:'library',level:level.id,whale:item.id}).filter(permitted);
+        list.append(option(item.title.replace(/^Whale\s+(\d+)/i,'Module $1'),teacher?.moduleOverview?.(level,item,lessons)||'',item.id===route.whale,()=>go({...route,view:'library',selection:'module',level:level.id,whale:item.id,lesson:'',exercise:'',block:'',section:'tasks'})));
+      });
+      if(!whales.length)list.append(node('p',level?'No modules available.':'Choose a level.','workspace-info-copy'));
+      tree.append(list);return;
+    }
+    const picker=node('label','','workspace-lesson-picker');picker.append(node('span','Lesson','workspace-visually-hidden'));
+    const select=node('select');select.setAttribute('aria-label','Choose lesson');select.disabled=studentLocked||!topics.length;
+    const prompt=node('option',topics.length?'Choose a lesson':'Choose a module');prompt.value='';select.append(prompt);
+    topics.forEach(item=>{const option=node('option',item.title);option.value=item.id;select.append(option);});
+    // Set selected attributes as well as value for browser and DOM fixture parity.
+    [...select.options||select.querySelectorAll('option')].forEach(option=>option.selected=option.value===(lesson?.id||''));
+    select.addEventListener('change',()=>{const next=topics.find(item=>item.id===select.value);if(next)chooseLesson(next);});
+    picker.append(select);tree.append(picker);
+    if(!lesson)return;
+    const overview=node('section','','workspace-lesson-overview');
+    overview.append(node('h2',lesson.title,'workspace-lesson-title'));
+    const goal=lesson.teacherInfo?.goal==='Complete the lesson task.'?'':lesson.teacherInfo?.goal;
+    if(goal)overview.append(node('p',goal,'workspace-info-copy'));
+    tree.append(overview);
+    if(lesson.blocks&&route.section!=='self-study')renderLessonBlocks(lesson,tree,studentLocked);
+    else{
+      const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label','Exercises');
+      lesson.stages.forEach(stage=>tasks.append(link(stageLabel(stage),{...route,exercise:stage.exercise.id,section:stageSection(stage)},route.exercise===stage.exercise.id,'workspace-stage-link')));tree.append(tasks);
+    }
     const actions=node('div','','workspace-lesson-actions');
     const skip=button('Skip lesson',()=>{},'workspace-progress-skip'),reset=button('',()=>{},'workspace-progress-reset');
     skip.disabled=reset.disabled=true;reset.setAttribute('aria-label','Reset lesson');
     reset.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>';
     actions.append(skip,reset);tree.append(actions);
-    const overview=node('section','','workspace-lesson-overview');
-    const heading=node('div','','workspace-lesson-heading');
-    heading.append(node('h2',lesson?.title||'Выберите урок','workspace-lesson-title'));
-    if(lesson)heading.append(lessonBadge(lesson));
-    overview.append(heading);
-    const goal=lesson?.teacherInfo?.goal==='Complete the lesson task.'?'':lesson?.teacherInfo?.goal;
-    if(goal)overview.append(node('p',goal,'workspace-info-copy'));
-    else if(!lesson)overview.append(node('p','Choose a lesson.','workspace-info-copy'));
-    tree.append(overview);
-    if(lesson?.blocks&&route.section!=='self-study')renderLessonBlocks(lesson,tree,studentLocked);
-    else if(lesson){
-      const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label','Exercises');
-      lesson.stages.forEach(stage=>tasks.append(link(stageLabel(stage),{...route,exercise:stage.exercise.id,section:stageSection(stage)},route.exercise===stage.exercise.id,'workspace-stage-link')));
-      tree.append(tasks);
-    }
   }
 
   function renderLessonBlocks(lesson,parent,studentLocked){
-    const structure=node('section','','workspace-lesson-blocks');structure.id='workspaceLessonBlocks';
-    structure.setAttribute('aria-label','Lesson blocks');
+    const structure=node('section','','workspace-lesson-blocks');structure.id='workspaceLessonBlocks';structure.setAttribute('aria-label','Lesson blocks');
     lesson.blocks.forEach(block=>{
       const active=route.block===block.id,key=`${lesson.id}:${block.id}`;
       const section=node('section','','workspace-lesson-block');section.dataset.block=block.id;
       const row=node('div','','workspace-block-row'),contents=node('div','','workspace-block-content');
       contents.id=`workspace-block-${block.id}`;contents.hidden=!openBlockDetails.has(key);
       const stages=lesson.stages.filter(stage=>block.stageIds.includes(stage.exercise.id));
-      const select=button('',()=>{
-        if(journeys[lesson.id])journeys[lesson.id].closed=false;
-        const stage=stages[0];
-        go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
+      const select=button(block.title,()=>{
+        const stage=stages[0];go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
       },'workspace-block-select');
-      select.disabled=studentLocked;select.setAttribute('aria-label',`${block.number} · ${block.title}`);
-      if(active)select.setAttribute('aria-current','step');
-      select.append(node('span',String(block.number).padStart(2,'0'),'workspace-block-number'),node('strong',block.title));
-      const toggle=button('',()=>{
-        const open=contents.hidden;contents.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
-        if(open)openBlockDetails.add(key);else openBlockDetails.delete(key);
-      },'workspace-block-expand');
-      toggle.disabled=studentLocked;toggle.setAttribute('aria-controls',contents.id);toggle.setAttribute('aria-expanded',String(!contents.hidden));
-      toggle.setAttribute('aria-label',`${block.title}: details`);
+      select.disabled=studentLocked;select.setAttribute('aria-label',block.id==='opening'?'Opening Speaking':block.id==='final'?'Final Speaking':block.title);
+      if(active)select.setAttribute('aria-current','step');row.append(select);
       const aim=lesson.teacherInfo?.blockAims?.[block.id];
-      if(aim)contents.append(node('p',aim,'workspace-info-copy'));
       if(stages.length){
-        const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label',`${block.number} · ${block.title}: exercises`);
-        stages.forEach((stage,index)=>{
-          const next={...route,block:block.id,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null};
-          const item=link(stageLabel(stage),next,route.exercise===stage.exercise.id,'workspace-stage-link');
-          item.setAttribute('data-step',String(index+1));tasks.append(item);
-        });
+        const toggle=button(contents.hidden?'+':'−',()=>{
+          const open=contents.hidden;contents.hidden=!open;toggle.textContent=open?'−':'+';toggle.setAttribute('aria-expanded',String(open));
+          if(open)openBlockDetails.add(key);else openBlockDetails.delete(key);
+        },'workspace-block-expand');
+        toggle.disabled=studentLocked;toggle.setAttribute('aria-controls',contents.id);toggle.setAttribute('aria-expanded',String(!contents.hidden));
+        toggle.setAttribute('aria-label',`${block.title}: exercises`);row.append(toggle);
+        const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label',`${block.title}: exercises`);
+        stages.forEach(stage=>tasks.append(link(stageLabel(stage),{...route,block:block.id,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null},route.exercise===stage.exercise.id,'workspace-stage-link')));
         contents.append(tasks);
       }
-      row.append(select,toggle);section.append(row,contents);structure.append(section);
+      section.append(row);if(aim)section.append(node('p',aim,'workspace-block-aim'));section.append(contents);structure.append(section);
     });
     parent.append(structure);
   }
@@ -602,8 +658,8 @@
     if (!stage || !visible) {
       const empty = node('section', '', 'workspace-empty');
       const block=visible&&route.section!=='self-study'?selected?.blocks?.find(block=>block.id===route.block):null;
-      empty.append(node('h1', block?`${block.number}. ${block.title}`:selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Выберите тему')));
-      empty.append(node('p', block?'Exercises will be added here.':selected ? 'В этом разделе пока нет заданий.' : (liveRole === 'student' ? 'Задание появится, когда преподаватель откроет его.' : 'Откройте тему в библиотеке слева.')));
+      empty.append(node('h1', block?block.title:selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Choose a lesson')));
+      if(block||selected||liveRole==='student')empty.append(node('p', block?'No exercises yet.':selected ? 'No exercises in this section yet.' : 'Задание появится, когда преподаватель откроет его.'));
       host.append(empty); document.title = 'Space Whale — Learning Space'; return;
     }
 
@@ -914,10 +970,10 @@
     clock.setAttribute('aria-valuemax',String(state.duration/60000));clock.setAttribute('aria-valuenow',String(spent/60000));clock.setAttribute('aria-valuetext',`${state.pre?'До урока: ':''}${Math.floor(seconds/60)} мин. ${seconds%60} сек.`);
     clock.dataset.started=String(state.active||state.pre);clock.dataset.phase=timer.ended?'closed':expired?'expired':state.active?'running':state.pre?'before':'ready';
     start.hidden=state.active&&!timer.ended;
-    start.textContent=timer.ended?'Lesson ended':state.waiting?'Waiting for learner':'Start lesson';
+    start.setAttribute('data-tooltip',timer.ended?'Lesson ended':state.waiting?'Waiting for learner':'Start lesson');
     start.disabled=locked()||(liveMode&&!state.canStart);
     start.setAttribute('aria-label',timer.ended?'Занятие завершено':state.waiting?'Ожидаем ученика':state.canStart?'Start Lesson':!liveMode?'Создать приглашение на занятие':scheduledStart()===null?'Сначала подключитесь к занятию':'Начать можно за 5 минут до занятия');
-    start.removeAttribute('data-tooltip');stop.hidden=!state.active||timer.ended;stop.disabled=locked();stop.textContent='Finish lesson';
+    stop.hidden=!state.active||timer.ended;stop.disabled=locked();
     clock.setAttribute('data-time-state','normal');
     if(expired)document.getElementById('workspaceTimerStatus').textContent='Время занятия истекло.';
   }
@@ -965,7 +1021,6 @@
   });
   tick();
   const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
-  const personIcon=profileButton.innerHTML,returnIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>';
   async function renderHomeworkProfile(){
     profile.replaceChildren();
     const lesson=selectedLesson(),panel=node('div'),message=node('p','Загрузка…');
@@ -983,7 +1038,7 @@
         rpc:async(name,args)=>{const {data,error}=await window.spaceWhaleSupabase.rpc(name,args);if(error)throw error;return data;}});
     }catch(_){message.textContent='Не удалось загрузить домашку. Откройте Homework ещё раз.';}
   }
-  profileButton.addEventListener('click',()=>{const open=!sidebar.classList.contains('is-profile');sidebar.classList.toggle('is-profile',open);profile.hidden=!open;if(open)renderHomeworkProfile();profileButton.innerHTML=open?returnIcon:personIcon;profileButton.setAttribute('aria-label',open?'Вернуться в класс':'Профиль ученика');profileButton.setAttribute('data-tooltip',open?'Вернуться в класс':'Профиль ученика');});
+  profileButton.addEventListener('click',()=>{const open=menuPanel!=='profile';setMenuPanel(open?'profile':null);if(open)renderHomeworkProfile();});
 
   window.addEventListener('popstate', () => {
     if (liveMode && liveReady && liveRole === 'student') {
@@ -1071,61 +1126,31 @@
     actions.append(create,close);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
   function setupSidebarOverlays(){
-    if(!document.body?.append || !document.addEventListener)return;
+    if(!document.body?.append||!document.addEventListener)return;
     const tooltip=node('div','','workspace-floating workspace-control-tooltip');tooltip.id='workspaceControlTooltip';tooltip.setAttribute('role','tooltip');
-    const popover=node('section','','workspace-floating workspace-lesson-popover');popover.id='workspaceLessonInfo';popover.setAttribute('role','dialog');popover.setAttribute('aria-labelledby','workspaceLessonInfoTitle');
-    [tooltip,popover].forEach(el=>{el.setAttribute('popover','manual');el.hidden=true;document.body.append(el);});
-    let tooltipOwner=null,infoOwner=null,hoverInfo=false,hoverCloseTimer=null;
-    const cancelHoverClose=()=>{if(hoverCloseTimer!==null){window.clearTimeout(hoverCloseTimer);hoverCloseTimer=null;}};
-    const hide=el=>{if(el.hidePopover&&el.matches(':popover-open'))el.hidePopover();el.hidden=true;};
-    const place=(el,owner)=>{
-      const rect=owner.getBoundingClientRect(),box=el.getBoundingClientRect(),margin=12;
-      const width=window.innerWidth,height=window.innerHeight;
-      const beside=el===popover&&rect.right+box.width+margin*2<width;
-      const left=beside?rect.right+10:Math.min(width-box.width-margin,Math.max(margin,rect.left));
-      let top=beside?rect.top:rect.bottom+10;
-      if(top+box.height>height-margin)top=rect.top-box.height-10;
-      el.style.left=`${Math.max(margin,left)}px`;el.style.top=`${Math.max(margin,Math.min(top,height-box.height-margin))}px`;
+    tooltip.setAttribute('popover','manual');tooltip.hidden=true;document.body.append(tooltip);
+    let owner=null;
+    const close=()=>{if(owner)owner.removeAttribute('aria-describedby');owner=null;if(tooltip.hidePopover&&tooltip.matches(':popover-open'))tooltip.hidePopover();tooltip.hidden=true;};
+    const place=()=>{
+      if(!owner?.getBoundingClientRect)return;
+      const rect=owner.getBoundingClientRect(),box=tooltip.getBoundingClientRect(),margin=8;
+      tooltip.style.left=`${Math.max(margin,Math.min(rect.right+10,window.innerWidth-box.width-margin))}px`;
+      tooltip.style.top=`${Math.max(margin,Math.min(rect.top+(rect.height-box.height)/2,window.innerHeight-box.height-margin))}px`;
     };
-    const show=(el,owner)=>{el.hidden=false;if(el.showPopover&&!el.matches(':popover-open'))el.showPopover();place(el,owner);};
-    const closeTooltip=()=>{if(tooltipOwner)tooltipOwner.removeAttribute('aria-describedby');tooltipOwner=null;hide(tooltip);};
-    const closeInfo=(restore=false)=>{cancelHoverClose();hoverInfo=false;const owner=infoOwner;if(owner)owner.setAttribute('aria-expanded','false');infoOwner=null;hide(popover);if(restore&&owner?.isConnected)owner.focus();};
-    dismissSidebarOverlays=()=>{closeTooltip();closeInfo();};
-    scheduleLessonPopoverClose=()=>{cancelHoverClose();if(hoverInfo)hoverCloseTimer=window.setTimeout(()=>closeInfo(),160);};
-    popover.addEventListener('pointerenter',cancelHoverClose);popover.addEventListener('pointerleave',()=>scheduleLessonPopoverClose());
-    openLessonPopover=(owner,lesson,hover=false)=>{
-      cancelHoverClose();
-      if(infoOwner===owner){if(hover)return;if(hoverInfo){hoverInfo=false;return;}closeInfo();return;}
-      closeInfo();closeTooltip();infoOwner=owner;hoverInfo=hover;
-      const header=node('div','','workspace-popover-heading');const title=node('h3',lesson.title);title.id='workspaceLessonInfoTitle';
-      const close=button('×',()=>closeInfo(true),'workspace-popover-close');close.setAttribute('aria-label','Закрыть информацию об уроке');header.append(title,close);popover.replaceChildren(header);
-      const meta=[lesson.level,lesson.whale?`Module ${lesson.whale}`:'',lesson.stages.length?`${lesson.stages.length} exercises`:''].filter(Boolean).join(' · ');if(meta)popover.append(node('p',meta,'workspace-popover-meta'));
-      lessonInfo(lesson).forEach(([label,text])=>{const row=node('p','','workspace-popover-row');row.append(node('strong',label),node('span',text));popover.append(row);});
-      owner.setAttribute('aria-expanded','true');show(popover,owner);if(!hover)close.focus();
+    const enter=event=>{
+      const next=event.target?.closest?.('.workspace-rail [data-tooltip]');if(!next||next.disabled)return;
+      if(owner===next)return;close();owner=next;tooltip.textContent=owner.getAttribute('data-tooltip');tooltip.hidden=false;owner.setAttribute('aria-describedby',tooltip.id);
+      if(tooltip.showPopover&&!tooltip.matches(':popover-open'))tooltip.showPopover();place();
     };
-    openSidebarPicker=(owner,title,options)=>{
-      if(infoOwner===owner){closeInfo();return;}closeInfo();closeTooltip();infoOwner=owner;
-      const header=node('div','','workspace-popover-heading');const heading=node('h3',title);heading.id='workspaceLessonInfoTitle';
-      const close=button('×',()=>closeInfo(true),'workspace-popover-close');close.setAttribute('aria-label','Закрыть выбор');header.append(heading,close);popover.replaceChildren(header);
-      const list=node('div','',`workspace-picker-options ${options.some(option=>option.number)?'workspace-card-picker':'workspace-number-picker'}`);
-      options.forEach(option=>{
-        const control=option.href?node('a',option.label,'workspace-picker-option'):button(option.label,()=>{closeInfo();option.action();},'workspace-picker-option');
-        if(option.number){control.replaceChildren(node('span',option.number,'workspace-picker-number'),node('strong',option.label));if(option.tags)control.append(node('small',option.tags));if(option.status&&!option.mark)control.append(node('span',option.status==='Done'?'✓':option.status,'workspace-lesson-status'));if(option.status)control.classList.add('is-progressed');if(option.status==='Skipped')control.append(node('span','Skip','workspace-skip-badge'));}
-        if(option.href)control.href=option.href;else control.setAttribute('aria-pressed',String(Boolean(option.selected)));
-        if(option.mark){const row=node('div','','workspace-collection-option');const mark=button(option.status&&option.status!=='Done'&&option.status!=='Skipped'?option.status:'✓',()=>{closeInfo();option.mark();},'workspace-collection-mark');mark.setAttribute('aria-label',`${(option.status==='Done'||option.status==='Skipped')?'Снять отметку выполнения':'Отметить выполненным'}: ${option.label}`);mark.setAttribute('aria-pressed',String(option.status==='Done'||option.status==='Skipped'));mark.disabled=locked();row.append(control,mark);list.append(row);}else list.append(control);
-      });
-      if(!options.length)list.append(node('p','Материалы пока не добавлены.','workspace-muted'));
-      popover.append(list);owner.setAttribute('aria-expanded','true');show(popover,owner);close.focus();
-    };
-    const tooltipFor=target=>target?.closest?.('[data-tooltip]');
-    const enter=event=>{const owner=tooltipFor(event.target);if(!owner||owner.disabled||infoOwner)return;if(tooltipOwner===owner)return;closeTooltip();tooltipOwner=owner;tooltip.textContent=owner.getAttribute('data-tooltip');owner.setAttribute('aria-describedby',tooltip.id);show(tooltip,owner);};
-    const leave=event=>{if(tooltipOwner&&!tooltipOwner.contains(event.relatedTarget))closeTooltip();};
+    const leave=event=>{if(owner&&!owner.contains(event.relatedTarget))close();};
+    dismissSidebarOverlays=close;
     document.addEventListener('pointerover',enter);document.addEventListener('focusin',enter);
     document.addEventListener('pointerout',leave);document.addEventListener('focusout',leave);
-    document.addEventListener('pointerdown',event=>{closeTooltip();if(infoOwner&&!popover.contains(event.target)&&!infoOwner.contains(event.target))closeInfo();});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeTooltip();closeInfo(true);}});
-    document.addEventListener('scroll',event=>{if(!popover.contains(event.target))dismissSidebarOverlays();},true);
-    window.addEventListener('resize',dismissSidebarOverlays);
+    document.addEventListener('pointerdown',event=>{
+      close();if(menuPanel&&!menu.contains(event.target)&&!sidebar.contains(event.target))setMenuPanel(null);
+    });
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'){close();if(menuPanel)setMenuPanel(null,true);}});
+    document.addEventListener('scroll',close,true);window.addEventListener('resize',close);
   }
   setupSidebarOverlays();
   history.replaceState(null, '', `classroom.html${query(route)}`);

@@ -64,8 +64,12 @@ Keep existing classroom stage order. The four-block navigation layer does not ch
 
 New and revised exercises still follow `docs/TEMPLATE_FACTORY.md` and `docs/SPEAKING_TEMPLATE.md`. The navigation contract adds no new response template or lesson-specific visual style.
 
-## Compact teacher menu (2026-10-14)
+## Teacher navigation rail (2026-10-14)
 
-The menu uses a plain Start/Finish button, a text countdown and one Level–Module–Lesson row. Home and learner profile share the lower dock with invitation controls. Milestone/snake/progress panels are removed. Skip lesson and reset are disabled visual placeholders.
+The teacher has one flat, rounded, 64px navigation rail. System icons, Level/Module/Lesson selectors and the four block icons form three groups separated by thin rules. Hover and focus labels appear to the right. A bottom Start/Finish icon and text countdown retain the existing invitation and live timer mechanics.
 
-A block row selects its first exercise in the main area without expanding the menu. A separate chevron reveals a concise English block aim and existing exercise links; details start collapsed and expand in normal document flow. Main-area previous/next exercise arrows keep every original stage reachable without the removed snake. Teacher metadata comes from `lesson-teacher-info.js`; show the lesson goal and subject-specific block aims, not generic teaching commentary or raw author notes.
+One panel replaces its contents for Levels, Modules, Lesson or learner profile. Level and module choices preserve an unselected lesson state using `selection=level|module`; `selection=none` is the empty entry state. Existing direct lesson and exercise links are unchanged. Closing the panel does not navigate or remount the task.
+
+The Lesson panel includes a lesson selector, the concrete English goal and the four English block aims. Optional +/− controls reveal the original exercise links in normal flow. Block rows and rail icons select the first exercise; rail icons do not open or expand the panel. Stage numbers, menu chevrons, Milestone and the snake are absent. Main-area previous/next and within-exercise progression remain available.
+
+Teacher metadata comes from `lesson-teacher-info.js`: `get(lesson)` supplies goals and aims, `levelOverview(level)` and `moduleOverview(level,module,lessons)` supply concise authored course overviews. Unknown or empty course areas receive no invented subject or grammar description. The teacher panel is hidden from learners along with the navigation rail.

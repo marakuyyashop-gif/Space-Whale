@@ -1,4 +1,4 @@
-/* English teacher goals from the approved A1 CARDs. Static metadata only. */
+/* English teacher guidance from approved cards and published lesson metadata. Static metadata only. */
 (function(root){
 'use strict';
 const a1 = {
@@ -493,6 +493,71 @@ const a1 = {
   "Review food quantities and prices, reasons for choices, appearance, categories, Present Continuous, and will/be going to."
  ]
 };
+const courseExtras={
+ 'a2-1-w1-smy-1':[
+  'Tell a connected story with events in order and a clear ending.',
+  '',
+  'Use sequencing phrases and distinguish eventually, finally, and in the end.',
+  'Describe the pictured day in order.',
+  'Tell a connected story from six pictures, add a problem, and explain the ending.'
+ ],
+ 'a2-1-w1-smy-2':[
+  'Describe the direction of movement and choose actions for a route or film.',
+  'Learn movement phrases for climbing, crossing, entering, exiting, and going around.',
+  'Use climb up/over, jump over, step onto, move into, come out of, and run around.',
+  'Explain two activity-park routes and choose one.',
+  'Explain actors’ movements in six scenes and choose three for a film.'
+ ],
+ 'a2-1-w1-smy-3':[
+  'Explain a route and clarify directions so a partner can reach the destination.',
+  'Learn phrases for following and describing a route.',
+  'Use go along/down, walk across/past, keep going straight, continue through, head towards, and pass + place.',
+  'Explain the marked route from the bus stop to the café.',
+  'Give directions along a new route and answer a partner’s clarification question.'
+ ],
+ 'a2-2-w4-l11':[
+  'Explain what happened during a journey and describe the situation now.',
+  'Learn traffic, flat tire, delay, accident, wrong turn, and roadwork.',
+  'Use Past Simple for what happened and be for the current state: stuck in traffic, delayed, or canceled.',
+  'Describe a travel problem to a friend who is waiting for you.',
+  'Explain what happened and what the situation is now in two travel situations.'
+ ],
+ 'a2-2-w4-l12':[
+  'Suggest a solution to a travel problem and agree on a new plan.',
+  'Learn phrases for alternative transport, routes, and waiting for the next service.',
+  'Suggest with could + base verb or Why don’t we + base verb?; respond with That works for me or Let’s do that.',
+  'Suggest a new plan for a travel problem.',
+  'Suggest an alternative, respond to a partner, and agree on what to do in two situations.'
+ ],
+ 'a2-2-w6-l1':[
+  'Explain what is present or not working and clarify a computer or TV problem.',
+  'Learn screen, button, cable, remote control, keyboard, and mouse.',
+  'Use something/anything/everything/nothing with singular verbs; distinguish nothing from not + anything.',
+  'Ask what is visible and what happens when a button is pressed.',
+  'Clarify what is visible, present, or working while checking a computer and TV.'
+ ],
+ 'a2-2-w6-l2':[
+  'Find a place where you can obtain a needed service.',
+  'Learn phrases for sending packages, buying supplies, and arranging everyday services.',
+  'Use somewhere/anywhere/everywhere/nowhere; distinguish nowhere from not + anywhere and use location word + to + verb.',
+  'Ask where to obtain a service and answer using the supplied location notes.',
+  'Help a partner find a service, explain search results, and describe unavailable options.'
+ ],
+ 'b1-1-w1-misha-1':[
+  'Discuss imaginary choices, explain a decision, and respond to changed conditions.',
+  'Learn phrases for housing, work choices, refusing an offer, changing your mind, and taking a chance.',
+  'Use If + Past Simple, would/wouldn’t + verb and hypothetical questions with What would you do if…?',
+  'Compare everyday housing and work choices and explain what matters to you.',
+  'Discuss hypothetical choices and explain how changed conditions affect a decision.'
+ ],
+ 'b1-1-w1-misha-2':[
+  'Give practical advice for someone’s situation and adjust it after new information.',
+  'Learn prepare, revise, concentrate, avoid, consider, and refuse with their useful verb patterns.',
+  'Use If I were you, I’d/I wouldn’t… and In your place/position/situation, I’d….',
+  'Give advice and a reason for two everyday situations.',
+  'Give situation-specific advice, explain the reason, and adjust it after new information.'
+ ]
+};
 function english(value){
  return typeof value==='string'&&/[A-Za-z]/.test(value)&&!/[\u0400-\u04ff]/.test(value)?value.trim():'';
 }
@@ -502,12 +567,71 @@ function get(lesson){
   const [goal,words,language]=card;
   return {goal,blockAims:{opening:'Try to '+goal.charAt(0).toLowerCase()+goal.slice(1),words,language,final:goal.replace(/\.$/,'')+' independently.'}};
  }
+ const extra=courseExtras[lesson?.id];
+ if(extra){
+  const [goal,words,language,opening,final]=extra;
+  return {goal,blockAims:{opening,words,language,final}};
+ }
  const authored=lesson?.teacherInfo||{},aims=authored.blockAims||{};
  const goal=english(authored.goal)||english(lesson?.goal)||english(lesson?.summary)||'Complete the lesson task.';
  return {goal,blockAims:{
   opening:english(aims.opening),words:english(aims.words),language:english(aims.language),final:english(aims.final)
  }};
 }
-const api={get};
+const levelOverviews={
+ 'A1.1':'Introductions, people, routines, preferences, and time. Main language: be, can, Present Simple, have/want/need/like, pronouns, possessives, and time expressions.',
+ 'A1.2':'Homes, everyday requests, food, choices, current actions, and plans. Main language: there is/are, imperatives, can, quantities, look/look like, Present Continuous, will, and be going to.',
+ 'A2.1':'Connected stories, movement, and route directions. Use sequencing phrases and movement verb–preposition combinations to explain events and routes.',
+ 'A2.2':'Travel problems, alternative plans, device problems, and finding services. Use Past Simple and be, could and Why don’t we…?, and indefinite pronouns and location words.',
+ 'B1.1':'Imaginary choices and practical advice. Use If + Past Simple with would/wouldn’t, If I were you…, and phrases for decisions, work, housing, and advice.'
+};
+const moduleOverviews={
+ 'A1.1':{
+  1:'Personal details, polite exchanges, spelling, numbers 0–100, contacts, and weather. Use be from, be + nationality, and It’s + adjective.',
+  2:'Introduce people, describe objects and states, and identify belongings. Use be, a/an/the, regular plurals, and possessive determiners.',
+  3:'Clarify information about people, locations, and abilities. Use be negatives and questions, in/on/at/near, Where is/are…?, and can/can’t.',
+  4:'Daily routines and frequency. Use Present Simple statements and negatives, frequency adverbs, in/on/at for time, and basic word order.',
+  5:'People’s habits, possessions, wants, and needs. Ask questions with be or do/does; use have/has, want + noun/want to + verb, and need + noun/need to + verb.',
+  6:'Preferences, family, belongings, and clothing. Use object pronouns, like, irregular plurals, this/that/these/those, a pair of, possessive ’s, and whose.',
+  7:'Clocks, calendars, and arranging a meeting. Use ordinal numbers, dates, in/on/at, every, from…to…, and questions with when or what time.'
+ },
+ 'A1.2':{
+  1:'Rooms, furniture, finding things, and directions. Use there is/are, place prepositions, Where is/are…?, positive and negative imperatives, and route phrases.',
+  2:'Services, permission, polite requests, help, and clarification. Use can/can’t, Can I…?, Can you…?, Could you…?, and short responses.',
+  3:'Food, shopping quantities, prices, and café orders. Use countable/uncountable nouns, some/any, how much/how many, I’d like…, and food offers.',
+  4:'Clothing choices, appearance, personality, and categories. Use look/look like, degree words, why/which and because, What is… like?/What does… look like?, and kind/type/sort of.',
+  5:'Current actions, routines, and finding missing things. Use Present Continuous statements, negatives, and questions; contrast it with Present Simple and practice look for/find.',
+  6:'Predictions, suggestions, intentions, and decisions. Use will/won’t, Let’s, How about/What about, and be going to; distinguish an existing plan from a decision made now.',
+  7:'Review A1 through introductions, routines, home situations, food orders, choices, current actions, and plans. Apply familiar language; no new vocabulary or grammar.'
+ },
+ 'A2.1':{
+  1:'Tell stories in order, describe movement, and explain routes. Use sequencing and outcome phrases, movement prepositions, and short direction instructions.'
+ },
+ 'A2.2':{
+  4:'Report travel problems and agree on an alternative plan. Use Past Simple for events, be for current states, could + verb, and Why don’t we + verb?',
+  6:'Clarify device problems and find services. Use something/anything/everything/nothing and somewhere/anywhere/everywhere/nowhere, including location word + to + verb.'
+ },
+ 'B1.1':{
+  1:'Discuss hypothetical choices and give practical advice. Use If + Past Simple, would/wouldn’t + verb, If I were you…, and In your place/position/situation….'
+ }
+};
+function identifier(value){return typeof value==='object'&&value!==null?value.id:value;}
+function authoredOverview(value){
+ return value&&typeof value==='object'?(english(value.teacherInfo?.overview)||english(value.overview)||english(value.description)):'';
+}
+function levelOverview(level){
+ return authoredOverview(level)||levelOverviews[identifier(level)]||'';
+}
+function moduleOverview(level,module,lessons){
+ const levelId=identifier(level),moduleId=identifier(module);
+ const authored=authoredOverview(module);
+ if(authored)return authored;
+ const planned=moduleOverviews[levelId]?.[moduleId];
+ if(planned)return planned;
+ const source=(Array.isArray(lessons)?lessons:[]).find(lesson=>
+  lesson?.level===levelId&&String(lesson?.whale??lesson?.module)===String(moduleId)&&english(lesson?.teacherInfo?.moduleOverview));
+ return english(source?.teacherInfo?.moduleOverview);
+}
+const api={get,levelOverview,moduleOverview};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SpaceWhaleLessonTeacherInfo=api;
 })(typeof window==='undefined'?globalThis:window);

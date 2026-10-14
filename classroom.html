@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="styles.css?v=20261012-image-folders">
 <link rel="stylesheet" href="exercise-kit.css?v=20261004-shared-structure">
 <link rel="stylesheet" href="learning-space.css?v=20261004-shared-structure">
-<link rel="stylesheet" href="workspace.css?v=20261014-compact-menu">
+<link rel="stylesheet" href="workspace.css?v=20261014-rail-menu">
 <link rel="stylesheet" href="classroom-media.css?v=20261004-shared-structure">
 <link rel="stylesheet" href="workspace-word-focus.css?v=20260926-context-translation">
 </head><body class="learning-space unified-workspace" data-theme="light">
@@ -14,30 +14,32 @@
 <div class="workspace-connection-state" id="workspaceConnectionState" role="status" hidden>Подключаемся к занятию…</div>
 <div class="workspace-session-tools"><p id="workspaceNotice" class="workspace-notice" role="status"></p><button id="workspaceNoticeClose" class="workspace-notice-close" type="button" aria-label="Закрыть уведомление">×</button></div>
 <div class="reference-app">
-<div class="workspace-sidebar-shell"><aside id="workspaceSidebar" class="app-sidebar" aria-label="Библиотека и задания">
-<header class="workspace-brand-row"><a class="workspace-brand" href="index.html">space whale<span aria-hidden="true">°</span></a><section id="workspaceClockPanel" class="workspace-clock-panel" aria-label="Lesson timer">
+<div class="workspace-sidebar-shell" data-panel-open="false">
+<aside id="workspaceSidebar" class="app-sidebar workspace-rail" aria-label="Workspace navigation">
+<a class="workspace-rail-brand" href="index.html" aria-label="Space Whale">SW</a>
+<nav class="workspace-rail-system" aria-label="Account and lesson links"><a class="workspace-rail-control workspace-home" href="index.html" aria-label="Home" data-tooltip="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a><button id="workspaceProfileButton" class="workspace-rail-control" type="button" aria-label="Profile" data-tooltip="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg></button><button id="newGuestLesson" class="workspace-rail-control" type="button" aria-label="New learner" data-tooltip="New learner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button><button id="inviteStudent" class="workspace-rail-control" type="button" aria-label="Link" data-tooltip="Link"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></button></nav>
+<hr class="workspace-rail-divider">
+<div id="workspaceCourseControls" class="workspace-course-controls" aria-label="Course selection"></div>
+<hr class="workspace-rail-divider">
+<nav id="workspaceBlockControls" class="workspace-rail-blocks" aria-label="Lesson blocks"></nav>
+<div class="workspace-rail-footer"><section id="workspaceClockPanel" class="workspace-clock-panel" aria-label="Lesson timer">
+<button id="startLesson" class="workspace-rail-control" type="button" aria-label="Start lesson" data-tooltip="Start lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7z"/></svg></button>
+<button id="workspaceStopLesson" class="workspace-rail-control" type="button" aria-label="Finish lesson" data-tooltip="Finish lesson" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
 <div id="workspaceClock" class="workspace-clock" data-started="false" role="timer" aria-label="Time remaining" hidden><div class="workspace-clock-face"><span id="workspaceClockTime">60:00</span></div></div>
-<button id="startLesson" type="button" aria-label="Start Lesson">Start lesson</button>
-<button id="workspaceStopLesson" type="button" aria-label="Finish lesson" hidden>Finish lesson</button>
 <span id="workspaceTimerStatus" class="workspace-visually-hidden" role="status"></span>
-</section></header>
-
-<div class="workspace-instruments">
-<div id="workspaceCourseControls" class="workspace-course-controls" aria-label="Level, Module и Lesson"></div>
+</section></div>
 <div class="workspace-session-heading workspace-visually-hidden"><a href="schedule.html" role="status"></a></div>
-
-</div>
-<div class="workspace-middle"><div id="workspaceTopics" class="workspace-tree" aria-label="Темы и упражнения"></div>
-
-</div>
 <nav class="workspace-dock" aria-label="Основная навигация" hidden>
 <a class="workspace-icon" href="index.html" aria-label="Home" data-tooltip="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a>
 <a class="workspace-icon" href="students.html" aria-label="Ученики" data-tooltip="Ученики"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a>
 <button id="libraryTab" class="workspace-icon" type="button" aria-label="Библиотека" data-tooltip="Библиотека" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M3 5l2 1-2 1M3 11l2 1-2 1M3 17l2 1-2 1"/></svg></button>
 <button id="classTab" class="workspace-icon" type="button" aria-label="Класс" data-tooltip="Класс" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
 </nav>
-<div class="workspace-mini-dock" aria-label="Lesson controls"><a class="workspace-icon workspace-home" href="index.html" aria-label="Home" data-tooltip="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a><button id="workspaceProfileButton" class="workspace-power workspace-icon" type="button" aria-label="Профиль ученика" data-tooltip="Профиль ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg></button><button id="newGuestLesson" type="button" aria-label="Новый ученик / закрыть ссылку" data-tooltip="Новый ученик / закрыть ссылку"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button><button id="inviteStudent" type="button" aria-label="Ссылка для ученика" data-tooltip="Ссылка для ученика"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></button></div>
-<section id="workspaceStudentProfile" class="workspace-student-profile" aria-label="Профиль ученика" hidden></section></aside><button id="workspaceSidebarToggle" class="workspace-sidebar-toggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Свернуть меню"><span aria-hidden="true"></span></button></div>
+</aside>
+<section id="workspaceMenuPanel" class="workspace-menu-panel" aria-label="Course information" hidden>
+<header class="workspace-menu-header"><a class="workspace-expanded-brand" href="index.html">Space Whale</a><button id="workspaceMenuClose" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg></button></header>
+<div class="workspace-menu-scroll"><div id="workspaceTopics" class="workspace-tree"></div><section id="workspaceStudentProfile" class="workspace-student-profile" aria-label="Learner profile" hidden></section></div>
+</section></div>
 <section class="class-area"><div class="workspace-utility-bar" id="workspaceUtilityBar"><button id="workspaceThemeToggle" class="workspace-theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема" title="Переключить тему"><span class="theme-sky" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars">✦ · ✧</span><span class="theme-orb"><i></i><i></i><i></i></span></span></button></div><div class="workspace-audio-notice"><button id="lessonAudioEnable" type="button" class="workspace-audio-enable" title="Браузер приостановил аудио упражнений. Нажмите, чтобы разрешить воспроизведение." hidden>Разрешить аудио упражнений</button><button id="lessonAudioDismiss" type="button" aria-label="Закрыть уведомление об аудио">×</button></div><aside id="videoDock" class="workspace-video-dock" tabindex="0" aria-label="Видеосвязь: перетащите окно" hidden>
 <div class="workspace-video-toolbar">
 
@@ -85,9 +87,9 @@
 <script src="course-content-a22-m6-l2.js?v=20261012-image-folders"></script>
 <script src="lesson-structure.js?v=20261014-compact-menu"></script>
 <script src="lesson-structure-content.js?v=20261014-compact-menu"></script>
-<script src="lesson-teacher-info.js?v=20261014-compact-menu"></script>
+<script src="lesson-teacher-info.js?v=20261014-rail-menu"></script>
 <script src="workspace-catalog.js?v=20261014-compact-menu"></script>
 <script src="homework-links.js?v=20261004-flow-4"></script>
 <script src="collaboration-state.js?v=20260924-guest"></script>
-<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20261014-compact-menu";document.body.append(script);}});</script>
+<script>window.SpaceWhaleTeacherAccess.then(allowed=>{if(allowed){const script=document.createElement("script");script.src="workspace.js?v=20261014-rail-menu";document.body.append(script);}});</script>
 </body></html>
