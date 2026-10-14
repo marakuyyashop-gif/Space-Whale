@@ -641,3 +641,18 @@ body.unified-workspace:not([data-theme=dark]) :is(.theme-sky,.theme-orb){backgro
 
 /* The same family applies to the lesson, sidebar, dialogs and controls. */
 body.unified-workspace{font-family:var(--sw-exercise-font);font-size:var(--sw-exercise-text-size)}
+
+/* Four shared lesson blocks; actual exercise controls keep their existing layout. */
+.workspace-lesson-blocks{padding:18px 20px 4px}
+.workspace-lesson-blocks>.workspace-info-eyebrow{margin:0 0 8px}
+.workspace-block-toggle{display:grid;grid-template-columns:24px minmax(0,1fr) 12px;align-items:center;gap:10px;width:100%;min-height:44px;padding:10px 0;border:0;background:transparent;color:var(--sw-neu-ink);text-align:left;font:inherit;cursor:pointer}
+.workspace-block-toggle strong{font-size:calc(var(--sw-exercise-text-size,16px) * 0.875);font-weight:500;line-height:1.4}
+.workspace-block-number{color:var(--sw-neu-muted);font-size:calc(var(--sw-exercise-text-size,16px) * 0.6875);font-variant-numeric:tabular-nums}
+.workspace-block-toggle::after{content:'';width:6px;height:6px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(-45deg)}
+.workspace-block-toggle[aria-expanded=true]::after{transform:rotate(45deg)}
+.workspace-block-toggle[aria-expanded=true] strong{font-weight:700}
+.workspace-block-toggle:focus-visible{outline:2px solid var(--sw-neu-ink);outline-offset:3px;border-radius:4px}
+.workspace-block-content{padding:0 0 12px 34px}
+.workspace-block-content .workspace-info-copy{margin:0 0 8px}
+.workspace-block-content .workspace-stage-link{padding:6px 0;grid-template-columns:18px minmax(0,1fr)}
+.workspace-block-empty{color:var(--sw-neu-muted)}

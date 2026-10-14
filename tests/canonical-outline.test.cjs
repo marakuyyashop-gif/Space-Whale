@@ -29,6 +29,13 @@ test('all loaded A1 lessons follow the single outline, not content metadata', ()
       assert.deepEqual(actual.map(l=>l.title),module.topics);
       assert.deepEqual(actual.map(l=>l.lessonNumber),module.topics.map((_,i)=>i+1));
       assert.ok(actual.every(lesson=>lesson.summary?.trim()), 'Every lesson has a short description');
+      for(const lesson of actual){
+        assert.deepEqual(lesson.blocks.map(block=>block.title),['Speaking','Discovery Words','Lexis Grammar','Speaking']);
+        assert.deepEqual(lesson.blocks.map(block=>block.number),[1,2,3,4]);
+        const assigned=lesson.blocks.flatMap(block=>block.stageIds);
+        assert.equal(new Set(assigned).size,assigned.length,'No exercise is duplicated across blocks');
+        assert.deepEqual([...assigned].sort(),lesson.stages.filter(stage=>stage.section!=='self-study').map(stage=>stage.exercise.id).sort());
+      }
       count += actual.length;
     }
   }
@@ -38,6 +45,20 @@ test('all loaded A1 lessons follow the single outline, not content metadata', ()
     const actual = catalog.lessons.find(l=>l.id===source.id);
     assert.ok(actual,source.id);
     assert.deepEqual(actual.stages,require('../lesson-structure.js').compose(require('../lesson-structure-content.js').apply([source])[0]).stages,'Exercise content must remain intact: '+source.id);
+  }
+});
+
+test('new empty lesson cards inherit the four blocks and block links round-trip without invented tasks',()=>{
+  const source={id:'future-new-lesson',level:'A1.2',whale:6,title:'New lesson',stages:[]};
+  const catalog=createCatalog([source],[]);
+  const lesson=catalog.lessons.find(lesson=>lesson.id===source.id);
+  assert.deepEqual(lesson.blocks.map(block=>block.id),['opening','words','language','final']);
+  assert.ok(lesson.blocks.every(block=>block.stageIds.length===0));
+  assert.deepEqual(lesson.stages,[]);
+  for(const block of lesson.blocks){
+    const route=catalog.normalize('?view=library&level=A1.2&whale=6&lesson='+source.id+'&block='+block.id);
+    assert.equal(route.block,block.id);assert.equal(route.exercise,'');
+    assert.deepEqual(catalog.normalize(catalog.query(route)),route);
   }
 });
 

@@ -89,13 +89,15 @@
     }
     const hasCourseRoute = ['view', 'level', 'whale', 'lesson', 'exercise'].some(key => params.has(key));
     const normalizedSearch = hasCourseRoute ? search : '?view=library&level=A1.1&whale=1';
-    const resume=new URLSearchParams(normalizedSearch);if(resume.get('lesson')&&!resume.get('exercise')&&journeys[resume.get('lesson')]?.last)resume.set('exercise',journeys[resume.get('lesson')].last);
+    const resume=new URLSearchParams(normalizedSearch);if(resume.get('lesson')&&!resume.get('exercise')&&!resume.get('block')&&journeys[resume.get('lesson')]?.last)resume.set('exercise',journeys[resume.get('lesson')].last);
     const route = catalog.normalize('?'+resume);
     route.panel = panels.includes(params.get('panel')) ? params.get('panel') : params.get('panel') === 'self-study' ? 'class' : 'library';
     route.section = sections.some(([id]) => id === params.get('section')) ? params.get('section') : 'tasks';
     if (params.get('panel') === 'self-study') route.section = 'self-study';
-    const selected=catalog.topics(route).find(lesson=>lesson.id===route.lesson)?.stages.find(stage=>stage.exercise.id===route.exercise);
+    const lesson=catalog.topics(route).find(lesson=>lesson.id===route.lesson);
+    const selected=lesson?.stages.find(stage=>stage.exercise.id===route.exercise);
     if(selected)route.section=stageSection(selected);
+    if(lesson?.blocks)route.block=lesson.blocks.find(block=>block.stageIds.includes(route.exercise))?.id || route.block || 'opening';
     try{route.exerciseView=JSON.parse(params.get('exercise_view')||'null');}catch(_){route.exerciseView=null;}
     const legacyIndex=selected?.exerciseAliases?.indexOf(params.get('exercise'))??-1;
     if(legacyIndex>=0)route.exerciseView={revealed:legacyIndex+1,children:{[selected.exerciseAliases[legacyIndex]]:route.exerciseView||{}}};
@@ -154,7 +156,8 @@
 
   function go(next, options = {}) {
     if (liveMode && liveReady && liveRole === 'student' && !options.remote) return;
-    if(next.lesson&&!next.exercise){const saved=journeys[next.lesson];if(saved?.last)next={...next,exercise:saved.last};}
+    if(next.lesson!==route.lesson&&!next.exercise&&!options.remote)next={...next,block:'opening'};
+    if(next.lesson&&!next.exercise&&!next.block){const saved=journeys[next.lesson];if(saved?.last)next={...next,exercise:saved.last};}
     if(next.exercise!==route.exercise&&!options.remote)next={...next,exerciseView:null};
     route = readRoute(query(next));
     if (route.lesson) expanded.add(route.lesson);
@@ -388,7 +391,7 @@
         control.append(node('span',String(index+1),'workspace-path-dot'));
         nav.append(control);
       });
-      const finish=button('✓',()=>markLesson('done'),'workspace-path-point workspace-path-done');finish.disabled=locked();finish.setAttribute('aria-label','Done — отметить все Milestones');finish.setAttribute('data-tooltip','Done');finish.setAttribute('aria-pressed',String(total>0&&done.length===total));nav.append(finish);
+      const finish=button('✓',()=>markLesson('done'),'workspace-path-point workspace-path-done');finish.disabled=locked()||!total;finish.setAttribute('aria-label','Done — отметить все Milestones');finish.setAttribute('data-tooltip','Done');finish.setAttribute('aria-pressed',String(total>0&&done.length===total));nav.append(finish);
       drawMilestoneSnake(nav,total+1,current,lesson);
     }
     renderLessonGauge();
@@ -515,13 +518,45 @@
       }
     }else{copy.textContent='Выберите урок с помощью кнопок рядом с таймером.';overview.append(copy);}
     tree.append(overview);
+    if(lesson?.blocks&&route.section!=='self-study')renderLessonBlocks(lesson,tree,studentLocked);
     if(lesson&&journeys[lesson.id]?.closed)return;
     const current=node('section','','workspace-current-overview'),stage=lesson?.stages[milestoneIndex];
     current.append(node('span',stage?`MILESTONE ${String(milestoneIndex+1).padStart(2,'0')}`:'MILESTONE','workspace-info-eyebrow'));
     const actions=node('div','','workspace-milestone-actions');const skip=button('Skip',()=>markLesson('skip'),'workspace-progress-skip');const reset=button('',()=>markLesson('reset'),'workspace-progress-reset');reset.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>';skip.disabled=reset.disabled=studentLocked;reset.setAttribute('aria-label','Сбросить отметки Milestones');reset.setAttribute('data-tooltip','Сбросить отметки');actions.append(skip,reset);current.append(actions);
     if(stage){const purpose=milestonePurpose(stage);current.append(node('h3',purpose.name),node('p',purpose.description,'workspace-info-copy'));}
-    else current.append(node('p','Задания появятся после выбора урока.','workspace-info-copy'));
+    else current.append(node('p',lesson?.blocks?'Выберите задание внутри блока.':'Задания появятся после выбора урока.','workspace-info-copy'));
     const path=node('nav','','workspace-lesson-path');path.id='workspaceLessonPath';path.setAttribute('aria-label','Milestones текущего Lesson');current.append(path);tree.append(current);
+  }
+
+  function renderLessonBlocks(lesson,parent,studentLocked){
+    const structure=node('section','','workspace-lesson-blocks');structure.id='workspaceLessonBlocks';
+    structure.setAttribute('aria-label','Lesson structure');
+    structure.append(node('h3','Lesson structure','workspace-info-eyebrow'));
+    lesson.blocks.forEach(block=>{
+      const active=route.block===block.id,section=node('section','','workspace-lesson-block');section.dataset.block=block.id;
+      const contents=node('div','','workspace-block-content');contents.id=`workspace-block-${block.id}`;contents.hidden=!active;
+      const stages=lesson.stages.filter(stage=>block.stageIds.includes(stage.exercise.id));
+      const control=button('',()=>{
+        if(journeys[lesson.id])journeys[lesson.id].closed=false;
+        const stage=stages[0];
+        go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
+      },'workspace-block-toggle');
+      control.disabled=studentLocked;control.setAttribute('aria-expanded',String(active));control.setAttribute('aria-controls',contents.id);
+      control.setAttribute('aria-label',`${block.number} · ${block.title}`);
+      control.append(node('span',String(block.number).padStart(2,'0'),'workspace-block-number'),node('strong',block.title));
+      contents.append(node('p',block.description,'workspace-info-copy'));
+      if(stages.length){
+        const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label',`${block.number} · ${block.title}: exercises`);
+        stages.forEach((stage,index)=>{
+          const next={...route,block:block.id,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null};
+          const item=link(stage.menu||stage.title||stage.exercise.title,next,route.exercise===stage.exercise.id,'workspace-stage-link');
+          item.setAttribute('data-step',String(index+1));tasks.append(item);
+        });
+        contents.append(tasks);
+      }else contents.append(node('p','Задания ещё не добавлены.','workspace-info-copy workspace-block-empty'));
+      section.append(control,contents);structure.append(section);
+    });
+    parent.append(structure);
   }
 
   function readAnswers(key, signature) {
@@ -648,7 +683,7 @@
       : guestToken
         ? `guest:${guestToken.slice(0, 8)}:${liveRole || 'connecting'}`
         : 'standalone';
-    const key = stage && visible ? `${liveIdentity}:${selected.id}:${stage.exercise.id}` : `${liveIdentity}:${route.view}:${route.panel}:${route.lesson}:${route.section}:empty`;
+    const key = stage && visible ? `${liveIdentity}:${selected.id}:${stage.exercise.id}` : `${liveIdentity}:${route.view}:${route.panel}:${route.lesson}:${route.section}:${route.block||''}:empty`;
 
     if (key === mountedKey) return;
     mounted?.destroy(); mounted = null; mountedKey = key;
@@ -656,8 +691,9 @@
 
     if (!stage || !visible) {
       const empty = node('section', '', 'workspace-empty');
-      empty.append(node('h1', selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Выберите тему')));
-      empty.append(node('p', selected ? 'В этом разделе пока нет заданий.' : (liveRole === 'student' ? 'Задание появится, когда преподаватель откроет его.' : 'Откройте тему в библиотеке слева.')));
+      const block=visible&&route.section!=='self-study'?selected?.blocks?.find(block=>block.id===route.block):null;
+      empty.append(node('h1', block?`${block.number}. ${block.title}`:selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Выберите тему')));
+      empty.append(node('p', block?'Exercises will be added here.':selected ? 'В этом разделе пока нет заданий.' : (liveRole === 'student' ? 'Задание появится, когда преподаватель откроет его.' : 'Откройте тему в библиотеке слева.')));
       host.append(empty); document.title = 'Space Whale — Learning Space'; return;
     }
 

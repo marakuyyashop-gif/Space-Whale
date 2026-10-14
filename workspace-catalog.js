@@ -429,7 +429,7 @@
     lessons.forEach(lesson => {
       if (!lesson.id || ids.has(lesson.id)) throw new Error('Duplicate or missing lesson ID');
       ids.add(lesson.id);
-      if (!lesson.stages?.length) throw new Error(`Empty lesson: ${lesson.id}`);
+      if (!Array.isArray(lesson.stages)) throw new Error(`Missing lesson stages: ${lesson.id}`);
       const stageIds = lesson.stages.map(stage => stage.exercise.id);
       if (new Set(stageIds).size !== stageIds.length) throw new Error(`Duplicate exercise ID: ${lesson.id}`);
       if (lesson.level !== null || lesson.whale !== null) {
@@ -442,7 +442,8 @@
     const actualById = new Map(lessons.map(lesson => [lesson.id, lesson]));
     const mergedLessons = outlineLessons
       .map(outline => actualById.get(outline.id) || outline)
-      .concat(lessons.filter(lesson => !outlineLessons.some(outline => outline.id === lesson.id)));
+      .concat(lessons.filter(lesson => !outlineLessons.some(outline => outline.id === lesson.id)))
+      .map(lesson => structure?.withBlocks ? structure.withBlocks(lesson) : lesson);
 
     const templateGroups = [
       ['materials','templates-materials','Материалы / элементы','Audio, Text, Image, Rule, Useful phrases и Possible answers.'],
@@ -475,9 +476,12 @@
       const lesson = templateMatch?.group || topics(route).find(lesson => lesson.id === params.get('lesson')) || (view === 'templates' ? templateLesson : null);
       if (lesson) {
         route.lesson = lesson.id;
-        if (lesson.stages.length) {
-          route.exercise = (templateMatch?.stage || lesson.stages.find(stage => stage.exercise.id === requestedExercise || stage.exerciseAliases?.includes(requestedExercise)) || lesson.stages[0]).exercise.id;
-        }
+        const block = lesson.blocks?.find(block => block.id === params.get('block'));
+        const requestedStage = lesson.stages.find(stage => stage.exercise.id === requestedExercise || stage.exerciseAliases?.includes(requestedExercise));
+        const first = block ? lesson.stages.find(stage => block.stageIds.includes(stage.exercise.id)) : lesson.stages[0];
+        const stage = templateMatch?.stage || requestedStage || first;
+        if (stage) route.exercise = stage.exercise.id;
+        if (block) route.block = lesson.blocks.find(block => block.stageIds.includes(route.exercise))?.id || block.id;
       }
       return route;
     }
@@ -486,6 +490,7 @@
       const params = new URLSearchParams({ view: route.view, level: route.level, whale: String(route.whale) });
       if (route.lesson) params.set('lesson', route.lesson);
       if (route.exercise) params.set('exercise', route.exercise);
+      if (mergedLessons.find(lesson => lesson.id === route.lesson)?.blocks?.some(block => block.id === route.block)) params.set('block', route.block);
       return `?${params}`;
     }
 

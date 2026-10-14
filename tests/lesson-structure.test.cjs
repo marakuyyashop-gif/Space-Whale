@@ -66,3 +66,109 @@ test('progressive dropdowns check and reveal each row individually with flat sav
  }
  const state=teacher.handle.getAnswers();assert.equal(state.category,'к какой категории относится предмет');assert.equal(state.article,'a');assert.equal(state.__sw_checked,true);assert.equal(kit.taskFinished(source,state),true);assert.deepEqual(state,pupil.handle.getAnswers());teacher.handle.destroy();pupil.handle.destroy();
 });
+test('four navigation blocks apply to empty and arbitrary future lessons without creating tasks',()=>{
+ for(const input of [{id:'future-empty',title:'A future lesson',stages:[]},{id:'another-future',title:'A future lesson'}]){
+  const before=JSON.stringify(input),actual=structure.withBlocks(input);
+  assert.deepEqual(actual.blocks.map(({id,number,title})=>({id,number,title})),[
+   {id:'opening',number:1,title:'Speaking'},{id:'words',number:2,title:'Discovery Words'},
+   {id:'language',number:3,title:'Lexis Grammar'},{id:'final',number:4,title:'Speaking'}]);
+  assert.ok(actual.blocks.every(b=>b.stageIds.length===0));assert.equal(actual.blocks[3].compareWith,'opening');
+  assert.equal(actual.stages,input.stages);assert.equal(JSON.stringify(input),before);
+ }
+ for(const input of [{id:'review-future',title:'Travel · Review',stages:[]},{id:'repeat-future',title:'Разговор · Повторение',stages:[]},{id:'review-by-flag',title:'Travel',review:true,stages:[]}]){
+  const words=structure.withBlocks(input).blocks[1];assert.match(words.description,/уже изученные/);assert.doesNotMatch(words.description,/нов(?:ые|ый|ого)/i);
+ }
+});
+test('authored navigation purpose wins over roles and headings, with P01 separate from P02',()=>{
+ const input={id:'future-pronunciation',stages:[
+  {role:'opening',exercise:{id:'start',kind:'presentation',title:'Start'}},
+  {role:'words',exercise:{id:'p01',kind:'audio',title:'Listen & Repeat',items:[{id:'one',text:'route'}]}},
+  {role:'practice',exercise:{id:'p02',kind:'audio',title:'Listen & Repeat',items:[{id:'one',text:'We can take another route.'}]}},
+  {navigationBlock:'words',role:'final',menu:'Final Speaking',exercise:{id:'authored-words',kind:'presentation',title:'Speaking'}},
+  {role:'wordPractice',exercise:{id:'word-practice',kind:'gaps',title:'Practice'}},
+  {role:'final',exercise:{id:'finish',kind:'presentation',title:'Finish'}},
+  {section:'self-study',navigationBlock:'not-a-classroom-block',exercise:{id:'homework',kind:'writing',title:'Homework'}}
+ ]};
+ const blocks=structure.withBlocks(input).blocks;
+ assert.deepEqual(blocks[0].stageIds,['start']);assert.deepEqual(blocks[1].stageIds,['p01','authored-words','word-practice']);
+ assert.deepEqual(blocks[2].stageIds,['p02']);assert.deepEqual(blocks[3].stageIds,['finish']);
+ for(const navigationBlock of ['practice','unknown',null,undefined])assert.throws(()=>structure.withBlocks({id:'bad',stages:[{navigationBlock,exercise:{id:'bad-task'}}]}),/Invalid navigation block/);
+});
+test('navigation metadata preserves stage order, exercise signatures, aliases and responses',()=>{
+ const input={id:'future-existing',stages:[
+  {role:'words',exercise:{id:'words-first',kind:'matching',items:[{id:'answer',correctId:'word'}]},exerciseAliases:['old-word-id']},
+  {role:'focus',exercise:{id:'language-first',kind:'rule-page',blocks:[{type:'text',text:'Examples'}]}},
+  {role:'words',exercise:{id:'words-later',kind:'audio',items:[{id:'repeat',text:'word'}]}},
+  {role:'final',exercise:{id:'final-task',kind:'writing',items:[{id:'answer',prompt:'Answer'}]}}
+ ]};
+ const before=JSON.stringify(input),actual=structure.withBlocks(input);
+ assert.equal(actual.stages,input.stages);assert.equal(JSON.stringify(input),before);
+ actual.stages.forEach((stage,i)=>assert.equal(stage,input.stages[i]));
+ assert.deepEqual(actual.blocks[1].stageIds,['words-first','words-later']);
+ const assigned=actual.blocks.flatMap(b=>b.stageIds);assert.equal(assigned.length,input.stages.length);assert.equal(new Set(assigned).size,assigned.length);
+ assert.deepEqual([...assigned].sort(),input.stages.map(s=>s.exercise.id).sort());
+ assert.deepEqual(structure.withBlocks(actual).blocks,actual.blocks);
+ const saved={answer:'saved',__sw_checked:true};assert.equal(structure.restore(actual.stages[0],saved,()=>{throw Error('unexpected response read');}),saved);
+ const homework={id:'homework-only',stages:[{section:'self-study',exercise:{id:'homework-only-task'}}]};assert.equal(structure.withBlocks(homework),homework);
+ assert.throws(()=>structure.withBlocks({id:'duplicate',stages:[{exercise:{id:'same'}},{exercise:{id:'same'}}]}),/duplicate navigation stage ID/);
+});
+test('legacy heading fallback uses explicit purpose and leaves ordinary tasks in language',()=>{
+ const input={id:'future-headings',stages:[
+  {menu:'Opening Speaking',exercise:{id:'opening-heading',kind:'presentation'}},
+  {menu:'New Words',exercise:{id:'words-heading',kind:'choice'}},
+  {menu:'Listen & Repeat',exercise:{id:'ambiguous-repeat',kind:'audio'}},
+  {menu:'Extra task',exercise:{id:'unlabelled-speaking',kind:'speaking'}},
+  {menu:'Final Speaking',exercise:{id:'final-heading',kind:'presentation'}}
+ ]};
+ const blocks=structure.withBlocks(input).blocks;
+ assert.deepEqual(blocks[0].stageIds,['opening-heading']);assert.deepEqual(blocks[1].stageIds,['words-heading']);
+ assert.deepEqual(blocks[2].stageIds,['ambiguous-repeat','unlabelled-speaking']);assert.deepEqual(blocks[3].stageIds,['final-heading']);
+ const recall=structure.withBlocks({id:'future-recall',stages:[{menu:'1. Вспоминаем числа',exercise:{id:'number-recall',kind:'presentation'}}]});
+ assert.deepEqual(recall.blocks[0].stageIds,[]);assert.deepEqual(recall.blocks[2].stageIds,['number-recall']);
+});
+test('reviewed A1 legacy roles keep phrase learning out of Words and preserve missing openings',()=>{
+ const legacyApp={SpaceWhaleExerciseKit:kit};vm.runInNewContext(fs.readFileSync(require.resolve('../whale1-content.js'),'utf8'),{window:legacyApp});
+ const original=legacyApp.SpaceWhaleContent,before=JSON.stringify(original),prepared=require('../lesson-structure-content.js').apply(original);
+ const legacy=prepared.map(structure.withBlocks),get=id=>legacy.find(l=>l.id==='a1-1-w1-l'+id);
+ assert.equal(JSON.stringify(original),before);
+ for(let i=0;i<original.length;i++){
+  assert.deepEqual(legacy[i].stages.map(s=>s.exercise.id),original[i].stages.map(s=>s.exercise.id));
+  legacy[i].stages.forEach((stage,j)=>assert.equal(stage.exercise,original[i].stages[j].exercise));
+  const ids=legacy[i].blocks.flatMap(b=>b.stageIds);assert.equal(ids.length,legacy[i].stages.length);assert.equal(new Set(ids).size,ids.length);
+ }
+ assert.deepEqual(get(1).blocks[1].stageIds,[]);assert.deepEqual(get(2).blocks[1].stageIds,[]);
+ assert.ok(get(1).blocks[2].stageIds.includes('a1-1-w1-l1-e03-repeat'));
+ assert.deepEqual(get(4).blocks[0].stageIds,[]);assert.deepEqual(get(5).blocks[0].stageIds,[]);
+ assert.ok(get(6).blocks[1].stageIds.includes('a1-1-w1-l6-e03'));assert.ok(get(6).blocks[2].stageIds.includes('a1-1-w1-l6-e05-repeat'));
+ assert.deepEqual(get(7).blocks[1].stageIds,[]);assert.deepEqual(get(7).blocks[3].stageIds,['a1-1-w1-l7-e06-text']);assert.ok(get(7).blocks[2].stageIds.includes('a1-1-w1-l7-e07'));
+});
+test('legacy A1.2 navigation retains word pronunciation, language practice and homework boundaries',()=>{
+ const originals=app.SpaceWhaleContent.filter(l=>['a1-2-w4-l1','a1-2-w4-l2','a1-2-w4-l3'].includes(l.id));
+ const prepared=require('../lesson-structure-content.js').apply(originals).map(structure.withBlocks);
+ for(let i=0;i<originals.length;i++){
+  const lesson=prepared[i],classroom=lesson.stages.filter(s=>s.section!=='self-study'),ids=lesson.blocks.flatMap(b=>b.stageIds);
+  assert.deepEqual(lesson.stages.map(s=>s.exercise.id),originals[i].stages.map(s=>s.exercise.id));
+  lesson.stages.forEach((s,j)=>assert.equal(s.exercise,originals[i].stages[j].exercise));
+  assert.deepEqual([...ids].sort(),Array.from(classroom,s=>s.exercise.id).sort());
+ }
+ const second=prepared.find(l=>l.id==='a1-2-w4-l2');assert.ok(second.blocks[1].stageIds.includes('a12w4l2-pronunciation'));
+ assert.ok(second.blocks[2].stageIds.includes('a12w4l2-discovery'));assert.ok(second.blocks[2].stageIds.includes('a12w4l2-writing'));
+ assert.ok(second.stages.some(s=>s.section==='self-study'));assert.ok(!second.blocks.flatMap(b=>b.stageIds).some(id=>/homework/.test(id)));
+ const authored={id:'a1-1-w1-l1',stages:[{role:'words',exercise:{id:'a1-1-w1-l1-e02'}}]};
+ assert.equal(require('../lesson-structure-content.js').apply([authored])[0].stages[0].role,'words');
+});
+test('other legacy metadata distinguishes Test Task, word chunks and draft endings',()=>{
+ const current={SpaceWhaleExerciseKit:kit};
+ for(const file of ['course-content-smy-a21.js','course-content-b1-misha.js','lesson-draft-first-day-school.js','lesson-draft-school-fair.js'])vm.runInNewContext(fs.readFileSync(require.resolve('../'+file),'utf8'),{window:current});
+ const before=JSON.stringify(current.SpaceWhaleContent),prepared=require('../lesson-structure-content.js').apply(current.SpaceWhaleContent).map(structure.withBlocks);
+ assert.equal(JSON.stringify(current.SpaceWhaleContent),before);
+ const get=id=>prepared.find(lesson=>lesson.id===id);
+ assert.deepEqual(get('a2-1-w1-smy-2').blocks[0].stageIds,['A2_MOVE_M01']);
+ assert.ok(get('b1-1-w1-misha-1').blocks[1].stageIds.includes('B1D1-M03'));
+ for(const [id,final] of [['first-day-school','first-day-speaking'],['school-fair','fair-speaking']]){
+  const lesson=get(id);assert.deepEqual(lesson.blocks[0].stageIds,[]);assert.deepEqual(lesson.blocks[3].stageIds,[final]);
+  const original=current.SpaceWhaleContent.find(l=>l.id===id);assert.deepEqual(lesson.stages.map(s=>s.exercise.id),original.stages.map(s=>s.exercise.id));
+ }
+ assert.ok(get('school-fair').blocks[1].stageIds.includes('fair-listen-words'));
+ assert.ok(get('school-fair').blocks[2].stageIds.includes('fair-final-match'));
+});

@@ -9,7 +9,7 @@ function fixture(guest=false,options={}){
  const create=document.createElement.bind(document);
  document.createElement=tag=>{const el=create(tag);if(tag==='audio'){el.pause=()=>{};}if(tag==='dialog'){el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;};}return el;};
  document.querySelector('#workspaceScroll').scrollTo=()=>{};
- const location={href:'https://example.test/classroom.html',pathname:'/classroom.html',search:'?level=A1.1&whale=1&lesson=a1-1-w1-l2'+(guest?'&guest=old-token':'')};location.href+=location.search;location.replace=url=>{location.href=url;};location.reload=()=>{};
+ const location={href:'https://example.test/classroom.html',pathname:'/classroom.html',search:(options.search||'?level=A1.1&whale=1&lesson=a1-1-w1-l2')+(guest?'&guest=old-token':'')};location.href+=location.search;location.replace=url=>{location.href=url;};location.reload=()=>{};
  const history={replaceState(a,b,url){location.search=new URL(url,location.href).search;},pushState(a,b,url){location.search=new URL(url,location.href).search;}};
  const copied=[],calls=[],storage=()=>{const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k)};};
  const channel={presenceState:()=>({})},transportSession={guest:true,allowed_lesson_ids:['*']};
@@ -49,6 +49,44 @@ test('course pickers and lesson overview show the short source descriptions',()=
  assert.equal(new URLSearchParams(s.location.search).get('lesson'),'a1-1-w1-lnumbers');
  assert.equal(s.document.querySelector('.workspace-lesson-title').textContent,'Числа');
  assert.equal(s.document.querySelector('.workspace-lesson-overview .workspace-info-copy').textContent,lessons[4].summary);
+});
+test('every Future and Practice lesson shows four reusable blocks even before exercises are added',()=>{
+ for(const [module,count] of [[6,7],[7,4]])for(let number=1;number<=count;number++){
+  const s=fixture(false,{search:`?view=library&level=A1.2&whale=${module}&lesson=a1-2-w${module}-l${number}`});
+  assert.deepEqual([...s.document.querySelectorAll('.workspace-block-toggle strong')].map(el=>el.textContent),['Speaking','Discovery Words','Lexis Grammar','Speaking']);
+  for(const [id,label] of [['opening','1. Speaking'],['words','2. Discovery Words'],['language','3. Lexis Grammar'],['final','4. Speaking']]){
+   s.click(s.document.querySelector(`[data-block="${id}"] .workspace-block-toggle`));
+   assert.equal(new URLSearchParams(s.location.search).get('block'),id);
+   assert.equal(new URLSearchParams(s.location.search).has('exercise'),false);
+   assert.equal(s.document.querySelector('#workspaceExercise h1').textContent,label);
+   assert.equal(s.document.querySelector('#workspaceExercise .exercise-kit'),null);
+   assert.equal(s.document.querySelectorAll('.workspace-block-toggle[aria-expanded=true]').length,1);
+   const reloaded=fixture(false,{search:s.location.search});
+   assert.equal(reloaded.document.querySelector('#workspaceExercise h1').textContent,label);
+  }
+  assert.equal(s.document.querySelector('.workspace-path-done').disabled,true);
+ }
+});
+test('word block opens the original exercises and retains their deep links',()=>{
+ const s=fixture(false,{search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1'});
+ s.click(s.document.querySelector('[data-block="words"] .workspace-block-toggle'));
+ assert.equal(new URLSearchParams(s.location.search).get('exercise'),'a12w4l1-words');
+ assert.equal(new URLSearchParams(s.location.search).get('block'),'words');
+ const repeat=s.document.querySelector('[data-block="words"] a[href*="exercise=a12w4l1-listen-repeat"]');
+ s.click(repeat);
+ assert.equal(new URLSearchParams(s.location.search).get('exercise'),'a12w4l1-listen-repeat');
+ assert.equal(s.document.querySelector('[data-block="words"] .workspace-block-toggle').getAttribute('aria-expanded'),'true');
+ assert.ok(s.document.querySelector('#workspaceExercise .ek-repeat-list'));
+ const reloaded=fixture(false,{search:s.location.search});
+ assert.equal(new URLSearchParams(reloaded.location.search).get('exercise'),'a12w4l1-listen-repeat');
+ assert.equal(reloaded.document.querySelector('[data-block="words"] .workspace-block-toggle').getAttribute('aria-expanded'),'true');
+});
+test('live empty-block selection follows teacher navigation and remains locked for learners',async()=>{
+ const s=fixture(true,{student:true,startedAt:new Date().toISOString()});await settled();
+ s.handlers.onNavigate({current_page_id:'?view=library&level=A1.2&whale=6&lesson=a1-2-w6-l1&block=language'});
+ assert.equal(s.document.querySelector('#workspaceExercise h1').textContent,'3. Lexis Grammar');
+ assert.ok([...s.document.querySelectorAll('.workspace-block-toggle')].every(control=>control.disabled));
+ assert.equal(new URLSearchParams(s.location.search).get('block'),'language');
 });
 test('existing invitation is copied unchanged; replacement requires a separate explicit action',async()=>{
  const s=fixture(true);await settled();s.click(s.document.querySelector('#inviteStudent'));await settled();assert.equal(s.copied[0],'https://example.test/classroom.html?guest=old-token');
