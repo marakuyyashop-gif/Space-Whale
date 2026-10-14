@@ -6,10 +6,10 @@ Every course lesson uses the same four navigation blocks, including lessons whos
 | --- | --- | --- | --- |
 | 1 | `opening` | Speaking | First attempt at the lesson's communicative task. |
 | 2 | `words` | Discovery Words | Introduce the target words, repeat them and practise their meanings. |
-| 3 | `language` | Lexis Grammar | Context, language discovery, rules and language practice, including reading, listening and controlled production. |
+| 3 | `language` | Lexis / Grammar | Context, language discovery, rules and language practice, including reading, listening and controlled production. |
 | 4 | `final` | Speaking | Independent use after practice; connect the planned task to the opening attempt. |
 
-The five pedagogical parts in the source instructions become four navigation blocks: source parts 3 and 4 share Lexis Grammar. This combines their navigation container, not their exercise definitions or checks.
+The five pedagogical parts in the source instructions become four navigation blocks: source parts 3 and 4 share Lexis / Grammar. This combines their navigation container, not their exercise definitions or checks.
 
 ## Catalog contract
 
@@ -19,7 +19,7 @@ The shared catalog's `withBlocks` result exposes:
 blocks: [
   {id: 'opening', number: 1, title: 'Speaking', description: '…', stageIds: []},
   {id: 'words', number: 2, title: 'Discovery Words', description: '…', stageIds: []},
-  {id: 'language', number: 3, title: 'Lexis Grammar', description: '…', stageIds: []},
+  {id: 'language', number: 3, title: 'Lexis / Grammar', description: '…', stageIds: []},
   {id: 'final', number: 4, title: 'Speaking', description: '…', stageIds: [], compareWith: 'opening'}
 ]
 ```
@@ -57,9 +57,15 @@ Keep existing classroom stage order. The four-block navigation layer does not ch
 
 ## Cases that need semantic roles
 
-- Vocabulary Listen & Repeat belongs to Discovery Words. A later Listen & Repeat of target constructions belongs to Lexis Grammar. A1.2 M5 L5 already distinguishes these as `P01` in `words` and `P02` in `practice`.
+- Vocabulary Listen & Repeat belongs to Discovery Words. A later Listen & Repeat of target constructions belongs to Lexis / Grammar. A1.2 M5 L5 already distinguishes these as `P01` in `words` and `P02` in `practice`.
 - A controlled oral picture task remains language practice even when it uses the shared Speaking renderer. In A1.2 M5 L1, “Слушать и сказать” and “Сказать по картинкам” have the `listening` role; “Самостоятельное описание” has the `final` role.
 - Opening and final Speaking can share the same title and task. Their explicit roles distinguish them; matching the title cannot.
-- A1.2 M4 L6 declares the single nested `L6-review` stage as `practice`. Its picture-speaking prompts belong to that review sequence. Keep the complete stage in Lexis Grammar; do not extract nested tasks or invent an opening, new words or a final task.
+- A1.2 M4 L6 declares the single nested `L6-review` stage as `practice`. Its picture-speaking prompts belong to that review sequence. Keep the complete stage in Lexis / Grammar; do not extract nested tasks or invent an opening, new words or a final task.
 
 New and revised exercises still follow `docs/TEMPLATE_FACTORY.md` and `docs/SPEAKING_TEMPLATE.md`. The navigation contract adds no new response template or lesson-specific visual style.
+
+## Compact teacher menu (2026-10-14)
+
+The menu uses a plain Start/Finish button, a text countdown and one Level–Module–Lesson row. Home and learner profile share the lower dock with invitation controls. Milestone/snake/progress panels are removed. Skip lesson and reset are disabled visual placeholders.
+
+A block row selects its first exercise in the main area without expanding the menu. A separate chevron reveals a concise English block aim and existing exercise links; details start collapsed and expand in normal document flow. Main-area previous/next exercise arrows keep every original stage reachable without the removed snake. Teacher metadata comes from `lesson-teacher-info.js`; show the lesson goal and subject-specific block aims, not generic teaching commentary or raw author notes.

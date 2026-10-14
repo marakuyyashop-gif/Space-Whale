@@ -30,7 +30,7 @@ test('all loaded A1 lessons follow the single outline, not content metadata', ()
       assert.deepEqual(actual.map(l=>l.lessonNumber),module.topics.map((_,i)=>i+1));
       assert.ok(actual.every(lesson=>lesson.summary?.trim()), 'Every lesson has a short description');
       for(const lesson of actual){
-        assert.deepEqual(lesson.blocks.map(block=>block.title),['Speaking','Discovery Words','Lexis Grammar','Speaking']);
+        assert.deepEqual(lesson.blocks.map(block=>block.title),['Speaking','Discovery Words','Lexis / Grammar','Speaking']);
         assert.deepEqual(lesson.blocks.map(block=>block.number),[1,2,3,4]);
         const assigned=lesson.blocks.flatMap(block=>block.stageIds);
         assert.equal(new Set(assigned).size,assigned.length,'No exercise is duplicated across blocks');

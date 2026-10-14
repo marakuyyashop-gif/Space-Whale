@@ -405,6 +405,7 @@
   function createCatalog(lessons, templates) {
     const structure=typeof module!=='undefined'&&module.exports?require('./lesson-structure.js'):root.SpaceWhaleLessonStructure;
     const plans=typeof module!=='undefined'&&module.exports?require('./lesson-structure-content.js'):root.SpaceWhaleLessonStructureContent;
+    const teacher=typeof module!=='undefined'&&module.exports?require('./lesson-teacher-info.js'):root.SpaceWhaleLessonTeacherInfo;
     if(structure)lessons=(plans?plans.apply(lessons):lessons).map(structure.compose);
     // Course metadata belongs exclusively to the outline, never to exercises.
     const outlineById = new Map(outlineLessons.map(lesson => [lesson.id, lesson]));
@@ -443,7 +444,8 @@
     const mergedLessons = outlineLessons
       .map(outline => actualById.get(outline.id) || outline)
       .concat(lessons.filter(lesson => !outlineLessons.some(outline => outline.id === lesson.id)))
-      .map(lesson => structure?.withBlocks ? structure.withBlocks(lesson) : lesson);
+      .map(lesson => structure?.withBlocks ? structure.withBlocks(lesson) : lesson)
+      .map(lesson => teacher ? {...lesson,teacherInfo:teacher.get(lesson)} : lesson);
 
     const templateGroups = [
       ['materials','templates-materials','Материалы / элементы','Audio, Text, Image, Rule, Useful phrases и Possible answers.'],

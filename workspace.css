@@ -202,7 +202,6 @@ body.unified-workspace{--workspace-accent:#c36631;--workspace-grid:rgba(66,72,78
 .workspace-topic-heading .workspace-add{max-width:24px;min-width:24px;font-size:calc(var(--sw-exercise-text-size,16px) * 1.0625);background:transparent;box-shadow:none;padding:2px}
 .workspace-topic-body{padding:0 0 17px}
 .workspace-topic-summary{font:400 calc(var(--sw-exercise-text-size,16px) * 0.75)/1.65 var(--sw-exercise-font);color:var(--sw-neu-muted);margin:0;padding:0 25px 16px}
-.workspace-milestone-caption{font:500 calc(var(--sw-exercise-text-size,16px) * 0.5625)/1.5 var(--sw-exercise-font);letter-spacing:.16em;color:var(--sw-neu-muted);margin:0;padding:0 25px 7px}
 .workspace-stages{gap:0}
 .unified-workspace .workspace-stage,.unified-workspace .workspace-stage.is-active{border-radius:0;box-shadow:none;background:transparent;margin:0}
 .workspace-stage-link{display:grid;grid-template-columns:23px minmax(0,1fr);gap:9px;padding:calc(9px * var(--sw-control-scale,1)) calc(25px * var(--sw-control-scale,1));font-size:calc(var(--sw-exercise-text-size,16px) * 0.75);line-height:1.5}
@@ -215,7 +214,7 @@ body.unified-workspace{--workspace-accent:#c36631;--workspace-grid:rgba(66,72,78
 .unified-workspace .app-sidebar{grid-template-columns:128px minmax(0,1fr);grid-template-rows:auto auto minmax(50px,1fr) auto;gap:10px 18px}
 .workspace-course-controls{grid-column:1;grid-row:2;flex-wrap:wrap;padding:0;gap:8px}.workspace-course-key{height:36px;padding:0 10px;border-radius:13px;min-width:0;gap:9px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.875)}.workspace-collection-add{width:22px;height:22px;margin:0}
 .workspace-clock-panel{grid-column:1;grid-row:3;align-self:start;padding:0 0 22px}.workspace-clock{width:calc(80px * var(--sw-control-scale,1));height:calc(80px * var(--sw-control-scale,1))}.workspace-clock svg{width:calc(70px * var(--sw-control-scale,1));height:calc(70px * var(--sw-control-scale,1))}.workspace-clock-face{font-size:calc(var(--sw-exercise-text-size,16px) * 1.125)}.workspace-timer-reset{width:calc(24px * var(--sw-control-scale,1));height:calc(24px * var(--sw-control-scale,1));right:0;bottom:0}
-.workspace-tree{grid-column:2;grid-row:2/5;margin:0 -18px 0 0;min-height:0}.workspace-topic-heading{padding:16px}.workspace-topic-toggle::before{font-size:calc(var(--sw-exercise-text-size,16px) * 1.3125)}.workspace-topic-summary{padding:0 16px 12px}.workspace-stage-link{padding:calc(8px * var(--sw-control-scale,1)) calc(16px * var(--sw-control-scale,1))}.workspace-milestone-caption{padding-left:16px}.workspace-session-tools{grid-column:1/-1;grid-row:5}
+.workspace-tree{grid-column:2;grid-row:2/5;margin:0 -18px 0 0;min-height:0}.workspace-topic-heading{padding:16px}.workspace-topic-toggle::before{font-size:calc(var(--sw-exercise-text-size,16px) * 1.3125)}.workspace-topic-summary{padding:0 16px 12px}.workspace-stage-link{padding:calc(8px * var(--sw-control-scale,1)) calc(16px * var(--sw-control-scale,1))}.workspace-session-tools{grid-column:1/-1;grid-row:5}
 }
 
 /* Sketch layout: top controls, timer beside course keys, flat Stage selection. */
@@ -247,24 +246,16 @@ body.unified-workspace{--workspace-accent:#c36631;--workspace-grid:rgba(66,72,78
 .workspace-stage-tools .workspace-lesson-info::before{content:'';width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg)}
 .workspace-stage-tools .workspace-lesson-info:hover{opacity:1;background:#ffffff35}
 .workspace-tree{padding-bottom:20px}
-.workspace-milestone-rail{position:absolute;z-index:4;left:18px;top:98px;bottom:60px;display:flex;flex-direction:column;align-items:center;gap:14px;width:34px;padding:10px 0;overflow-y:auto;scrollbar-width:none}
-.workspace-milestone-rail::before{content:'';position:absolute;left:16px;top:20px;bottom:20px;width:1px;background:color-mix(in srgb,var(--sw-neu-muted) 25%,transparent);pointer-events:none}
-.workspace-milestone-rail .workspace-milestone-dot{position:relative;display:block;flex:none;box-sizing:border-box;width:30px;height:28px;margin:0;padding:0;overflow:hidden;white-space:nowrap;font-size:0;color:transparent;border-radius:12px;background:transparent;box-shadow:none}
-.workspace-milestone-rail .workspace-milestone-dot::before{content:'';position:absolute;left:11px;top:10px;width:8px;height:8px;border-radius:50%;background:#a6adb2;box-shadow:0 0 0 4px #f1f2f2;transition:transform 180ms,background 180ms}
-.workspace-milestone-rail .workspace-milestone-dot:hover::before{transform:scale(1.25);background:#737c84}
-.workspace-milestone-rail .workspace-milestone-dot[aria-current]::before{background:var(--workspace-accent);box-shadow:0 0 0 4px #f1e4dc}
-.workspace-milestone-rail .workspace-milestone-dot::after{display:none}
 [data-theme=dark] .workspace-course-key,[data-theme=dark].unified-workspace #startLesson{background:var(--sw-neu-surface);color:var(--sw-neu-ink);box-shadow:var(--sw-neu-small)}
 [data-theme=dark] .workspace-stage-status{background:linear-gradient(145deg,#515b65,#343b44);box-shadow:var(--sw-neu-small)}
 [data-theme=dark] .workspace-stage-status.is-complete{background:linear-gradient(145deg,#87bb93,#4b9364)}
-[data-theme=dark] .workspace-milestone-dot::before{box-shadow:0 0 0 4px var(--sw-neu-bg)}
 @media(max-width:768px){
 .unified-workspace .app-sidebar{grid-template-columns:135px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:12px 14px;padding-bottom:0}
 .workspace-brand-row{grid-column:1/-1}.workspace-instruments{grid-column:1;grid-row:2;align-self:start;grid-template-columns:1fr;gap:9px;padding:0}
 .workspace-instruments .workspace-clock-panel{grid-column:1;grid-row:1}.workspace-instruments .workspace-clock{width:calc(82px * var(--sw-control-scale,1));height:calc(82px * var(--sw-control-scale,1))}.workspace-instruments .workspace-clock svg{width:calc(72px * var(--sw-control-scale,1));height:calc(72px * var(--sw-control-scale,1))}.workspace-clock-face{font-size:calc(var(--sw-exercise-text-size,16px) * 0.875)}
 .workspace-instruments .workspace-course-controls{grid-column:1;grid-row:2;grid-template-columns:1fr 1fr;gap:8px}.workspace-course-key{height:39px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.875);padding:0 8px;gap:5px}.workspace-instruments .workspace-collection-add{bottom:0}
 .workspace-tree{grid-column:2;grid-row:2;margin-right:-18px}.workspace-topic-heading{padding:16px;gap:10px}.workspace-topic-toggle::before{font-size:calc(var(--sw-exercise-text-size,16px) * 1.25)}.workspace-topic-toggle{font-size:calc(var(--sw-exercise-text-size,16px) * 0.75)}.workspace-stage-tools{gap:9px}
-.workspace-session-tools{grid-column:1/-1;grid-row:3}.workspace-milestone-rail{left:3px;top:70px;bottom:24px;width:30px}.unified-workspace .lesson-scroll{padding-left:44px!important}
+.workspace-session-tools{grid-column:1/-1;grid-row:3}.unified-workspace .lesson-scroll{padding-left:44px!important}
 }
 
 .workspace-control-tooltip{border-radius:16px;background:var(--sw-neu-surface);color:var(--sw-neu-ink);box-shadow:0 5px 18px #3038401c,inset 0 1px 0 #ffffff55;padding:8px 12px}
@@ -297,20 +288,11 @@ body.unified-workspace{--workspace-accent:#c36631;--workspace-grid:rgba(66,72,78
 .workspace-mini-dock{display:flex;justify-content:center;align-items:center;gap:20px;flex:none;height:40px;margin:-18px -18px 0;padding:5px 18px 8px;background:var(--sw-neu-surface)}
 .workspace-mini-dock button{width:calc(27px * var(--sw-control-scale,1));height:calc(27px * var(--sw-control-scale,1));border:0;border-radius:calc(10px * var(--sw-control-scale,1));display:grid;place-items:center;background:transparent;color:var(--sw-neu-muted);padding:calc(4px * var(--sw-control-scale,1))}
 .workspace-mini-dock svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.workspace-milestone-rail{left:7px;width:56px;gap:10px;padding:0;overflow:visible;flex-direction:column}
-.workspace-milestone-rail::before{display:none}
-.workspace-rail-caption{order:2;font:400 calc(var(--sw-exercise-text-size,16px) * 0.5625)/1.2 var(--sw-exercise-font);letter-spacing:.025em;color:var(--sw-neu-muted);opacity:.8;text-align:center;flex:none}
-.workspace-milestone-track{position:relative;display:flex;flex-direction:column-reverse;justify-content:space-between;align-items:center;flex:1;min-height:0;width:30px}
-.workspace-milestone-track::before{content:'';position:absolute;left:14.5px;top:14px;bottom:14px;width:1px;background:linear-gradient(to top,var(--workspace-accent) 0 var(--milestone-fill,0%),color-mix(in srgb,var(--sw-neu-muted) 28%,transparent) var(--milestone-fill,0%) 100%)}
-.workspace-milestone-track:has(>a:only-child)::before{display:none}
-.workspace-milestone-rail .workspace-milestone-dot{flex:0 1 28px;min-height:8px;overflow:visible}
-.workspace-milestone-rail .workspace-milestone-dot::before{top:calc(50% - 4px)}
-.workspace-milestone-rail .workspace-milestone-dot.is-complete::before{background:var(--workspace-accent);box-shadow:0 0 0 4px #f1e4dc}
-@media(max-width:768px){.workspace-mini-dock{grid-column:1/-1;grid-row:3;margin:0 -18px;height:32px}.workspace-instruments .workspace-course-controls{gap:7px}.unified-workspace .workspace-course-key{width:49px;height:49px;min-width:49px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.8125)}.workspace-milestone-rail{left:0;width:40px}.workspace-rail-caption{font-size:calc(var(--sw-exercise-text-size,16px) * 0.5)}}
+@media(max-width:768px){.workspace-mini-dock{grid-column:1/-1;grid-row:3;margin:0 -18px;height:32px}.workspace-instruments .workspace-course-controls{gap:7px}.unified-workspace .workspace-course-key{width:49px;height:49px;min-width:49px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.8125)}}
 
 /* Sidebar console draft: a single accent and four stationary selector bands. */
 body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718888}
-.workspace-sidebar-shell,.workspace-milestone-rail{--workspace-accent:var(--sidebar-accent)}
+.workspace-sidebar-shell{--workspace-accent:var(--sidebar-accent)}
 .unified-workspace .app-sidebar{gap:16px;overflow:visible;--console-top:#f7f8f8;--console-bottom:#b9c1c6;--key-face:linear-gradient(145deg,#fff,#e3e6e8);--key-edge:#b7bdc1;--key-shadow:#515c6638}
 [data-theme=dark].unified-workspace .app-sidebar{--console-top:#252c32;--console-bottom:#56626c;--key-face:linear-gradient(145deg,#f2f4f4,#c8d0d3);--key-edge:#879299;--key-shadow:#0006}
 .workspace-instruments{grid-template-columns:minmax(0,1fr) 82px;gap:12px;padding:4px 12px 10px}
@@ -333,17 +315,9 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-inline-option{display:block;box-sizing:border-box;width:100%;padding:13px 25px;border:0;border-radius:0;color:var(--sw-neu-ink);font:400 calc(var(--sw-exercise-text-size,16px) * 0.875)/1.45 var(--sw-exercise-font);text-align:left;text-decoration:none;cursor:pointer;background:color-mix(in srgb,var(--console-bottom) calc(var(--option-tone)*75%),var(--console-top))}
 .workspace-inline-option:hover,.workspace-inline-option[aria-current]{box-shadow:inset 3px 0 var(--sidebar-accent);font-weight:600;filter:brightness(1.035)}
 .workspace-empty-option{padding:15px 25px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.8125);color:var(--sw-neu-muted)}
-.workspace-lesson-gauge{position:relative;flex:1 1 190px;min-height:120px;max-height:260px;width:100%;margin:auto 0;display:grid;place-items:center;border-radius:30px;background:var(--sw-neu-surface)}
-.workspace-lesson-gauge svg{width:100%;height:100%;max-height:240px;overflow:visible}
-.workspace-gauge-tick{stroke:color-mix(in srgb,var(--sw-neu-muted) 28%,var(--sw-neu-surface));stroke-width:3;stroke-linecap:round;transform-box:fill-box;transform-origin:center;transition:stroke 450ms,transform 550ms cubic-bezier(.2,.7,.2,1);transition-delay:var(--tick-delay)}
-.workspace-gauge-tick.is-filled{stroke:var(--sidebar-accent);transform:scale(1.08)}
-.workspace-gauge-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;pointer-events:none}
-.workspace-gauge-percent{font:500 calc(var(--sw-exercise-text-size,16px) * 1.8125)/1.1 var(--sw-exercise-font);color:var(--sw-neu-ink);font-variant-numeric:tabular-nums}.workspace-gauge-count{font:400 calc(var(--sw-exercise-text-size,16px) * 0.6875)/1.3 var(--sw-exercise-font);color:var(--sw-neu-muted)}
 .workspace-mini-dock{margin:0 -18px;border-radius:0 0 34px 34px;height:34px}
-.workspace-milestone-rail .workspace-milestone-dot:is(.is-complete,[aria-current])::before{box-shadow:0 0 0 4px color-mix(in srgb,var(--sidebar-accent) 16%,var(--sw-neu-surface))}
-@media(max-height:760px) and (min-width:769px){.unified-workspace .app-sidebar{gap:12px}.workspace-selector-toggle{height:calc(49px * var(--sw-control-scale,1))}.workspace-instruments .workspace-clock{height:calc(105px * var(--sw-control-scale,1));width:calc(105px * var(--sw-control-scale,1))}.workspace-instruments .workspace-clock svg{height:calc(97px * var(--sw-control-scale,1));width:calc(97px * var(--sw-control-scale,1))}.workspace-lesson-gauge{min-height:95px}.workspace-gauge-percent{font-size:calc(var(--sw-exercise-text-size,16px) * 1.5)}}
-@media(max-width:768px){.unified-workspace .app-sidebar{overflow-y:auto;grid-template-columns:140px minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:14px}.workspace-instruments{grid-column:1;grid-row:2;grid-template-columns:1fr;padding:0}.workspace-instruments .workspace-course-controls{grid-row:2;grid-column:1}.unified-workspace .workspace-tree{grid-column:2;grid-row:2;margin:0 -18px 0 0;align-self:start}.workspace-selector-toggle{height:calc(51px * var(--sw-control-scale,1));padding:0 calc(16px * var(--sw-control-scale,1));font-size:calc(var(--sw-exercise-text-size,16px) * 1.0625)}.workspace-lesson-gauge{grid-column:1/-1;grid-row:3;height:170px;min-height:170px;max-width:260px;justify-self:center}.workspace-mini-dock{grid-row:4}.workspace-inline-option{padding:11px 16px}}
-@media(prefers-reduced-motion:reduce){.workspace-gauge-tick{transition:none}}
+@media(max-height:760px) and (min-width:769px){.unified-workspace .app-sidebar{gap:12px}.workspace-selector-toggle{height:calc(49px * var(--sw-control-scale,1))}.workspace-instruments .workspace-clock{height:calc(105px * var(--sw-control-scale,1));width:calc(105px * var(--sw-control-scale,1))}.workspace-instruments .workspace-clock svg{height:calc(97px * var(--sw-control-scale,1));width:calc(97px * var(--sw-control-scale,1))}}
+@media(max-width:768px){.unified-workspace .app-sidebar{overflow-y:auto;grid-template-columns:140px minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:14px}.workspace-instruments{grid-column:1;grid-row:2;grid-template-columns:1fr;padding:0}.workspace-instruments .workspace-course-controls{grid-row:2;grid-column:1}.unified-workspace .workspace-tree{grid-column:2;grid-row:2;margin:0 -18px 0 0;align-self:start}.workspace-selector-toggle{height:calc(51px * var(--sw-control-scale,1));padding:0 calc(16px * var(--sw-control-scale,1));font-size:calc(var(--sw-exercise-text-size,16px) * 1.0625)}.workspace-mini-dock{grid-row:4}.workspace-inline-option{padding:11px 16px}}
 /* True half-discs, separate button pickers, circular live progress. */
 .unified-workspace .workspace-half-key{width:calc(80px * var(--sw-control-scale,1));height:calc(40px * var(--sw-control-scale,1));min-height:calc(40px * var(--sw-control-scale,1));border-radius:calc(40px * var(--sw-control-scale,1)) calc(40px * var(--sw-control-scale,1)) 0 0;flex:none}
 .unified-workspace .workspace-half-key:last-child{border-radius:0 0 40px 40px}
@@ -352,13 +326,6 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-number-picker .workspace-picker-option{display:grid;place-items:center;padding:12px 8px;min-height:44px;border-radius:13px;text-align:center;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small)}
 .workspace-number-picker .workspace-picker-option[aria-pressed=true]{box-shadow:var(--sw-neu-inset);color:var(--sidebar-accent)}
 .workspace-number-picker .workspace-picker-option::after{display:none}
-.workspace-lesson-gauge{background:transparent!important;border:0;box-shadow:none;min-height:110px;max-height:260px}
-.workspace-lesson-gauge svg{width:min(100%,240px);height:100%;max-height:240px;aspect-ratio:1;flex:none}
-.workspace-gauge-tick,.workspace-gauge-tick.is-filled{transform:none;stroke:none;transition:none}
-.workspace-gauge-rest{stroke:color-mix(in srgb,var(--sw-neu-muted) 45%,transparent);stroke-width:3;stroke-linecap:round}
-.workspace-gauge-fill{stroke:var(--sidebar-accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:25;stroke-dashoffset:25;opacity:0;transition:stroke-dashoffset 550ms cubic-bezier(.2,.7,.2,1),opacity 250ms;transition-delay:var(--tick-delay)}
-.workspace-gauge-tick.is-filled .workspace-gauge-fill{stroke-dashoffset:0;opacity:1}
-@media(prefers-reduced-motion:reduce){.workspace-gauge-fill{transition:none}}
 .workspace-selector-row{height:59px}
 .workspace-selector-label{display:flex;align-items:center;height:100%;padding:0 58px 0 25px;font:600 calc(var(--sw-exercise-text-size,16px) * 1.25)/1.2 var(--sw-exercise-font);letter-spacing:-.035em}
 .workspace-selector-toggle{position:absolute;right:0;top:0;width:calc(53px * var(--sw-control-scale,1));height:100%;padding:0;justify-content:center}
@@ -382,26 +349,12 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 [data-theme=dark] .workspace-clock{background:var(--sw-neu-surface);box-shadow:inset 0 1px 1px #ffffff16,4px 6px 12px #0004,-3px -3px 9px #ffffff04}
 .workspace-middle{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;margin:0 -18px;scrollbar-width:thin;scrollbar-color:#87939855 transparent;overscroll-behavior:contain}
 .unified-workspace .workspace-tree{margin:0;padding:0;overflow:visible;min-height:0;z-index:auto}
-.workspace-lesson-overview,.workspace-current-overview{box-sizing:border-box;margin:0;border:0;border-radius:0;box-shadow:none;padding:23px 23px 22px;background:var(--sidebar-top);color:var(--sw-neu-ink)}
+.workspace-lesson-overview{box-sizing:border-box;margin:0;border:0;border-radius:0;box-shadow:none;padding:23px 23px 22px;background:var(--sidebar-top);color:var(--sw-neu-ink)}
 .workspace-lesson-overview{min-height:185px;background:linear-gradient(var(--sidebar-top),color-mix(in srgb,var(--sidebar-top) 65%,var(--sidebar-lower)))}
-.workspace-current-overview{min-height:165px;background:linear-gradient(color-mix(in srgb,var(--sidebar-top) 65%,var(--sidebar-lower)),var(--sidebar-lower))}
 .workspace-info-eyebrow{display:block;margin-bottom:11px;font:600 calc(var(--sw-exercise-text-size,16px) * 0.625)/1.4 var(--sw-exercise-font);letter-spacing:.16em;color:var(--sw-neu-muted)}
 .workspace-lesson-overview h2{font:600 calc(var(--sw-exercise-text-size,16px) * 1.125)/1.4 var(--sw-exercise-font);letter-spacing:-.025em;margin:0 0 12px}
-.workspace-current-overview h3{font:600 calc(var(--sw-exercise-text-size,16px) * 1.0625)/1.4 var(--sw-exercise-font);margin:0 0 9px}
 .workspace-info-copy{font:400 calc(var(--sw-exercise-text-size,16px) * 0.875)/1.65 var(--sw-exercise-font);color:var(--sw-neu-muted);margin:0;overflow-wrap:break-word}
 .workspace-info-copy strong{color:var(--sw-neu-ink);font-weight:600}
-.workspace-lesson-path{position:relative;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:0;margin:17px -6px 0;padding:8px 6px 12px;overscroll-behavior:contain}
-.workspace-path-point{position:relative;display:grid;place-items:center;flex:1 0 32px;min-width:calc(32px * var(--sw-control-scale,1));height:calc(30px * var(--sw-control-scale,1));text-decoration:none;color:var(--sw-neu-muted);font:400 calc(var(--sw-exercise-text-size,16px) * 0.625)/1 var(--sw-exercise-font)}
-.workspace-path-point:not(:last-child)::after{content:'';position:absolute;left:calc(50% + 8px);right:calc(-50% + 8px);height:calc(1px * var(--sw-control-scale,1));background:color-mix(in srgb,var(--sw-neu-muted) 28%,transparent)}
-.workspace-path-point[data-state=passed]::after{background:var(--sidebar-accent)}
-.workspace-path-dot{position:relative;z-index:1;display:grid;place-items:center;width:18px;height:18px;border:1px solid color-mix(in srgb,var(--sw-neu-muted) 38%,transparent);border-radius:50%;background:var(--sidebar-lower)}
-.workspace-path-point[data-state=passed] .workspace-path-dot{background:var(--sidebar-accent);border-color:var(--sidebar-accent);color:var(--sw-neu-bg)}
-.workspace-path-point[data-state=current] .workspace-path-dot{width:calc(23px * var(--sw-control-scale,1));height:calc(23px * var(--sw-control-scale,1));border:2px solid var(--sidebar-accent);color:var(--sw-neu-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--sidebar-accent) 17%,transparent);font-weight:700}
-.unified-workspace #workspaceLessonGauge{display:grid;position:relative;width:100%;height:170px;min-height:170px;max-height:170px;margin:8px 0 0;padding:0;border:0;border-radius:0;background:none!important;box-shadow:none!important;flex:none}
-#workspaceLessonGauge svg{width:170px;height:170px;max-height:none;justify-self:center}
-#workspaceLessonGauge .workspace-gauge-face{gap:4px}.workspace-gauge-percent{font-size:calc(var(--sw-exercise-text-size,16px) * 1.5)}.workspace-gauge-count{font-size:calc(var(--sw-exercise-text-size,16px) * 0.625)}
-.workspace-gauge-rest{stroke:#a4adb5;opacity:.75;stroke-dasharray:none}
-[data-theme=dark] .workspace-gauge-rest{stroke:#626d78;opacity:.8}
 .workspace-mini-dock{flex:none;margin:0 -18px;height:35px;background:var(--sw-neu-surface)}
 .workspace-card-picker{display:grid;grid-template-columns:1fr;gap:9px}
 .workspace-card-picker .workspace-picker-option{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 10px;padding:13px;border-radius:15px;background:var(--sw-neu-bg);box-shadow:var(--sw-neu-small);color:var(--sw-neu-ink)}
@@ -425,28 +378,13 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-lesson-selector:is(:hover,:focus-visible){transform:translateY(-1px);filter:brightness(1.035)}
 .workspace-lesson-selector[aria-expanded=true]{box-shadow:var(--sw-neu-inset)}
 .workspace-lesson-selector[aria-expanded=true] .workspace-selector-chevron{transform:rotate(225deg)}
-.workspace-current-overview{background:var(--sidebar-lower);padding:22px 20px;min-height:0}
 .unified-workspace .app-sidebar{--sidebar-lower:#dfe3e6}
 [data-theme=dark].unified-workspace .app-sidebar{--sidebar-lower:#272c32}
-.workspace-lesson-path{display:grid;grid-template-columns:repeat(var(--path-columns,8),minmax(0,1fr));row-gap:9px;overflow:visible;margin:17px 0 0;padding:6px 0 3px}
-.workspace-path-point{min-width:0;width:100%;height:calc(29px * var(--sw-control-scale,1))}
-.workspace-path-point.is-row-end::after{display:none}
-.workspace-path-point:hover .workspace-path-dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--sidebar-accent) 18%,transparent)}
 @media(prefers-reduced-motion:reduce){.workspace-lesson-selector{transition:none}}
-/* Explicit completion controls, independent of exercise answers. */
-.workspace-path-point{padding:0;border:0;background:none;cursor:pointer;font-family:var(--sw-exercise-font)}
-.workspace-path-done{justify-self:center;align-self:center;width:28px;height:28px;border:1px solid color-mix(in srgb,var(--sidebar-accent) 55%,transparent);border-radius:10px;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small);font-size:calc(var(--sw-exercise-text-size,16px) * 1.0625);color:var(--sw-neu-muted)}
-.workspace-path-done[aria-pressed=true]{background:var(--sidebar-accent);color:var(--sw-neu-bg)}
-.workspace-current-overview{position:relative}
-.workspace-current-overview>.workspace-info-eyebrow{padding-right:70px}
-.workspace-milestone-actions{position:absolute;right:17px;top:16px;display:flex;align-items:center;gap:9px}
-.workspace-milestone-actions button{border:0;background:none;color:var(--sw-neu-muted);cursor:pointer;padding:calc(4px * var(--sw-control-scale,1));border-radius:calc(8px * var(--sw-control-scale,1))}
 .workspace-progress-skip{font:400 calc(var(--sw-exercise-text-size,16px) * 0.6875)/1.4 var(--sw-exercise-font)}.workspace-progress-reset{font:400 calc(var(--sw-exercise-text-size,16px) * 1.375)/1 var(--sw-exercise-font)}
-.workspace-milestone-actions button:hover{color:var(--sw-neu-ink);background:color-mix(in srgb,var(--sidebar-accent) 12%,transparent)}
 .workspace-lesson-status{font:500 calc(var(--sw-exercise-text-size,16px) * 0.6875)/1.4 var(--sw-exercise-font);color:var(--sidebar-accent)}
 .workspace-card-picker .workspace-lesson-status{grid-column:2}
 .workspace-card-picker:has(.workspace-picker-number:first-child) .workspace-picker-number{overflow-wrap:normal}
-#workspaceLessonGauge[hidden]{display:none!important}
 .workspace-card-picker .workspace-picker-option{grid-template-columns:36px minmax(0,1fr)}
 .workspace-card-picker .workspace-picker-number{font-size:calc(var(--sw-exercise-text-size,16px) * 0.625)}
 /* Lesson badges, start-in-clock and the student profile placeholder. */
@@ -470,18 +408,7 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 /* One continuous lesson path. */
 .workspace-middle{display:flex;flex-direction:column;background:var(--sidebar-lower)}
 .unified-workspace .workspace-tree{flex:1;display:flex;flex-direction:column}
-.workspace-current-overview{flex:1;padding-bottom:25px}
-.workspace-lesson-path{position:relative;display:block;height:290px;margin:20px 0 0;padding:0;overflow:visible}
-.workspace-lesson-path>svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--sw-neu-muted);stroke-opacity:.5;stroke-width:1.1;overflow:visible}
-.workspace-lesson-path .workspace-path-point{position:absolute;transform:translate(-50%,-50%);width:calc(28px * var(--sw-control-scale,1));height:calc(28px * var(--sw-control-scale,1));min-width:0;z-index:1}
-.workspace-lesson-path .workspace-path-point::after{display:none!important}
-.workspace-lesson-path .workspace-path-dot{width:22px;height:22px;background:var(--sidebar-lower)}
-.workspace-lesson-path .workspace-path-point[data-state=passed] .workspace-path-dot{background:var(--sidebar-accent)}
-.workspace-lesson-path .workspace-path-point[aria-current] .workspace-path-dot{border:2px solid var(--sidebar-accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--sidebar-accent) 16%,var(--sidebar-lower))}
-.workspace-snake-label{position:absolute;left:8px;right:8px;text-align:center;font:500 calc(var(--sw-exercise-text-size,16px) * 0.6875)/1.4 var(--sw-exercise-font);color:var(--sw-neu-ink);pointer-events:none}
-.workspace-milestone-actions .workspace-progress-reset{display:inline-grid;place-items:center;width:36px;height:36px;min-height:36px;padding:8px;border:0;border-radius:50%;background:transparent;box-shadow:none;color:var(--sw-neu-muted)}
 .workspace-progress-reset svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.workspace-milestone-actions .workspace-progress-reset:hover:not(:disabled){background:var(--sw-neu-hover);color:var(--sw-neu-ink);transform:none;filter:none}
 .workspace-lesson-selector{padding-right:65px}
 .workspace-lesson-selector>.workspace-lesson-status{position:absolute;right:13px;top:50%;transform:translateY(-50%);margin:0}
 .workspace-lesson-selector .workspace-selector-chevron{right:21px;top:15px}
@@ -492,7 +419,7 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-collection-option{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:8px;align-items:center}
 .workspace-collection-mark{width:29px;height:29px;border:1px solid color-mix(in srgb,var(--sw-neu-muted) 25%,transparent);border-radius:10px;background:var(--sw-neu-bg);color:var(--sw-neu-muted);cursor:pointer}
 .workspace-collection-mark[aria-pressed=true]{background:var(--sidebar-accent);color:white;border-color:transparent}
-.unified-workspace .app-sidebar.is-profile>.workspace-instruments,.unified-workspace .app-sidebar.is-profile>.workspace-middle,.unified-workspace .app-sidebar.is-profile>.workspace-mini-dock,.unified-workspace .app-sidebar.is-profile>.workspace-session-tools{display:none}
+.unified-workspace .app-sidebar.is-profile>.workspace-instruments,.unified-workspace .app-sidebar.is-profile>.workspace-middle,.unified-workspace .app-sidebar.is-profile>.workspace-session-tools{display:none}
 #workspaceStudentProfile{position:relative;inset:auto;flex:1;width:100%;min-height:0;padding:0;background:transparent;z-index:auto}
 .workspace-session-dialog{width:min(390px,calc(100vw - 48px));border:0;border-radius:25px;padding:25px;background:var(--sw-neu-bg);color:var(--sw-neu-ink);font:400 calc(var(--sw-exercise-text-size,16px) * 0.875)/1.6 var(--sw-exercise-font);box-shadow:0 18px 60px #0005}
 .workspace-session-dialog::backdrop{background:#15191d66;backdrop-filter:blur(3px)}
@@ -519,7 +446,6 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .workspace-dialog-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--sw-neu-muted);font-size:calc(var(--sw-exercise-text-size,16px) * 1.5);cursor:pointer}
 .workspace-dialog-button.is-brand{background:var(--sidebar-accent);color:white}
 .workspace-dialog-button.is-finish{background:var(--sw-neu-surface);color:var(--sw-neu-ink)}
-.workspace-snake-label{width:max-content;max-width:105px;font-size:calc(var(--sw-exercise-text-size,16px) * 0.625);line-height:1.25;pointer-events:none}
 .workspace-lesson-selector .workspace-lesson-status,.workspace-card-picker .workspace-lesson-status{min-width:calc(25px * var(--sw-control-scale,1));height:calc(23px * var(--sw-control-scale,1));padding:0 calc(4px * var(--sw-control-scale,1));font-size:calc(var(--sw-exercise-text-size,16px) * 0.625);line-height:calc(23px * var(--sw-control-scale,1));border-radius:calc(8px * var(--sw-control-scale,1))}
 .workspace-lesson-status[role=button]{cursor:pointer}
 .workspace-lesson-status.is-empty{background:transparent;color:var(--sw-neu-muted);box-shadow:var(--sw-neu-inset);opacity:.65}
@@ -656,3 +582,241 @@ body.unified-workspace{font-family:var(--sw-exercise-font);font-size:var(--sw-ex
 .workspace-block-content .workspace-info-copy{margin:0 0 8px}
 .workspace-block-content .workspace-stage-link{padding:6px 0;grid-template-columns:18px minmax(0,1fr)}
 .workspace-block-empty{color:var(--sw-neu-muted)}
+
+/* Current sidebar contract: one flat column, compact controls and independent
+   block selection/detail disclosure. Keep exercise and video surfaces unchanged. */
+body.unified-workspace .app-sidebar{
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  position:relative!important;
+  inset:auto!important;
+  width:282px!important;
+  height:calc(100dvh - 44px)!important;
+  margin:22px 0 22px 22px;
+  padding:18px 16px 12px;
+  gap:12px;
+  min-height:0;
+  border:0!important;
+  border-radius:0;
+  background:var(--sidebar-top)!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+body.unified-workspace .workspace-sidebar-toggle,
+body.unified-workspace .workspace-sidebar-toggle:hover{box-shadow:none;background:var(--sidebar-top);transform:translateY(-50%)}
+body.unified-workspace .app-sidebar .workspace-brand-row{
+  display:flex;
+  flex:none;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+  min-height:32px;
+  margin:0;
+  padding:0;
+  gap:8px;
+}
+.app-sidebar .workspace-brand{font-size:16px;line-height:1.25;letter-spacing:-.035em;gap:2px}
+.app-sidebar .workspace-brand span{font-size:20px;line-height:1}
+body.unified-workspace .app-sidebar .workspace-clock-panel{
+  display:flex;
+  flex:none;
+  align-items:center;
+  justify-content:flex-end;
+  position:static;
+  inset:auto;
+  width:auto;
+  height:auto;
+  min-width:0;
+  margin:0;
+  padding:0;
+  gap:6px;
+}
+body.unified-workspace .app-sidebar .workspace-clock{
+  position:static;
+  inset:auto;
+  flex:none;
+  width:auto;
+  height:auto;
+  min-width:36px;
+  min-height:0;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.app-sidebar .workspace-clock::before,.app-sidebar .workspace-clock::after{content:none;display:none}
+.app-sidebar .workspace-clock>svg{display:none}
+body.unified-workspace .app-sidebar .workspace-clock-face{
+  display:flex;
+  position:static;
+  inset:auto;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:1px;
+  font-size:11px;
+  line-height:1.2;
+  font-weight:500;
+  letter-spacing:0;
+  color:var(--sw-neu-muted);
+  visibility:visible;
+}
+.app-sidebar .workspace-clock-label{font-size:8px;line-height:1.2;letter-spacing:0}
+body.unified-workspace[data-theme] .app-sidebar :is(#startLesson,#workspaceStopLesson){
+  display:inline-flex;
+  position:static!important;
+  inset:auto!important;
+  align-items:center;
+  justify-content:center;
+  flex:none;
+  width:auto;
+  min-width:76px;
+  height:30px;
+  min-height:30px;
+  margin:0;
+  padding:0 9px;
+  border:0;
+  border-radius:10px;
+  background:#747a82!important;
+  background-image:none!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  font:500 11px/1.2 var(--sw-exercise-font);
+  letter-spacing:0;
+  white-space:nowrap;
+  opacity:1;
+  filter:none;
+  transform:none;
+  cursor:pointer;
+}
+body.unified-workspace[data-theme] .app-sidebar :is(#startLesson,#workspaceStopLesson):is(:hover,:focus-visible){background:#646b74!important;box-shadow:none!important;transform:none;filter:none}
+.app-sidebar #startLesson::before,.app-sidebar #startLesson::after{content:none!important;display:none!important}
+body.unified-workspace .app-sidebar button:disabled{cursor:default;opacity:.5}
+body.unified-workspace .app-sidebar .workspace-instruments{
+  display:block;
+  position:static;
+  inset:auto;
+  flex:none;
+  align-self:stretch;
+  width:auto;
+  min-width:0;
+  margin:0;
+  padding:0;
+}
+body.unified-workspace .app-sidebar .workspace-course-controls{
+  display:flex;
+  position:static;
+  inset:auto;
+  align-items:center;
+  justify-content:flex-start;
+  flex-direction:row;
+  flex-wrap:nowrap;
+  width:100%;
+  height:auto;
+  margin:0;
+  padding:0;
+  gap:6px;
+}
+body.unified-workspace[data-theme] .app-sidebar .workspace-console-selector{
+  display:inline-flex;
+  position:static!important;
+  inset:auto!important;
+  align-items:center;
+  justify-content:center;
+  flex:1 1 0;
+  width:auto;
+  min-width:0;
+  height:30px;
+  min-height:30px;
+  margin:0;
+  padding:0 7px;
+  border:1px solid color-mix(in srgb,var(--sw-neu-muted) 22%,transparent);
+  border-radius:4px;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  color:var(--sw-neu-ink);
+  font:500 12px/1.2 var(--sw-exercise-font);
+  letter-spacing:0;
+  transform:none;
+}
+body.unified-workspace[data-theme] .app-sidebar .workspace-console-selector:is(:hover,:focus-visible,[aria-expanded=true]){background:color-mix(in srgb,var(--sw-neu-muted) 7%,transparent)!important;box-shadow:none!important;transform:none}
+body.unified-workspace .app-sidebar .workspace-middle{
+  display:flex;
+  position:static;
+  flex:1 1 0;
+  flex-direction:column;
+  min-height:0;
+  min-width:0;
+  margin:0;
+  padding:0;
+  background:transparent;
+  overflow:hidden;
+}
+body.unified-workspace .app-sidebar .workspace-middle:has(.workspace-block-content:not([hidden])){overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+body.unified-workspace .app-sidebar .workspace-tree{
+  display:block;
+  position:static;
+  flex:none;
+  width:100%;
+  min-height:0;
+  min-width:0;
+  margin:0;
+  padding:0;
+  overflow:visible;
+}
+.app-sidebar .workspace-lesson-actions{display:flex;position:static;align-items:center;justify-content:flex-end;gap:8px;margin:0 0 10px;padding:0}
+.app-sidebar .workspace-lesson-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:28px;margin:0;padding:3px 5px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--sw-neu-muted);font:400 11px/1.3 var(--sw-exercise-font)}
+.app-sidebar .workspace-lesson-actions .workspace-progress-reset{width:28px;height:28px;padding:6px}
+.app-sidebar .workspace-lesson-actions .workspace-progress-reset svg{width:14px;height:14px}
+body.unified-workspace .app-sidebar .workspace-lesson-overview{position:static;inset:auto;min-height:0;margin:0 0 14px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.app-sidebar .workspace-lesson-heading{margin:0 0 7px;gap:8px}
+.app-sidebar .workspace-lesson-overview h2{margin:0;font:600 15px/1.35 var(--sw-exercise-font);letter-spacing:0}
+.app-sidebar .workspace-info-copy{font:400 12px/1.45 var(--sw-exercise-font);color:var(--sw-neu-muted);margin:0;overflow-wrap:break-word}
+.app-sidebar .workspace-lesson-status{min-width:20px;height:20px;margin:0;padding:0;border:0;border-radius:0;background:transparent!important;box-shadow:none!important;color:var(--sw-neu-muted);font-size:12px;line-height:20px}
+.app-sidebar .workspace-lesson-status.is-empty{opacity:.55}
+.app-sidebar .workspace-lesson-blocks{margin:0;padding:0;border:0;background:transparent}
+.app-sidebar .workspace-lesson-block{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+.app-sidebar .workspace-block-row{display:flex;align-items:center;gap:4px;min-height:38px;margin:0;padding:0}
+.app-sidebar .workspace-block-select{display:flex;align-items:center;gap:9px;flex:1 1 0;min-width:0;min-height:36px;margin:0;padding:6px 0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--sw-neu-ink);font:400 13px/1.35 var(--sw-exercise-font);text-align:left;cursor:pointer}
+.app-sidebar .workspace-block-select strong{font:500 13px/1.35 var(--sw-exercise-font)}
+.app-sidebar .workspace-block-select[aria-current] strong{font-weight:600}
+.app-sidebar .workspace-block-number{flex:none;width:16px;color:var(--sw-neu-muted);font:400 10px/1.35 var(--sw-exercise-font);font-variant-numeric:tabular-nums}
+.app-sidebar .workspace-block-expand{display:grid;place-items:center;flex:none;width:30px;height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--sw-neu-muted);cursor:pointer}
+.app-sidebar .workspace-block-expand::after{content:'';width:6px;height:6px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg)}
+.app-sidebar .workspace-block-expand[aria-expanded=true]::after{transform:rotate(225deg)}
+.app-sidebar :is(.workspace-block-select,.workspace-block-expand):hover:not(:disabled){color:var(--sw-neu-ink)}
+.app-sidebar :is(.workspace-block-select,.workspace-block-expand):focus-visible{outline:1px solid var(--sw-neu-muted);outline-offset:2px}
+.app-sidebar .workspace-block-content{margin:0;padding:2px 0 10px 25px;background:transparent}
+.app-sidebar .workspace-block-content .workspace-info-copy{font-size:11px;line-height:1.45;margin:0 0 6px}
+.app-sidebar .workspace-block-content .workspace-stage-link{display:grid;grid-template-columns:14px minmax(0,1fr);gap:5px;margin:0;padding:5px 0;border:0;border-radius:0;background:transparent;font-size:11px;line-height:1.4;box-shadow:none}
+.app-sidebar .workspace-block-content .workspace-stage-link::before{font-size:9px;line-height:1.7}
+.app-sidebar .workspace-block-content .workspace-stage-link[aria-current]::after{display:none}
+body.unified-workspace .app-sidebar .workspace-mini-dock{display:flex;position:static;align-items:center;justify-content:center;flex:none;order:1;gap:14px;height:36px;min-height:36px;margin:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+body.unified-workspace[data-theme] .app-sidebar .workspace-mini-dock :is(a,button,#workspaceProfileButton){display:grid;position:static;place-items:center;flex:none;width:30px;height:30px;min-width:30px;min-height:30px;margin:0;padding:5px;border:0;border-radius:0;background:transparent!important;box-shadow:none!important;color:var(--sw-neu-muted);text-decoration:none;transform:none;filter:none;cursor:pointer}
+.app-sidebar .workspace-mini-dock :is(a,button):hover{color:var(--sw-neu-ink)}
+.app-sidebar .workspace-mini-dock :is(svg,#workspaceProfileButton svg){width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* Course menus keep the same content and placement with plain, flat surfaces. */
+.workspace-lesson-popover{border:1px solid color-mix(in srgb,var(--sw-neu-muted) 22%,transparent);border-radius:6px;box-shadow:none;padding:16px}
+.workspace-card-picker{gap:3px}
+.workspace-card-picker .workspace-picker-option,.workspace-number-picker .workspace-picker-option{border:0;border-radius:3px;background:transparent;box-shadow:none;padding:9px 10px}
+.workspace-card-picker .workspace-picker-option:is([aria-pressed=true],.is-progressed),.workspace-number-picker .workspace-picker-option[aria-pressed=true]{background:color-mix(in srgb,var(--sw-neu-muted) 7%,transparent);box-shadow:none}
+.workspace-popover-close{border:0;border-radius:0;background:transparent;box-shadow:none}
+.workspace-card-picker .workspace-lesson-status{box-shadow:none}
+
+@media(max-height:640px){
+  body.unified-workspace .app-sidebar{gap:8px;padding-top:12px;padding-bottom:8px}
+  body.unified-workspace .app-sidebar .workspace-middle{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  .app-sidebar .workspace-lesson-actions{margin-bottom:6px}
+  .app-sidebar .workspace-lesson-overview{margin-bottom:10px}
+}
+@media(max-width:768px){
+  body.unified-workspace .workspace-sidebar-shell{height:52dvh;min-height:0}
+  body.unified-workspace .app-sidebar{display:flex;flex-direction:column;width:calc(100% - 36px)!important;height:calc(52dvh - 24px)!important;margin:12px 18px;padding:12px 16px 8px;gap:8px}
+  body.unified-workspace .app-sidebar .workspace-middle{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  body.unified-workspace .reference-app.workspace-sidebar-closed .workspace-sidebar-shell{height:48px}
+}

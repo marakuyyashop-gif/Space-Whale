@@ -71,7 +71,7 @@ test('four navigation blocks apply to empty and arbitrary future lessons without
   const before=JSON.stringify(input),actual=structure.withBlocks(input);
   assert.deepEqual(actual.blocks.map(({id,number,title})=>({id,number,title})),[
    {id:'opening',number:1,title:'Speaking'},{id:'words',number:2,title:'Discovery Words'},
-   {id:'language',number:3,title:'Lexis Grammar'},{id:'final',number:4,title:'Speaking'}]);
+   {id:'language',number:3,title:'Lexis / Grammar'},{id:'final',number:4,title:'Speaking'}]);
   assert.ok(actual.blocks.every(b=>b.stageIds.length===0));assert.equal(actual.blocks[3].compareWith,'opening');
   assert.equal(actual.stages,input.stages);assert.equal(JSON.stringify(input),before);
  }

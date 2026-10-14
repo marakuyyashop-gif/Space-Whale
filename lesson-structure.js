@@ -22,7 +22,7 @@ function compose(lesson){
 }
 // Navigation blocks describe the existing stages; they do not compose exercises.
 const navigationRoles={opening:'opening',words:'words',wordPractice:'words',focus:'language',practice:'language',reading:'language',listening:'language',language:'language',final:'final'};
-const navigationTitles={opening:'Speaking',words:'Discovery Words',language:'Lexis Grammar',final:'Speaking'};
+const navigationTitles={opening:'Speaking',words:'Discovery Words',language:'Lexis / Grammar',final:'Speaking'};
 function navigationRole(stage,index,count){
  if(Object.prototype.hasOwnProperty.call(stage,'navigationBlock')){
   if(!Object.prototype.hasOwnProperty.call(navigationTitles,stage.navigationBlock))throw Error('Invalid navigation block '+String(stage.navigationBlock));
