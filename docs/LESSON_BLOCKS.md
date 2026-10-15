@@ -76,10 +76,16 @@ Teacher metadata comes from `lesson-teacher-info.js`: `get(lesson)` supplies goa
 
 ## Course selection and teacher copy (2026-10-15)
 
-Selecting a level opens its Modules panel; the heading includes the level ID. Selecting a module opens a vertical Lessons list with the same card typography, a concrete lesson summary and short grammatical targets. Selecting a lesson opens a separate details view. The Lessons button returns to the list without changing or remounting the exercise. The L rail control always opens that list.
+Selecting a level opens its Modules panel; the heading includes the level ID. Selecting a module opens a vertical Lessons list with the same card typography, a concrete lesson summary and short grammatical targets. Selecting a lesson opens a separate details view. The L rail control returns to the list without changing or remounting the exercise. There is no separate Back/Lessons link in lesson details.
 
 `teacher-copy.js` renders descriptions as ordinary topic text and a separate Language line with restrained emphasis. `lessonOverview(lesson)` returns `{summary, language}`; a new lesson can declare `teacherInfo.language` (a string or array of English groups) or English `grammar`. This shared renderer uses text nodes, not authored HTML. Module/level overview strings can use `Language:` or `Grammar:` to separate grammatical targets from topics.
 
 Each block has an Aim. The complete title-and-aim card selects its first original task; +/− is a separate sibling button and only reveals existing task links. No lesson dropdown or numbered stage labels remain. No new exercise content, media, teacher hints or answer keys are created here.
 
 Typography comes from `typography.css` for site, classroom, homework and previews. It requests the platform system font, including San Francisco on Apple devices and the native UI font elsewhere. This does not distribute Apple font files. Font sizing and control scaling remain in `exercise-theme.css`.
+
+## Sidebar hierarchy and contrast (2026-10-15)
+
+The expanded panel uses a compact inline Level / Module path. Each path segment opens its corresponding selection panel without changing the active exercise. Lesson details have a single `Lesson N · title` heading, with the canonical display number; no generic Lesson heading or extra Lessons link repeats above it.
+
+Lists and block controls run edge to edge with full-width separators and square outer corners. Text keeps internal padding. Descriptions are 14px at the default scale in neutral gray, while the selected lesson heading is 18px on its own contrasting header surface. These panel rules do not change exercise typography. The narrow rail keeps its rounded icons and L remains the return to the lesson list.

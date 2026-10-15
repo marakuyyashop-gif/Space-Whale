@@ -331,9 +331,23 @@
     profile.hidden=menuPanel!=='profile';tree.hidden=menuPanel==='profile';
     profileButton.setAttribute('aria-controls',menu.id);profileButton.setAttribute('aria-expanded',String(menuPanel==='profile'));
     if(!menuPanel||menuPanel==='profile')return;
-    const caption=menuPanel==='levels'?'Levels':menuPanel==='modules'?'Modules':menuPanel==='lesson'?'Lessons':'Lesson';
-    const title=node('h2',caption+(menuPanel!=='levels'&&level?` · ${level.id}`:''),'workspace-panel-title');tree.append(title);
-    if(whale&&['lesson','lesson-details'].includes(menuPanel))tree.append(node('p',whale.title.replace(/^Whale\s+(\d+)/i,'Module $1'),'workspace-panel-context'));
+    const heading=node('div','','workspace-panel-heading');
+    if(menuPanel==='levels')heading.append(node('h2','Levels','workspace-panel-title'));
+    else if(view!=='library'&&menuPanel!=='modules')heading.append(node('h2',view==='templates'?'Exercise templates':'Lessons','workspace-panel-title'));
+    else{
+      const path=node('nav','','workspace-course-path');path.setAttribute('aria-label','Course path');
+      const separator=()=>path.append(node('span','/','workspace-path-separator'));
+      if(level){
+        const control=button(level.id,()=>setMenuPanel('levels'),'workspace-path-level');control.setAttribute('aria-label','Choose level');path.append(control);
+      }
+      if(menuPanel==='modules'){
+        if(level)separator();const current=node('span','Modules','workspace-path-current');current.setAttribute('aria-current','page');path.append(current);
+      }else if(whale){
+        separator();const control=button(whale.title.replace(/^Whale\s+(\d+)/i,'Module $1'),()=>setMenuPanel('modules'),'workspace-path-module');control.setAttribute('aria-label','Choose module');path.append(control);
+      }else if(!level)path.append(node('span','Course','workspace-path-current'));
+      heading.append(path);
+    }
+    tree.append(heading);
     const teacher=window.SpaceWhaleLessonTeacherInfo;
     const copy=window.SpaceWhaleTeacherCopy;
     const option=(label,description,selected,action,href)=>{
@@ -366,17 +380,18 @@
     }
     if(menuPanel==='lesson'){
       const list=node('div','','workspace-panel-list');
-      topics.forEach(item=>{
-        const card=option(item.title,teacher.lessonOverview(item),item.id===lesson?.id,()=>{menuPanel='lesson-details';chooseLesson(item);});
+      topics.forEach((item,index)=>{
+        const label=view==='templates'?item.title:`Lesson ${item.lessonNumber||index+1} · ${item.title}`;
+        const card=option(label,teacher.lessonOverview(item),item.id===lesson?.id,()=>{menuPanel='lesson-details';chooseLesson(item);});
         card.dataset.lesson=item.id;list.append(card);
       });
       if(!topics.length)list.append(node('p',whale?'No lessons available.':'Choose a module.','workspace-info-copy'));
       tree.append(list);return;
     }
-    const back=button('Lessons',()=>setMenuPanel('lesson'),'workspace-lessons-back');back.setAttribute('aria-label','Back to lessons');tree.append(back);
     if(!lesson)return;
     const overview=node('section','','workspace-lesson-overview');
-    overview.append(node('h2',lesson.title,'workspace-lesson-title'));
+    const label=view==='templates'?lesson.title:`Lesson ${lesson.lessonNumber||lessonIndex+1} · ${lesson.title}`;
+    overview.append(node('h2',label,'workspace-lesson-title'));
     copy.appendDescription(overview,teacher.lessonOverview(lesson));
     tree.append(overview);
     if(lesson.blocks&&route.section!=='self-study')renderLessonBlocks(lesson,tree,studentLocked);

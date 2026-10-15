@@ -51,18 +51,18 @@ test('course panels use a consistent card hierarchy with concise English descrip
   assert.match(language.textContent,/^Language:/);assert.ok(language.querySelector('.workspace-grammar-term'));
  }
  s.click(panelOption(s,'A1.2'));
- assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');assert.equal(d.querySelector('.workspace-panel-title').textContent,'Modules · A1.2');
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');assert.equal(d.querySelector('.workspace-panel-heading .workspace-path-level').textContent,'A1.2');assert.match(d.querySelector('.workspace-panel-heading').textContent,/Modules/);
  assert.equal(panelOption(s,'A1.1'),undefined);
  const modules=[...d.querySelectorAll('#workspaceTopics .workspace-panel-option')];assert.equal(modules.length,7);
  assert.ok(modules.every(item=>item.querySelector('.workspace-option-description .workspace-description-topic')?.textContent&&item.querySelector('.workspace-description-language .workspace-grammar-term')));
  s.click(modules.find(item=>item.querySelector('strong').textContent==='Module 4 · Выбор'));
- assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.equal(d.querySelector('.workspace-panel-title').textContent,'Lessons · A1.2');
- assert.equal(d.querySelector('.workspace-panel-context').textContent,'Module 4 · Выбор');assert.equal(d.querySelector('select[aria-label="Choose lesson"]'),null);
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.equal(d.querySelector('.workspace-panel-title'),null);
+ assert.equal(d.querySelector('.workspace-course-path .workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-course-path .workspace-path-module').textContent,'Module 4 · Выбор');assert.equal(d.querySelector('.workspace-panel-context'),null);assert.equal(d.querySelector('select[aria-label="Choose lesson"]'),null);
  const lessons=[...d.querySelectorAll('.workspace-panel-option[data-lesson]')];assert.equal(lessons.length,6);
  for(const card of lessons){assert.ok(card.querySelector('strong'));assert.ok(card.querySelector('.workspace-description-topic'));assert.ok(card.querySelector('.workspace-description-language'));}
  chooseLesson(s,'a1-2-w4-l1');
  assert.equal(new URLSearchParams(s.location.search).get('lesson'),'a1-2-w4-l1');assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson-details');
- assert.equal(d.querySelector('.workspace-panel-title').textContent,'Lesson · A1.2');assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Примерочная');
+ assert.equal(d.querySelector('.workspace-panel-title'),null);assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 1 · Примерочная');assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(d.querySelector('.workspace-lessons-back'),null);
  assert.equal(d.querySelector('.workspace-lesson-overview .workspace-description-topic').textContent,'Describe how clothes look and compare similar items.');
  assert.deepEqual([...d.querySelectorAll('.workspace-block-select > strong')].map(el=>el.textContent),['Speaking','Discovery Words','Lexis / Grammar','Speaking']);
  assert.equal(d.querySelector('.workspace-block-number'),null);
@@ -252,7 +252,7 @@ test('template groups remain reachable through the lesson panel in the same Work
    assert.equal(s.document.querySelector('#workspaceLessonPath'),null);
    assert.equal(s.document.querySelectorAll('.workspace-block-stages a').length,count);
    assert.ok(s.document.querySelector('#workspaceExercise h2'));
-   s.click(s.document.querySelector('.workspace-lessons-back'));
+   openPanel(s,'lesson');
  }
 });
 test('vertical rail keeps account, course, lesson and timer sections separate',()=>{
@@ -311,16 +311,35 @@ test('rail navigation and reload retain existing saved answers and stable exerci
  const restored=fixture(false,{search:s.location.search,sessionStorage:s.sessionStorage,localStorage:s.localStorage});
  assert.equal(restored.mounts.at(-1).exercise.id,'a12w4l1-words');assert.equal(JSON.stringify(restored.mounts.at(-1).config.answers),JSON.stringify(answers));
 });
-test('Lessons back and the rail L button return to cards without changing the mounted task',()=>{
+test('rail L returns to the lesson list without a back button or changing the mounted task',()=>{
  const s=fixture(false,{search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1'}),d=s.document;
  openLessonDetails(s);s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));
  const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search;
- s.click(d.querySelector('.workspace-lessons-back'));
+ assert.equal(d.querySelector('.workspace-lessons-back'),null);assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 1 · Примерочная');
+ openPanel(s,'lesson');
  assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.equal(d.querySelector('.workspace-lesson-overview'),null);assert.ok(d.querySelector('.workspace-panel-option[data-lesson="a1-2-w4-l1"]'));
- assert.equal(root.firstElementChild,exercise);assert.equal(s.location.search,search);
- chooseLesson(s,'a1-2-w4-l1');s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));
- const mounted=root.firstElementChild,current=s.location.search;openPanel(s,'lesson');
- assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.equal(root.firstElementChild,mounted);assert.equal(s.location.search,current);
+ assert.equal(root.firstElementChild,exercise);assert.equal(s.location.search,search);assert.equal(d.querySelector('.workspace-lessons-back'),null);
+ assert.equal(d.querySelector('.workspace-panel-title'),null);assert.equal(d.querySelectorAll('.workspace-course-path').length,1);
+});
+test('course path controls change panels without changing the selected lesson, answers or task',()=>{
+ const s=fixture(false,{search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1'}),d=s.document;
+ openLessonDetails(s);s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));
+ const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search,mountCount=s.mounts.length;
+ s.click(d.querySelector('.workspace-course-path .workspace-path-module'));
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');assert.equal(d.querySelector('.workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-path-module'),null);assert.match(d.querySelector('.workspace-panel-heading').textContent,/Modules/);
+ assert.equal(d.querySelector('.workspace-lesson-title'),null);assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);
+ s.click(d.querySelector('.workspace-path-level'));
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'levels');assert.equal(d.querySelector('.workspace-panel-heading h2').textContent,'Levels');assert.ok(panelOption(s,'A1.2'));
+ assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);
+});
+test('lesson labels use canonical positions after inserted number lessons and preserve stable IDs',()=>{
+ const s=fixture(false,{search:'?view=library&level=A1.1&whale=1&lesson=a1-1-w1-lnumbers'}),d=s.document;
+ openPanel(s,'lesson');
+ for(const [id,label] of [['a1-1-w1-lnumbers','Lesson 5 · Числа'],['a1-1-w1-ltens','Lesson 6 · Десятки'],['a1-1-w1-l5','Lesson 7 · Контакты']]){
+  const card=d.querySelector(`.workspace-panel-option[data-lesson="${id}"]`);assert.ok(card);assert.equal(card.querySelector('strong').textContent,label);
+  s.click(card);assert.equal(d.querySelector('.workspace-lesson-title').textContent,label);assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(new URLSearchParams(s.location.search).get('lesson'),id);
+  openPanel(s,'lesson');
+ }
 });
 test('future lessons share card and aim language formatting without unsafe HTML',()=>{
  const unsafe='<img src=x onerror="alert(1)">',lesson={id:'future-grammar-test',title:'Future grammar',level:'A1.2',whale:4,stages:[],teacherInfo:{
@@ -332,7 +351,7 @@ test('future lessons share card and aim language formatting without unsafe HTML'
  assert.equal(topic.querySelector('.workspace-grammar-term'),null);assert.match(topic.textContent,/Something New Tense/);
  assert.deepEqual([...labels.querySelectorAll('.workspace-grammar-term')].map(el=>el.textContent),['Something New Tense',unsafe]);assert.equal(card.querySelector('img'),null);
  s.click(card);assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson-details');
- assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Future grammar');
+ assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 7 · Future grammar');
  const aim=d.querySelector('#workspaceLessonBlocks [data-block="language"] .workspace-block-aim');assert.equal(aim.querySelector('.workspace-grammar-term').textContent,'Something New Tense');assert.equal(aim.querySelector('img'),null);
  assert.equal(d.querySelector('#workspaceTopics img'),null);assert.equal(d.querySelector('#workspaceTopics script'),null);
 });
