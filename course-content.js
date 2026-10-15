@@ -301,6 +301,7 @@
             {
               type: 'text',
               title: 'Посмотри на примеры.',
+              role: 'examples',
               text: 'The blouse looks nice.\nThe blouse looks like a shirt.\nThe hat looks strange.\nThe hat looks like a flower.',
               highlights: ['looks nice', 'looks like a shirt', 'looks strange', 'looks like a flower']
             },

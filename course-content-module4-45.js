@@ -246,7 +246,7 @@ l5.push(stage('Word Practice',3,E('L5-word-initial-gaps','gaps','Complete the se
  inputMode:'text',items:wordPractice5.map(([before,answer,after],i)=>({id:String(i+1),segments:[before,{id:'word'+(i+1),answers:[answer],placeholder:answer[0]},after]}))
 })));
 l5.push(stage('Complete the Rule',2,S('L5-M06','Complete the rules.',[
- P('L5-kind-context','Complete the rules.',[{type:'text',text:'It’s a kind of furniture.\nIt’s a type of drink.\nIt’s a sort of clothing.\nIt’s like a big cushion.',highlights:['a kind of','a type of','a sort of','It’s like']}]),
+ P('L5-kind-context','Complete the rules.',[{type:'text',role:'examples',text:'It’s a kind of furniture.\nIt’s a type of drink.\nIt’s a sort of clothing.\nIt’s like a big cushion.',highlights:['a kind of','a type of','a sort of','It’s like']}]),
  E('L5-category-discovery','gaps','Complete the rules.',{progressiveQuestions:true,inputMode:'select',instruction:'Choose the correct options.',items:[
  {id:'1',highlights:['a kind of','a type of','a sort of'],segments:['Используйте a kind of, a type of или a sort of, когда хотите сказать ',{id:'category',answers:['к какой категории относится предмет'],options:['на что похож предмет','что человек добрый','к какой категории относится предмет']},'.']},
  {id:'2',highlights:['like'],segments:['Используйте like, когда хотите сказать ',{id:'similarity',answers:['на что похож предмет'],options:['что вам нравится','на что похож предмет','к какой категории относится предмет']},'.']},
