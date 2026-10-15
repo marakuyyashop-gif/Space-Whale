@@ -48,7 +48,7 @@
     base('listen-repeat-demo','audio','Listen & Repeat',{layout:'listen-repeat',instruction:'Технические звуковые сигналы. Запуск следующего останавливает предыдущий.',items:[1,2].map(n=>({id:`item${n}`,text:`[Phrase ${n}]`,audio:sound}))}),
     matching('picture-word-demo','picture-word'),
     matching('word-definition-demo','word-definition'),
-    base('rule-page-demo','rule-page','Guided Discovery',{blocks:[{type:'text',title:'[Exercise instruction]',text:'[Example 1 with target form]\n[Example 2 with target form]',highlights:['target form']},{type:'exercise',id:'notice',exercise:choice('discovery-choice')},{type:'rule',title:'Rule',text:'[Rule explanation]',formula:'[Form] + [Form]',examples:['[Example]']}]}),
+    base('rule-page-demo','rule-page','Guided Discovery',{blocks:[{type:'text',role:'examples',text:'[Example 1 with target form]\n[Example 2 with target form]',highlights:['target form']},{type:'exercise',id:'notice',exercise:choice('discovery-choice')},{type:'rule',title:'Rule',text:'[Rule explanation]',formula:'[Form] + [Form]',examples:['[Example]']}]}),
     {...gaps('error-correction-demo'),title:'Error Correction',instruction:'Исправьте только выделенный фрагмент. Технический ответ: [Correct form].',items:[{id:'correction1',segments:['[Unchanged context] ([Incorrect form]) → ',{id:'corrected',answers:['[Correct form]']},' [Unchanged ending].']}]},
     choice('image-choice-demo',false,true),
     choice('multiple-choice-demo',true),

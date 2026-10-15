@@ -68,10 +68,14 @@ test('two-option gaps show complete corrected sentences with muted context',()=>
  const s=setup(stage('language-practice'),{syncChecks:true});
  s.handle.setAnswers({look1:'looks like',look2:'look like',look3:'looks',look4:'looks like',look5:'look',__sw_checked:true});
  const rows=s.host.querySelectorAll('.ek-answer-pairs>li');assert.equal(rows.length,5);
- assert.equal(rows[0].textContent,'This blouse looks like my old blouse.');
+ const sentence=row=>{const copy=row.cloneNode(true);copy.querySelector('.ek-attempt-marker').remove();return copy.textContent;};
+ assert.equal(sentence(rows[0]),'This blouse looks like my old blouse.');
+ assert.equal(rows[0].dataset.result,'correct');assert.equal(rows[0].getAttribute('value'),'1');assert.equal(rows[0].querySelector('.ek-attempt-marker').getAttribute('aria-label'),'Your last answer was correct');
  assert.equal(rows[0].querySelector('strong').textContent,'looks like');
  assert.equal(rows[0].querySelector('.ek-muted').textContent,'This blouse ');
- assert.equal(rows[2].textContent,'How does this suit look?');
+ assert.equal(sentence(rows[2]),'How does this suit look?');
+ assert.equal(rows[2].dataset.result,'correct');assert.equal(rows[2].getAttribute('value'),'3');
+ assert.equal(sentence(rows[3]),'This coat looks expensive.');assert.equal(rows[3].dataset.result,'retry');assert.equal(rows[3].getAttribute('value'),'4');assert.equal(rows[3].querySelector('.ek-attempt-marker').getAttribute('aria-label'),'Your last answer was incorrect');
 });
 test('language focus has one heading and interaction instruction',()=>{
  const s=setup(stage('language-focus'));

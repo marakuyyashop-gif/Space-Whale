@@ -116,7 +116,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 
 ## Approved monochrome direction
 
-The shared native system family comes from typography.css; 16px body, 20px primary title, 18px embedded heading, 14px instructions and controls. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.
+The shared native system family comes from typography.css; 16px body, 20px primary title, 18px embedded heading, 16px task instructions and body text; secondary control labels use the shared smaller scale. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.
 
 ## Whale 1 content (2026-09-24)
 
@@ -182,6 +182,12 @@ Appearance controls are in `exercise-theme.css`: `--sw-exercise-font` for the fa
 
 Phone matching grids keep two columns for picture-word and text/translation cards. Six source cards occupy three rows. The existing card selector still opens the same dialog; desktop grids and answer mechanics remain unchanged.
 
-Grammar highlights and correction answers use the surrounding family, type size and line height, with restrained neutral semibold emphasis. The single native family is defined in `typography.css`, with no third-party web-font requests. Rule examples keep a consistent paragraph rhythm. Shared composition rendering omits redundant generic instructions when the visible task heading already states the same action; specific instructions and context remain.
+Grammar highlights and correction answers use the surrounding family, type size and line height, with clear charcoal semibold emphasis. The single native family is defined in `typography.css`, with no third-party web-font requests. Rule examples keep a consistent paragraph rhythm. Shared composition rendering omits redundant generic instructions when the visible task heading already states the same action; specific instructions and context remain.
 
 Corrections contain all keyed source rows or picture cards, in their authored order and numbering, whenever any keyed item needs correction. Already-correct answers remain visible in that section. Open writing continues to show neutral completion without invented model answers or grading.
+
+## Actual-template refinement (2026-10-15)
+
+Refine the existing shared kit and Templates catalog directly. Do not create standalone design samples or alternate classroom scenes. Checked fields and chips keep white surfaces, thin result-colored outlines and compact circular check/cross markers. Remove obsolete dotted fills and competing result palettes. Corrections have one barely shaded rounded panel, readable body-sized text, unchanged source numbering and all keyed rows, including correct attempts. Each row/card carries the outcome of the learner's last checked attempt; the displayed canonical answer is not itself labeled as an incorrect answer.
+
+Use one primary task heading. Explicit `presentation.blocks[].role: "examples"` groups model paragraphs with tighter internal spacing and larger separation from the title and subsequent questions; keep source text and exercise IDs unchanged. Other text blocks and dialogues retain their paragraph structure.

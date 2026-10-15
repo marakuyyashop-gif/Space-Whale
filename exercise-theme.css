@@ -7,7 +7,7 @@
   --sw-control-scale: 1; /* All workspace controls; 1 keeps the approved size. */
   --sw-exercise-title-size: calc(var(--sw-exercise-text-size) * 1.25);
   --sw-exercise-compact-text-size: calc(var(--sw-exercise-text-size) * 1);
-  --sw-exercise-compact-title-size: calc(var(--sw-exercise-text-size) * 1.125);
+  --sw-exercise-compact-title-size: var(--sw-exercise-title-size);
   --sw-exercise-mobile-text-size: calc(var(--sw-exercise-text-size) * 1);
   --sw-exercise-mobile-title-size: calc(var(--sw-exercise-text-size) * 1.25);
   --sw-exercise-radius: 14px;
@@ -16,8 +16,8 @@
   --sw-action-hover: #fff;
   --sw-action-ink: #000;
   --sw-exercise-muted: #686b70;
-  --sw-exercise-emphasis-ink: #555;
-  --sw-exercise-emphasis-weight: 550;
+  --sw-exercise-emphasis-ink: #333;
+  --sw-exercise-emphasis-weight: 600;
   --sw-exercise-line: #dedfe2;
   --sw-exercise-surface: #fff;
   --sw-exercise-soft: #fff;
@@ -41,8 +41,17 @@
   --sw-interaction-selected: #fff;
   --sw-control-ring: #777b80;
   --sw-exercise-accent: #292b2f;
-  --sw-exercise-correct: #25734b;
-  --sw-exercise-incorrect: #b13b3b;
+  --sw-answer-correct:#69a781;
+  --sw-answer-incorrect:#e15d68;
+  --sw-feedback-correct-mark:#4d8d63;
+  --sw-feedback-incorrect-mark:#c94553;
+  --sw-feedback-empty-mark:#8a8a91;
+  --sw-feedback-surface:#f7f7f8;
+  --sw-feedback-context:#68686e;
+  --sw-feedback-marker-size:calc(16px * var(--sw-control-scale));
+  --sw-answer-surface:#fff;
+  --sw-exercise-correct:var(--sw-answer-correct);
+  --sw-exercise-incorrect:var(--sw-answer-incorrect);
 }
 
 /* Approved material system. Shared by all exercise hosts and the workspace. */
@@ -54,13 +63,16 @@
   --sw-neu-inset:inset 3px 4px 12px #aeb5bf38,inset -3px -3px 12px #ffffff70;
   --sw-neu-glow:5px 6px 14px #b9bec680,-5px -5px 16px #ffffffed;
   --sw-neu-feedback:#fff;--sw-neu-checked:#fff;--sw-neu-hover:#fff;
-  --sw-neu-success:linear-gradient(140deg,#a0ddb6,#7dca9a 45%,#60b981);
-  --sw-neu-error:linear-gradient(140deg,#f3bdc4,#e9a0aa 45%,#d9808e);
+  --sw-neu-success:var(--sw-answer-correct);
+  --sw-neu-error:var(--sw-answer-incorrect);
   --sw-neu-option-limit:38rem;
   --sw-motion-time:260ms;--sw-motion-easing:cubic-bezier(.22,.7,.25,1);
 }
 [data-theme=dark] {
-  --sw-exercise-emphasis-ink:#c3c3c3;
+  --sw-exercise-emphasis-ink:#e3e3e3;
+  --sw-answer-surface:#2e3137;
+  --sw-feedback-surface:#2b2e34;
+  --sw-feedback-context:#b7b7be;
   --sw-neu-bg:#25282d;--sw-neu-ink:#eef0f3;--sw-neu-muted:#b2b8c2;
   --sw-neu-surface:linear-gradient(135deg,#2d3137,#25282d 55%,#22252a);
   --sw-neu-raised:9px 9px 20px #15171b99,-8px -8px 20px #353a4260;
@@ -69,6 +81,4 @@
   --sw-neu-glow:5px 6px 14px #14161b99,-5px -5px 16px #3b414a80;
   --sw-neu-feedback:#2e333a;--sw-neu-checked:#343b44;--sw-neu-hover:#363d46;
 }
-/* One brand token for navigation and correct answers. */
-:root{--sw-brand-accent:#718888;--sw-answer-correct:var(--sw-brand-accent);--sw-answer-incorrect:#86503f;--sw-neu-success:var(--sw-answer-correct);--sw-neu-error:var(--sw-answer-incorrect);--sw-exercise-correct:var(--sw-answer-correct);--sw-exercise-incorrect:var(--sw-answer-incorrect)}
-[data-theme=dark]{--sw-answer-incorrect:#b47b67}
+:root{--sw-brand-accent:#718888}

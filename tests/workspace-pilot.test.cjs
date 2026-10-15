@@ -55,9 +55,9 @@ test('course panels use a consistent card hierarchy with concise English descrip
  assert.equal(panelOption(s,'A1.1'),undefined);
  const modules=[...d.querySelectorAll('#workspaceTopics .workspace-panel-option')];assert.equal(modules.length,7);
  assert.ok(modules.every(item=>item.querySelector('.workspace-option-description .workspace-description-topic')?.textContent&&item.querySelector('.workspace-description-language .workspace-grammar-term')));
- s.click(modules.find(item=>item.querySelector('strong').textContent==='Module 4 · Выбор'));
+ s.click(modules.find(item=>item.querySelector('strong').textContent==='Module 4. Выбор'));
  assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.equal(d.querySelector('.workspace-panel-title'),null);
- assert.equal(d.querySelector('.workspace-course-path .workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-course-path .workspace-path-module').textContent,'Module 4 · Выбор');assert.equal(d.querySelector('.workspace-panel-context'),null);assert.equal(d.querySelector('select[aria-label="Choose lesson"]'),null);
+ assert.equal(d.querySelector('.workspace-course-path .workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-course-path .workspace-path-module').textContent,'Module 4. Выбор');assert.equal(d.querySelector('.workspace-panel-context'),null);assert.equal(d.querySelector('select[aria-label="Choose lesson"]'),null);
  const lessons=[...d.querySelectorAll('.workspace-panel-option[data-lesson]')];assert.equal(lessons.length,6);
  for(const card of lessons){assert.ok(card.querySelector('strong'));assert.ok(card.querySelector('.workspace-description-topic'));assert.ok(card.querySelector('.workspace-description-language'));}
  chooseLesson(s,'a1-2-w4-l1');
@@ -326,7 +326,7 @@ test('full course path controls switch panels without changing the selected less
  openLessonDetails(s);s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));
  s.mounts.at(-1).config.onChange({'picture-coat':'coat'});
  const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search,mountCount=s.mounts.length,answersKey='space-whale:workspace:v1:a1-2-w4-l1:a12w4l1-words',answers=s.sessionStorage.getItem(answersKey);
- const path=d.querySelector('#workspacePanelHeading .workspace-course-path');assert.ok(path);assert.deepEqual([...path.querySelectorAll('button')].map(el=>el.textContent),['A1.2','Module 4 · Выбор','Lesson 1 · Примерочная']);
+ const path=d.querySelector('#workspacePanelHeading .workspace-course-path');assert.ok(path);assert.deepEqual([...path.querySelectorAll('button')].map(el=>el.textContent),['A1.2','Module 4. Выбор','Lesson 1 · Примерочная']);
  s.click(path.querySelector('.workspace-path-lesson'));
  assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.ok(d.querySelector('.workspace-panel-option[data-lesson="a1-2-w4-l1"]'));assert.equal(d.querySelector('.workspace-lesson-overview'),null);
  assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);assert.equal(s.sessionStorage.getItem(answersKey),answers);

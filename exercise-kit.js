@@ -15,6 +15,14 @@
     return text;
   };
   const sameTaskCopy = (first,second) => Boolean(first&&second)&&taskCopyKey(first)===taskCopyKey(second);
+  const mechanismTitles = new Set(['matching','gaps','dropdown','inline dropdown','single choice','multiple choice','multiple select','text single choice','image single choice','text multiple select','image multiple select','typed input','typed input / gap','text / writing field','typed gap','typed gap + word bank','writing','open writing','global audio','reading','order','sort','image label']);
+  const hiddenChildHeading = (parent,child) => sameTaskCopy(parent.title,child.title)||mechanismTitles.has(taskCopy(child.title));
+  const hasExampleModels = def => ['presentation','rule-page'].includes(def.kind)&&def.blocks?.some(block=>block.type==='text'&&block.role==='examples');
+  const hasSpecificChildHeading = def => {
+    if(def.kind!=='stage'||!mechanismTitles.has(taskCopy(def.title)))return false;
+    const child=def.exercises.find(block=>!['presentation','audio'].includes(block.exercise.kind))?.exercise||def.exercises[0]?.exercise;
+    return child&&!mechanismTitles.has(taskCopy(child.title))&&!sameTaskCopy(child.title,def.title);
+  };
   const redundantInstruction = def => sameTaskCopy(def.instruction,def.title)||(
     taskCopyKey(def.instruction)==='choose-options'&&
     (def.kind==='choice'||def.kind==='gaps'&&def.inputMode==='select')&&
@@ -152,6 +160,7 @@
       array(def.blocks, 'blocks');
       def.blocks.forEach(block => {
         if (!['text', 'image', 'disclosure'].includes(block.type)) fail('Unsupported presentation block');
+        if(block.role==='examples'&&block.type!=='text')fail('Example models require a text block');
         if (block.type === 'image') { if (!block.imagePending) text(block.image, 'image'); media(block); }
         else {
           text(block.text, 'block text'); if (block.type === 'disclosure') text(block.title, 'disclosure title');
@@ -187,6 +196,7 @@
       const blockIds = new Set();
       def.blocks.forEach((block, index) => {
         if (!block || !['text', 'rule', 'image', 'exercise'].includes(block.type)) fail('Unsupported rule-page block');
+        if(block.role==='examples'&&block.type!=='text')fail('Example models require a text block');
         if (block.type === 'text') {
           text(block.text, 'text block');
           if (block.highlights != null) { array(block.highlights, 'highlights'); block.highlights.forEach(part => { text(part, 'highlight'); if (!block.text.includes(part)) fail('Highlight missing from text'); }); }
@@ -683,6 +693,7 @@
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
+      if(def.kind==='choice')body.querySelectorAll('.ek-radio[data-feedback],.ek-radio input[data-feedback]').forEach(control=>control.removeAttribute('data-feedback'));
       if(def.kind==='order'){
         body.querySelectorAll('.ek-order-target [data-feedback]').forEach(token=>{token.removeAttribute('data-feedback');token.removeAttribute('aria-description');});
         body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
@@ -794,7 +805,8 @@
     host.classList.toggle('ek-stage-compact',def.kind==='stage'&&def.compact===true);
     host.classList.toggle('ek-stage-sequence',def.kind==='stage'&&def.progressive===true);
     host.replaceChildren();
-    if(!config.hideHeading)host.append(node('h2', 'ek-title', def.title));
+    host.classList.toggle('ek-model-material',hasExampleModels(def));
+    if(!config.hideHeading&&!hasSpecificChildHeading(def))host.append(node('h2', config.primaryHeading?'ek-title ek-primary-title':'ek-title', def.title));
     if(def.instruction && !redundantInstruction(def))host.append(node('p', 'ek-instruction', def.instruction));
     const body = node('div', 'ek-body');
     const actions = node('div', 'ek-actions');
@@ -891,6 +903,11 @@
       }
       return el;
     }
+    function exampleModels(block){
+      const models=node('div','ek-example-group');models.setAttribute('role','group');models.setAttribute('aria-label','Examples');
+      block.text.split(/\r?\n+/).filter(text=>text.trim()).forEach(text=>{const model=richText(text,block.highlights,block.emphasis);model.classList.add('ek-example-model');models.append(model);});
+      return models;
+    }
     const paintControls=new Map();
     function inlinePicker(id,label,options,number){
       const wrap = node('span', 'ek-inline-choice');
@@ -961,8 +978,8 @@
         const card=node('figure','ek-picture-correction-card ek-picture-cue-card');
         const pictures=node('div','ek-picture-cue-images');
         for(let i=0;i<(item.imageCopies||1);i++)pictures.append(illustration(item));
-        card.append(pictures,node('figcaption','ek-picture-cue-number',String(index+1)));
-        card.setAttribute('aria-label','Picture '+(index+1));track.append(card);
+        card.append(pictures,node('figcaption','ek-picture-cue-number',String(itemNumber(item))));
+        card.setAttribute('aria-label','Picture '+itemNumber(item));track.append(card);
       });
       return track;
     }
@@ -1001,6 +1018,7 @@
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
+          else if(block.role==='examples')body.append(exampleModels(block));
           else body.append(richText(block.text, block.highlights, block.emphasis));
         });
       }
@@ -1023,11 +1041,13 @@
           const index = nestedMounts.length;
           const block = def.exercises[index];
           const section = node('section', 'ek-stage-section'); section.setAttribute('aria-label', `Exercise ${index + 1}`);
+          if(hasExampleModels(block.exercise))section.classList.add('ek-stage-models');
+          if(index>0&&hasExampleModels(def.exercises[index-1].exercise))section.classList.add('ek-stage-model-questions');
           if(def.progressive&&index>0&&!stageStops.includes(index))section.classList.add('ek-stage-linked');
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:sameTaskCopy(block.exercise.title,def.title)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1088,8 +1108,8 @@
         def.blocks.forEach((block, index) => {
           if (block.type === 'text') {
             const section = node('section', 'ek-rule-section ek-rule-text-section');
-            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title === 'Examples' ? '[Exercise instruction]' : block.title));
-            section.append(richText(block.text, block.highlights));
+            if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
+            section.append(block.role==='examples'?exampleModels(block):richText(block.text, block.highlights));
             if(afterExercise)revealable.push(section);page.append(section);
           }
           if (block.type === 'rule') {
@@ -1124,7 +1144,8 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
-              hideHeading:sameTaskCopy(block.exercise.title,def.title),
+              hideHeading:hiddenChildHeading(def,block.exercise),
+              itemNumbers:config.itemNumbers,
               audioPath:(config.audioPath||def.id)+':'+block.id,
               onSkip:()=>{if(revealable.length&&!answers.__sw_rule_visible){answers.__sw_rule_visible=true;syncRules?.(true);viewChanged();}else config.onSkip?.();},
               navigationReadOnly:Boolean(config.navigationReadOnly),
@@ -1206,16 +1227,16 @@
         const grid = node('div', pictureWord ? 'ek-card-grid ek-picture-word-grid' : 'ek-card-grid');
         def.items.forEach((item, index) => {
           const card = node('article', pictureWord ? 'ek-card ek-picture-word-card' : 'ek-card');
-          const number = node('span', pictureWord ? 'ek-number ek-picture-number' : 'ek-number', String(index + 1));
+          const number = node('span', pictureWord ? 'ek-number ek-picture-number' : 'ek-number', String(itemNumber(item)));
           card.append(number);
           if (item.image || item.imagePending) card.append(illustration(item));
           if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
-          const promptText = pictureWord ? `Picture ${index + 1}` : item.text;
+          const promptText = pictureWord ? `Picture ${itemNumber(item)}` : item.text;
           const refreshSlot = (matchItem, matchIndex, control) => {
             if (!control) return;
             const option = def.options.find(candidate => candidate.id === answers[matchItem.id]);
-            const label = pictureWord ? `picture ${matchIndex + 1}` : matchItem.text;
+            const label = pictureWord ? `picture ${itemNumber(matchItem)}` : matchItem.text;
             control.textContent = option?.text || (modern?'':'+');
             control.dataset.selected = String(Boolean(option));
             control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
@@ -1259,23 +1280,23 @@
         }
         const pictureRows=def.layout==='picture-rows';
         if(pictureRows)body.append(pictureCues(def.items));
-        let gapNumber = 0;
         def.items.forEach((item, index) => {
           const compact=pictureRows,container=compact?node('div','ek-picture-sentence'):body;
-          if(compact)container.append(node('span','ek-picture-response-number',`${index+1}.`));
+          if(compact)container.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
           if(!compact&&(item.image || item.imagePending))body.append(illustration(item));
           const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
           if (def.preserveLines) row.style.whiteSpace = 'pre-wrap';
-          if (!modern && !compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${index + 1}. `));
+          if (!compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${itemNumber(item)}. `));
+          let gapIndex=0;
           item.segments.forEach(segment => {
             if (typeof segment === 'string') {
               if(item.highlights?.length) row.append(...Array.from(richText(segment,item.highlights).childNodes));
               else row.append(doc.createTextNode(segment));
               return;
             }
-            gapNumber += 1;
-            const number = gapNumber;
-            const label = `Sentence ${index + 1}, gap ${segment.id}`;
+            gapIndex += 1;
+            const number = itemNumber(item);
+            const label = `Sentence ${number}, gap ${gapIndex}`;
             const options = def.inputMode === 'text' ? null : segment.options || (def.inputMode === 'select' ? def.bank : null);
             if (options) {
               const {wrap,opener}=inlinePicker(segment.id,label,options.map(value=>({id:value,text:value})),number);row.append(wrap);controls.set(segment.id,opener);return;
@@ -1298,13 +1319,13 @@
         if (def.layout === 'dropdown') {
           const row = node('div', 'ek-discovery-choice');
           row.append(doc.createTextNode(`${item.prompt} `));
-          const {wrap,opener}=inlinePicker(item.id,item.prompt,item.options,index+1);
+          const {wrap,opener}=inlinePicker(item.id,item.prompt,item.options,itemNumber(item));
           row.append(wrap);body.append(row);controls.set(item.id,opener);return;
         }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question');
         const legend=node('legend');
-        if(item.promptHighlights?.length){legend.append(...richText(`${index + 1}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
-        else legend.textContent=`${index + 1}. ${item.prompt}`;
+        if(item.promptHighlights?.length){legend.append(...richText(`${itemNumber(item)}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
+        else legend.textContent=`${itemNumber(item)}. ${item.prompt}`;
         group.append(legend);
         item.options.forEach(option => {
           const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = def.multiple ? 'checkbox' : 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = def.multiple ? (Array.isArray(answers[item.id]) && answers[item.id].includes(option.id)) : answers[item.id] === option.id;
@@ -1330,7 +1351,7 @@
           const selected = def.options.find(option => option.id === answers[item.id]);
           const target = button(selected?.text || '+', () => {if(selected)assign(item.id,'');}, 'ek-image-label-target');
           target.style.left = `${item.x}%`; target.style.top = `${item.y}%`;
-          target.setAttribute('aria-label', item.prompt || `Target ${index + 1}`);
+          target.setAttribute('aria-label', item.prompt || `Target ${itemNumber(item)}`);
           target.title='Click to return label; use Alt + arrow to move labels with the keyboard';
           if (selected) {draggable(target, selected.id);keyboardPlacement(target,def.items,()=>index,destination=>assign(destination.id,selected.id));}
           dropzone(target, id => assign(item.id, id));
@@ -1414,11 +1435,11 @@
         def.items.forEach((item, index) => {
         const compact=def.layout==='picture-rows';
         const row=compact?node('div','ek-picture-sentence'):body;
-        if(compact)row.append(node('span','ek-picture-response-number',`${index+1}.`));
+        if(compact)row.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
-        const label = node('label', 'ek-writing', compact ? '' : `${index + 1}. ${item.prompt}`);
+        const label = node('label', 'ek-writing', compact ? '' : `${itemNumber(item)}. ${item.prompt}`);
         const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; if(item.placeholder)input.placeholder=item.placeholder; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
-        if(compact)input.setAttribute('aria-label',`Word for picture ${index+1}`);
+        if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
         row.append(label);if(compact)body.append(row); controls.set(item.id, input);
       });
@@ -1473,12 +1494,38 @@
       });
     }
     const itemNumber = item => config.itemNumbers?.[item.id] || def.items.indexOf(item)+1;
+    const itemResult = item => {
+      const values=def.kind==='gaps'?item.segments.filter(segment=>typeof segment!=='string').map(segment=>feedback[segment.id]||'empty'):[feedback[item.id]||'empty'];
+      return ['retry','empty','review','correct'].find(result=>values.includes(result))||'empty';
+    };
+    const markAttempt = (element,result) => {
+      element.dataset.result=result;
+      const marker=node('span','ek-attempt-marker',({correct:'✓',retry:'×',empty:'–',review:'?'})[result]);
+      marker.dataset.result=result;marker.setAttribute('role','img');
+      marker.setAttribute('aria-label',({correct:'Your last answer was correct',retry:'Your last answer was incorrect',empty:'Your last answer was not completed',review:'Your last answer needs teacher review'})[result]);
+      element.prepend(marker);return element;
+    };
+    function markChoiceOptions(){
+      if(def.kind!=='choice')return;
+      def.items.forEach(item=>{
+        const group=controls.get(item.id);if(group?.tagName!=='FIELDSET')return;
+        const correct=def.multiple?item.correctIds:item.correctId==null?null:[item.correctId];
+        if(!correct)return;
+        group.querySelectorAll('.ek-radio').forEach(label=>{
+          const input=label.querySelector('input'),selected=def.multiple?Array.isArray(answers[item.id])&&answers[item.id].includes(input.value):answers[item.id]===input.value;
+          const result=correct.includes(input.value)?'correct':selected?'retry':null;
+          if(result){label.dataset.feedback=result;input.dataset.feedback=result;}
+          else{label.removeAttribute('data-feedback');input.removeAttribute('data-feedback');}
+        });
+      });
+    }
     function pictureCorrections(items,labelFor){
       const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
       track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
       items.forEach(item=>{
         const answer=labelFor(item);if(!answer)return;
         const card=node('article','ek-picture-correction-card');
+        markAttempt(card,itemResult(item));
         card.setAttribute('data-answer-number',String(itemNumber(item)));
         card.setAttribute('aria-label','Answer '+itemNumber(item));
         if(item.image||item.imagePending)card.append(illustration(item));
@@ -1497,7 +1544,7 @@
         const value=feedback[id];if(value&&def.kind!=='order')control.setAttribute('data-feedback',value);
         const lamp=lamps.get(id);if(lamp){lamp.dataset.result=value||'empty';lamp.setAttribute('aria-label',value==='correct'?'Correct':value==='retry'?'Try again':'Not answered');}
       });
-      markOrderTokens();
+      markOrderTokens();markChoiceOptions();
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
       // One mistake opens the complete authored key, keeping correct responses
       // in their original positions. Saved answers and grading are untouched.
@@ -1508,10 +1555,10 @@
         if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
       }));
       const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
-      const pair=(prompt,answer,number)=>{if(!answer)return;const row=node('li');if(number)row.setAttribute('value',String(number));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
+      const pair=(prompt,answer,item)=>{if(!answer)return;const row=markAttempt(node('li'),item?itemResult(item):feedback.order||'empty');if(item)row.setAttribute('value',String(itemNumber(item)));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
       if(corrections){
         if(def.kind==='gaps')def.items.forEach(item=>{
-          const row=node('li');row.setAttribute('value',String(itemNumber(item)));
+          const row=markAttempt(node('li'),itemResult(item));row.setAttribute('value',String(itemNumber(item)));
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
           else item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
@@ -1521,13 +1568,13 @@
         }
         else if(def.kind==='writing'){
           if(def.items.some(item=>(item.image||item.imagePending)&&item.acceptedAnswers?.length))pictureCorrections(def.items,item=>item.acceptedAnswers?.[0]);
-          else def.items.forEach(item=>pair(item.prompt,item.acceptedAnswers?.[0],itemNumber(item)));
+          else def.items.forEach(item=>pair(item.prompt,item.acceptedAnswers?.[0],item));
         }
         else if(def.items)def.items.forEach(item=>{
-          if(item.feedbackText){const row=node('li');row.setAttribute('value',String(itemNumber(item)));row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
+          if(item.feedbackText){const row=markAttempt(node('li'),itemResult(item));row.setAttribute('value',String(itemNumber(item)));row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
           const choices=item.options||def.options||def.groups||[];
           const ids=def.multiple?item.correctIds:[item.correctId];
-          pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '),itemNumber(item));
+          pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '),item);
         });
       }
       if(list.children.length){solution.prepend(node('strong','ek-feedback-heading',def.kind==='order'?'Correct Answer':'Correct answers'));resultsBox.append(solution);}
@@ -1540,34 +1587,7 @@
       // to an explicit followUp or stage revealed by the teacher, never here.
       resultsBox.hidden=!resultsBox.children.length;status.classList.toggle('ek-feedback-with-answers',!resultsBox.hidden);
     }
-    const checkFeedback = () => {
-      if(modern||def.kind==='writing'){showFeedback();return;}
-      feedback = grade(def, answers);
-      const labels = { correct: '✓ Correct', retry: '✕ Incorrect', empty: 'Not answered yet', review: 'Teacher review' };
-      resultsBox.replaceChildren();
-      Object.entries(feedback).forEach(([id, result], index) => {
-        if(def.kind!=='order')controls.get(id)?.setAttribute('data-feedback', result);
-        const line = node('li', '', `${index + 1}. ${labels[result]}`); line.setAttribute('data-feedback', result); resultsBox.append(line);
-      });
-      markOrderTokens();
-      if (Object.values(feedback).some(result => result === 'retry' || result === 'empty')) {
-        const correction = node('li', 'ek-correction'); correction.append(node('strong', '', def.kind==='order'?'Correct Answer':'Correct solution'));
-        if (def.kind === 'gaps') def.items.forEach(item => {
-          const line = node('p', 'ek-correction-line');
-          item.segments.forEach(segment => line.append(typeof segment === 'string' ? node('span','ek-muted',segment) : node('strong','',segment.answers?.[0] || '…'))); correction.append(line);
-        });
-        else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',orderSentence(def,def.correctOrder)));
-        else if (def.kind !== 'order') def.items.forEach((item,index) => {
-          const choices = item.options || def.options || def.groups || [];
-          const ids = def.multiple ? item.correctIds : item.correctId == null ? [] : [item.correctId];
-          const correct = (ids || []).map(id => choices.find(option => option.id === id)?.text).filter(Boolean).join(' + ');
-          if (correct) correction.append(node('p','',`${item.text || item.prompt || `Target ${index+1}`} → ${correct}`));
-        });
-        if (correction.children.length > 1) resultsBox.append(correction);
-      }
-      const values = Object.values(feedback);
-      announce(`${values.filter(value => value === 'correct').length} correct · ${values.filter(value => value === 'empty').length} unanswered${values.includes('review') ? ' · Some answers need teacher review' : ''}`);
-    };
+    const checkFeedback = showFeedback;
     function updateActions(){
       const check=actions.querySelector('.ek-check');if(!check)return;
       const values=Object.values(grade(def,answers));

@@ -331,7 +331,7 @@ test('sentence feedback marks individual positions, handles accepted orders and 
  const s=setup(def,{syncChecks:true});s.mount.setAnswers({order:['which','want','he','does','end'],__sw_checked:true});
  assert.equal(s.host.querySelector('.ek-order-target').hasAttribute('data-feedback'),false);
  assert.deepEqual([...s.host.querySelectorAll('.ek-order-target>.ek-token')].map(token=>token.dataset.feedback),['correct','retry','correct','retry','correct']);
- assert.equal(s.host.querySelector('.ek-answer-pairs').textContent,'Which cap does he want?');
+ assert.equal(s.host.querySelector('.ek-answer-pairs strong').textContent,'Which cap does he want?');assert.equal(s.host.querySelector('.ek-answer-pairs>li').dataset.result,'retry');
  s.click('want');assert.equal(s.host.querySelectorAll('.ek-order-target [data-feedback]').length,0);
  s.click('Reset exercise');assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
  const alternative=setup({...def,acceptedOrders:[['he','does','want','which','end']]},{syncChecks:true});
@@ -397,12 +397,12 @@ test('nested feedback remains visible when another stage opens and closes',()=>{
   assert.equal(section.querySelector('.ek-question').dataset.feedback,'correct');
 });
 
-test('inline and typed gap feedback belongs to the number inside the field',()=>{
+test('inline and typed gap feedback stays inside the field alongside its original sentence number',()=>{
   for(const id of ['inline-demo','typed-demo']){
     const s=setup(id);const field=s.host.querySelector('.ek-gap');
     const badge=s.host.querySelector('.ek-gap-number');
     assert.ok(field.contains(badge)||field.parentElement.contains(badge));
-    assert.equal(s.host.querySelectorAll('.ek-sentence-number').length,0);
+    assert.equal(s.host.querySelectorAll('.ek-sentence-number').length,1);assert.equal(s.host.querySelector('.ek-sentence-number').textContent,'1. ');
     s.click('OK');assert.equal(badge.dataset.result,'empty');
     if(id==='inline-demo'){
       s.fire(field,'click');s.fire(s.host.querySelector('.ek-inline-option'),'click');
@@ -824,6 +824,8 @@ test('one mistaken closed response shows all four original answers without chang
   const rows=[...s.host.querySelectorAll('.ek-answer-pairs>li')];
   assert.equal(rows.length,4,def.kind+(def.multiple?' multiple':''));
   assert.deepEqual(rows.map(row=>row.getAttribute('value')),['1','2','3','4']);
+  assert.deepEqual(rows.map(row=>row.dataset.result),['correct','retry','retry','retry']);
+  assert.deepEqual(rows.map(row=>row.querySelector('.ek-attempt-marker').getAttribute('aria-label')),['Your last answer was correct','Your last answer was incorrect','Your last answer was incorrect','Your last answer was incorrect']);
   assert.deepEqual(rows.map(row=>row.querySelector('strong').textContent),words);
   assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,0);
   const correct=Object.fromEntries(words.map((word,i)=>[def.kind==='gaps'?'g'+i:'i'+i,def.kind==='writing'||def.kind==='gaps'?word:def.multiple?['o'+i]:'o'+i]));
@@ -838,7 +840,7 @@ test('picture corrections keep all original cards after one correct match and re
  const saved={i0:'coat',i1:'belt',i2:'scarf',i3:'hat',__sw_checked:true};s.mount.setAnswers(saved);
  const cards=[...s.host.querySelectorAll('.ek-picture-correction-card')];
  assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),words);
- assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','2','3','4']);
+ assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','2','3','4']);assert.deepEqual(cards.map(card=>card.dataset.result),['correct','retry','retry','retry']);
  assert.deepEqual(cards.map(card=>card.querySelector('img').src),words.map(word=>word+'.webp'));
  assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,0);assert.ok(s.button('Next correct pictures'));
 });
@@ -886,4 +888,104 @@ test('actual Complete the rules example has one heading, no generic instruction 
  assert.equal(s.host.querySelector('.ek-instruction'),null);
  assert.match(s.host.textContent,/What does she look like\? — She has long brown hair/);assert.match(s.host.textContent,/What is she like\? — She is polite and helpful/);
  assert.ok(s.host.querySelector('.ek-choice-trigger'));assert.equal(JSON.stringify(def),before);
+});
+
+
+test('last-attempt correction markers distinguish correct, wrong and unanswered rows and clear on edit',()=>{
+ const def={version:1,id:'attempt-markers',kind:'gaps',title:'Complete the sentences.',inputMode:'text',items:['coat','hat','belt','scarf'].map((word,i)=>({id:'row'+i,segments:['This is a ',{id:'gap'+i,answers:[word]},'.']}))};
+ const teacher=setup(def,{syncChecks:true});const saved={gap0:'coat',gap1:'wrong',gap2:'',gap3:'wrong',__sw_checked:true};teacher.mount.setAnswers(saved);
+ const rows=[...teacher.host.querySelectorAll('.ek-answer-pairs>li')];
+ assert.deepEqual(rows.map(row=>row.dataset.result),['correct','retry','empty','retry']);
+ assert.deepEqual(rows.map(row=>row.querySelector('strong').textContent),['coat','hat','belt','scarf']);
+ assert.deepEqual(rows.map(row=>row.querySelector('strong').hasAttribute('data-feedback')),[false,false,false,false],'canonical answers are not styled as failed answers');
+ assert.equal(rows[2].querySelector('.ek-attempt-marker').getAttribute('aria-label'),'Your last answer was not completed');
+ const learner=setup(def,{syncChecks:true});learner.mount.setAnswers(saved);assert.deepEqual([...learner.host.querySelectorAll('.ek-answer-pairs>li')].map(row=>row.dataset.result),['correct','retry','empty','retry']);assert.equal(learner.changes.length,0);
+ const field=teacher.host.querySelector('input');field.value='coat again';teacher.fire(field,'input');assert.equal(teacher.host.querySelector('.ek-attempt-marker'),null);assert.equal(teacher.host.querySelectorAll('[data-feedback]').length,0);assert.equal(teacher.mount.getAnswers().__sw_checked,undefined);
+});
+
+test('multiple gaps share the original sentence number while accessible gap positions stay distinct',()=>{
+ const def={version:1,id:'sentence-numbers',kind:'gaps',title:'Complete the sentences.',inputMode:'text',items:[
+  {id:'first',segments:['I ',{id:'one',answers:['am']},' wearing a ',{id:'two',answers:['coat']},'.']},
+  {id:'second',segments:['It ',{id:'three',answers:['is']},' cold.']}]};
+ const s=setup(def,{syncChecks:true});
+ assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ']);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-gap-number')].map(el=>el.dataset.number),['1','1','2']);
+ assert.deepEqual([...s.host.querySelectorAll('input')].map(el=>el.getAttribute('aria-label')),['Sentence 1, gap 1','Sentence 1, gap 2','Sentence 2, gap 1']);
+ s.mount.setAnswers({one:'am',two:'wrong',three:'wrong',__sw_checked:true});assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(el=>[el.getAttribute('value'),el.dataset.result]),[['1','retry'],['2','retry']]);
+});
+
+test('progressive second and third questions retain the same number in prompts, controls and corrections',()=>{
+ const options=[{id:'a',text:'Correct'},{id:'b',text:'Other'}];
+ for(const kind of ['choice','gaps']){
+  const def={version:1,id:'progressive-numbers-'+kind,kind,title:'Complete.',progressiveQuestions:true,items:[1,2,3].map(n=>kind==='choice'?{id:'item'+n,prompt:'Question '+n,options,correctId:'a'}:{id:'item'+n,segments:['Sentence '+n+' ',{id:'gap'+n,answers:['correct'],options:['correct','other']},'.']})};
+  const state=kind==='choice'?{item1:'a',item2:'b',item3:'b'}:{gap1:'correct',gap2:'other',gap3:'other'};
+  const s=setup(def,{syncChecks:true});s.mount.setAnswers({...state,__sw_choice_revealed:3,__sw_choice_checked:['item1','item2','item3']});
+  assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(el=>el.getAttribute('value')),['2','3']);
+  if(kind==='choice')assert.deepEqual([...s.host.querySelectorAll('legend')].map(el=>el.textContent),['1. Question 1','2. Question 2','3. Question 3']);
+  else{assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ','3. ']);assert.deepEqual([...s.host.querySelectorAll('.ek-choice-trigger>.ek-gap-number')].map(el=>el.dataset.number),['1','2','3']);}
+  assert.equal(s.changes.length,0);
+ }
+});
+
+test('radio and checkbox option feedback appears only after Check and clears on edit and reset',()=>{
+ for(const multiple of [false,true]){
+  const def={version:1,id:'option-feedback-'+multiple,kind:'choice',title:'Choose.',multiple,items:[{id:'question',prompt:'Pick.',options:[{id:'a',text:'One'},{id:'b',text:'Two'},{id:'c',text:'Three'}],...(multiple?{correctIds:['a','c']}:{correctId:'a'})}]};
+  const s=setup(def,{syncChecks:true}),snapshot={question:multiple?['b']: 'b',__sw_checked:true};
+  assert.equal(s.host.querySelector('.ek-radio[data-feedback]'),null);s.mount.setAnswers(snapshot);
+  assert.deepEqual([...s.host.querySelectorAll('.ek-radio')].map(el=>el.dataset.feedback),multiple?['correct','retry','correct']:['correct','retry',undefined]);
+  assert.deepEqual([...s.host.querySelectorAll('.ek-radio input')].map(el=>el.dataset.feedback),multiple?['correct','retry','correct']:['correct','retry',undefined]);
+  assert.deepEqual(s.mount.getAnswers(),snapshot);const input=s.host.querySelector('input');input.checked=true;s.fire(input,'change');assert.equal(s.host.querySelector('.ek-radio[data-feedback]'),null);assert.equal(s.host.querySelector('.ek-attempt-marker'),null);
+  s.click('Reset exercise');assert.equal(s.host.querySelector('[data-feedback]'),null);
+ }
+});
+
+test('existing Matching and Guided Discovery previews keep one primary task heading',()=>{
+ const matching=setup('matching-template');assert.deepEqual([...matching.host.querySelectorAll('.ek-title')].map(el=>el.textContent),['Match the Halves']);assert.equal(matching.host.querySelector('.ek-instruction').textContent,'Выберите подходящую пару.');
+ const discovery=setup('rule-page-demo');assert.deepEqual([...discovery.host.querySelectorAll('.ek-title')].map(el=>el.textContent),['Guided Discovery']);assert.equal(discovery.host.querySelectorAll('.ek-example-model').length,2);assert.doesNotMatch(discovery.host.textContent,/\[Exercise instruction\]/);
+ const authored=setup({version:1,id:'authored-example-title',kind:'rule-page',title:'Read.',blocks:[{type:'text',title:'Examples',text:'An authored model.'}]});assert.equal(authored.host.querySelector('.ek-rule-section-title').textContent,'Examples');
+});
+
+test('explicit model groups support one to three examples without splitting ordinary dialogues',()=>{
+ for(const count of [1,2,3]){
+  const lines=Array.from({length:count},(_,i)=>'This is model '+(i+1)+'.'),def={version:1,id:'models-'+count,kind:'presentation',title:'Read the examples.',blocks:[{type:'text',role:'examples',text:lines.join('\n\n'),highlights:['model']}]};
+  const before=JSON.stringify(def),s=setup(def);assert.deepEqual([...s.host.querySelectorAll('.ek-example-model')].map(el=>el.textContent),lines);assert.equal(s.host.querySelectorAll('.ek-example-group').length,1);assert.equal(s.host.querySelectorAll('.ek-example-model strong').length,count);assert.equal(JSON.stringify(def),before);
+ }
+ const dialogue='A: Hello.\n\nB: Hi.\nA: How are you?',normal=setup({version:1,id:'not-models',kind:'presentation',title:'Read the conversation.',blocks:[{type:'text',text:dialogue}]});assert.equal(normal.host.querySelector('.ek-example-group'),null);assert.equal(normal.host.querySelector('.ek-copy').textContent,dialogue);
+});
+
+test('actual Complete the rules models preserve text, source state compatibility and teacher reveal boundaries',()=>{
+ const app={SpaceWhaleExerciseKit:kit,SpaceWhaleLessonMedia:{},SpaceWhaleContent:[]};vm.runInNewContext(fs.readFileSync(require.resolve('../course-content-module4-45.js'),'utf8'),{window:app});
+ const def=app.SpaceWhaleContent.find(l=>l.id==='a1-2-w4-l4').stages.find(s=>s.exercise.id==='L4-discovery-rule').exercise,old=JSON.parse(JSON.stringify(def));delete old.exercises[0].exercise.blocks[0].role;
+ assert.equal(require('../lesson-structure.js').compatible(JSON.stringify(old),JSON.stringify(def)),true);
+ const s=setup(def,{syncChecks:true});assert.deepEqual([...def.revealStops],[2,3]);assert.equal(s.host.querySelectorAll('.ek-stage-models').length,1);assert.equal(s.host.querySelectorAll('.ek-stage-model-questions').length,1);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-example-model')].map(el=>el.textContent),['What does she look like? — She has long brown hair.','What is she like? — She is polite and helpful.']);
+ assert.equal([...s.host.querySelector('.ek-stage-stack').children].filter(section=>!section.hidden).length,2);assert.equal(s.host.querySelector('.ek-rule-block'),null);
+ const saved={'L4-complete-rule':{'1':'как она выглядит','2':'какая она в общении',__sw_choice_revealed:2,__sw_choice_checked:['1','2']},revealed:2};s.mount.setAnswers(saved);assert.equal(s.changes.length,0);
+ assert.equal(s.host.querySelectorAll('.ek-example-model').length,2);assert.equal(s.host.querySelectorAll('.ek-sentence-number')[1].textContent,'2. ');
+});
+
+
+test('all existing mechanic previews have exactly one primary heading before their next teacher step',()=>{
+ for(const def of data.SpaceWhaleTemplates.filter(def=>def.catalogGroup==='mechanics')){
+  const s=setup(def);const headings=[...s.host.querySelectorAll('.ek-title')];assert.equal(headings.length,1,def.id+': '+headings.map(el=>el.textContent).join(' / '));
+ }
+ const grouped=setup({version:1,id:'grouped-heading',kind:'stage',layout:'grouped',title:'Matching',exercises:[{id:'one',exercise:{...fixture('matching-demo'),id:'grouped-matching'}}]});
+ assert.deepEqual([...grouped.host.querySelectorAll('.ek-title')].map(el=>el.textContent),['Match the Halves']);
+});
+
+test('the shared correction contract also applies to the legacy preview host',()=>{
+ const {document,window}=parseHTML('<html><body class="design-preview"><main></main></body></html>'),host=document.querySelector('main');
+ const def={version:1,id:'legacy-key',kind:'gaps',title:'Complete.',inputMode:'text',items:[{id:'one',segments:['First ',{id:'first',answers:['coat']},'.']},{id:'two',segments:['Second ',{id:'second',answers:['hat']},'.']}]};
+ const mounted=kit.mount(host,def,{syncChecks:true});mounted.setAnswers({first:'coat',second:'wrong',__sw_checked:true});
+ assert.deepEqual([...host.querySelectorAll('.ek-answer-pairs>li')].map(el=>[el.getAttribute('value'),el.dataset.result]),[['1','correct'],['2','retry']]);
+ const input=host.querySelector('input');input.value='changed';input.dispatchEvent(new window.Event('input',{bubbles:true}));assert.equal(host.querySelector('.ek-attempt-marker'),null);
+});
+
+
+test('editing a later task preserves the earlier checked option borders and last-attempt markers',()=>{
+ const task=id=>({version:1,id,kind:'choice',title:'Choose.',items:[{id:'question',prompt:'Pick.',options:[{id:'a',text:'Right'},{id:'b',text:'Wrong'}],correctId:'a'}]});
+ const s=setup({version:1,id:'independent-option-feedback',kind:'stage',title:'Practice.',progressive:true,exercises:[{id:'first',exercise:task('first-task')},{id:'second',exercise:task('second-task')}]},{syncChecks:true});
+ s.mount.setAnswers({revealed:2,first:{question:'b',__sw_checked:true},second:{}});
+ const sections=[...s.host.querySelector('.ek-stage-stack').children],previous=sections[0],input=sections[1].querySelector('input');input.checked=true;s.fire(input,'change');
+ assert.deepEqual([...previous.querySelectorAll('.ek-radio')].map(el=>el.dataset.feedback),['correct','retry']);assert.equal(previous.querySelector('.ek-answer-pairs>li').dataset.result,'retry');assert.equal(s.mount.getAnswers().first.__sw_checked,true);
 });

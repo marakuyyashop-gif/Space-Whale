@@ -286,6 +286,7 @@
     if(journeys[lesson.id])journeys[lesson.id].closed=false;saveJourney();
     go({...route,...lessonLocation(lesson),selection:'',lesson:lesson.id,exercise:'',exerciseView:null,block:'opening',section:'tasks'});
   }
+  const moduleLabel = module => module.title.replace(/^Whale\s+(\d+)/i,'Module $1').replace(/^(Module\s+\d+)\s*·\s*/i,'$1. ');
   function renderSidebar(){
     dismissSidebarOverlays();tree.replaceChildren();
     const controls=document.getElementById('workspaceCourseControls'),blocks=document.getElementById('workspaceBlockControls');
@@ -344,7 +345,7 @@
       if(menuPanel==='modules'){
         if(level)separator();const current=node('span','Modules','workspace-path-current');current.setAttribute('aria-current','page');path.append(current);
       }else if(whale){
-        separator();const control=button(whale.title.replace(/^Whale\s+(\d+)/i,'Module $1'),()=>setMenuPanel('modules'),'workspace-path-module');control.setAttribute('aria-label','Choose module');path.append(control);
+        separator();const control=button(moduleLabel(whale),()=>setMenuPanel('modules'),'workspace-path-module');control.setAttribute('aria-label','Choose module');path.append(control);
       }else if(!level)path.append(node('span','Course','workspace-path-current'));
       if(menuPanel==='lesson-details'&&lesson){
         separator();const label=`Lesson ${lesson.lessonNumber||lessonIndex+1} · ${lesson.title}`;
@@ -377,7 +378,7 @@
       const list=node('div','','workspace-panel-list');
       whales.forEach(item=>{
         const lessons=catalog.topics({view:'library',level:level.id,whale:item.id}).filter(permitted);
-        list.append(option(item.title.replace(/^Whale\s+(\d+)/i,'Module $1'),teacher?.moduleOverview?.(level,item,lessons)||'',item.id===route.whale,()=>{menuPanel='lesson';go({...route,view:'library',selection:'module',level:level.id,whale:item.id,lesson:'',exercise:'',block:'',section:'tasks'});}));
+        list.append(option(moduleLabel(item),teacher?.moduleOverview?.(level,item,lessons)||'',item.id===route.whale,()=>{menuPanel='lesson';go({...route,view:'library',selection:'module',level:level.id,whale:item.id,lesson:'',exercise:'',block:'',section:'tasks'});}));
       });
       if(!whales.length)list.append(node('p',level?'No modules available.':'Choose a level.','workspace-info-copy'));
       tree.append(list);return;

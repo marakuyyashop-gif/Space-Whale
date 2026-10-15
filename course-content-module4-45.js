@@ -142,7 +142,7 @@ const discovery4=E('L4-complete-rule','gaps','Complete the rules.',{progressiveQ
  ]
 });
 l4.push(stage('Complete the Rule',3,S('L4-discovery-rule','Complete the rules.',[
- P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),highlights:['What does she look like?','What is she like?']}]),
+ P('L4-question-examples','Complete the rules.',[{...T('What does she look like? — She has long brown hair.\n\nWhat is she like? — She is polite and helpful.'),role:'examples',highlights:['What does she look like?','What is she like?']}]),
  {...discovery4,items:discovery4.items.map((item,i)=>({...item,highlights:[i===0?'What does she look like?':'What is she like?']}))},rule4
 ],{revealStops:[2,3],requireCheckBeforeNext:true})));
 const dialogue4='Ben: I want to invite our new neighbors for coffee. Do you know them?\n\nLisa: Yes. Their names are Nick and Emma.\n\nBen: What is Nick like?\n\nLisa: He’s really helpful. He often helps me with my bike.\n\nBen: What does he look like?\n\nLisa: He has short curly hair.\n\nBen: And Emma? What is she like?\n\nLisa: She’s polite and quiet.\n\nBen: What does she look like?\n\nLisa: She has long straight hair.\n\nBen: Do you have their phone number?\n\nLisa: Yes, I do. Here it is.\n\nBen: Great, thanks!';
