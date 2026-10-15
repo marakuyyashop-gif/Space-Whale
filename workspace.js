@@ -330,8 +330,9 @@
     const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
     profile.hidden=menuPanel!=='profile';tree.hidden=menuPanel==='profile';
     profileButton.setAttribute('aria-controls',menu.id);profileButton.setAttribute('aria-expanded',String(menuPanel==='profile'));
-    if(!menuPanel||menuPanel==='profile')return;
-    const heading=node('div','','workspace-panel-heading');
+    const heading=document.getElementById('workspacePanelHeading');heading.replaceChildren();
+    if(!menuPanel)return;
+    if(menuPanel==='profile'){heading.append(node('h2','Learner profile','workspace-panel-title'));return;}
     if(menuPanel==='levels')heading.append(node('h2','Levels','workspace-panel-title'));
     else if(view!=='library'&&menuPanel!=='modules')heading.append(node('h2',view==='templates'?'Exercise templates':'Lessons','workspace-panel-title'));
     else{
@@ -345,9 +346,12 @@
       }else if(whale){
         separator();const control=button(whale.title.replace(/^Whale\s+(\d+)/i,'Module $1'),()=>setMenuPanel('modules'),'workspace-path-module');control.setAttribute('aria-label','Choose module');path.append(control);
       }else if(!level)path.append(node('span','Course','workspace-path-current'));
+      if(menuPanel==='lesson-details'&&lesson){
+        separator();const label=`Lesson ${lesson.lessonNumber||lessonIndex+1} · ${lesson.title}`;
+        const control=button(label,()=>setMenuPanel('lesson'),'workspace-path-lesson');control.setAttribute('aria-label','Choose lesson');control.setAttribute('aria-current','page');path.append(control);
+      }
       heading.append(path);
     }
-    tree.append(heading);
     const teacher=window.SpaceWhaleLessonTeacherInfo;
     const copy=window.SpaceWhaleTeacherCopy;
     const option=(label,description,selected,action,href)=>{

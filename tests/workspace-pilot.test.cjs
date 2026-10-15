@@ -44,7 +44,7 @@ test('course panels use a consistent card hierarchy with concise English descrip
  const s=fixture(),d=s.document;
  openPanel(s,'level');
  assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'levels');
- assert.equal(d.querySelector('.workspace-panel-title').textContent,'Levels');
+ assert.equal(d.querySelector('#workspacePanelHeading .workspace-panel-title').textContent,'Levels');assert.equal(d.querySelector('#workspaceTopics .workspace-panel-title'),null);
  for(const id of ['A1.1','A1.2']){
   const card=panelOption(s,id),topic=card.querySelector('.workspace-description-topic'),language=card.querySelector('.workspace-description-language');
   assert.ok(topic.textContent);assert.doesNotMatch(topic.textContent,/[А-Яа-яЁё]/);assert.equal(topic.querySelector('.workspace-grammar-term'),null);
@@ -62,7 +62,7 @@ test('course panels use a consistent card hierarchy with concise English descrip
  for(const card of lessons){assert.ok(card.querySelector('strong'));assert.ok(card.querySelector('.workspace-description-topic'));assert.ok(card.querySelector('.workspace-description-language'));}
  chooseLesson(s,'a1-2-w4-l1');
  assert.equal(new URLSearchParams(s.location.search).get('lesson'),'a1-2-w4-l1');assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson-details');
- assert.equal(d.querySelector('.workspace-panel-title'),null);assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 1 · Примерочная');assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(d.querySelector('.workspace-lessons-back'),null);
+ assert.equal(d.querySelector('.workspace-panel-title'),null);assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 1 · Примерочная');assert.equal(d.querySelector('#workspacePanelHeading .workspace-path-lesson').textContent,'Lesson 1 · Примерочная');assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(d.querySelector('.workspace-lessons-back'),null);
  assert.equal(d.querySelector('.workspace-lesson-overview .workspace-description-topic').textContent,'Describe how clothes look and compare similar items.');
  assert.deepEqual([...d.querySelectorAll('.workspace-block-select > strong')].map(el=>el.textContent),['Speaking','Discovery Words','Lexis / Grammar','Speaking']);
  assert.equal(d.querySelector('.workspace-block-number'),null);
@@ -263,7 +263,7 @@ test('vertical rail keeps account, course, lesson and timer sections separate',(
  assert.equal(d.querySelectorAll('.workspace-rail-divider').length,2);
  assert.ok(d.querySelector('.workspace-rail-footer #startLesson svg'));assert.equal(d.querySelector('#startLesson').textContent,'');
  assert.ok(d.querySelector('.workspace-rail-footer #workspaceClockTime'));
- assert.equal(d.querySelector('.workspace-rail-brand').textContent,'SW');assert.equal(d.querySelector('.workspace-expanded-brand').textContent,'Space Whale');
+ assert.equal(d.querySelector('.workspace-rail-brand').textContent,'SW');assert.equal(d.querySelector('.workspace-expanded-brand'),null);assert.equal(d.querySelector('.workspace-menu-header'),null);assert.ok(d.querySelector('.workspace-panel-heading #workspacePanelHeading'));assert.equal(d.querySelector('.workspace-menu-scroll .workspace-panel-heading'),null);
  openPanel(s,'level');s.click(panelOption(s,'A1.2'));
  s.click([...d.querySelectorAll('.workspace-panel-option')].find(el=>el.querySelector('strong').textContent.includes('4')));
  chooseLesson(s,'a1-2-w4-l1');
@@ -321,23 +321,37 @@ test('rail L returns to the lesson list without a back button or changing the mo
  assert.equal(root.firstElementChild,exercise);assert.equal(s.location.search,search);assert.equal(d.querySelector('.workspace-lessons-back'),null);
  assert.equal(d.querySelector('.workspace-panel-title'),null);assert.equal(d.querySelectorAll('.workspace-course-path').length,1);
 });
-test('course path controls change panels without changing the selected lesson, answers or task',()=>{
+test('full course path controls switch panels without changing the selected lesson, answers or task',()=>{
  const s=fixture(false,{search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1'}),d=s.document;
  openLessonDetails(s);s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));
- const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search,mountCount=s.mounts.length;
- s.click(d.querySelector('.workspace-course-path .workspace-path-module'));
- assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');assert.equal(d.querySelector('.workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-path-module'),null);assert.match(d.querySelector('.workspace-panel-heading').textContent,/Modules/);
+ s.mounts.at(-1).config.onChange({'picture-coat':'coat'});
+ const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search,mountCount=s.mounts.length,answersKey='space-whale:workspace:v1:a1-2-w4-l1:a12w4l1-words',answers=s.sessionStorage.getItem(answersKey);
+ const path=d.querySelector('#workspacePanelHeading .workspace-course-path');assert.ok(path);assert.deepEqual([...path.querySelectorAll('button')].map(el=>el.textContent),['A1.2','Module 4 · Выбор','Lesson 1 · Примерочная']);
+ s.click(path.querySelector('.workspace-path-lesson'));
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');assert.ok(d.querySelector('.workspace-panel-option[data-lesson="a1-2-w4-l1"]'));assert.equal(d.querySelector('.workspace-lesson-overview'),null);
+ assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);assert.equal(s.sessionStorage.getItem(answersKey),answers);
+ s.click(d.querySelector('#workspacePanelHeading .workspace-path-module'));
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');assert.equal(d.querySelector('.workspace-path-level').textContent,'A1.2');assert.equal(d.querySelector('.workspace-path-module'),null);assert.equal(d.querySelector('.workspace-path-lesson'),null);assert.match(d.querySelector('.workspace-panel-heading').textContent,/Modules/);
  assert.equal(d.querySelector('.workspace-lesson-title'),null);assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);
  s.click(d.querySelector('.workspace-path-level'));
- assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'levels');assert.equal(d.querySelector('.workspace-panel-heading h2').textContent,'Levels');assert.ok(panelOption(s,'A1.2'));
- assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);
+ assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'levels');assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,'Levels');assert.ok(panelOption(s,'A1.2'));
+ assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);assert.equal(s.sessionStorage.getItem(answersKey),answers);
+});
+test('panel heading stays outside the scroll area and remains available for Profile',()=>{
+ const s=fixture(),d=s.document,root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search;
+ const header=d.querySelector('#workspaceMenuPanel > .workspace-panel-heading');assert.ok(header);assert.equal(d.querySelector('.workspace-menu-scroll #workspacePanelHeading'),null);
+ assert.ok(header.querySelector('#workspaceMenuClose[aria-label="Close menu"]'));assert.equal(d.querySelector('.workspace-menu-header'),null);assert.equal(d.querySelector('.workspace-expanded-brand'),null);
+ s.click(d.querySelector('#workspaceProfileButton'));assert.equal(d.querySelector('#workspaceTopics').hidden,true);assert.equal(d.querySelector('#workspacePanelHeading').textContent,'Learner profile');assert.equal(header.hidden,false);
+ s.click(header.querySelector('#workspaceMenuClose'));assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);assert.equal(root.firstElementChild,exercise);assert.equal(s.location.search,search);
+ openPanel(s,'level');assert.equal(header.querySelector('#workspacePanelHeading h2').textContent,'Levels');assert.equal(d.querySelector('#workspaceTopics .workspace-panel-title'),null);
+ openPanel(s,'module');assert.equal(header.querySelector('.workspace-path-level').textContent,'A1.1');assert.match(header.querySelector('#workspacePanelHeading').textContent,/Modules/);assert.doesNotMatch(header.querySelector('#workspacePanelHeading').textContent,/Learner profile/);
 });
 test('lesson labels use canonical positions after inserted number lessons and preserve stable IDs',()=>{
  const s=fixture(false,{search:'?view=library&level=A1.1&whale=1&lesson=a1-1-w1-lnumbers'}),d=s.document;
  openPanel(s,'lesson');
  for(const [id,label] of [['a1-1-w1-lnumbers','Lesson 5 · Числа'],['a1-1-w1-ltens','Lesson 6 · Десятки'],['a1-1-w1-l5','Lesson 7 · Контакты']]){
   const card=d.querySelector(`.workspace-panel-option[data-lesson="${id}"]`);assert.ok(card);assert.equal(card.querySelector('strong').textContent,label);
-  s.click(card);assert.equal(d.querySelector('.workspace-lesson-title').textContent,label);assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(new URLSearchParams(s.location.search).get('lesson'),id);
+  s.click(card);assert.equal(d.querySelector('.workspace-lesson-title').textContent,label);assert.equal(d.querySelector('#workspacePanelHeading .workspace-path-lesson').textContent,label);assert.equal(d.querySelectorAll('#workspaceTopics h2').length,1);assert.equal(new URLSearchParams(s.location.search).get('lesson'),id);
   openPanel(s,'lesson');
  }
 });
@@ -351,7 +365,7 @@ test('future lessons share card and aim language formatting without unsafe HTML'
  assert.equal(topic.querySelector('.workspace-grammar-term'),null);assert.match(topic.textContent,/Something New Tense/);
  assert.deepEqual([...labels.querySelectorAll('.workspace-grammar-term')].map(el=>el.textContent),['Something New Tense',unsafe]);assert.equal(card.querySelector('img'),null);
  s.click(card);assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson-details');
- assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 7 · Future grammar');
+ assert.equal(d.querySelector('.workspace-lesson-title').textContent,'Lesson 7 · Future grammar');assert.equal(d.querySelector('#workspacePanelHeading .workspace-path-lesson').textContent,'Lesson 7 · Future grammar');
  const aim=d.querySelector('#workspaceLessonBlocks [data-block="language"] .workspace-block-aim');assert.equal(aim.querySelector('.workspace-grammar-term').textContent,'Something New Tense');assert.equal(aim.querySelector('img'),null);
  assert.equal(d.querySelector('#workspaceTopics img'),null);assert.equal(d.querySelector('#workspaceTopics script'),null);
 });
