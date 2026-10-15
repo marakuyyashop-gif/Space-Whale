@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Space Whale · Template review</title>
+<link rel="stylesheet" href="typography.css?v=20261015-readable-exercises">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#333;font:400 16px/1.6 var(--font)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+#templateReview{--review-ink:#333;--review-muted:#666;--review-line:#d5d5d5;--review-soft:#f1f1f1;--review-green:#286144;--review-green-soft:#eef6f0;--review-red:#a33f50;--review-red-soft:#fbf0f2;max-width:780px;margin:0 auto;padding:28px 24px 64px}
+.review-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.review-brand{font-weight:600;letter-spacing:-.02em}
+.review-label{font-size:14px;color:var(--review-muted)}
+.variants{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.variants button{padding:9px 16px;border:1px solid var(--review-line);border-radius:22px;background:#fff;font-size:14px}
+.variants button[aria-pressed=true]{background:#e8e8e8;border-color:#bdbdbd;font-weight:600}
+.course-path{padding:14px 18px;border:1px solid #e1e1e1;border-radius:22px;font-size:14px;font-weight:600}
+.selected-stage{position:relative;margin-top:12px;padding:14px 18px 14px 24px;background:var(--review-soft);border:1px solid #e1e1e1;border-radius:22px;box-shadow:0 2px 6px #00000009;font-weight:600}
+.selected-stage:before{content:"";position:absolute;inset:13px auto 13px 9px;width:3px;background:#686868;border-radius:3px}
+.selected-stage span{float:right;font-size:14px;font-weight:400;color:var(--review-muted)}
+.demo{margin-top:36px}
+.demo+.demo{border-top:1px solid #e3e3e3;margin-top:36px;padding-top:32px}
+h1,h2,h3,p{margin:0}
+h1{font-size:18px;line-height:1.45;font-weight:600}
+h2{font-size:16px;line-height:1.6;font-weight:600}
+strong{font:inherit;font-weight:600;color:#353535}
+.model-group{display:grid;gap:8px;margin-top:24px;margin-bottom:24px;padding:18px 20px;border-radius:24px;background:#f6f6f6}
+.question-instruction{margin-bottom:14px;color:#555}
+.rule-questions{margin:0;padding-left:24px}
+.rule-questions li{padding:6px 0 6px 3px}
+select{max-width:100%;padding:7px 11px;border:1px solid #d3d3d3;border-radius:14px;background:white;font-size:16px;line-height:1.5}
+.sample-note{margin:12px 0 18px;color:var(--review-muted);font-size:14px}
+.questions{margin:24px 0 0;padding-left:26px}
+.question-row{position:relative;padding:8px 34px 8px 4px}
+.question-row::marker,.correction-row::marker{color:#666;font-variant-numeric:tabular-nums}
+.sentence{display:block;line-height:2.5}
+.answer-input{display:inline-block;vertical-align:middle;width:6.5ch;height:40px;min-height:40px;padding:6px 10px;border:1.5px solid #bdbdbd;border-radius:15px;background:#fff;font-family:var(--font);font-size:16px;font-weight:400;line-height:24px;caret-color:#333;outline:none}
+.answer-input:focus{box-shadow:0 0 0 3px #dddddd80;border-color:#666}
+.attempt-mark{position:absolute;right:5px;top:14px;display:grid;place-items:center;width:24px;height:24px;font-size:20px;line-height:1;font-weight:600}
+[data-result=correct]>.sentence>.answer-input{border-color:var(--review-green);background:var(--review-green-soft)}
+[data-result=retry]>.sentence>.answer-input{border-color:var(--review-red);background:var(--review-red-soft)}
+[data-result=correct]>.attempt-mark,[data-result=correct]>.correction-status{color:var(--review-green)}
+[data-result=retry]>.attempt-mark,[data-result=retry]>.correction-status{color:var(--review-red)}
+[data-result=empty]>.attempt-mark,[data-result=empty]>.correction-status{color:#777}
+.actions{display:flex;gap:10px;align-items:center;margin-top:18px}
+.actions button{padding:9px 20px;min-height:42px;border:1px solid #d0d0d0;border-radius:22px;background:#fff}
+.actions #sampleCheck{font-weight:600;box-shadow:0 2px 6px #0000000a}
+.actions #sampleReset{color:#666}
+.feedback{margin-top:24px;padding:22px 24px;border:2px solid transparent;border-radius:28px;background:var(--review-soft)}
+#templateReview[data-variant=dashed] .feedback{background:#fff;border-color:#d1d1d1;border-style:dashed}
+.feedback-status{font-weight:500;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #d8d8d8}
+.feedback-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.feedback-header p{font-size:14px;color:#666}
+.answers{margin:0;padding-left:25px}
+.correction-row{position:relative;padding:9px 0 9px 4px}
+.correct-sentence{display:inline;color:#555;font-size:16px}
+.correction-status{display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;font-size:14px;font-weight:500}
+.status-icon{font-size:18px;line-height:1;font-weight:600}
+button:focus-visible,select:focus-visible{outline:2px solid #666;outline-offset:3px}
+.review-footer{margin-top:32px;font-size:14px;color:#666}
+@media(max-width:480px){#templateReview{padding:20px 16px 40px}.review-top{align-items:flex-start}.selected-stage span{float:none;display:block;margin-top:3px}.model-group{padding:16px}.feedback{padding:18px 16px}.feedback-header{display:block}.feedback-header p{margin-top:3px}.correction-status{display:flex;margin:4px 0 0}.course-path{font-size:14px}.question-row{padding-right:28px}.answer-input{width:6ch}.sentence{line-height:2.8}}
+</style>
+</head>
+<body>
+<main id="templateReview" data-variant="soft">
+<header class="review-top"><div class="review-brand">Space Whale</div><div class="review-label">Design preview · sample content</div></header>
+<div class="variants" role="group" aria-label="Correct answers appearance">
+<button type="button" data-variant="soft" aria-pressed="true">Soft gray panel</button>
+<button type="button" data-variant="dashed" aria-pressed="false">Dashed outline</button>
+</div>
+<nav class="course-path" aria-label="Sample course path">A1.2 / Module 4. Выбор / Lesson 4. Новый сосед</nav>
+<div class="selected-stage" aria-label="Selected stage: Speaking">Speaking <span>Selected stage</span></div>
+<section class="demo" aria-labelledby="ruleHeading">
+<h1 id="ruleHeading">Complete the rules.</h1>
+<div class="model-group" aria-label="Examples">
+<p><strong>What does she look like?</strong> — She has long brown hair.</p>
+<p><strong>What is she like?</strong> — She is polite and helpful.</p>
+</div>
+<p class="question-instruction">Choose the correct option.</p>
+<ol class="rule-questions">
+<li>We use <strong>What does she look like?</strong> to ask about her <select aria-label="Rule 1"><option>appearance</option><option>personality</option></select>.</li>
+<li>We use <strong>What is she like?</strong> to ask about her <select aria-label="Rule 2"><option>personality</option><option>appearance</option></select>.</li>
+</ol>
+</section>
+<section class="demo" aria-labelledby="practiceHeading">
+<h1 id="practiceHeading">Complete the sentences.</h1>
+<p class="sample-note">Sample checked attempt. Edit the fields and check again.</p>
+<ol id="sampleQuestions" class="questions"></ol>
+<div class="actions"><button type="button" id="sampleCheck">Check</button><button type="button" id="sampleReset">Reset</button></div>
+<section id="sampleFeedback" class="feedback" aria-labelledby="answerHeading" hidden>
+<p id="sampleStatus" class="feedback-status" role="status"></p>
+<div class="feedback-header"><h2 id="answerHeading">Correct answers</h2><p>Marks show your last attempt.</p></div>
+<ol id="sampleAnswers" class="answers"></ol>
+</section>
+</section>
+<p class="review-footer">Preview only. Sample fields do not save or change lesson answers.</p>
+</main>
+<script>
+(() => {
+  const root=document.getElementById('templateReview');
+  const tasks=[
+    {start:'She ',end:' a blue coat.',answer:'has',initial:'has'},
+    {start:'They ',end:' at home.',answer:'are',initial:'is'},
+    {start:'I ',end:' a new hat.',answer:'have',initial:'has'},
+    {start:'He ',end:' friendly.',answer:'is',initial:'are'}
+  ];
+  const questions=root.querySelector('#sampleQuestions');
+  const feedback=root.querySelector('#sampleFeedback');
+  const answers=root.querySelector('#sampleAnswers');
+  const status=root.querySelector('#sampleStatus');
+  const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+  const fields=[];
+  tasks.forEach((task,index)=>{
+    const row=make('li','question-row');row.value=index+1;
+    const label=make('label','sentence');label.htmlFor='sample-'+index;label.append(document.createTextNode(task.start));
+    const input=make('input','answer-input');input.id='sample-'+index;input.type='text';input.autocomplete='off';input.spellcheck=false;input.value=task.initial;input.setAttribute('aria-label','Answer '+(index+1));label.append(input,document.createTextNode(task.end));
+    const mark=make('span','attempt-mark');mark.setAttribute('aria-live','polite');row.append(label,mark);questions.append(row);fields.push({row,input,mark});
+  });
+  const clear=()=>{
+    feedback.hidden=true;
+    fields.forEach(({row,input,mark})=>{row.removeAttribute('data-result');input.removeAttribute('aria-invalid');mark.textContent='';mark.removeAttribute('aria-label');});
+  };
+  const check=()=>{
+    answers.replaceChildren();let correct=0;
+    tasks.forEach((task,index)=>{
+      const field=fields[index],value=field.input.value.trim().toLowerCase();
+      const result=value===''?'empty':value===task.answer?'correct':'retry';
+      const icon=result==='correct'?'✓':result==='retry'?'×':'—';
+      const label=result==='correct'?'Correct':result==='retry'?'Needs review':'Not answered';
+      if(result==='correct')correct++;
+      field.row.dataset.result=result;field.input.setAttribute('aria-invalid',String(result==='retry'));
+      field.mark.textContent=icon;field.mark.setAttribute('aria-label',label);
+      const row=make('li','correction-row');row.value=index+1;row.dataset.result=result;
+      const line=make('span','correct-sentence');line.append(document.createTextNode(task.start),make('strong','',task.answer),document.createTextNode(task.end));
+      const marker=make('span','correction-status');marker.append(make('span','status-icon',icon),make('span','',label));row.append(line,marker);answers.append(row);
+    });
+    status.textContent=correct===tasks.length?'All correct.':correct+' of '+tasks.length+' correct.';
+    feedback.hidden=false;
+  };
+  fields.forEach(({input})=>input.addEventListener('input',clear));
+  root.querySelector('#sampleCheck').addEventListener('click',check);
+  root.querySelector('#sampleReset').addEventListener('click',()=>{fields.forEach(({input})=>input.value='');clear();fields[0].input.focus();});
+  root.querySelectorAll('[data-variant]').forEach(button=>button.addEventListener('click',()=>{
+    root.dataset.variant=button.dataset.variant;
+    root.querySelectorAll('[data-variant]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  }));
+  check();
+})();
+</script>
+</body>
+</html>
