@@ -339,14 +339,14 @@ test('sentence feedback marks individual positions, handles accepted orders and 
  assert.equal(alternative.host.querySelectorAll('.ek-order-target>.ek-token[data-feedback=correct]').length,5);
 });
 
-test('picture writing corrections reuse picture-word cards without exposing open-response samples',()=>{
+test('picture writing corrections keep correct and incorrect picture-word cards without exposing open-response samples',()=>{
  const def={version:1,id:'picture-recall',kind:'writing',title:'Write the words.',responseMode:'accepted',items:[
   {id:'cap',prompt:'Picture 1',image:'cap.webp',alt:'Picture 1',acceptedAnswers:['cap','a cap']},
   {id:'belt',prompt:'Picture 2',image:'belt.webp',alt:'Picture 2',acceptedAnswers:['belt','a belt']}]};
  const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
  s.mount.setAnswers({cap:'hat',belt:'a belt',__sw_checked:true});
  const cards=s.host.querySelectorAll('.ek-picture-corrections .ek-picture-correction-card');
- assert.equal(cards.length,1);assert.equal(cards[0].querySelector('img').src,'cap.webp');assert.equal(cards[0].querySelector('strong').textContent,'cap');
+ assert.equal(cards.length,2);assert.equal(cards[0].querySelector('img').src,'cap.webp');assert.equal(cards[0].querySelector('strong').textContent,'cap');assert.equal(cards[1].querySelector('strong').textContent,'belt');
  assert.ok(s.button('Next correct pictures'));s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
 });
 
@@ -799,4 +799,91 @@ test('feedback scrolling waits for the final layout and is cancelled when the ex
    bottom=800;frame();assert.equal(target,248,'uses the final height');
    target=undefined;s.mount.setAnswers({q:'c',__sw_checked:true});s.mount.destroy();assert.equal(frame,null);assert.equal(target,undefined);
  }finally{view.requestAnimationFrame=original;view.cancelAnimationFrame=originalCancel;}
+});
+
+
+test('one mistaken closed response shows all four original answers without changing saved responses',()=>{
+ const words=['coat','hat','belt','scarf'],options=words.map((text,i)=>({id:'o'+i,text}));
+ const cases=[
+  {kind:'choice',items:words.map((word,i)=>({id:'i'+i,prompt:'Question '+(i+1),options,correctId:'o'+i}))},
+  {kind:'choice',multiple:true,items:words.map((word,i)=>({id:'i'+i,prompt:'Question '+(i+1),options,correctIds:['o'+i]}))},
+  {kind:'matching',options,items:words.map((word,i)=>({id:'i'+i,text:'Prompt '+(i+1),correctId:'o'+i}))},
+  {kind:'sort',groups:options,items:words.map((word,i)=>({id:'i'+i,text:'Item '+(i+1),correctId:'o'+i}))},
+  {kind:'image-label',image:'clothes.webp',alt:'Clothes',options,items:words.map((word,i)=>({id:'i'+i,prompt:'Object '+(i+1),x:10+i*20,y:50,correctId:'o'+i}))},
+  {kind:'writing',responseMode:'accepted',items:words.map((word,i)=>({id:'i'+i,prompt:'Word '+(i+1),acceptedAnswers:[word,`a ${word}`]}))},
+  {kind:'gaps',inputMode:'text',items:words.map((word,i)=>({id:'i'+i,segments:['This is a ',{id:'g'+i,answers:[word]},'.']}))}
+ ];
+ for(const [index,content] of cases.entries()){
+  const def={version:1,id:'complete-key-'+index,title:'Practice.',...content},s=setup(def,{syncChecks:true});
+  const answers=Object.fromEntries(words.map((word,i)=>{
+   const key=def.kind==='gaps'?'g'+i:'i'+i;
+   const value=def.kind==='writing'||def.kind==='gaps'?(i===0?word:'wrong'):'o'+(i===0?0:i%3+1);
+   return [key,def.multiple?[value]:value];
+  }));
+  const saved={...answers,__sw_checked:true};s.mount.setAnswers(saved);
+  const rows=[...s.host.querySelectorAll('.ek-answer-pairs>li')];
+  assert.equal(rows.length,4,def.kind+(def.multiple?' multiple':''));
+  assert.deepEqual(rows.map(row=>row.getAttribute('value')),['1','2','3','4']);
+  assert.deepEqual(rows.map(row=>row.querySelector('strong').textContent),words);
+  assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,0);
+  const correct=Object.fromEntries(words.map((word,i)=>[def.kind==='gaps'?'g'+i:'i'+i,def.kind==='writing'||def.kind==='gaps'?word:def.multiple?['o'+i]:'o'+i]));
+  s.mount.setAnswers({...correct,__sw_checked:true});assert.equal(s.host.querySelector('.ek-correction'),null);
+ }
+});
+
+test('picture corrections keep all original cards after one correct match and retain navigation and answer state',()=>{
+ const words=['coat','hat','belt','scarf'];
+ const s=setup({version:1,id:'all-picture-answers',kind:'matching',layout:'picture-word',title:'Match.',
+  items:words.map((word,i)=>({id:'i'+i,text:'Picture '+(i+1),image:word+'.webp',alt:word,correctId:word})),options:words.map(word=>({id:word,text:word}))},{syncChecks:true});
+ const saved={i0:'coat',i1:'belt',i2:'scarf',i3:'hat',__sw_checked:true};s.mount.setAnswers(saved);
+ const cards=[...s.host.querySelectorAll('.ek-picture-correction-card')];
+ assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),words);
+ assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','2','3','4']);
+ assert.deepEqual(cards.map(card=>card.querySelector('img').src),words.map(word=>word+'.webp'));
+ assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,0);assert.ok(s.button('Next correct pictures'));
+});
+
+test('a mixed picture and text writing key keeps original order and skips unkeyed prompts without renumbering',()=>{
+ const def={version:1,id:'mixed-key',kind:'writing',title:'Write.',items:[
+  {id:'one',prompt:'First',acceptedAnswers:['coat'],image:'coat.webp',alt:'Coat'},
+  {id:'two',prompt:'Tell me your own idea.',possibleAnswers:['My personal idea']},
+  {id:'three',prompt:'Third',acceptedAnswers:['belt']},
+  {id:'four',prompt:'Fourth',acceptedAnswers:['scarf'],image:'scarf.webp',alt:'Scarf'}]};
+ const s=setup(def,{syncChecks:true});s.mount.setAnswers({one:'coat',two:'Something personal',three:'hat',four:'scarf',__sw_checked:true});
+ const cards=[...s.host.querySelectorAll('.ek-picture-correction-card')];
+ assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),['coat','belt','scarf']);
+ assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','3','4']);
+ assert.equal(cards[1].querySelector('img'),null);assert.match(cards[1].textContent,/Third/);
+ assert.doesNotMatch(s.host.querySelector('.ek-results').textContent,/My personal idea|Something personal/);
+});
+
+test('a revealed question keeps its original correction number across the progressive adapter',()=>{
+ const def={version:1,id:'question-numbers',kind:'choice',title:'Choose the correct answer.',progressiveQuestions:true,items:[
+  {id:'first',prompt:'First?',options:[{id:'a',text:'One'},{id:'b',text:'Wrong'}],correctId:'a'},
+  {id:'second',prompt:'Second?',options:[{id:'a',text:'Two'},{id:'b',text:'Wrong'}],correctId:'a'}]};
+ const s=setup(def,{syncChecks:true});s.mount.setAnswers({first:'a',second:'b',__sw_choice_revealed:2,__sw_choice_checked:['first','second']});
+ const rows=[...s.host.querySelectorAll('.ek-answer-pairs>li')];
+ assert.equal(rows.length,1);assert.equal(rows[0].getAttribute('value'),'2');assert.match(rows[0].textContent,/Second.*Two/);
+ assert.equal(s.mount.getAnswers().first,'a');assert.equal(s.mount.getAnswers().second,'b');assert.equal(s.changes.length,0);
+});
+
+test('generic duplicate task copy is hidden but contextual directions and examples remain',()=>{
+ const task={version:1,id:'generic-task',kind:'gaps',title:'Complete the sentences with the correct words.',inputMode:'select',instruction:'Choose the correct options.',items:[{id:'row',segments:['This is a ',{id:'gap',answers:['coat'],options:['coat','hat']},'.']}]};
+ const stage={version:1,id:'one-task-heading',kind:'stage',title:'Complete the sentences.',exercises:[{id:'task',exercise:task}]};
+ const s=setup(stage);assert.equal(s.host.querySelectorAll('.ek-title').length,1);assert.equal(s.host.querySelector('.ek-instruction'),null);assert.ok(s.host.querySelector('.ek-choice-trigger'));
+ const specific=setup({...task,instruction:'Look at the picture. Choose one word for each gap.'});
+ assert.equal(specific.host.querySelector('.ek-instruction').textContent,'Look at the picture. Choose one word for each gap.');
+ const separate=setup({...stage,exercises:[{id:'task',exercise:{...task,title:'Complete the questions about your weekend.',instruction:'Write one or two words in each gap.'}}]});
+ assert.equal(separate.host.querySelectorAll('.ek-title').length,2);assert.match(separate.host.querySelector('.ek-instruction').textContent,/one or two words/);
+});
+
+test('actual Complete the rules example has one heading, no generic instruction repeat and unchanged examples',()=>{
+ const app={SpaceWhaleExerciseKit:kit,SpaceWhaleLessonMedia:{},SpaceWhaleContent:[]};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../course-content-module4-45.js'),'utf8'),{window:app});
+ const lesson=app.SpaceWhaleContent.find(lesson=>lesson.id==='a1-2-w4-l4'),def=lesson.stages.find(stage=>stage.exercise.id==='L4-discovery-rule').exercise;
+ const before=JSON.stringify(def),s=setup(def,{syncChecks:true});
+ assert.equal(s.host.querySelectorAll('.ek-title').length,1);assert.equal(s.host.querySelector('.ek-title').textContent,'Complete the rules.');
+ assert.equal(s.host.querySelector('.ek-instruction'),null);
+ assert.match(s.host.textContent,/What does she look like\? — She has long brown hair/);assert.match(s.host.textContent,/What is she like\? — She is polite and helpful/);
+ assert.ok(s.host.querySelector('.ek-choice-trigger'));assert.equal(JSON.stringify(def),before);
 });

@@ -1,4 +1,4 @@
-@import url("typography.css?v=20261015-native-type");
+@import url("typography.css?v=20261015-readable-exercises");
 :root{color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:#fff;color:#202124;font:16px/1.6 var(--font)}

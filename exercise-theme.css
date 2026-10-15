@@ -1,4 +1,4 @@
-@import url("typography.css?v=20261015-native-type");
+@import url("typography.css?v=20261015-readable-exercises");
 /* SPACE WHALE — edit shared appearance here.
    Lessons contain content only. Every host imports these tokens through exercise-kit.css.
    Keep type-specific changes under their named tokens; never style one lesson ID. */
@@ -16,6 +16,8 @@
   --sw-action-hover: #fff;
   --sw-action-ink: #000;
   --sw-exercise-muted: #686b70;
+  --sw-exercise-emphasis-ink: #555;
+  --sw-exercise-emphasis-weight: 550;
   --sw-exercise-line: #dedfe2;
   --sw-exercise-surface: #fff;
   --sw-exercise-soft: #fff;
@@ -58,6 +60,7 @@
   --sw-motion-time:260ms;--sw-motion-easing:cubic-bezier(.22,.7,.25,1);
 }
 [data-theme=dark] {
+  --sw-exercise-emphasis-ink:#c3c3c3;
   --sw-neu-bg:#25282d;--sw-neu-ink:#eef0f3;--sw-neu-muted:#b2b8c2;
   --sw-neu-surface:linear-gradient(135deg,#2d3137,#25282d 55%,#22252a);
   --sw-neu-raised:9px 9px 20px #15171b99,-8px -8px 20px #353a4260;

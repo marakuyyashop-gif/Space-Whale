@@ -4,6 +4,22 @@
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const normalizeEnglish = value => normalize(value).replace(/[‘’ʼ]/g, "'").replace(/\.$/, '').trim();
+  // Only interchangeable generic task copy is folded. Context, word limits and
+  // other authored instructions keep their wording and place in the exercise.
+  const taskCopy = value => normalize(value).replace(/[.!?]+$/, '').trim();
+  const taskCopyKey = value => {
+    const text=taskCopy(value);
+    if(/^complete (?:the )?sentences?(?: with (?:the )?(?:correct|right) words?)?$/.test(text))return 'complete-sentences';
+    if(/^complete (?:the )?rules?$/.test(text))return 'complete-rules';
+    if(/^choose (?:the )?(?:correct|right) (?:options?|answers?)$/.test(text))return 'choose-options';
+    return text;
+  };
+  const sameTaskCopy = (first,second) => Boolean(first&&second)&&taskCopyKey(first)===taskCopyKey(second);
+  const redundantInstruction = def => sameTaskCopy(def.instruction,def.title)||(
+    taskCopyKey(def.instruction)==='choose-options'&&
+    (def.kind==='choice'||def.kind==='gaps'&&def.inputMode==='select')&&
+    ['complete-sentences','complete-rules'].includes(taskCopyKey(def.title))
+  );
   // Opt-in for keyed translations: typography and contractions do not change meaning.
   // Vocabulary/word order/tense are still checked against authored alternatives.
   const normalizeTranslation = value => normalize(value).replace(/[‘’ʼ]/g, "'")
@@ -412,10 +428,10 @@
       if(skipped.length===items.length)state.__sw_skipped=true;
       return state;
     };
-    const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:definition.instruction,
+    const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:redundantInstruction(definition)?'':definition.instruction,
       progressive:true,requireCheckBeforeNext:true,exercises:items.map(item=>({id:blockId(item),
         exercise:{...definition,id:definition.id+'-'+item.id,instruction:'',items:[item]}}))};
-    const handle=mount(host,stage,{...config,sequentialListening:false,syncChecks:true,answers:unpack(saved),
+    const handle=mount(host,stage,{...config,sequentialListening:false,syncChecks:true,itemNumbers:Object.fromEntries(items.map((item,index)=>[item.id,config.itemNumbers?.[item.id]||index+1])),answers:unpack(saved),
       onChange:value=>{saved=pack(value);config.onChange?.(clone(saved));}});
     return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>{saved=clone(value||{});handle.setAnswers(unpack(saved));}};
   }
@@ -428,7 +444,7 @@
       const task={...definition,id:taskId,instruction:''};delete task.followUp;
       const unpack=value=>{const response=clone(value||{}),revealed=response.__sw_followup_revealed||1;delete response.__sw_followup_revealed;return {revealed,[taskId]:response};};
       const pack=value=>({...clone(value[taskId]||{}),__sw_followup_revealed:value.revealed||1});
-      const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:definition.instruction,
+      const stage={version:1,id:definition.id,kind:'stage',title:definition.title,instruction:redundantInstruction(definition)?'':definition.instruction,
         progressive:true,requireCheckBeforeNext:true,exercises:[{id:taskId,exercise:task},{id:followId,exercise:{version:1,id:followId,kind:'presentation',...definition.followUp}}]};
       const handle=mount(host,stage,{...config,syncChecks:true,answers:unpack(config.answers),onChange:value=>config.onChange?.(pack(value))});
       return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>handle.setAnswers(unpack(value))};
@@ -779,7 +795,7 @@
     host.classList.toggle('ek-stage-sequence',def.kind==='stage'&&def.progressive===true);
     host.replaceChildren();
     if(!config.hideHeading)host.append(node('h2', 'ek-title', def.title));
-    if(def.instruction && def.instruction.trim()!==def.title.trim())host.append(node('p', 'ek-instruction', def.instruction));
+    if(def.instruction && !redundantInstruction(def))host.append(node('p', 'ek-instruction', def.instruction));
     const body = node('div', 'ek-body');
     const actions = node('div', 'ek-actions');
     const status = node('p', 'ek-status'); status.setAttribute('role', 'status');
@@ -1011,7 +1027,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:block.exercise.title===def.title||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,hideHeading:sameTaskCopy(block.exercise.title,def.title)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1108,7 +1124,7 @@
             page.append(section);
             const handle = mount(child, block.exercise, {
               discovery: true,
-              hideHeading:block.exercise.title===def.title,
+              hideHeading:sameTaskCopy(block.exercise.title,def.title),
               audioPath:(config.audioPath||def.id)+':'+block.id,
               onSkip:()=>{if(revealable.length&&!answers.__sw_rule_visible){answers.__sw_rule_visible=true;syncRules?.(true);viewChanged();}else config.onSkip?.();},
               navigationReadOnly:Boolean(config.navigationReadOnly),
@@ -1456,11 +1472,18 @@
         }else{token.dataset.feedback=result;token.setAttribute('aria-description',result==='correct'?'Correct position':'Incorrect position');}
       });
     }
+    const itemNumber = item => config.itemNumbers?.[item.id] || def.items.indexOf(item)+1;
     function pictureCorrections(items,labelFor){
       const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
       track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
       items.forEach(item=>{
-        const card=node('article','ek-picture-correction-card');card.append(illustration(item),node('strong','',labelFor(item)));track.append(card);
+        const answer=labelFor(item);if(!answer)return;
+        const card=node('article','ek-picture-correction-card');
+        card.setAttribute('data-answer-number',String(itemNumber(item)));
+        card.setAttribute('aria-label','Answer '+itemNumber(item));
+        if(item.image||item.imagePending)card.append(illustration(item));
+        else if(item.prompt||item.text)card.append(node('span','ek-muted',item.prompt||item.text));
+        card.append(node('strong','',answer));track.append(card);
       });
       if(!track.children.length)return;
       const move=direction=>{const distance=(track.firstElementChild?.getBoundingClientRect().width||180)+12;track.scrollBy?.({left:direction*distance,behavior:'smooth'});};
@@ -1476,38 +1499,35 @@
       });
       markOrderTokens();
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
-      // Legacy showAnswers:false hid essential solutions across the imported course.
-      // Personal/open responses are never graded against example text.
+      // One mistake opens the complete authored key, keeping correct responses
+      // in their original positions. Saved answers and grading are untouched.
       const attempted=Object.values(feedback).some(value=>value!=='empty');
+      const corrections=attempted&&Object.values(feedback).some(value=>value==='retry'||value==='empty');
       const examples=[];
       if(def.kind==='gaps')def.items.forEach(item=>item.segments.forEach(segment=>{
         if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
       }));
       const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
-      const pair=(prompt,answer)=>{if(!answer)return;const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
-      const needsSolution=id=>['retry','empty'].includes(feedback[id]);
-      if(attempted){
+      const pair=(prompt,answer,number)=>{if(!answer)return;const row=node('li');if(number)row.setAttribute('value',String(number));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
+      if(corrections){
         if(def.kind==='gaps')def.items.forEach(item=>{
-          if(!Object.values(feedback).some(value=>value==='retry'||value==='empty'))return;
-          const row=node('li');
+          const row=node('li');row.setAttribute('value',String(itemNumber(item)));
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
           else item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
         });
-        else if(def.kind==='order' && needsSolution('order'))pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
+        else if(def.kind==='order')pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
         else if(def.kind==='matching'&&def.layout==='picture-word'){
-          pictureCorrections(def.items.filter(item=>needsSolution(item.id)),item=>def.options.find(option=>option.id===item.correctId)?.text||'');
+          pictureCorrections(def.items,item=>def.options.find(option=>option.id===item.correctId)?.text||'');
         }
         else if(def.kind==='writing'){
-          const pictures=def.items.filter(item=>needsSolution(item.id)&&(item.image||item.imagePending)&&item.acceptedAnswers?.length);
-          pictureCorrections(pictures,item=>item.acceptedAnswers[0]);
-          def.items.forEach(item=>{if(needsSolution(item.id)&&!pictures.includes(item))pair(item.prompt,item.acceptedAnswers?.[0]);});
+          if(def.items.some(item=>(item.image||item.imagePending)&&item.acceptedAnswers?.length))pictureCorrections(def.items,item=>item.acceptedAnswers?.[0]);
+          else def.items.forEach(item=>pair(item.prompt,item.acceptedAnswers?.[0],itemNumber(item)));
         }
         else if(def.items)def.items.forEach(item=>{
-          if(item.feedbackText){const row=node('li');row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
-          if(!needsSolution(item.id))return;
+          if(item.feedbackText){const row=node('li');row.setAttribute('value',String(itemNumber(item)));row.append(richText(item.feedbackText,item.feedbackHighlights||[]));list.append(row);return;}
           const choices=item.options||def.options||def.groups||[];
           const ids=def.multiple?item.correctIds:[item.correctId];
-          pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '));
+          pair(item.text||item.prompt||'',(ids||[]).map(id=>choices.find(option=>option.id===id)?.text).filter(Boolean).join(' / '),itemNumber(item));
         });
       }
       if(list.children.length){solution.prepend(node('strong','ek-feedback-heading',def.kind==='order'?'Correct Answer':'Correct answers'));resultsBox.append(solution);}
@@ -1533,13 +1553,11 @@
       if (Object.values(feedback).some(result => result === 'retry' || result === 'empty')) {
         const correction = node('li', 'ek-correction'); correction.append(node('strong', '', def.kind==='order'?'Correct Answer':'Correct solution'));
         if (def.kind === 'gaps') def.items.forEach(item => {
-          if (!item.segments.some(segment => typeof segment !== 'string' && ['retry','empty'].includes(feedback[segment.id]) && segment.answers)) return;
           const line = node('p', 'ek-correction-line');
           item.segments.forEach(segment => line.append(typeof segment === 'string' ? node('span','ek-muted',segment) : node('strong','',segment.answers?.[0] || '…'))); correction.append(line);
         });
         else if (def.kind === 'order' && def.correctOrder) correction.append(node('p','',orderSentence(def,def.correctOrder)));
         else if (def.kind !== 'order') def.items.forEach((item,index) => {
-          if (!['retry','empty'].includes(feedback[item.id])) return;
           const choices = item.options || def.options || def.groups || [];
           const ids = def.multiple ? item.correctIds : item.correctId == null ? [] : [item.correctId];
           const correct = (ids || []).map(id => choices.find(option => option.id === id)?.text).filter(Boolean).join(' + ');

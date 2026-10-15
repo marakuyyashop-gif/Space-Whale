@@ -198,7 +198,7 @@ body.unified-workspace .app-sidebar,body.unified-workspace[data-theme=dark] .app
 
 /* Every persistent floating notice has a separate dismiss control. */
 .unified-workspace .workspace-session-tools{max-height:none;overflow:visible}
-.workspace-notice-close,.workspace-audio-notice>button:last-child,.workspace-media-notice>button:last-child{border:0;background:transparent;color:inherit;cursor:pointer;font:calc(var(--sw-exercise-text-size,16px) * 1.5)/1 sans-serif;width:calc(32px * var(--sw-control-scale,1));height:calc(32px * var(--sw-control-scale,1));flex:none}
+.workspace-notice-close,.workspace-audio-notice>button:last-child,.workspace-media-notice>button:last-child{border:0;background:transparent;color:inherit;cursor:pointer;font:calc(var(--sw-exercise-text-size,16px) * 1.5)/1 var(--sw-exercise-font);width:calc(32px * var(--sw-control-scale,1));height:calc(32px * var(--sw-control-scale,1));flex:none}
 .workspace-notice-close{position:absolute;right:5px;top:5px}
 .workspace-notice:empty+.workspace-notice-close{display:none}
 .unified-workspace .workspace-notice:not(:empty){padding-right:42px}

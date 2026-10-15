@@ -116,7 +116,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 
 ## Approved monochrome direction
 
-Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px instructions and controls. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.
+The shared native system family comes from typography.css; 16px body, 20px primary title, 18px embedded heading, 14px instructions and controls. Shared palette and sizing live in exercise-theme.css. Workspace overrides must use those tokens rather than fixed competing sizes. Charcoal buttons have content-sized width, restrained padding and rounded corners. Cards are flat; shadows remain for floating menus/dialogs. Audio progress and non-feedback interaction states are monochrome. Only correct/incorrect feedback and content images use color. Separate exercise spacing and grouped component spacing remain distinct. Sidebar and Home styles are outside this change. Touch targets remain usable with coarse-pointer overrides. No lesson data or answer-state changes are required for this theme.
 
 ## Whale 1 content (2026-09-24)
 
@@ -129,7 +129,7 @@ Onest throughout; 16px body, 20px primary title, 18px embedded heading, 14px ins
 
 ## Feedback contract (2026-09-26)
 
-- Closed tasks retain correct/retry indicators after OK. Incorrect or unanswered items in an attempted task reveal their authored solutions, including matching and picture tasks. Legacy `feedback.showAnswers:false` no longer suppresses these essential corrections in the modern workspace. Two-option choices and dropdowns also reveal corrections. When a gaps task has any mistake, its feedback shows all complete corrected sentences with muted context and highlighted answer spans.
+- Closed tasks retain correct/retry indicators after OK. When an attempted task has an incorrect or unanswered item, its corrections section includes all keyed items in their original order and numbering, including items already answered correctly. This applies to matching, picture tasks, choices, gaps, sort and keyed writing. Legacy `feedback.showAnswers:false` does not suppress these essential corrections in the modern workspace. Two-option choices and dropdowns also reveal corrections. Gap corrections show complete sentences with muted context and restrained answer emphasis.
 - Free writing and unkeyed gaps require teacher review; no AI grammar or semantic grading is connected. Writing confirms completed input with `Well done` without showing examples. Personal data can vary.
 - OK remains available after checking. Changing a response clears old feedback; reset clears both answers and feedback.
 
@@ -177,3 +177,11 @@ Words and Listen & Repeat share a section. Related practice tasks share a sectio
 Original exercise, item, media and answer IDs remain stable. Grouped sections have new IDs and aliases for old source links. The workspace reads old individual local/live answers only when no grouped response exists; it does not modify/delete the original records. Layout-only signature changes keep compatible responses. Live drafts and view state use the existing collaboration/audio protocols. B1 Error Correction uses new item IDs so old free-text replies are not interpreted as answers to the new questions.
 
 Appearance controls are in `exercise-theme.css`: `--sw-exercise-font` for the family, `--sw-exercise-text-size` for the base type scale, `--sw-control-scale` for controls. Heading/mobile/sidebar/dialog type sizes derive from the base; control shapes derive from the control scale. Default values retain the approved appearance. Change the shared values, never a lesson selector. These are site configuration values, not learner-specific preferences.
+
+## Shared readability (2026-10-15)
+
+Phone matching grids keep two columns for picture-word and text/translation cards. Six source cards occupy three rows. The existing card selector still opens the same dialog; desktop grids and answer mechanics remain unchanged.
+
+Grammar highlights and correction answers use the surrounding family, type size and line height, with restrained neutral semibold emphasis. The single native family is defined in `typography.css`, with no third-party web-font requests. Rule examples keep a consistent paragraph rhythm. Shared composition rendering omits redundant generic instructions when the visible task heading already states the same action; specific instructions and context remain.
+
+Corrections contain all keyed source rows or picture cards, in their authored order and numbering, whenever any keyed item needs correction. Already-correct answers remain visible in that section. Open writing continues to show neutral completion without invented model answers or grading.

@@ -1,4 +1,4 @@
-@import url("typography.css?v=20261015-native-type");
+@import url("typography.css?v=20261015-readable-exercises");
 /* Inline paint only: no padding/borders that could reflow an exercise. */
 .exercise-kit .sw-word-focus{display:inline;border-radius:4px;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .12s,box-shadow .12s}
 @media(hover:hover){.exercise-kit .sw-word-focus:hover{background:color-mix(in srgb,var(--sw-neu-muted,#767c83) 8%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--sw-neu-muted,#767c83) 10%,transparent)}}
