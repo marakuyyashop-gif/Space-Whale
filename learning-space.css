@@ -1,8 +1,9 @@
+@import url("typography.css?v=20261015-native-type");
 :root { --learning-column-width: 560px; }
 .learning-space .reference-app { min-width: 0; }
-.learning-space .learning-heading { margin: 22px 6px 12px; font: 500 calc(var(--sw-exercise-text-size,16px) * 1)/1.4 Onest,Arial,sans-serif; }
+.learning-space .learning-heading { margin: 22px 6px 12px; font: 500 calc(var(--sw-exercise-text-size,16px) * 1)/1.4 var(--font); }
 .learning-menu { overflow-y: auto; flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
-.learning-menu button { border: 0; background: transparent; text-align: left; border-radius: calc(12px * var(--sw-control-scale,1)); padding: calc(11px * var(--sw-control-scale,1)) calc(12px * var(--sw-control-scale,1)); font: 400 calc(var(--sw-exercise-text-size,16px) * 0.8125)/1.5 Onest,Arial,sans-serif; cursor: pointer; color: #36383d; }
+.learning-menu button { border: 0; background: transparent; text-align: left; border-radius: calc(12px * var(--sw-control-scale,1)); padding: calc(11px * var(--sw-control-scale,1)) calc(12px * var(--sw-control-scale,1)); font: 400 calc(var(--sw-exercise-text-size,16px) * 0.8125)/1.5 var(--font); cursor: pointer; color: #36383d; }
 .learning-menu button[aria-current=true] { background: #292b2f; color: white; }
 .learning-menu .draft-menu-number { margin-right: 10px; }
 .learning-links { padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; font-size: calc(var(--sw-exercise-text-size,16px) * 0.75); }

@@ -1,6 +1,7 @@
+@import url("typography.css?v=20261015-native-type");
 :root{color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;background:#fff;color:#202124;font:16px/1.6 Onest,sans-serif}
+body{margin:0;background:#fff;color:#202124;font:16px/1.6 var(--font)}
 .homework-page{max-width:920px;margin:auto;padding:44px 28px 90px}
 h1{font-size:26px;line-height:1.3;margin:5px 0 24px;font-weight:600}
 .homework-level{color:#686b70;font-size:14px;margin:0}

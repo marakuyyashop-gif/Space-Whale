@@ -73,3 +73,13 @@ One panel replaces its contents for Levels, Modules, Lesson or learner profile. 
 The Lesson panel includes a lesson selector, the concrete English goal and the four English block aims. Optional +/− controls reveal the original exercise links in normal flow. Block rows and rail icons select the first exercise; rail icons do not open or expand the panel. Stage numbers, menu chevrons, Milestone and the snake are absent. Main-area previous/next and within-exercise progression remain available.
 
 Teacher metadata comes from `lesson-teacher-info.js`: `get(lesson)` supplies goals and aims, `levelOverview(level)` and `moduleOverview(level,module,lessons)` supply concise authored course overviews. Unknown or empty course areas receive no invented subject or grammar description. The teacher panel is hidden from learners along with the navigation rail.
+
+## Course selection and teacher copy (2026-10-15)
+
+Selecting a level opens its Modules panel; the heading includes the level ID. Selecting a module opens a vertical Lessons list with the same card typography, a concrete lesson summary and short grammatical targets. Selecting a lesson opens a separate details view. The Lessons button returns to the list without changing or remounting the exercise. The L rail control always opens that list.
+
+`teacher-copy.js` renders descriptions as ordinary topic text and a separate Language line with restrained emphasis. `lessonOverview(lesson)` returns `{summary, language}`; a new lesson can declare `teacherInfo.language` (a string or array of English groups) or English `grammar`. This shared renderer uses text nodes, not authored HTML. Module/level overview strings can use `Language:` or `Grammar:` to separate grammatical targets from topics.
+
+Each block has an Aim. The complete title-and-aim card selects its first original task; +/− is a separate sibling button and only reveals existing task links. No lesson dropdown or numbered stage labels remain. No new exercise content, media, teacher hints or answer keys are created here.
+
+Typography comes from `typography.css` for site, classroom, homework and previews. It requests the platform system font, including San Francisco on Apple devices and the native UI font elsewhere. This does not distribute Apple font files. Font sizing and control scaling remain in `exercise-theme.css`.

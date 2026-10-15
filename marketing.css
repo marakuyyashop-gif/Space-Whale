@@ -1,7 +1,8 @@
+@import url("typography.css?v=20261015-native-type");
 :root{--ink:#202124;--muted:#6f7279;--line:#e3e4e8;--paper:#f7f7f5;--lavender:#dedcf8;--blue:#cbdcf5;--green:#dbe9d8;--cream:#efe8da;--white:#fff;--radius:26px}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;color:var(--ink);font-family:Onest,Arial,sans-serif;background:var(--paper);-webkit-font-smoothing:antialiased}
+body{margin:0;color:var(--ink);font-family:var(--font);background:var(--paper);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 .marketing-container{width:min(1180px,calc(100% - 40px));margin:0 auto}
 .marketing-header{position:sticky;top:0;z-index:100;background:rgba(247,247,245,.9);border-bottom:1px solid rgba(210,211,214,.75);backdrop-filter:blur(18px)}

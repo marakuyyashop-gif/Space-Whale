@@ -1,3 +1,4 @@
+@import url("typography.css?v=20261015-native-type");
 .workspace-video-dock{position:fixed;z-index:1100;box-sizing:border-box;min-width:110px;min-height:100px;border-radius:22px;background:var(--sw-neu-feedback);box-shadow:var(--sw-neu-small);color:var(--sw-neu-ink);font-family:var(--sw-exercise-font);isolation:isolate;touch-action:none;user-select:none;cursor:grab}
 .workspace-video-dock:active{cursor:grabbing}
 .workspace-video-toolbar{position:absolute;inset:6px 6px auto auto;display:flex;gap:3px;z-index:4}

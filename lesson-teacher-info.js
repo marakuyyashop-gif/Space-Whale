@@ -561,58 +561,177 @@ const courseExtras={
 function english(value){
  return typeof value==='string'&&/[A-Za-z]/.test(value)&&!/[\u0400-\u04ff]/.test(value)?value.trim():'';
 }
+const lessonLanguageModules={
+ 'a1-1-w1':[
+  'Greetings and farewells','Polite responses','Names and spelling','Country and nationality phrases','Numbers 0–20','Numbers 21–100; Age','Contact questions','Weather questions; It’s + adjective','Everyday conversation review'
+ ],
+ 'a1-1-w2':[
+  'Be: I am; Roles','Articles; Adjective + noun','Be: he/she/it; States','Regular plurals','Possessive determiners','Be: we/you/they','Be; Articles; Plurals; Possessive determiners'
+ ],
+ 'a1-1-w3':[
+  'Be: negatives','Be: questions and short answers','Place prepositions','Be + location; Where…?','Can/can’t: ability','Can: questions and short answers','Be; Location; Can/can’t'
+ ],
+ 'a1-1-w4':[
+  'Present Simple: I/you/we/they','Present Simple: he/she/it','Frequency adverbs','Time expressions; Time prepositions','Basic word order','Present Simple: negatives','Present Simple; Frequency; Word order'
+ ],
+ 'a1-1-w5':[
+  'Present Simple: questions; How often…?','Present Simple: object questions','Be vs action verbs','Have/has; Be + adjective','Have: questions and negatives','Want + noun; Want to + verb','Need + noun; Need to + verb','Present Simple; Have; Want/need'
+ ],
+ 'a1-1-w6':[
+  'Object pronouns','Like: nouns and actions','Like: questions and negatives','Irregular plurals','Demonstratives; Singular/plural','Plural nouns; A pair of','Possessive ’s; Whose…?','Object pronouns; Plurals; Possession; Like'
+ ],
+ 'a1-1-w7':[
+  'Clock time; When/What time…?','Weekdays; On/every','Months; In/from…to…','Seasons; When…?','Ordinal numbers','Dates; Time prepositions','Time and date review'
+ ],
+ 'a1-2-w1':[
+  'There is/are: statements','There is/are: negatives','There is/are: questions','Existence vs location; Place prepositions','Location questions and responses','Affirmative imperatives','Negative imperatives','Directions; Imperatives','There is/are; Location; Imperatives; Directions'
+ ],
+ 'a1-2-w2':[
+  'Can/can’t: possibility','Can I…?: permission','Can/Could you…?: requests','Offers of help','Clarification requests','Can/can’t; Requests; Offers; Clarification'
+ ],
+ 'a1-2-w3':[
+  'Countable/uncountable nouns','Some/any','Quantity questions and expressions','Prices; How much…?','Ordering food','Food offers; Some','Countability; Quantities; Ordering; Offers'
+ ],
+ 'a1-2-w4':[
+  'Look + adjective; Look like + noun','Degree modifiers','Which/Why…?; Opinions and reasons','Personality vs appearance; Be/have','Category and similarity phrases','Appearance; Degree; Reasons; Categories'
+ ],
+ 'a1-2-w5':[
+  'Present Continuous: statements','Present Continuous: negatives','Present Continuous: questions','Present Simple vs Present Continuous','Look for vs find','Present Continuous; Routines vs current actions; Searching'
+ ],
+ 'a1-2-w6':[
+  'Will/won’t: predictions','Will: questions','Suggestions; I’ll: immediate decisions','Be going to: statements and negatives','Be going to: questions','Be going to vs will','Predictions; Suggestions; Intentions; Immediate decisions'
+ ],
+ 'a1-2-w7':[
+  'Be; Possession; Plurals; Can/can’t','Present Simple; Preferences; Needs; Time','There is/are; Location; Imperatives; Requests','Food and choices; Appearance; Present Continuous; Future forms'
+ ]
+};
+const lessonLanguage={};
+Object.entries(lessonLanguageModules).forEach(([module,labels])=>labels.forEach((label,index)=>{
+ const suffix=module==='a1-1-w1'?[1,2,3,4,'numbers','tens',5,6,7][index]:module==='a1-1-w7'?[1,2,4,5,3,6,7][index]:index+1;
+ lessonLanguage[module+'-l'+suffix]=label;
+}));
+Object.assign(lessonLanguage,{
+ 'a2-1-w1-smy-1':'Sequencing and outcome phrases',
+ 'a2-1-w1-smy-2':'Movement verbs and prepositions',
+ 'a2-1-w1-smy-3':'Directions; Movement prepositions',
+ 'a2-2-w4-l11':'Past Simple; Be for current states',
+ 'a2-2-w4-l12':'Could; Suggestions with Why don’t we…?',
+ 'a2-2-w6-l1':'Indefinite pronouns; Singular agreement',
+ 'a2-2-w6-l2':'Indefinite adverbs of place; Infinitives for services',
+ 'b1-1-w1-misha-1':'Second Conditional; Hypothetical questions',
+ 'b1-1-w1-misha-2':'If I were you…; Advice; Verb patterns'
+});
+const wordCategories={
+ 'a1-1-w1-l3':'Learn terms for names and spelling.',
+ 'a1-1-w1-l5':'Learn symbols used in email addresses.',
+ 'a1-1-w2-l3':'Learn adjectives for feelings and physical states.',
+ 'a1-1-w3-l3':'Learn names for everyday places.',
+ 'a1-1-w4-l3':'Learn frequency adverbs.',
+ 'a1-1-w4-l4':'Learn words for parts of the day and week.',
+ 'a1-1-w4-l5':'Learn terms for parts of speech and sentence roles.',
+ 'a1-1-w5-l2':'Learn verbs for communication and listening.',
+ 'a1-1-w5-l3':'Learn adjectives for states and availability.',
+ 'a1-1-w6-l1':'Learn verbs for helping and communicating with others.',
+ 'a1-1-w7-l1':'Learn verbs used in schedules.',
+ 'a1-1-w7-l3':'Learn nouns for time periods and scheduled events.',
+ 'a1-2-w2-l5':'Learn terms used when clarifying messages and spelling.',
+ 'a1-2-w1-l6':'Learn phrases for moving items and operating devices.',
+ 'a1-2-w2-l2':'Learn verbs for permission requests involving everyday activities.',
+ 'a1-2-w2-l4':'Learn verbs for handling belongings.',
+ 'a1-2-w3-l4':'Learn names for baked goods and currencies.',
+ 'a1-2-w4-l3':'Learn names for clothing accessories.',
+ 'a1-2-w4-l5':'Learn nouns for everyday categories.',
+ 'a1-2-w5-l2':'Learn phrases for household cleaning.',
+ 'a1-2-w5-l4':'Learn verbs and phrases for learning activities.',
+ 'a1-2-w6-l4':'Learn phrases for preparing for guests.',
+ 'a2-1-w1-smy-2':'Learn phrases for movement and direction.',
+ 'a2-2-w4-l11':'Learn terms for travel and road problems.',
+ 'a2-2-w6-l1':'Learn names for computer and TV equipment.',
+ 'b1-1-w1-misha-1':'Learn phrases for decisions about work and housing.',
+ 'b1-1-w1-misha-2':'Learn verbs for preparation, focus, and decisions.'
+};
+function languageTerms(value){
+ const terms=Array.isArray(value)?value.map(english).filter(Boolean).join('; '):english(value);
+ return terms.replace(/^Language:\s*/i,'').replace(/\.$/,'');
+}
+function shortLanguage(lesson){
+ const authored=lesson?.teacherInfo||{};
+ return languageTerms(authored.language)||languageTerms(authored.grammar)||lessonLanguage[lesson?.id]||languageTerms(lesson?.language)||languageTerms(lesson?.grammar);
+}
+function abilityAim(prefix,text){
+ const phrase=english(text).replace(/^Try to\s+/i,'').replace(/\s+independently\.$/,'').replace(/\.$/,'');
+ return phrase?prefix+phrase.charAt(0).toLowerCase()+phrase.slice(1)+'.':'';
+}
+function knownInfo(lesson,goal,words,language,opening=goal,final=goal){
+ const info={goal,language:shortLanguage(lesson),blockAims:{
+  opening:abilityAim('Assess the ability to ',opening),
+  words:wordCategories[lesson.id]||words,
+  language,
+  final:abilityAim('Consolidate the ability to ',final)
+ }};
+ if(lesson.id==='a1-2-w4-l1')Object.assign(info.blockAims,{
+  opening:'Assess how the learner describes clothing and visual similarity.',
+  language:'Distinguish look + adjective from look like + noun.',
+  final:'Consolidate descriptions of clothing using look + adjective and look like + noun.'
+ });
+ return info;
+}
 function get(lesson){
  const card=a1[lesson?.id];
  if(card){
   const [goal,words,language]=card;
-  return {goal,blockAims:{opening:'Try to '+goal.charAt(0).toLowerCase()+goal.slice(1),words,language,final:goal.replace(/\.$/,'')+' independently.'}};
+  return knownInfo(lesson,goal,words,language);
  }
  const extra=courseExtras[lesson?.id];
  if(extra){
   const [goal,words,language,opening,final]=extra;
-  return {goal,blockAims:{opening,words,language,final}};
+  return knownInfo(lesson,goal,words,language,opening,final);
  }
  const authored=lesson?.teacherInfo||{},aims=authored.blockAims||{};
  const goal=english(authored.goal)||english(lesson?.goal)||english(lesson?.summary)||'Complete the lesson task.';
- return {goal,blockAims:{
+ return {goal,language:shortLanguage(lesson),blockAims:{
   opening:english(aims.opening),words:english(aims.words),language:english(aims.language),final:english(aims.final)
  }};
 }
+function lessonOverview(lesson){
+ const info=get(lesson);
+ return {summary:info.goal==='Complete the lesson task.'?'':info.goal,language:shortLanguage(lesson)};
+}
 const levelOverviews={
- 'A1.1':'Introductions, people, routines, preferences, and time. Main language: be, can, Present Simple, have/want/need/like, pronouns, possessives, and time expressions.',
- 'A1.2':'Homes, everyday requests, food, choices, current actions, and plans. Main language: there is/are, imperatives, can, quantities, look/look like, Present Continuous, will, and be going to.',
- 'A2.1':'Connected stories, movement, and route directions. Use sequencing phrases and movement verb–preposition combinations to explain events and routes.',
- 'A2.2':'Travel problems, alternative plans, device problems, and finding services. Use Past Simple and be, could and Why don’t we…?, and indefinite pronouns and location words.',
- 'B1.1':'Imaginary choices and practical advice. Use If + Past Simple with would/wouldn’t, If I were you…, and phrases for decisions, work, housing, and advice.'
+ 'A1.1':'Introductions, people, daily routines, and time. Language: be, can, Present Simple, pronouns and possessives.',
+ 'A1.2':'Homes, everyday requests, food, choices, and plans. Language: there is/are, quantities, Present Continuous, future forms.',
+ 'A2.1':'Connected stories, movement, and directions. Language: sequencing phrases, movement prepositions, route instructions.',
+ 'A2.2':'Travel problems, alternative plans, and everyday services. Language: Past Simple, suggestions, indefinite pronouns and adverbs.',
+ 'B1.1':'Imaginary choices and practical advice. Language: Second Conditional, If I were you.'
 };
 const moduleOverviews={
  'A1.1':{
-  1:'Personal details, polite exchanges, spelling, numbers 0–100, contacts, and weather. Use be from, be + nationality, and It’s + adjective.',
-  2:'Introduce people, describe objects and states, and identify belongings. Use be, a/an/the, regular plurals, and possessive determiners.',
-  3:'Clarify information about people, locations, and abilities. Use be negatives and questions, in/on/at/near, Where is/are…?, and can/can’t.',
-  4:'Daily routines and frequency. Use Present Simple statements and negatives, frequency adverbs, in/on/at for time, and basic word order.',
-  5:'People’s habits, possessions, wants, and needs. Ask questions with be or do/does; use have/has, want + noun/want to + verb, and need + noun/need to + verb.',
-  6:'Preferences, family, belongings, and clothing. Use object pronouns, like, irregular plurals, this/that/these/those, a pair of, possessive ’s, and whose.',
-  7:'Clocks, calendars, and arranging a meeting. Use ordinal numbers, dates, in/on/at, every, from…to…, and questions with when or what time.'
+  1:'Personal details, polite exchanges, spelling, contacts, and weather. Language: everyday phrases, numbers 0–100, be + noun/adjective.',
+  2:'People, objects, states, and belongings. Language: be, articles, regular plurals, possessive determiners.',
+  3:'People, locations, and abilities. Language: be negatives and questions, place prepositions, can/can’t.',
+  4:'Daily routines and frequency. Language: Present Simple statements and negatives, frequency adverbs, time expressions, word order.',
+  5:'Habits, possessions, wants, and needs. Language: Present Simple questions, be vs action verbs, have, want/need.',
+  6:'Preferences, family, belongings, and clothing. Language: object pronouns, like, plurals and demonstratives, possession.',
+  7:'Clocks, calendars, and arranging a meeting. Language: time and dates, ordinal numbers, time prepositions, When/What time…?'
  },
  'A1.2':{
-  1:'Rooms, furniture, finding things, and directions. Use there is/are, place prepositions, Where is/are…?, positive and negative imperatives, and route phrases.',
-  2:'Services, permission, polite requests, help, and clarification. Use can/can’t, Can I…?, Can you…?, Could you…?, and short responses.',
-  3:'Food, shopping quantities, prices, and café orders. Use countable/uncountable nouns, some/any, how much/how many, I’d like…, and food offers.',
-  4:'Clothing choices, appearance, personality, and categories. Use look/look like, degree words, why/which and because, What is… like?/What does… look like?, and kind/type/sort of.',
-  5:'Current actions, routines, and finding missing things. Use Present Continuous statements, negatives, and questions; contrast it with Present Simple and practice look for/find.',
-  6:'Predictions, suggestions, intentions, and decisions. Use will/won’t, Let’s, How about/What about, and be going to; distinguish an existing plan from a decision made now.',
-  7:'Review A1 through introductions, routines, home situations, food orders, choices, current actions, and plans. Apply familiar language; no new vocabulary or grammar.'
+  1:'Rooms, furniture, finding things, and directions. Language: there is/are, place prepositions, imperatives, route phrases.',
+  2:'Services, permission, requests, and help. Language: can/can’t, polite requests, offers, clarification phrases.',
+  3:'Food, quantities, prices, and café orders. Language: countability, some/any, quantity questions, ordering and offers.',
+  4:'Clothing choices, appearance, personality, and categories. Language: look/look like, degree words, opinions and reasons, category phrases.',
+  5:'Current actions, routines, and missing things. Language: Present Continuous, Present Simple vs Continuous, look for/find.',
+  6:'Predictions, suggestions, intentions, and decisions. Language: will/won’t, suggestions, be going to, plans vs immediate decisions.',
+  7:'Practical review of everyday A1 situations. Language: familiar A1 structures; no new vocabulary or grammar.'
  },
  'A2.1':{
-  1:'Tell stories in order, describe movement, and explain routes. Use sequencing and outcome phrases, movement prepositions, and short direction instructions.'
+  1:'Connected stories, movement, and directions. Language: sequencing phrases, movement prepositions, route instructions.'
  },
  'A2.2':{
-  4:'Report travel problems and agree on an alternative plan. Use Past Simple for events, be for current states, could + verb, and Why don’t we + verb?',
-  6:'Clarify device problems and find services. Use something/anything/everything/nothing and somewhere/anywhere/everywhere/nowhere, including location word + to + verb.'
+  4:'Travel problems and alternative plans. Language: Past Simple, be for current states, could, suggestions with Why don’t we…?',
+  6:'Device problems and finding services. Language: indefinite pronouns, indefinite adverbs of place, infinitives for services.'
  },
  'B1.1':{
-  1:'Discuss hypothetical choices and give practical advice. Use If + Past Simple, would/wouldn’t + verb, If I were you…, and In your place/position/situation….'
+  1:'Hypothetical choices and practical advice. Language: Second Conditional, If I were you, In your place.'
  }
 };
 function identifier(value){return typeof value==='object'&&value!==null?value.id:value;}
@@ -632,6 +751,6 @@ function moduleOverview(level,module,lessons){
   lesson?.level===levelId&&String(lesson?.whale??lesson?.module)===String(moduleId)&&english(lesson?.teacherInfo?.moduleOverview));
  return english(source?.teacherInfo?.moduleOverview);
 }
-const api={get,levelOverview,moduleOverview};
+const api={get,levelOverview,moduleOverview,lessonOverview};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SpaceWhaleLessonTeacherInfo=api;
 })(typeof window==='undefined'?globalThis:window);

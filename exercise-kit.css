@@ -1,7 +1,8 @@
-@import url("exercise-theme.css?v=20261004-shared-structure");
+@import url("typography.css?v=20261015-native-type");
+@import url("exercise-theme.css?v=20261015-native-type");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
-  --ek-font: var(--sw-exercise-font, Onest, Arial, sans-serif);
+  --ek-font: var(--sw-exercise-font);
   --ek-text-size: var(--sw-exercise-text-size, 16px);
   --ek-title-size: var(--sw-exercise-title-size, 20px);
   --ek-gap: 24px;
