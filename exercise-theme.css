@@ -50,7 +50,6 @@
   --sw-picture-word-slot-surface:#f7f7f8;
   --sw-picture-word-slot-border:#d9d9de;
   --sw-image-label-border:#aaaab2;
-  --sw-picture-word-field-outline:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Crect x='.5' y='.5' width='199' height='43' rx='20' fill='none' stroke='%23d7d7dc' stroke-width='1' stroke-dasharray='7 5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   --sw-exercise-index-ink:#8a8a8a;
   --sw-card-shadow:0 0 20px #25252514,0 4px 18px #25252509;
   --sw-interaction-hover: #fff;
@@ -93,7 +92,6 @@
   --sw-picture-word-slot-border:#555b64;
   --sw-image-label-border:#858b94;
   --sw-example-divider:#454950;
-  --sw-picture-word-field-outline:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Crect x='.5' y='.5' width='199' height='43' rx='20' fill='none' stroke='%23555b64' stroke-width='1' stroke-dasharray='7 5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   --sw-exercise-index-ink:#a8a8af;
   --sw-card-shadow:0 0 20px #0000003d,0 4px 18px #00000020;
   --sw-exercise-emphasis-ink:#e3e3e3;
