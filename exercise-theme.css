@@ -31,6 +31,12 @@
   --sw-exercise-control-height: calc(40px * var(--sw-control-scale));
   --sw-stage-gap: 48px;
   --sw-component-gap: 24px;
+  --sw-task-content-gap: 20px;
+  --sw-title-instruction-gap: 8px;
+  --sw-example-row-gap: 6px;
+  --sw-example-label-gap: 8px;
+  --sw-example-divider-gap: 12px;
+  --sw-example-divider: #ececef;
   --sw-audio-idle: #c5c7ce;
   --sw-audio-progress: #292b2f;
   --sw-matching-min-height: 148px;
@@ -43,6 +49,7 @@
   --sw-picture-correction-height:100px;
   --sw-picture-word-slot-surface:#f7f7f8;
   --sw-picture-word-slot-border:#d9d9de;
+  --sw-image-label-border:#aaaab2;
   --sw-picture-word-field-outline:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Crect x='.5' y='.5' width='199' height='43' rx='20' fill='none' stroke='%23d7d7dc' stroke-width='1' stroke-dasharray='7 5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   --sw-exercise-index-ink:#8a8a8a;
   --sw-card-shadow:0 0 20px #25252514,0 4px 18px #25252509;
@@ -84,6 +91,8 @@
 [data-theme=dark] {
   --sw-picture-word-slot-surface:#2b2e34;
   --sw-picture-word-slot-border:#555b64;
+  --sw-image-label-border:#858b94;
+  --sw-example-divider:#454950;
   --sw-picture-word-field-outline:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Crect x='.5' y='.5' width='199' height='43' rx='20' fill='none' stroke='%23555b64' stroke-width='1' stroke-dasharray='7 5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   --sw-exercise-index-ink:#a8a8af;
   --sw-card-shadow:0 0 20px #0000003d,0 4px 18px #00000020;

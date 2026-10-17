@@ -3,7 +3,7 @@ const {parseHTML}=require('linkedom');
 const kit=require('../exercise-kit.js');
 const settled=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(guest=false,options={}){
- let handlers;
+ let handlers;const windowEvents=new Map();
  const {document,window:dom}=parseHTML(fs.readFileSync(require.resolve('../classroom.html'),'utf8'));
  const createNS=document.createElementNS.bind(document);document.createElementNS=(ns,tag)=>{const el=createNS(ns,tag);if(tag==='path'){el.getTotalLength=()=>500;el.getPointAtLength=n=>({x:n%200,y:n/2});}return el;};
  const create=document.createElement.bind(document);
@@ -15,7 +15,7 @@ function fixture(guest=false,options={}){
  const recordedKit={...kit,mount(root,exercise,config){const instance=kit.mount(root,exercise,config);mounts.push({exercise,config,instance});return instance;}};
  const channel={presenceState:()=>({})},transportSession={guest:true,allowed_lesson_ids:['*']};
  const classroom={state:{clientId:'owner',channel},getCurrentUser:async()=>({id:'owner'}),connectGuest:async(token,h)=>{handlers=h;if(options.invalid){const error=new Error('closed');error.code=options.offline?'NETWORK':'GUEST_LINK_CLOSED';throw error;}return {session:transportSession,role:options.student?'student':'teacher',meta:{started_at:options.startedAt||null,server_now:new Date().toISOString(),duration_minutes:60,allowed_lesson_ids:['*']}};},loadSharedState:async()=>null,startGuestLesson:async()=>{calls.push('start');if(options.startFails)throw new Error('offline');return {started_at:new Date().toISOString(),server_now:new Date().toISOString(),status:'live',duration_minutes:60,allowed_lesson_ids:['*']};},navigate:async()=>{},loadExerciseResponse:async()=>null,queueGuestSnapshot(){},sendExerciseSnapshot:async()=>{},requestExerciseState:async()=>{},disconnect:async()=>{calls.push('disconnect');}};
- const window={SpaceWhaleIsTeacher:!options.student,SpaceWhaleExerciseKit:recordedKit,SpaceWhaleCatalog:require('../workspace-catalog.js'),SpaceWhaleClassroom:classroom,addEventListener(){},setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,innerWidth:1200,innerHeight:800,spaceWhaleSupabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:name==='create_guest_workspace'?{token:'new-token'}:true};}}};
+ const window={SpaceWhaleIsTeacher:!options.student,SpaceWhaleExerciseKit:recordedKit,SpaceWhaleCatalog:require('../workspace-catalog.js'),SpaceWhaleClassroom:classroom,addEventListener(type,callback){if(!windowEvents.has(type))windowEvents.set(type,[]);windowEvents.get(type).push(callback);},setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,innerWidth:options.width||1200,innerHeight:800,spaceWhaleSupabase:{rpc:async(name,args)=>{calls.push({name,args});return {data:name==='create_guest_workspace'?{token:'new-token'}:true};}}};
  window.SpaceWhaleMedia={lessonStarted:id=>calls.push({name:'media-started',id}),connect:async context=>{calls.push({name:'media-connect',context});},stopMedia:async()=>{calls.push({name:'media-stop'});},createInvitation:async()=>{calls.push({name:'create_guest_workspace'});if(options.createInvitation)await options.createInvitation();return {token:'new-token'};},endSession:async args=>{calls.push({name:'revoke_guest_lesson_link',args:{p_token:args.guestToken}});if(options.endVideo)await options.endVideo(handlers);}};
  const context={window,document,location,history,localStorage:options.localStorage||storage(),sessionStorage:options.sessionStorage||storage(),navigator:{clipboard:{writeText:async url=>copied.push(url)}},URL,URLSearchParams,console,setTimeout:()=>1,clearTimeout(){},clearInterval(){}};
  if(options.ended)context.sessionStorage.setItem('space-whale:clock:guest:old-token',JSON.stringify({startedAt:1,readyAt:1,ended:true}));
@@ -25,7 +25,7 @@ function fixture(guest=false,options={}){
  vm.runInContext(fs.readFileSync(require.resolve('../workspace.js'),'utf8'),context,{filename:'workspace.js'});
  const click=el=>{assert.ok(el);el.dispatchEvent(new dom.Event('click',{bubbles:true}));};
  const event=(el,type,properties={})=>{assert.ok(el);const event=new dom.Event(type,{bubbles:true});Object.assign(event,properties);el.dispatchEvent(event);};
- return {document,location,copied,calls,mounts,click,event,transportState(data){Object.assign(transportSession,data);handlers.onLessonState(data);},get handlers(){return handlers;},sessionStorage:context.sessionStorage,localStorage:context.localStorage};
+ return {document,location,copied,calls,mounts,click,event,window,resizeViewport(width){window.innerWidth=width;windowEvents.get('resize')?.forEach(callback=>callback());},transportState(data){Object.assign(transportSession,data);handlers.onLessonState(data);},get handlers(){return handlers;},sessionStorage:context.sessionStorage,localStorage:context.localStorage};
 }
 const openPanel=(s,selector)=>s.click(s.document.querySelector(`.selector-${selector}`));
 const panelOption=(s,label)=>[...s.document.querySelectorAll('#workspaceTopics .workspace-panel-option')].find(el=>el.querySelector('strong')?.textContent===label);
@@ -432,4 +432,56 @@ test('new pupil action acknowledges immediately while the server prepares the ro
  assert.equal(create.textContent,'Создаём ссылку…');assert.equal(create.getAttribute('aria-busy'),'true');assert.equal(create.disabled,true);
  assert.match(s.document.querySelector('.workspace-session-dialog [role=status]').textContent,/готовим новую/);
  finish();await settled();assert.equal(new URL(s.location.href).searchParams.get('room'),'new-token');
+});
+
+
+test('sidebar adapts to desktop width and retains the mobile overlay and explicit close',()=>{
+ const s=fixture(),d=s.document,panel=d.querySelector('#workspaceMenuPanel'),shell=d.querySelector('.workspace-sidebar-shell');
+ const width=()=>parseFloat(d.body.style.getPropertyValue('--workspace-panel-width'));
+ assert.equal(width(),336);s.resizeViewport(900);assert.equal(width(),252);s.resizeViewport(769);assert.equal(width(),240);
+ openPanel(s,'lesson');assert.equal(panel.hidden,false);assert.equal(shell.dataset.panelOpen,'true');
+ s.resizeViewport(390);assert.equal(width(),240);assert.equal(panel.hidden,false);
+ s.click(d.querySelector('#workspaceExercise'));assert.equal(panel.hidden,false);
+ s.click(d.querySelector('#workspaceMenuClose'));assert.equal(panel.hidden,true);
+ s.resizeViewport(1200);assert.equal(width(),336);assert.equal(panel.hidden,true);
+});
+test('sidebar drag saves width and clamps the visible panel without losing its preference',()=>{
+ const storage=new Map(),store={getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)};
+ const s=fixture(false,{localStorage:store,width:1600}),d=s.document,handle=d.querySelector('.workspace-panel-resize');
+ const width=()=>parseFloat(d.body.style.getPropertyValue('--workspace-panel-width'));
+ assert.equal(handle.getAttribute('role'),'separator');assert.equal(handle.getAttribute('aria-orientation'),'vertical');
+ openPanel(s,'lesson');handle.setPointerCapture=()=>{};
+ s.event(handle,'pointerdown',{button:0,pointerId:7,clientX:408});s.event(handle,'pointermove',{pointerId:7,clientX:800});
+ assert.equal(width(),480);s.event(handle,'pointerup',{pointerId:7});assert.equal(storage.get('space-whale:workspace-panel-width:v1'),'480');
+ s.resizeViewport(900);assert.equal(width(),351);assert.equal(storage.get('space-whale:workspace-panel-width:v1'),'480');
+ s.resizeViewport(1600);assert.equal(width(),480);
+ const reload=fixture(false,{localStorage:store,width:1600});assert.equal(parseFloat(reload.document.body.style.getPropertyValue('--workspace-panel-width')),480);
+});
+test('sidebar keyboard resizing exposes its range and ignores unrelated keys',()=>{
+ const s=fixture(false,{width:1600}),d=s.document,handle=d.querySelector('.workspace-panel-resize');openPanel(s,'lesson');
+ const width=()=>parseFloat(d.body.style.getPropertyValue('--workspace-panel-width'));
+ s.event(handle,'keydown',{key:'Home'});assert.equal(width(),240);assert.equal(handle.getAttribute('aria-valuemin'),'240');
+ s.event(handle,'keydown',{key:'ArrowRight'});assert.equal(width(),256);
+ s.event(handle,'keydown',{key:'ArrowRight',shiftKey:true});assert.equal(width(),288);
+ s.event(handle,'keydown',{key:'ArrowLeft'});assert.equal(width(),272);
+ s.event(handle,'keydown',{key:'Enter'});assert.equal(width(),272);
+ s.event(handle,'keydown',{key:'End'});assert.equal(width(),480);assert.equal(handle.getAttribute('aria-valuenow'),'480');assert.equal(handle.getAttribute('aria-valuemax'),'480');
+});
+test('canceled sidebar drag and secondary pointers do not change the saved preference',()=>{
+ const s=fixture(false,{width:1600}),d=s.document,handle=d.querySelector('.workspace-panel-resize');openPanel(s,'lesson');
+ const width=()=>parseFloat(d.body.style.getPropertyValue('--workspace-panel-width'));
+ s.event(handle,'pointerdown',{button:2,pointerId:1,clientX:408});s.event(handle,'pointermove',{pointerId:1,clientX:600});assert.equal(width(),344);
+ s.event(handle,'pointerdown',{button:0,pointerId:2,clientX:408});s.event(handle,'pointermove',{pointerId:3,clientX:600});assert.equal(width(),344);
+ s.event(handle,'pointermove',{pointerId:2,clientX:600});assert.equal(width(),480);
+ s.event(handle,'pointercancel',{pointerId:2});assert.equal(width(),344);assert.equal(s.localStorage.getItem('space-whale:workspace-panel-width:v1'),null);
+ assert.equal(d.querySelector('.workspace-sidebar-shell').classList.contains('is-resizing'),false);
+});
+test('sidebar remains resizable when storage is unavailable or contains malformed values',()=>{
+ const blocked={getItem(){throw new Error('blocked');},setItem(){throw new Error('blocked');}};
+ for(const localStorage of [blocked,{getItem:()=>'{bad}',setItem(){}}]){
+  const s=fixture(false,{localStorage,width:1600}),handle=s.document.querySelector('.workspace-panel-resize');openPanel(s,'lesson');
+  s.event(handle,'keydown',{key:'End'});assert.equal(parseFloat(s.document.body.style.getPropertyValue('--workspace-panel-width')),480);
+  s.resizeViewport(200);assert.equal(parseFloat(s.document.body.style.getPropertyValue('--workspace-panel-width')),136);
+  s.resizeViewport(1600);assert.equal(parseFloat(s.document.body.style.getPropertyValue('--workspace-panel-width')),480);
+ }
 });

@@ -1,5 +1,5 @@
 /* The live workspace uses the same material tokens as every exercise. */
-body.unified-workspace{background:var(--sw-neu-bg);color:var(--sw-neu-ink);--learning-column-width:704px;--workspace-panel-width:344px;--workspace-menu-ink:#222;--workspace-menu-muted:#555;--workspace-menu-line:#d0d0d0;--workspace-menu-surface:#fff;--workspace-menu-hover:#f5f5f5;--workspace-menu-selected:#f8f8f8;--workspace-menu-heading:#f0f0f0;--workspace-menu-term:#363636;--workspace-menu-label:#666;--workspace-menu-subdued:#8b8b8b}
+body.unified-workspace{background:var(--sw-neu-bg);color:var(--sw-neu-ink);--learning-column-width:704px;--workspace-panel-width:clamp(240px,28vw,344px);--workspace-menu-ink:#222;--workspace-menu-muted:#555;--workspace-menu-line:#d0d0d0;--workspace-menu-surface:#fff;--workspace-menu-hover:#f5f5f5;--workspace-menu-selected:#f8f8f8;--workspace-menu-heading:#f0f0f0;--workspace-menu-term:#363636;--workspace-menu-label:#666;--workspace-menu-subdued:#8b8b8b}
 body.unified-workspace[data-theme=dark]{--workspace-menu-ink:#eee;--workspace-menu-muted:#bcbcbc;--workspace-menu-line:#454545;--workspace-menu-surface:#292929;--workspace-menu-hover:#333;--workspace-menu-selected:#303030;--workspace-menu-heading:#353535;--workspace-menu-term:#d3d3d3;--workspace-menu-label:#b0b0b0;--workspace-menu-subdued:#888}
 .unified-workspace .reference-app{background:var(--sw-neu-bg);height:100dvh;min-width:0;overflow:hidden;transition:grid-template-columns var(--sw-motion-time) var(--sw-motion-easing)}
 
@@ -256,6 +256,14 @@ body.unified-workspace .workspace-sidebar-shell{
   overflow:visible;
   z-index:6;
 }
+body.unified-workspace .workspace-panel-resize{position:absolute;inset:0 -5px 0 auto;z-index:3;display:none;width:10px;cursor:col-resize;touch-action:none;outline:none}
+body.unified-workspace .workspace-sidebar-shell[data-panel-open=true] .workspace-panel-resize{display:block}
+body.unified-workspace .workspace-panel-resize::after{content:'';position:absolute;top:calc(50% - 22px);left:4px;width:2px;height:44px;border-radius:2px;background:var(--workspace-menu-muted);opacity:0;transition:opacity .15s}
+body.unified-workspace .workspace-panel-resize:is(:hover,:focus-visible)::after,
+body.unified-workspace .workspace-sidebar-shell.is-resizing .workspace-panel-resize::after{opacity:.45}
+body.unified-workspace .workspace-sidebar-shell.is-resizing{user-select:none}
+body.unified-workspace:has(.workspace-sidebar-shell.is-resizing){cursor:col-resize;user-select:none}
+body.unified-workspace .reference-app:has(.workspace-sidebar-shell.is-resizing){transition:none}
 body.unified-workspace .app-sidebar.workspace-rail{
   box-sizing:border-box;
   display:flex;
@@ -525,6 +533,7 @@ body.unified-workspace .workspace-menu-panel #workspaceStudentProfile .homework-
   body.unified-workspace .workspace-sidebar-shell{position:relative;flex:none;height:100dvh;min-height:0;overflow:visible}
   body.unified-workspace .app-sidebar.workspace-rail{width:64px!important;height:100dvh!important;margin:0;flex:0 0 64px}
   body.unified-workspace .workspace-menu-panel{position:fixed;inset:0 auto 0 64px;flex:none;width:min(var(--workspace-panel-width),calc(100vw - 64px));height:100dvh;z-index:31}
+  body.unified-workspace .workspace-panel-resize{position:fixed;inset:0 auto 0 calc(64px + var(--workspace-panel-width) - 5px);z-index:32}
   body.unified-workspace .class-area{width:auto!important;height:100dvh;min-height:0;flex:none}
 }
 

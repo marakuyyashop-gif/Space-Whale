@@ -1101,7 +1101,7 @@ test('existing Matching and Guided Discovery previews keep one primary task head
 test('explicit model groups support one to three examples without splitting ordinary dialogues',()=>{
  for(const count of [1,2,3]){
   const lines=Array.from({length:count},(_,i)=>'This is model '+(i+1)+'.'),def={version:1,id:'models-'+count,kind:'presentation',title:'Read the examples.',blocks:[{type:'text',role:'examples',text:lines.join('\n\n'),highlights:['model']}]};
-  const before=JSON.stringify(def),s=setup(def);assert.deepEqual([...s.host.querySelectorAll('.ek-example-model')].map(el=>el.textContent),lines);assert.equal(s.host.querySelectorAll('.ek-example-group').length,1);assert.equal(s.host.querySelectorAll('.ek-example-model strong').length,count);assert.equal(JSON.stringify(def),before);
+  const before=JSON.stringify(def),s=setup(def);assert.deepEqual([...s.host.querySelectorAll('.ek-example-text')].map(el=>el.textContent),lines);assert.deepEqual([...s.host.querySelectorAll('.ek-example-number')].map(el=>el.textContent),lines.map((_,i)=>`${i+1}.`));assert.equal(s.host.querySelectorAll('.ek-example-group').length,1);assert.equal(s.host.querySelectorAll('.ek-example-model strong').length,count);assert.equal(JSON.stringify(def),before);
  }
  const dialogue='A: Hello.\n\nB: Hi.\nA: How are you?',normal=setup({version:1,id:'not-models',kind:'presentation',title:'Read the conversation.',blocks:[{type:'text',text:dialogue}]});assert.equal(normal.host.querySelector('.ek-example-group'),null);assert.equal(normal.host.querySelector('.ek-copy').textContent,dialogue);
 });
@@ -1111,7 +1111,7 @@ test('actual Complete the rules models preserve text, source state compatibility
  const def=app.SpaceWhaleContent.find(l=>l.id==='a1-2-w4-l4').stages.find(s=>s.exercise.id==='L4-discovery-rule').exercise,old=JSON.parse(JSON.stringify(def));delete old.exercises[0].exercise.blocks[0].role;
  assert.equal(require('../lesson-structure.js').compatible(JSON.stringify(old),JSON.stringify(def)),true);
  const s=setup(def,{syncChecks:true});assert.deepEqual([...def.revealStops],[2,3]);assert.equal(s.host.querySelectorAll('.ek-stage-models').length,1);assert.equal(s.host.querySelectorAll('.ek-stage-model-questions').length,1);
- assert.deepEqual([...s.host.querySelectorAll('.ek-example-model')].map(el=>el.textContent),['What does she look like? — She has long brown hair.','What is she like? — She is polite and helpful.']);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-example-text')].map(el=>el.textContent),['What does she look like? — She has long brown hair.','What is she like? — She is polite and helpful.']);
  assert.equal([...s.host.querySelector('.ek-stage-stack').children].filter(section=>!section.hidden).length,2);assert.equal(s.host.querySelector('.ek-rule-block'),null);
  const saved={'L4-complete-rule':{'1':'как она выглядит','2':'какая она в общении',__sw_choice_revealed:2,__sw_choice_checked:['1','2']},revealed:2};s.mount.setAnswers(saved);assert.equal(s.changes.length,0);
  assert.equal(s.host.querySelectorAll('.ek-example-model').length,2);assert.equal(s.host.querySelectorAll('.ek-sentence-number')[1].textContent,'2. ');
@@ -1123,8 +1123,14 @@ test('actual W03B presents one instruction and compact models label while keepin
  assert.equal(s.host.querySelector('.ek-examples-label').textContent,'Examples:');
  assert.equal(s.host.querySelectorAll('.ek-examples-label').length,1);
  const models=def.exercises[0].exercise.blocks[0];
- assert.deepEqual([...s.host.querySelectorAll('.ek-example-model')].map(el=>el.textContent),Array.from(models.text.split('\n')));
+ assert.deepEqual([...s.host.querySelectorAll('.ek-example-text')].map(el=>el.textContent),Array.from(models.text.split('\n')));
+ assert.deepEqual([...s.host.querySelectorAll('.ek-example-number')].map(el=>el.textContent),['1.','2.','3.','4.']);
  assert.deepEqual([...s.host.querySelectorAll('.ek-example-model strong')].map(el=>el.textContent),Array.from(models.highlights));
+ const sourceWords=def.exercises[1].exercise.items.map(item=>item.text);
+ [...s.host.querySelectorAll('.ek-example-model')].forEach((model,index)=>{
+  assert.equal(model.querySelector('.ek-example-number').textContent,`${index+1}.`);
+  assert.ok(model.querySelector('strong').textContent.startsWith(sourceWords[index]),'each example keeps the same numbered target word as the matching card');
+ });
  s.mount.setAnswers({'part-2':{'item-1':'answer-1',__sw_checked:true}});
  assert.equal(s.host.querySelector('.ek-word-definition-slot').getAttribute('data-feedback'),'correct');
  assert.equal(s.changes.length,0);assert.equal(JSON.stringify(def),before);
@@ -1134,6 +1140,12 @@ test('actual W03B presents one instruction and compact models label while keepin
  renamed.exercises[1].exercise.items[0].text='backpack';
  const variable=setup(renamed);assert.equal(variable.host.querySelector('.ek-example-model strong').textContent,'backpack');
  assert.equal(variable.host.querySelector('.ek-card-label').textContent,'backpack');
+ assert.equal(variable.host.querySelector('.ek-example-number').textContent,'1.');
+ const reader=setup(def,{readOnly:true,syncChecks:true});
+ reader.mount.setAnswers({'part-2':{'item-1':'answer-1',__sw_checked:true}});
+ assert.deepEqual([...reader.host.querySelectorAll('.ek-example-number')].map(el=>el.textContent),['1.','2.','3.','4.']);
+ assert.equal(reader.host.querySelector('.ek-word-definition-slot').getAttribute('data-feedback'),'correct');
+ assert.equal(reader.host.querySelectorAll('.ek-examples-label').length,1);assert.equal(reader.changes.length,0);
  const other=setup({...def,title:'Read the examples. Then choose the correct options.'});
  assert.deepEqual([...other.host.querySelectorAll('.ek-title')].map(el=>el.textContent),['Read the examples. Then choose the correct options.','Match the words with their meanings.']);
 });

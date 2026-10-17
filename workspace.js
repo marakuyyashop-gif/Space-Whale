@@ -1068,6 +1068,65 @@
     close.disabled=!guestToken;
     actions.append(create,close);sessionDialog.append(actions,error);sessionDialog.showModal();
   });
+  function setupSidebarResize(){
+    const shell=document.querySelector('.workspace-sidebar-shell');
+    if(!shell?.append||!document.body.style?.setProperty)return;
+    const storageKey='space-whale:workspace-panel-width:v1';
+    let preferredWidth=null,drag=null;
+    try{
+      const saved=Number(localStorage.getItem(storageKey));
+      if(Number.isFinite(saved)&&saved>=240&&saved<=480)preferredWidth=saved;
+    }catch(_){}
+    const handle=node('div','','workspace-panel-resize');
+    handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','vertical');
+    handle.setAttribute('aria-label','Sidebar width');handle.setAttribute('aria-controls',menu.id);
+    handle.setAttribute('tabindex','0');shell.append(handle);
+    const limits=()=>{
+      const viewport=Math.max(1,window.innerWidth||document.documentElement?.clientWidth||1280);
+      const available=Math.max(0,viewport-64),min=Math.min(240,available);
+      const max=viewport<=768?Math.min(480,available):Math.max(min,Math.min(480,Math.floor(available*.42)));
+      return {min,max,defaultWidth:Math.min(344,Math.max(240,Math.round(viewport*.28)))};
+    };
+    const paint=width=>{
+      const bounds=limits();
+      const value=Math.round(Math.max(bounds.min,Math.min(bounds.max,width??preferredWidth??bounds.defaultWidth)));
+      document.body.style.setProperty('--workspace-panel-width',`${value}px`);
+      handle.setAttribute('aria-valuemin',String(bounds.min));handle.setAttribute('aria-valuemax',String(bounds.max));
+      handle.setAttribute('aria-valuenow',String(value));handle.setAttribute('aria-valuetext',`${value} pixels`);
+      return value;
+    };
+    const remember=value=>{preferredWidth=value;try{localStorage.setItem(storageKey,String(value));}catch(_){}};
+    const finish=commit=>{
+      if(!drag)return;
+      const pointerId=drag.pointerId;
+      if(commit)remember(Number(handle.getAttribute('aria-valuenow')));
+      drag=null;shell.classList.remove('is-resizing');
+      if(handle.hasPointerCapture?.(pointerId))handle.releasePointerCapture(pointerId);
+      paint();
+    };
+    handle.addEventListener('pointerdown',event=>{
+      if(drag||event.button!==0||event.isPrimary===false||menu.hidden)return;
+      event.preventDefault();
+      drag={pointerId:event.pointerId,startX:event.clientX,startWidth:paint()};
+      shell.classList.add('is-resizing');handle.setPointerCapture?.(event.pointerId);
+    });
+    handle.addEventListener('pointermove',event=>{
+      if(!drag||event.pointerId!==drag.pointerId)return;
+      paint(drag.startWidth+event.clientX-drag.startX);
+    });
+    handle.addEventListener('pointerup',event=>{if(drag&&event.pointerId===drag.pointerId)finish(true);});
+    handle.addEventListener('pointercancel',event=>{if(drag&&event.pointerId===drag.pointerId)finish(false);});
+    handle.addEventListener('lostpointercapture',()=>finish(false));
+    handle.addEventListener('keydown',event=>{
+      if(menu.hidden)return;
+      const {min,max}=limits(),current=Number(handle.getAttribute('aria-valuenow')),step=event.shiftKey?32:16;
+      const next={ArrowLeft:current-step,ArrowRight:current+step,Home:min,End:max}[event.key];
+      if(next===undefined)return;
+      event.preventDefault();remember(paint(next));
+    });
+    window.addEventListener('resize',()=>{finish(false);paint();});
+    paint();
+  }
   function setupSidebarOverlays(){
     if(!document.body?.append||!document.addEventListener)return;
     const tooltip=node('div','','workspace-floating workspace-control-tooltip');tooltip.id='workspaceControlTooltip';tooltip.setAttribute('role','tooltip');
@@ -1093,6 +1152,7 @@
     document.addEventListener('keydown',event=>{if(event.key==='Escape'){close();if(menuPanel)setMenuPanel(null,true);}});
     document.addEventListener('scroll',close,true);window.addEventListener('resize',close);
   }
+  setupSidebarResize();
   setupSidebarOverlays();
   history.replaceState(null, '', `classroom.html${query(route)}`);
   render();

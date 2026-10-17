@@ -979,7 +979,11 @@
     function exampleModels(block,label=false){
       const models=node('div','ek-example-group');models.setAttribute('role','group');models.setAttribute('aria-label','Examples');
       if(label)models.append(node('p','ek-examples-label','Examples:'));
-      block.text.split(/\r?\n+/).filter(text=>text.trim()).forEach(text=>{const model=richText(text,block.highlights,block.emphasis);model.classList.add('ek-example-model');models.append(model);});
+      block.text.split(/\r?\n+/).filter(text=>text.trim()).forEach((text,index)=>{
+        const model=node('p','ek-copy ek-example-model'),copy=node('span','ek-example-text');
+        copy.append(...richText(text,block.highlights,block.emphasis).childNodes);
+        model.append(node('span','ek-example-number',`${index+1}.`),copy);models.append(model);
+      });
       return models;
     }
     const paintControls=new Map();
