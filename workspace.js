@@ -26,6 +26,8 @@
   const sessionHeading = document.querySelector('.workspace-session-heading a');
 
   const sidebar=document.getElementById('workspaceSidebar');
+  const workArea=document.querySelector('.class-area');
+  const narrowSidebar=()=>Math.max(1,window.innerWidth||document.documentElement?.clientWidth||1280)<960;
   let menuPanel=null;
   const menu=document.getElementById('workspaceMenuPanel');
   document.getElementById('workspaceMenuClose')?.addEventListener('click',()=>setMenuPanel(null,true));
@@ -158,6 +160,8 @@
 
   function go(next, options = {}) {
     if (liveMode && liveReady && liveRole === 'student' && !options.remote) return;
+    const revealWork=options.revealWork&&narrowSidebar()&&Boolean(menuPanel);
+    if(revealWork)menuPanel=null;
     if(next.lesson!==route.lesson&&!next.exercise&&!options.remote)next={...next,block:'opening'};
     if(next.lesson&&!next.exercise&&!next.block){const saved=journeys[next.lesson];if(saved?.last)next={...next,exercise:saved.last};}
     if(next.exercise!==route.exercise&&!options.remote)next={...next,exerciseView:null};
@@ -165,6 +169,8 @@
       history[options.remote ? 'replaceState' : 'pushState'](null, '', `classroom.html${query(route)}`);
     render();
     mounted?.setViewState?.(route.exerciseView,true);
+    if(revealWork){host.setAttribute('tabindex','-1');host.focus?.({preventScroll:true});}
+    else if(menuPanel&&narrowSidebar()&&!options.remote)document.getElementById('workspaceMenuClose')?.focus?.({preventScroll:true});
     if (!options.remote) syncTeacherNavigation();
   }
 
@@ -186,7 +192,7 @@
     if (liveMode && liveReady && liveRole === 'student') el.setAttribute('aria-disabled', 'true');
     el.addEventListener('click', event => {
       if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      event.preventDefault(); go(next);
+      event.preventDefault(); go(next,{revealWork:true});
     });
     return el;
   }
@@ -279,10 +285,22 @@
   function setMenuPanel(name,restoreFocus=false){
     const previous=menuPanel;menuPanel=name;
     dismissSidebarOverlays();renderSidebar();
-    if(restoreFocus){
+    if(name&&narrowSidebar())document.getElementById('workspaceMenuClose')?.focus?.({preventScroll:true});
+    else if(restoreFocus||(!name&&narrowSidebar())){
       const owner=previous==='profile'?document.getElementById('workspaceProfileButton'):document.querySelector(`.selector-${previous==='levels'?'level':previous==='modules'?'module':'lesson'}`);
       owner?.focus?.();
     }
+  }
+  function updateSidebarLayout(){
+    const sidebarAvailable=!['student','connecting','connection-error'].includes(document.body.dataset.workspaceRole);
+    const open=Boolean(menuPanel)&&sidebarAvailable,navigationOnly=open&&narrowSidebar();
+    document.querySelector('.workspace-sidebar-shell').dataset.panelOpen=String(open);
+    const app=document.querySelector('.reference-app');
+    app.classList.toggle('workspace-menu-open',open);
+    app.classList.toggle('workspace-navigation-only',navigationOnly);
+    // Hide the work view, not its mounted exercise or media state.
+    workArea.hidden=navigationOnly;workArea.toggleAttribute('inert',navigationOnly);
+    if(navigationOnly)workArea.setAttribute('aria-hidden','true');else workArea.removeAttribute('aria-hidden');
   }
   function chooseLesson(lesson){
     if(journeys[lesson.id])journeys[lesson.id].closed=false;saveJourney();
@@ -315,7 +333,7 @@
       const control=button('',()=>{
         if(journeys[lesson.id])journeys[lesson.id].closed=false;
         const stage=lesson.stages.find(stage=>block.stageIds.includes(stage.exercise.id));
-        go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
+        go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'},{revealWork:true});
       },'workspace-rail-control workspace-block-icon');
       control.dataset.block=block.id;control.disabled=studentLocked;
       control.setAttribute('aria-label',block.id==='opening'?'Opening Speaking':block.id==='final'?'Final Speaking':block.title);
@@ -328,8 +346,7 @@
     blocks.hidden=!blocks.childElementCount;
     blocks.previousElementSibling.hidden=blocks.hidden;
     menu.hidden=!menuPanel;menu.dataset.panel=menuPanel||'';
-    document.querySelector('.workspace-sidebar-shell').dataset.panelOpen=String(Boolean(menuPanel));
-    document.querySelector('.reference-app').classList.toggle('workspace-menu-open',Boolean(menuPanel));
+    updateSidebarLayout();
     const profile=document.getElementById('workspaceStudentProfile'),profileButton=document.getElementById('workspaceProfileButton');
     profile.hidden=menuPanel!=='profile';tree.hidden=menuPanel==='profile';
     profileButton.setAttribute('aria-controls',menu.id);profileButton.setAttribute('aria-expanded',String(menuPanel==='profile'));
@@ -448,7 +465,7 @@
       contents.id=`workspace-block-${block.id}`;contents.hidden=!openBlockDetails.has(key);
       const stages=lesson.stages.filter(stage=>block.stageIds.includes(stage.exercise.id));
       const select=button('',()=>{
-        const stage=stages[0];go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'});
+        const stage=stages[0];go({...route,block:block.id,exercise:stage?.exercise.id||'',exerciseView:null,section:stage?stageSection(stage):'tasks'},{revealWork:true});
       },'workspace-block-select');
       select.disabled=studentLocked;select.setAttribute('aria-label',block.id==='opening'?'Opening Speaking':block.id==='final'?'Final Speaking':block.title);
       if(active)select.setAttribute('aria-current','step');select.append(node('strong',block.title));section.append(select);
@@ -1072,7 +1089,7 @@
     const shell=document.querySelector('.workspace-sidebar-shell');
     if(!shell?.append||!document.body.style?.setProperty)return;
     const storageKey='space-whale:workspace-panel-width:v1';
-    let preferredWidth=null,drag=null;
+    let preferredWidth=null,drag=null,wasNarrow=narrowSidebar();
     try{
       const saved=Number(localStorage.getItem(storageKey));
       if(Number.isFinite(saved)&&saved>=240&&saved<=480)preferredWidth=saved;
@@ -1105,7 +1122,7 @@
       paint();
     };
     handle.addEventListener('pointerdown',event=>{
-      if(drag||event.button!==0||event.isPrimary===false||menu.hidden)return;
+      if(drag||event.button!==0||event.isPrimary===false||menu.hidden||narrowSidebar())return;
       event.preventDefault();
       drag={pointerId:event.pointerId,startX:event.clientX,startWidth:paint()};
       shell.classList.add('is-resizing');handle.setPointerCapture?.(event.pointerId);
@@ -1118,13 +1135,19 @@
     handle.addEventListener('pointercancel',event=>{if(drag&&event.pointerId===drag.pointerId)finish(false);});
     handle.addEventListener('lostpointercapture',()=>finish(false));
     handle.addEventListener('keydown',event=>{
-      if(menu.hidden)return;
+      if(menu.hidden||narrowSidebar())return;
       const {min,max}=limits(),current=Number(handle.getAttribute('aria-valuenow')),step=event.shiftKey?32:16;
       const next={ArrowLeft:current-step,ArrowRight:current+step,Home:min,End:max}[event.key];
       if(next===undefined)return;
       event.preventDefault();remember(paint(next));
     });
-    window.addEventListener('resize',()=>{finish(false);paint();});
+    window.addEventListener('resize',()=>{
+      finish(false);paint();
+      const narrow=narrowSidebar();
+      if(narrow&&!wasNarrow&&menuPanel)setMenuPanel(null,true);
+      else updateSidebarLayout();
+      wasNarrow=narrow;
+    });
     paint();
   }
   function setupSidebarOverlays(){

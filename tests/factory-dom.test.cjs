@@ -1129,17 +1129,17 @@ test('actual W03B presents one instruction and compact models label while keepin
  const sourceWords=def.exercises[1].exercise.items.map(item=>item.text);
  [...s.host.querySelectorAll('.ek-example-model')].forEach((model,index)=>{
   assert.equal(model.querySelector('.ek-example-number').textContent,`${index+1}.`);
-  assert.ok(model.querySelector('strong').textContent.startsWith(sourceWords[index]),'each example keeps the same numbered target word as the matching card');
+  assert.equal(model.querySelector('strong').textContent,`[Example for ${sourceWords[index].slice(1,-1)}]`,'each example keeps the same numbered target word as the matching card');
  });
  s.mount.setAnswers({'part-2':{'item-1':'answer-1',__sw_checked:true}});
  assert.equal(s.host.querySelector('.ek-word-definition-slot').getAttribute('data-feedback'),'correct');
  assert.equal(s.changes.length,0);assert.equal(JSON.stringify(def),before);
  const renamed=JSON.parse(before);renamed.id+='-variable';
- renamed.exercises[0].exercise.blocks[0].text=models.text.replaceAll('luggage','backpack');
- renamed.exercises[0].exercise.blocks[0].highlights[0]='backpack';
- renamed.exercises[1].exercise.items[0].text='backpack';
- const variable=setup(renamed);assert.equal(variable.host.querySelector('.ek-example-model strong').textContent,'backpack');
- assert.equal(variable.host.querySelector('.ek-card-label').textContent,'backpack');
+ renamed.exercises[0].exercise.blocks[0].text=models.text.replaceAll('[Example for Word 1]','[Example for revised word]');
+ renamed.exercises[0].exercise.blocks[0].highlights[0]='[Example for revised word]';
+ renamed.exercises[1].exercise.items[0].text='[Revised word]';
+ const variable=setup(renamed);assert.equal(variable.host.querySelector('.ek-example-model strong').textContent,'[Example for revised word]');
+ assert.equal(variable.host.querySelector('.ek-card-label').textContent,'[Revised word]');
  assert.equal(variable.host.querySelector('.ek-example-number').textContent,'1.');
  const reader=setup(def,{readOnly:true,syncChecks:true});
  reader.mount.setAnswers({'part-2':{'item-1':'answer-1',__sw_checked:true}});
@@ -1150,34 +1150,63 @@ test('actual W03B presents one instruction and compact models label while keepin
  assert.deepEqual([...other.host.querySelectorAll('.ek-title')].map(el=>el.textContent),['Read the examples. Then choose the correct options.','Match the words with their meanings.']);
 });
 
-test('actual W04 keeps object keyed drag, feedback, return, reset and remote hydration with intrinsic image dimensions',()=>{
+test('actual W04 keeps stable keys, pending dimensions, drag, feedback, reset and remote hydration',()=>{
  const def=sourceFixture('W04'),before=JSON.stringify(def),s=setup(def,{syncChecks:true}),targets=()=>[...s.host.querySelectorAll('.ek-image-label-target')];
  const image=s.host.querySelector('.ek-image-label-image');
- assert.equal(image.getAttribute('width'),String(def.imageWidth));assert.equal(image.getAttribute('height'),String(def.imageHeight));
- assert.ok(!image.style.getPropertyValue('aspect-ratio'),'the next image uses its intrinsic ratio rather than an inline constraint');
+ assert.ok(image.classList.contains('ek-image-pending'));assert.equal(image.getAttribute('role'),'img');assert.equal(image.getAttribute('aria-label'),'[Image]');
+ assert.equal(image.style.aspectRatio,`${def.imageWidth} / ${def.imageHeight}`);assert.equal(image.style.minHeight,'0');assert.equal(s.host.querySelector('img'),null);
  assert.deepEqual(targets().map(target=>target.style.top),Array.from(def.items,item=>item.y+'%'));
- s.drag(s.button('furniture'),targets()[1]);s.drag(s.button('drink'),targets()[0]);
+ s.drag(s.button('[Word 1]'),targets()[1]);s.drag(s.button('[Word 2]'),targets()[0]);
  assert.deepEqual(s.mount.getAnswers(),{tea:'furniture',cabinet:'drink'});s.click('OK');
  assert.equal(targets()[0].getAttribute('data-feedback'),'retry');assert.equal(targets()[1].getAttribute('data-feedback'),'retry');
- assert.equal(s.host.querySelector('.ek-answer-pairs'),null);assert.equal(s.host.querySelector('.ek-results').hidden,true);assert.equal(s.host.querySelector('.ek-status').hidden,false);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(row=>[row.getAttribute('value'),row.dataset.result,row.querySelector('.ek-muted').textContent,row.querySelector('strong').textContent]),
+  [1,2,3,4,5,6].map(number=>[String(number),number<3?'retry':'empty',`[Word ${number}]`,`[Translation Word ${number}]`]));
+ assert.equal(s.host.querySelector('.ek-results').hidden,false);assert.equal(s.host.querySelector('.ek-status').hidden,false);
  s.drag(targets()[1],targets()[0]);assert.equal(s.mount.getAnswers().cabinet,'furniture');
- assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
- assert.ok(s.host.querySelector('.ek-image-label-bank').textContent.includes('drink'));
- s.drag(s.button('drink'),targets()[1]);s.click('OK');
+ assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);assert.equal(s.host.querySelector('.ek-answer-pairs'),null);
+ assert.ok(s.host.querySelector('.ek-image-label-bank').textContent.includes('[Word 2]'));
+ s.drag(s.button('[Word 2]'),targets()[1]);s.click('OK');
  assert.equal(targets()[0].getAttribute('data-feedback'),'correct');assert.equal(targets()[1].getAttribute('data-feedback'),'correct');
+ assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(row=>row.dataset.result),['correct','correct','empty','empty','empty','empty']);
  s.fire(targets()[0],'click');assert.equal(s.mount.getAnswers().cabinet,'');
- assert.ok(s.host.querySelector('.ek-image-label-bank').textContent.includes('furniture'));
+ assert.ok(s.host.querySelector('.ek-image-label-bank').textContent.includes('[Word 1]'));
  const changeCount=s.changes.length;s.mount.setAnswers({cabinet:'furniture',tea:'drink',__sw_checked:true});
  assert.equal(s.changes.length,changeCount);assert.equal(targets()[0].getAttribute('data-feedback'),'correct');
  assert.equal(s.host.querySelectorAll('.ek-image-label-bank .ek-token').length,4);
  s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.host.querySelectorAll('.ek-image-label-bank .ek-token').length,6);
  assert.equal(s.host.querySelectorAll('[data-feedback]').length,0);
- s.fire(s.button('furniture'),'keydown',{altKey:true,key:'ArrowRight'});assert.equal(s.mount.getAnswers().cabinet,'furniture');
+ s.fire(s.button('[Word 1]'),'keydown',{altKey:true,key:'ArrowRight'});assert.equal(s.mount.getAnswers().cabinet,'furniture');
  s.fire(targets()[0],'keydown',{altKey:true,key:'ArrowRight'});assert.equal(s.mount.getAnswers().tea,'furniture');assert.equal(s.mount.getAnswers().cabinet,undefined);
  s.drag(targets()[1],s.host.querySelector('.ek-image-label-bank'));assert.deepEqual(s.mount.getAnswers(),{});
  assert.equal(s.host.querySelectorAll('.ek-image-label-bank .ek-token').length,6);assert.equal(JSON.stringify(def),before);
+ const saved=Object.fromEntries(def.items.map(item=>[item.id,item.correctId]));s.mount.setAnswers({...saved,__sw_checked:true});
+ assert.equal(s.host.querySelector('.ek-answer-pairs'),null);assert.equal(s.host.querySelector('.ek-results').hidden,true);
  const locked=setup(def,{readOnly:true,answers:{cabinet:'furniture'}}),target=locked.host.querySelector('.ek-image-label-target');
  assert.equal(target.disabled,true);locked.fire(target,'click');assert.deepEqual(locked.mount.getAnswers(),{cabinet:'furniture'});assert.equal(locked.changes.length,0);
+});
+
+test('real image labels keep intrinsic artwork and target-only feedback without authored translations',()=>{
+ const def=JSON.parse(JSON.stringify(sourceFixture('W04')));def.image=def.sourceArtwork.image;def.alt=def.sourceArtwork.alt;delete def.imagePending;def.options.forEach(option=>delete option.translation);
+ const s=setup(def,{syncChecks:true}),image=s.host.querySelector('.ek-image-label-image');
+ assert.equal(image.tagName,'IMG');assert.equal(image.getAttribute('width'),String(def.imageWidth));assert.equal(image.getAttribute('height'),String(def.imageHeight));
+ assert.ok(!image.style.getPropertyValue('aspect-ratio'),'real artwork uses its intrinsic ratio');
+ s.mount.setAnswers({cabinet:'drink',tea:'furniture',__sw_checked:true});
+ assert.equal(s.host.querySelector('.ek-answer-pairs'),null);assert.equal(s.host.querySelector('.ek-results').hidden,true);
+ assert.equal(s.host.querySelector('.ek-image-label-target').getAttribute('data-feedback'),'retry');assert.equal(s.changes.length,0);
+});
+
+test('image-label translation keys are optional author text and retain all keyed outcomes',()=>{
+ const def={version:1,id:'translated-labels',kind:'image-label',title:'Label.',imagePending:true,alt:'[Image]',imageWidth:800,imageHeight:600,
+  items:[{id:'one',x:25,y:50,correctId:'a'},{id:'two',x:75,y:50,correctId:'b'}],options:[{id:'b',text:'Another term'},{id:'a',text:'Authored term',translation:'<b>Authored translation</b>'}]};
+ const s=setup(def,{syncChecks:true});s.mount.setAnswers({one:'a',two:'a',__sw_checked:true});
+ const rows=[...s.host.querySelectorAll('.ek-answer-pairs>li')];
+ assert.deepEqual(rows.map(row=>[row.getAttribute('value'),row.dataset.result,row.querySelector('strong').textContent]),[['1','correct','<b>Authored translation</b>'],['2','retry','Another term']]);
+ assert.equal(rows[0].querySelector('b'),null);assert.equal(rows[0].querySelector('.ek-muted').textContent,'Authored term');
+ assert.equal(rows[1].querySelector('.ek-muted'),null);assert.equal(s.host.querySelectorAll('.ek-image-label-target')[0].textContent,'Authored term');
+ assert.equal(s.changes.length,0);assert.deepEqual(s.mount.getAnswers(),{one:'a',two:'a',__sw_checked:true});
+ assert.throws(()=>kit.validate({...def,imagePending:'pending'}),/imagePending must be boolean/);
+ assert.throws(()=>kit.validate({...def,imagePending:false}),/image: expected non-empty text/);
+ assert.throws(()=>kit.validate({...def,options:[{id:'a',text:'Term',translation:''},{id:'b',text:'Other'}]}),/option translation/);
 });
 
 

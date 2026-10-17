@@ -435,15 +435,69 @@ test('new pupil action acknowledges immediately while the server prepares the ro
 });
 
 
-test('sidebar adapts to desktop width and retains the mobile overlay and explicit close',()=>{
- const s=fixture(),d=s.document,panel=d.querySelector('#workspaceMenuPanel'),shell=d.querySelector('.workspace-sidebar-shell');
+test('narrowing the desktop sidebar collapses to the rail without replacing the active task',()=>{
+ const s=fixture(false,{search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-words'}),d=s.document,panel=d.querySelector('#workspaceMenuPanel'),shell=d.querySelector('.workspace-sidebar-shell');
  const width=()=>parseFloat(d.body.style.getPropertyValue('--workspace-panel-width'));
- assert.equal(width(),336);s.resizeViewport(900);assert.equal(width(),252);s.resizeViewport(769);assert.equal(width(),240);
+ const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,mountCount=s.mounts.length,search=s.location.search,work=d.querySelector('.class-area'),scroll=d.querySelector('#workspaceScroll');
+ s.mounts.at(-1).config.onChange({'picture-coat':'coat'});
+ const key='space-whale:workspace:v1:a1-2-w4-l1:a12w4l1-words',answers=s.sessionStorage.getItem(key);scroll.scrollTop=137;
+ assert.equal(width(),336);
  openPanel(s,'lesson');assert.equal(panel.hidden,false);assert.equal(shell.dataset.panelOpen,'true');
- s.resizeViewport(390);assert.equal(width(),240);assert.equal(panel.hidden,false);
- s.click(d.querySelector('#workspaceExercise'));assert.equal(panel.hidden,false);
- s.click(d.querySelector('#workspaceMenuClose'));assert.equal(panel.hidden,true);
+ s.resizeViewport(960);assert.equal(panel.hidden,false);assert.equal(work.hidden,false);
+ s.resizeViewport(959);assert.equal(panel.hidden,true);assert.equal(shell.dataset.panelOpen,'false');
+ assert.equal(work.hidden,false);assert.equal(work.hasAttribute('inert'),false);
+ s.resizeViewport(900);assert.equal(width(),252);s.resizeViewport(390);assert.equal(width(),240);
+ assert.equal(panel.hidden,true);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);
+ assert.equal(s.location.search,search);assert.equal(s.sessionStorage.getItem(key),answers);assert.equal(scroll.scrollTop,137);
  s.resizeViewport(1200);assert.equal(width(),336);assert.equal(panel.hidden,true);
+});
+test('narrow menus replace the work view and explicit controls restore the same mounted task',()=>{
+ const s=fixture(false,{width:390,search:'?view=library&level=A1.2&whale=4&lesson=a1-2-w4-l1&exercise=a12w4l1-words'}),d=s.document;
+ const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,work=d.querySelector('.class-area'),app=d.querySelector('.reference-app'),panel=d.querySelector('#workspaceMenuPanel'),mountCount=s.mounts.length,search=s.location.search;
+ s.mounts.at(-1).config.onChange({'picture-coat':'coat'});
+ const key='space-whale:workspace:v1:a1-2-w4-l1:a12w4l1-words',answers=s.sessionStorage.getItem(key);
+ const restored=()=>{assert.equal(work.hidden,false);assert.equal(work.hasAttribute('inert'),false);assert.equal(work.hasAttribute('aria-hidden'),false);assert.equal(panel.hidden,true);assert.equal(app.classList.contains('workspace-navigation-only'),false);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);assert.equal(s.location.search,search);assert.equal(s.sessionStorage.getItem(key),answers);};
+ openPanel(s,'lesson');assert.equal(panel.hidden,false);assert.equal(work.hidden,true);assert.equal(work.hasAttribute('inert'),true);assert.equal(work.getAttribute('aria-hidden'),'true');assert.equal(app.classList.contains('workspace-navigation-only'),true);
+ const width=d.body.style.getPropertyValue('--workspace-panel-width');s.event(d.querySelector('.workspace-panel-resize'),'keydown',{key:'End'});assert.equal(d.body.style.getPropertyValue('--workspace-panel-width'),width);assert.equal(s.localStorage.getItem('space-whale:workspace-panel-width:v1'),null);
+ s.resizeViewport(430);assert.equal(panel.hidden,false);assert.equal(work.hidden,true);
+ s.event(root,'pointerdown');s.click(root);assert.equal(panel.hidden,false);assert.equal(work.hidden,true);
+ s.click(d.querySelector('#workspaceMenuClose'));restored();
+ openPanel(s,'module');s.event(d,'keydown',{key:'Escape'});restored();
+ openPanel(s,'level');openPanel(s,'level');restored();
+ openPanel(s,'lesson');s.click(d.querySelector('#workspaceBlockControls [data-block="words"]'));restored();
+ assert.equal(s.calls.filter(call=>call?.name==='media-stop').length,0);
+});
+test('narrow course navigation keeps its hierarchy open until a block or stage is selected',()=>{
+ const s=fixture(false,{width:768,search:'?view=library&selection=none'}),d=s.document,work=d.querySelector('.class-area'),panel=d.querySelector('#workspaceMenuPanel');
+ openPanel(s,'level');s.click(panelOption(s,'A1.2'));assert.equal(panel.dataset.panel,'modules');assert.equal(work.hidden,true);
+ s.click(panelOption(s,'Module 4. Выбор'));assert.equal(panel.dataset.panel,'lesson');assert.equal(work.hidden,true);
+ chooseLesson(s,'a1-2-w4-l1');assert.equal(panel.dataset.panel,'lesson-details');assert.equal(work.hidden,true);
+ s.click(d.querySelector('#workspaceLessonBlocks [data-block="words"] .workspace-block-expand'));assert.equal(work.hidden,true);assert.equal(panel.hidden,false);
+ s.click(d.querySelector('#workspaceLessonBlocks [data-block="words"] a[href*="exercise=a12w4l1-listen-repeat"]'));
+ assert.equal(new URLSearchParams(s.location.search).get('exercise'),'a12w4l1-listen-repeat');assert.equal(work.hidden,false);assert.equal(work.hasAttribute('inert'),false);assert.equal(panel.hidden,true);
+ openPanel(s,'lesson');chooseLesson(s,'a1-2-w4-l1');
+ s.click(d.querySelector('#workspaceLessonBlocks [data-block="words"] .workspace-block-select'));
+ assert.equal(new URLSearchParams(s.location.search).get('exercise'),'a12w4l1-words');assert.equal(work.hidden,false);assert.equal(panel.hidden,true);
+ const empty=fixture(false,{width:390,search:'?view=library&level=A1.2&whale=6&lesson=a1-2-w6-l1'});openLessonDetails(empty);
+ empty.click(empty.document.querySelector('#workspaceLessonBlocks [data-block="words"] .workspace-block-select'));
+ assert.equal(empty.document.querySelector('.class-area').hidden,false);assert.equal(empty.document.querySelector('#workspaceMenuPanel').hidden,true);assert.equal(empty.document.querySelector('#workspaceExercise h1').textContent,'Discovery Words');
+});
+test('narrow template family navigation stays available and choosing a template restores work',()=>{
+ const s=fixture(false,{width:390,search:'?view=templates'}),d=s.document,panel=d.querySelector('#workspaceMenuPanel'),work=d.querySelector('.class-area');
+ assert.equal(work.hidden,true);const family=d.querySelector('#workspaceTopics [data-template-family="W"]').dataset.lesson;chooseLesson(s,family);
+ assert.equal(panel.hidden,false);assert.equal(work.hidden,true);
+ s.click(d.querySelector('.workspace-panel-back'));assert.equal(panel.dataset.panel,'lesson');assert.equal(work.hidden,true);
+ chooseLesson(s,family);const template=d.querySelector('#workspaceTopics .workspace-panel-option[data-exercise]'),id=template.dataset.exercise;s.click(template);
+ assert.equal(new URLSearchParams(s.location.search).get('exercise'),id);assert.equal(panel.hidden,true);assert.equal(work.hidden,false);assert.equal(work.hasAttribute('inert'),false);
+ const exercise=d.querySelector('#workspaceExercise').firstElementChild,mountCount=s.mounts.length;
+ openPanel(s,'lesson');const root=d.querySelector('#workspaceExercise');assert.equal(root.firstElementChild,exercise);assert.equal(work.hidden,true);
+ s.resizeViewport(1200);assert.equal(panel.hidden,false);assert.equal(work.hidden,false);assert.equal(work.hasAttribute('inert'),false);assert.equal(root.firstElementChild,exercise);assert.equal(s.mounts.length,mountCount);
+});
+test('learner role always releases the work view from narrow teacher navigation',async()=>{
+ const s=fixture(true,{width:390,student:true}),d=s.document;
+ openPanel(s,'lesson');assert.equal(d.querySelector('.class-area').hidden,true);
+ await settled();assert.equal(d.body.dataset.workspaceRole,'student');
+ assert.equal(d.querySelector('.class-area').hidden,false);assert.equal(d.querySelector('.class-area').hasAttribute('inert'),false);assert.equal(d.querySelector('.reference-app').classList.contains('workspace-navigation-only'),false);
 });
 test('sidebar drag saves width and clamps the visible panel without losing its preference',()=>{
  const storage=new Map(),store={getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)};

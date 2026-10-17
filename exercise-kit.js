@@ -252,10 +252,11 @@
       return def;
     }
     if (def.kind === 'image-label') {
-      text(def.image, 'image');
+      if (!def.imagePending) text(def.image, 'image');
       text(def.alt, 'image alt');
-      media({ image: def.image, alt: def.alt });
+      media(def);
       const valid = options(def.options);
+      def.options.forEach(option => { if (option.translation != null) text(option.translation, 'option translation'); });
       const assigned = new Set();
       ids(def.items, 'items');
       def.items.forEach((item, index) => {
@@ -603,7 +604,7 @@
     const illustration = item => {
       if (item.imagePending && !item.image) {
         const blank = node('div', 'ek-image ek-image-pending'+(['gaps','choice','writing'].includes(def.kind)?' ek-task-image':''));
-        blank.setAttribute('aria-label', 'Изображение');
+        blank.setAttribute('aria-label', item.alt || 'Изображение');
         blank.setAttribute('role', 'img');
         return blank;
       }
@@ -1453,7 +1454,10 @@
       if (def.kind === 'image-label') {
         const wrap = node('div', 'ek-image-label-wrap');
         const stage = node('div', 'ek-image-label-stage');
-        const image = illustration({image:def.image, alt:def.alt,imageWidth:def.imageWidth,imageHeight:def.imageHeight}); image.style.removeProperty('aspect-ratio'); image.classList.add('ek-image-label-image'); stage.append(image);
+        const image = illustration({image:def.image, imagePending:def.imagePending, alt:def.alt,imageWidth:def.imageWidth,imageHeight:def.imageHeight});
+        if(def.imagePending&&!def.image){image.style.aspectRatio=def.imageWidth>0&&def.imageHeight>0?`${def.imageWidth} / ${def.imageHeight}`:'4 / 3';image.style.minHeight='0';}
+        else image.style.removeProperty('aspect-ratio');
+        image.classList.add('ek-image-label-image'); stage.append(image);
         const assign = (targetId, optionId) => {
           if(config.readOnly)return;
           if (optionId && !def.options.some(option => option.id === optionId)) return;
@@ -1663,6 +1667,7 @@
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
       // Text answers keep the full authored key; picture corrections focus on
       // mistakes while image labels retain feedback at their image targets.
+      // An authored translation opts image labels into the shared text key too.
       // Grading and saved answers stay intact.
       const attempted=Object.values(feedback).some(value=>value!=='empty');
       const corrections=attempted&&Object.values(feedback).some(value=>value==='retry'||value==='empty');
@@ -1672,8 +1677,13 @@
       }));
       const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
       const pair=(prompt,answer,item)=>{if(!answer)return;const row=markAttempt(node('li'),item?itemResult(item):feedback.order||'empty');if(item)row.setAttribute('value',String(itemNumber(item)));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
-      if(corrections&&def.kind!=='image-label'){
-        if(def.kind==='gaps')def.items.forEach(item=>{
+      const imageLabelTranslations=def.kind==='image-label'&&def.options.some(option=>option.translation);
+      if(corrections&&(def.kind!=='image-label'||imageLabelTranslations)){
+        if(def.kind==='image-label')def.items.forEach(item=>{
+          const option=def.options.find(option=>option.id===item.correctId);
+          if(option)pair(option.translation?option.text:'',option.translation||option.text,item);
+        });
+        else if(def.kind==='gaps')def.items.forEach(item=>{
           const row=markAttempt(node('li'),itemResult(item));row.setAttribute('value',String(itemNumber(item)));
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
           else item.segments.forEach((segment,index)=>{if(def.layout==='table'&&index)row.append(doc.createTextNode(' · '));row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…'));});list.append(row);

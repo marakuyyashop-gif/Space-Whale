@@ -39,64 +39,58 @@
   const clothesBase = 'Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/';
   const clothing = ['hat', 'skirt', 'coat', 'suit', 'blouse', 'sweater'];
   const categoriesSheet = 'Images/Текущие/A.1.2/Module 4/lesson 4 - sosed/e4a4d283-e122-474e-bb12-87c03be1f988.png';
-  const travelMeanings = [
-    ['luggage', 'bags you take when you travel'],
-    ['refund', 'money a shop or company gives back to you'],
-    ['route', 'the roads or paths you use to get somewhere'],
-    ['passenger', 'a person traveling in a car, bus, train, or plane']
-  ];
+  const wordMeanings = Array.from({length: 4}, (_, index) => [
+    `[Word ${index + 1}]`, `[Definition Word ${index + 1}]`
+  ]);
 
   const definitions = [
     entry('W01', 'Picture–Word Matching', base('w01', 'matching', 'Match the words with the pictures.', {
       layout: 'picture-word',
       items: clothing.map((word, index) => ({
         id: `picture-${index + 1}`, text: String(index + 1),
-        image: `${clothesBase}${word}-cutout.webp`, alt: `A ${word}`,
+        imagePending: true, alt: `[Image for Word ${index + 1}]`,
+        sourceArtwork: {image: `${clothesBase}${word}-cutout.webp`, alt: `A ${word}`},
         correctId: word
       })),
-      options: ['suit', 'coat', 'hat', 'blouse', 'sweater', 'skirt'].map(word => option(word, word))
+      options: ['suit', 'coat', 'hat', 'blouse', 'sweater', 'skirt'].map(word => option(word, `[Word ${clothing.indexOf(word) + 1}]`))
     }), 'Match separate pictures with the words or short phrases they show.', [catalog('8–9'), words('1–2')]),
 
-    entry('W02', 'Word–Translation Matching', matching('w02', 'Match the words with their translations.', [
-      ['quiet', 'тихий'],
-      ['helpful', 'готовый помочь'],
-      ['rude', 'грубый'],
-      ['polite', 'вежливый'],
-      ['lazy', 'ленивый'],
-      ['noisy', 'шумный']
-    ], [3, 0, 5, 2, 1, 4], 'word-translation'), 'Match English words with one precise Russian meaning for each word.', [catalog('10'), words('3')]),
+    entry('W02', 'Word–Translation Matching', matching('w02', 'Match the words with their translations.',
+      Array.from({length: 6}, (_, index) => [`[Word ${index + 1}]`, `[Translation Word ${index + 1}]`]),
+      [3, 0, 5, 2, 1, 4], 'word-translation'), 'Match English words with one precise Russian meaning for each word.', [catalog('10'), words('3')]),
 
     entry('W03A', 'Word–Definition Matching — без контекста', matching('w03a', 'Match the words with their meanings.',
-      travelMeanings, [2, 0, 3, 1], 'word-definition'),
+      wordMeanings, [2, 0, 3, 1], 'word-definition'),
     'Match words with clear English explanations, without example sentences.', [catalog('11'), words('4')]),
 
     entry('W03B', 'Word–Definition Matching — с примерами', grouped('w03b', 'Read the examples. Then match the words with their meanings.', [
       models('w03b-examples',
-        'We left our luggage at the hotel.\nThe store gave me a refund for the broken lamp.\nThis route is shorter, but there is a lot of traffic.\nThere were only three passengers on the bus.',
-        ['luggage', 'refund', 'route', 'passengers']),
-      matching('w03b-pairs', 'Match the words with their meanings.', travelMeanings, [1, 3, 0, 2], 'word-definition')
+        '[Example for Word 1]\n[Example for Word 2]\n[Example for Word 3]\n[Example for Word 4]',
+        ['[Example for Word 1]', '[Example for Word 2]', '[Example for Word 3]', '[Example for Word 4]']),
+      matching('w03b-pairs', 'Match the words with their meanings.', wordMeanings, [1, 3, 0, 2], 'word-definition')
     ]), 'Read a natural example for each new word, then choose its English meaning.', [catalog('11'), words('5')]),
 
     entry('W04', 'Image Label', base('w04', 'image-label', 'Label the picture.', {
-      image: categoriesSheet, imageWidth: 1448, imageHeight: 1086,
-      alt: 'A cabinet, a cup of tea, a hoodie, an apartment building, a pastry, and a shop in six separate areas.',
+      imagePending: true, imageWidth: 1448, imageHeight: 1086,
+      alt: '[Image]',
+      sourceArtwork: {image: categoriesSheet, alt: 'A cabinet, a cup of tea, a hoodie, an apartment building, a pastry, and a shop in six separate areas.'},
       items: [
-        {id: 'cabinet', x: 17, y: 9, prompt: 'Label for the cabinet', correctId: 'furniture'},
-        {id: 'tea', x: 50, y: 46, prompt: 'Label for the cup', correctId: 'drink'},
-        {id: 'hoodie', x: 67, y: 9, prompt: 'Label for the hoodie', correctId: 'clothing'},
-        {id: 'apartment', x: 17, y: 91, prompt: 'Label for the apartment building', correctId: 'building'},
-        {id: 'pastry', x: 50, y: 91, prompt: 'Label for the pastry', correctId: 'food'},
-        {id: 'store', x: 83, y: 91, prompt: 'Label for the storefront', correctId: 'shop'}
+        {id: 'cabinet', x: 17, y: 9, prompt: '[Image target for Word 1]', correctId: 'furniture'},
+        {id: 'tea', x: 50, y: 46, prompt: '[Image target for Word 2]', correctId: 'drink'},
+        {id: 'hoodie', x: 67, y: 9, prompt: '[Image target for Word 3]', correctId: 'clothing'},
+        {id: 'apartment', x: 17, y: 91, prompt: '[Image target for Word 4]', correctId: 'building'},
+        {id: 'pastry', x: 50, y: 91, prompt: '[Image target for Word 5]', correctId: 'food'},
+        {id: 'store', x: 83, y: 91, prompt: '[Image target for Word 6]', correctId: 'shop'}
       ],
-      options: ['shop', 'clothing', 'food', 'furniture', 'building', 'drink'].map(word => option(word, word))
+      options: ['shop', 'clothing', 'food', 'furniture', 'building', 'drink'].map(word => {
+        const number = ['furniture', 'drink', 'clothing', 'building', 'food', 'shop'].indexOf(word) + 1;
+        return {...option(word, `[Word ${number}]`), translation: `[Translation Word ${number}]`};
+      })
     }), 'Place words at the right objects or areas of one shared picture.', [catalog('12'), words('6')]),
 
-    entry('W05', 'слово и короткое пояснение по общему признаку', matching('w05', 'Who are these people? Match the words and clues.', [
-      ['colleague', 'work together'],
-      ['neighbor', 'live next door'],
-      ['relative', 'part of the same family'],
-      ['friend', 'enjoy spending free time together']
-    ], [2, 0, 3, 1], 'word-definition'), 'Match words with short clues organized around one clear feature.', [words('7')]),
+    entry('W05', 'слово и короткое пояснение по общему признаку', matching('w05', 'Match the words and clues.',
+      Array.from({length: 4}, (_, index) => [`[Word ${index + 1}]`, `[Clue for Word ${index + 1}]`]),
+      [2, 0, 3, 1], 'word-definition'), 'Match words with short clues organized around one clear feature.', [words('7')]),
 
     entry('P01', 'Listen & Repeat — Words', base('p01', 'audio', 'Listen and repeat.', {
       layout: 'listen-repeat',

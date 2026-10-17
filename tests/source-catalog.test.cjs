@@ -43,6 +43,33 @@ test('W02 uses the shared translation row while W03 keeps the definition row',()
  view.handle.destroy();
  for(const code of ['W03A','W03B'])assert.ok(definitions(templates.find(def=>def.code===code)).some(def=>def.layout==='word-definition'));
 });
+test('Words catalog uses structural placeholders with stable keys, option order and media references',()=>{
+ const words=templates.filter(def=>def.catalogFamily==='W');
+ const optionOrders={W01:['suit','coat','hat','blouse','sweater','skirt'],W02:['answer-4','answer-1','answer-6','answer-3','answer-2','answer-5'],W03A:['answer-3','answer-1','answer-4','answer-2'],W03B:['answer-2','answer-4','answer-1','answer-3'],W04:['shop','clothing','food','furniture','building','drink'],W05:['answer-3','answer-1','answer-4','answer-2']};
+ for(const card of words){
+  const def=definitions(card).find(def=>['matching','image-label'].includes(def.kind));
+  assert.deepEqual(def.options.map(option=>option.id),optionOrders[card.code],card.code);
+  def.items.forEach((item,index)=>{
+   const number=index+1,answer=def.options.find(option=>option.id===item.correctId);
+   if(['W01','W04'].includes(card.code)){
+    assert.equal(answer.text,`[Word ${number}]`);
+    if(card.code==='W04')assert.equal(answer.translation,`[Translation Word ${number}]`);
+   }else{
+    assert.equal(item.text,`[Word ${number}]`);
+    assert.equal(answer.text,card.code==='W02'?`[Translation Word ${number}]`:card.code==='W05'?`[Clue for Word ${number}]`:`[Definition Word ${number}]`);
+   }
+  });
+  const s=mount(card);assert.equal(s.host.querySelectorAll('img').length,0,card.code);assert.doesNotMatch(s.host.textContent,/quiet|helpful|luggage|refund|colleague|neighbor|furniture|cabinet/);s.handle.destroy();
+ }
+ const pictures=words.find(def=>def.code==='W01');
+ assert.deepEqual(pictures.items.map(item=>item.id),['picture-1','picture-2','picture-3','picture-4','picture-5','picture-6']);
+ assert.ok(pictures.items.every(item=>item.imagePending===true&&!item.image&&item.sourceArtwork.image));
+ const imageLabel=words.find(def=>def.code==='W04');
+ assert.equal(imageLabel.imagePending,true);assert.equal(imageLabel.image,undefined);assert.ok(imageLabel.sourceArtwork.image);
+ assert.deepEqual(imageLabel.items.map(item=>[item.id,item.x,item.y,item.correctId]),[['cabinet',17,9,'furniture'],['tea',50,46,'drink'],['hoodie',67,9,'clothing'],['apartment',17,91,'building'],['pastry',50,91,'food'],['store',83,91,'shop']]);
+ const examples=words.find(def=>def.code==='W03B').exercises[0].exercise.blocks[0];
+ assert.deepEqual(examples.text.split('\n'),[1,2,3,4].map(number=>`[Example for Word ${number}]`));assert.deepEqual(examples.highlights,examples.text.split('\n'));
+});
 test('all source-coded cards use the shared renderer; existing artwork paths resolve and missing audio stays pending',()=>{
  let audioCount=0;
  const checkMedia=node=>{
