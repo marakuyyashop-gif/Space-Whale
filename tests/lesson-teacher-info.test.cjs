@@ -103,7 +103,7 @@ test('all nine published A2 and B1 lessons have concrete English guidance from t
  const root=path.join(__dirname,'..'),window={SpaceWhaleExerciseKit:require('../exercise-kit.js')},context=vm.createContext({window});
  const html=fs.readFileSync(path.join(root,'classroom.html'),'utf8');
  const scripts=[...html.matchAll(/<script src="([^"?]+)(?:\?[^\"]*)?"/g)].map(match=>match[1])
-  .filter(file=>/^(template-gallery|lesson-draft-|course-content|whale1-content|homework-a21)/.test(file));
+  .filter(file=>/^(template-source-|template-gallery|lesson-draft-|course-content|whale1-content|homework-a21)/.test(file));
  for(const file of scripts)vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context);
  const catalog=createCatalog(window.SpaceWhaleContent,window.SpaceWhaleTemplates);
  const lessons=catalog.lessons.filter(lesson=>/^(A2|B1)\./.test(lesson.level)&&lesson.stages.length);

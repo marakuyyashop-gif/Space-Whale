@@ -1,0 +1,1515 @@
+{
+  "version": "2026-10-17",
+  "counts": {
+    "catalogLabels": 73,
+    "addedLabels": 7,
+    "allLabels": 80,
+    "leafCards": 79,
+    "leafByFamily": {
+      "W": 6,
+      "P": 2,
+      "D": 4,
+      "R": 4,
+      "E": 29,
+      "Q": 2,
+      "L": 18,
+      "T": 12,
+      "S": 2
+    }
+  },
+  "familyOrder": [
+    "W",
+    "P",
+    "D",
+    "R",
+    "E",
+    "Q",
+    "L",
+    "T",
+    "S"
+  ],
+  "familyNames": {
+    "W": "Words",
+    "P": "Listen & Repeat",
+    "D": "Discovery",
+    "R": "Rule",
+    "E": "Practice",
+    "Q": "Questions & Discussion",
+    "L": "Listening",
+    "T": "Reading",
+    "S": "Speaking"
+  },
+  "entries": [
+    {
+      "code": "S01",
+      "family": "S",
+      "name": "Picture Speaking",
+      "catalogPages": "1–6, 60",
+      "catalogHeadings": [
+        "Picture Speaking"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "изображение ситуации, задача и уточняющие сведения, языковые опоры Use → ученик рассматривает детали и строит собственное устное сообщение или разговор.",
+      "latestSource": {
+        "file": "16-S_Speaking_-.pdf",
+        "pages": [
+          7,
+          8,
+          11,
+          12,
+          13,
+          14
+        ],
+        "headings": [
+          "Picture Speaking"
+        ]
+      },
+      "supersededFlags": [
+        "speaking-final"
+      ]
+    },
+    {
+      "code": "S02",
+      "family": "S",
+      "name": "Text Speaking",
+      "catalogPages": "7, 60",
+      "catalogHeadings": [
+        "Text Speaking"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "вопрос или короткая ситуация с задачей, при необходимости смысловые пункты и Use → ученик устно отвечает, рассказывает либо выясняет информацию у собеседника.",
+      "latestSource": {
+        "file": "16-S_Speaking_-.pdf",
+        "pages": [
+          7,
+          8,
+          11,
+          12,
+          13,
+          14
+        ],
+        "headings": [
+          "Text Speaking"
+        ]
+      },
+      "supersededFlags": [
+        "speaking-final"
+      ]
+    },
+    {
+      "code": "W01",
+      "family": "W",
+      "name": "Picture–Word Matching",
+      "catalogPages": "8–9",
+      "catalogHeadings": [
+        "Picture–Word Matching"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "отдельные карточки с изображениями и открываемые по нажатию английские варианты → ученик выбирает слово и составляет пару с картинкой.",
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          1,
+          2
+        ],
+        "headings": [
+          "слово и отдельная картинка",
+          "картинки и целые фразы"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "W02",
+      "family": "W",
+      "name": "Word–Translation Matching",
+      "catalogPages": "10",
+      "catalogHeadings": [
+        "Word–Translation Matching"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "английские Words и варианты русского перевода нужных значений → ученик подбирает перевод и составляет пары.",
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          3
+        ],
+        "headings": [
+          "слово и русский перевод"
+        ]
+      },
+      "supersededFlags": [
+        "word-language-boundary"
+      ]
+    },
+    {
+      "code": "W03",
+      "family": "W",
+      "name": "Word–Definition Matching: семейство вариантов",
+      "catalogPages": "11",
+      "catalogHeadings": [
+        "Word–Definition Matching"
+      ],
+      "role": "parent",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "английские слова и короткие определения → ученик читает и составляет пары. Для конкретного задания выбирай W03A или W03B; W03 не добавляется третьим упражнением.",
+      "children": [
+        "W03A",
+        "W03B"
+      ],
+      "hasOwnExercise": false,
+      "supersededFlags": []
+    },
+    {
+      "code": "W03A",
+      "family": "W",
+      "name": "Word–Definition Matching: без контекста",
+      "catalogPages": "11",
+      "catalogHeadings": [
+        "Word–Definition Matching — без контекста"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "слова и короткие английские определения без дополнительных предложений-примеров → ученик читает и сопоставляет пары.",
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          4
+        ],
+        "headings": [
+          "слово и объяснение на английском"
+        ]
+      },
+      "supersededFlags": [
+        "word-language-boundary"
+      ]
+    },
+    {
+      "code": "W03B",
+      "family": "W",
+      "name": "Word–Definition Matching: с примерами",
+      "catalogPages": "11",
+      "catalogHeadings": [
+        "Word–Definition Matching — с примерами"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "по одному самостоятельному предложению с каждым целевым словом, затем слова и определения → ученик читает примеры и сопоставляет значения.",
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          5
+        ],
+        "headings": [
+          "пример, слово и объяснение на английском"
+        ]
+      },
+      "supersededFlags": [
+        "word-language-boundary"
+      ]
+    },
+    {
+      "code": "W04",
+      "family": "W",
+      "name": "Image Label",
+      "catalogPages": "12",
+      "catalogHeadings": [
+        "Image Label"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "общая сцена, схема или коллаж с отмеченными местами и банк английских Words → ученик размещает готовые подписи у соответствующих объектов, участков или признаков.",
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          6
+        ],
+        "headings": [
+          "подписи на общей картинке"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "P01",
+      "family": "P",
+      "name": "Listen & Repeat — Words",
+      "catalogPages": "13",
+      "catalogHeadings": [
+        "Listen & Repeat — Words"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "строка с единицей Words и строка с естественным предложением; рядом с каждой — аудио, текст виден. Два шага: ученик слушает и повторяет единицу отдельно, затем слушает и повторяет предложение. Промежуточного дробления нет.",
+      "latestSource": {
+        "file": "11-P_LISTEN_REPEAT_-.pdf",
+        "pages": [
+          1
+        ],
+        "headings": [
+          "новые слова"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "D01",
+      "family": "D",
+      "name": "Complete the Rule: дополнить вывод",
+      "catalogPages": "22–24",
+      "catalogHeadings": [
+        "Complete the Rule"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "даны примеры и неполный вывод в тексте, таблице или схеме. Ученик рассматривает примеры и выбирает либо вписывает недостающие элементы. Результат — дополненный вывод о значении, строении или употреблении модели.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          3,
+          9,
+          10,
+          11
+        ],
+        "headings": [
+          "Дополнить вывод"
+        ]
+      },
+      "supersededFlags": [
+        "d-flexible"
+      ]
+    },
+    {
+      "code": "D02",
+      "family": "D",
+      "name": "Meaning Choice: выбрать значение",
+      "catalogPages": "24",
+      "catalogHeadings": [
+        "Meaning Choice"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "новая единица показана в понятном примере или ситуации; рядом даны варианты значения. Ученик выбирает объяснение, перевод либо изображение, которое передаёт смысл. Ответ может показывать и понимание того, зачем выражение используется в общении.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          3,
+          9,
+          10,
+          11
+        ],
+        "headings": [
+          "Выбрать значение"
+        ]
+      },
+      "supersededFlags": [
+        "d-flexible"
+      ]
+    },
+    {
+      "code": "D03",
+      "family": "D",
+      "name": "Sort the Examples: распределить по группам",
+      "catalogPages": "25",
+      "catalogHeadings": [
+        "Sort the Examples"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "даны примеры, названия групп и элементы для распределения. Ученик сравнивает показанные случаи и относит слова, выражения или примеры к подходящим группам. Результат — классификация по замеченному различию.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          4,
+          9,
+          10,
+          11
+        ],
+        "headings": [
+          "Распределить примеры по группам"
+        ]
+      },
+      "supersededFlags": [
+        "d-flexible"
+      ]
+    },
+    {
+      "code": "D04",
+      "family": "D",
+      "name": "Match the Examples: сопоставить примеры",
+      "catalogPages": "26",
+      "catalogHeadings": [
+        "Match the Examples"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "даны понятный контекст или примеры и элементы для пар. Ученик соединяет части модели, выражения и значения, вопросы и ответы либо примеры и изображения. Так он замечает новую связь до объяснения правила.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          4,
+          9,
+          10,
+          11
+        ],
+        "headings": [
+          "Составить пары"
+        ]
+      },
+      "supersededFlags": [
+        "d-flexible"
+      ]
+    },
+    {
+      "code": "R01",
+      "family": "R",
+      "name": "Краткое пояснение / Short Explanation",
+      "catalogPages": "21, 27",
+      "catalogHeadings": [
+        "Краткое пояснение к Words",
+        "Rule — Short Explanation"
+      ],
+      "role": "explanation",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "дано готовое пояснение слова, выражения или модели с нужными примерами. Ученик читает или разбирает его с преподавателем, соотнося объяснение с примерами. Для Grammar / Lexis раскрываются назначение, строение и употребление; для Words — нужная особенность значения или употребления.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          5,
+          6,
+          7,
+          12
+        ],
+        "headings": [
+          "Пояснение"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "R02",
+      "family": "R",
+      "name": "Сравнение слов и моделей / Contrast",
+      "catalogPages": "21, 28",
+      "catalogHeadings": [
+        "Сравнение слов и вариантов употребления",
+        "Rule — Contrast"
+      ],
+      "role": "explanation",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "дано параллельное объяснение двух или нескольких вариантов с критериями выбора и примерами. Ученик сопоставляет их значение, строение или условия употребления. Отдельного ответа формат не требует.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          5,
+          6,
+          7,
+          12
+        ],
+        "headings": [
+          "Сравнение"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "R03",
+      "family": "R",
+      "name": "Наглядная схема / Visual",
+      "catalogPages": "21, 29",
+      "catalogHeadings": [
+        "Наглядная схема для Words",
+        "Rule — Visual"
+      ],
+      "role": "explanation",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовая схема или изображение с подписями показывает значение, различие или связь. Ученик рассматривает взаимное расположение частей, стрелки, выделение и примеры. Отдельного ответа формат не требует.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          5,
+          6,
+          7,
+          12
+        ],
+        "headings": [
+          "Схема"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "R04",
+      "family": "R",
+      "name": "Речевая памятка / Useful Language",
+      "catalogPages": "30–31",
+      "catalogHeadings": [
+        "Rule — Useful Language"
+      ],
+      "role": "explanation",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые выражения связаны с тем, что человек хочет сделать в общении. Фразы можно сгруппировать по назначению, роли собеседника или этапу действия, добавив нужные пояснения, модели и примеры. Ученик получает опору и находит в ней подходящий способ выражения мысли.",
+      "latestSource": {
+        "file": "13-D_Discovery_R_Rule_-.pdf",
+        "pages": [
+          5,
+          6,
+          7,
+          12
+        ],
+        "headings": [
+          "Речевая памятка"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "P02",
+      "family": "P",
+      "name": "Listen & Repeat — Grammar / Lexis",
+      "catalogPages": "32",
+      "catalogHeadings": [
+        "Listen & Repeat — Grammar / Lexis"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "даны понятные речевые образцы с аудиокнопками. Ученик слушает и повторяет; обычно текст виден. Для Lexis можно дать выражение, затем предложение с ним. Для Grammar нужны полные речевые образцы с целевой формой, ударением, ритмом и интонацией. Трудную реплику можно собрать из коротких осмысленных частей.",
+      "latestSource": {
+        "file": "11-P_LISTEN_REPEAT_-.pdf",
+        "pages": [
+          2
+        ],
+        "headings": [
+          "речевые конструкции"
+        ]
+      },
+      "supersededFlags": [
+        "p02-optional"
+      ]
+    },
+    {
+      "code": "E01",
+      "family": "E",
+      "name": "Single Choice",
+      "catalogPages": "33",
+      "catalogHeadings": [
+        "Single Choice"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "вопрос или условие, несколько готовых текстовых ответов; ученик выбирает один подходящий. Возможны картинка и короткий контекст.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E02",
+      "family": "E",
+      "name": "Multiple Select",
+      "catalogPages": "34",
+      "catalogHeadings": [
+        "Multiple Select"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "несколько готовых вариантов и указание отметить все подходящие. Ученик проверяет каждый вариант по общему критерию; возможна картинка.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E03",
+      "family": "E",
+      "name": "Dropdown: отдельные предложения и реплики",
+      "catalogPages": "13–14, 34–35",
+      "catalogHeadings": [
+        "Dropdown — отдельные предложения и реплики"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые фразы или короткие диалоги с пропусками; ученик выбирает элемент из локального списка. Возможна картинка.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E03A",
+      "family": "E",
+      "name": "Dropdown: связный текст",
+      "catalogPages": "14, 35–36",
+      "catalogHeadings": [
+        "Dropdown — связный текст"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст с локальными списками в пропусках. Ученик выбирает элементы по предложению и общему контексту.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E03B",
+      "family": "E",
+      "name": "Dropdown: перевод слова",
+      "catalogPages": "15",
+      "catalogHeadings": [
+        "Dropdown — перевод слова"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "английское слово и выпадающие переводы; ученик выбирает перевод нужного значения. На снимке показано раскрытое меню с русскими вариантами.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E04",
+      "family": "E",
+      "name": "Ввести пропуск с банком слов",
+      "catalogPages": "17, 38",
+      "catalogHeadings": [
+        "Ввести пропуск с банком слов"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "предложения или текст с пустыми полями и общий перемешанный банк. Ученик выбирает единицу и вводит её; при явном требовании изменяет форму.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E04A",
+      "family": "E",
+      "name": "Ввести пропуск с подсказкой",
+      "catalogPages": "16, 36–37",
+      "catalogHeadings": [
+        "Ввести пропуск с подсказкой"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "фразы или текст с локальными подсказками; ученик самостоятельно вводит недостающую единицу. Подсказка — первая буква, часть слова, исходная форма или другая опора.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E05",
+      "family": "E",
+      "name": "Ввести пропуск без подсказки",
+      "catalogPages": "16–17, 37",
+      "catalogHeadings": [
+        "Ввести пропуск без подсказки"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "предложение, реплика или связный текст с пустыми полями; нет банка и локальных подсказок. Ученик сам подбирает и вводит недостающий элемент.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E05A",
+      "family": "E",
+      "name": "Ввести слово по переводу-подсказке",
+      "catalogPages": "15",
+      "catalogHeadings": [
+        "Ввести слово по переводу-подсказке"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "перевод нужного значения и поле без английских вариантов. Ученик вспоминает и пишет английское слово; на снимке русские подсказки находятся внутри полей под иллюстрацией.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E05B",
+      "family": "E",
+      "name": "Заполнить схему или таблицу",
+      "catalogPages": "38",
+      "catalogHeadings": [
+        "Заполнить схему или таблицу"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "схема с названиями групп, примерами, заполненными элементами и пустыми ячейками. Ученик восстанавливает элементы уже объяснённой системы.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06",
+      "family": "E",
+      "name": "Matching: части предложения",
+      "catalogPages": "39–40",
+      "catalogHeadings": [
+        "Matching — части предложения"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "два перемешанных набора частей, иногда после короткого текста. Ученик соединяет части в законченные высказывания по смыслу и грамматике.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06A",
+      "family": "E",
+      "name": "Matching: вопрос и ответ",
+      "catalogPages": "41",
+      "catalogHeadings": [
+        "Matching — вопрос и ответ"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые вопросы и ответы перемешаны. Ученик подбирает ответ к вопросу или вопрос к ответу; направление задаётся целью.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06B",
+      "family": "E",
+      "name": "Matching: пример и слово",
+      "catalogPages": "18, 41",
+      "catalogHeadings": [
+        "Matching — пример и слово"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "короткие ситуации или примеры и готовые слова/выражения. Ученик соотносит конкретный случай с проявившимся значением или функцией.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06C",
+      "family": "E",
+      "name": "Matching: слово и изменённая форма",
+      "catalogPages": "19, 42",
+      "catalogHeadings": [
+        "Matching — слово и изменённая форма"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "исходные слова или короткие фразы и готовые изменённые формы. Ученик составляет соответствующие пары.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06D",
+      "family": "E",
+      "name": "Matching Image and Phrase",
+      "catalogPages": "42",
+      "catalogHeadings": [
+        "Matching Image and Phrase"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "отдельные изображения и перемешанные готовые фразы или предложения. Ученик соединяет каждую ситуацию с подходящим высказыванием.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06E",
+      "family": "E",
+      "name": "Matching: деятельность и предмет",
+      "catalogPages": "19, 43",
+      "catalogHeadings": [
+        "Matching — деятельность и предмет"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые названия действий или занятий и изображения связанных предметов. Ученик сопоставляет деятельность с характерной предметной опорой.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06F",
+      "family": "E",
+      "name": "Matching: части словосочетания",
+      "catalogPages": "20, 43",
+      "catalogHeadings": [
+        "Matching — части словосочетания"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "два перемешанных набора частей уже изученных сочетаний или chunks. Ученик соединяет их в естественные словосочетания.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E06G",
+      "family": "E",
+      "name": "Matching: фраза и значение",
+      "catalogPages": "43–44",
+      "catalogHeadings": [
+        "Matching — фраза и значение"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "изученные фразы и готовые переводы либо краткие определения. Ученик сопоставляет выражение как целую смысловую единицу с его значением.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E07",
+      "family": "E",
+      "name": "Сортировка по категориям",
+      "catalogPages": "44",
+      "catalogHeadings": [
+        "Сортировка по категориям"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые единицы и названные группы с уже объяснённым критерием. Ученик распределяет слова, выражения или примеры по категориям.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E08",
+      "family": "E",
+      "name": "Sort",
+      "catalogPages": "45",
+      "catalogHeadings": [
+        "Sort"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "перемешанные слова, выражения, предложения или действия. Ученик выстраивает их по явно названному критерию: смысловой шкале или последовательности шагов.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E09",
+      "family": "E",
+      "name": "Word Order: составить предложение",
+      "catalogPages": "45",
+      "catalogHeadings": [
+        "Word Order — составить предложение"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "все слова или части фразы даны в перемешанном виде. Ученик располагает их в порядке предложения, вопроса или реплики.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E11",
+      "family": "E",
+      "name": "Написать предложение по подсказкам",
+      "catalogPages": "46",
+      "catalogHeadings": [
+        "Написать предложение по подсказкам"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "опорные слова, данные или краткие фразы, иногда изображение. Ученик сам строит и записывает полное предложение или вопрос.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E11A",
+      "family": "E",
+      "name": "Устно восстановить фразу по изображению",
+      "catalogPages": "46",
+      "catalogHeadings": [
+        "Устно восстановить фразу по изображению"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "картинка и короткая речевая опора или незавершённая модель. Ученик восстанавливает недостающие элементы и произносит полную фразу.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E12",
+      "family": "E",
+      "name": "Преобразовать слово",
+      "catalogPages": "18, 39",
+      "catalogHeadings": [
+        "Преобразовать слово"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "исходное слово и ясно указанное изменение. Ученик самостоятельно вводит нужную форму либо слово другой части речи.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E13",
+      "family": "E",
+      "name": "Error Correction",
+      "catalogPages": "47",
+      "catalogHeadings": [
+        "Error Correction"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "фразы с ошибками в изученной модели; условие уточняет, есть ли ошибка в каждой строке и что исправлять. Ученик обнаруживает и исправляет целевой элемент.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E14",
+      "family": "E",
+      "name": "Краткий письменный ответ",
+      "catalogPages": "47",
+      "catalogHeadings": [
+        "Краткий письменный ответ"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "вопрос, изображение, данные, ситуация или одно входящее сообщение. Ученик записывает конкретный ответ: слово, фразу, короткое предложение или заметку.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E15",
+      "family": "E",
+      "name": "Завершить предложение",
+      "catalogPages": "48",
+      "catalogHeadings": [
+        "Завершить предложение"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовые начала предложений, иногда изображение. Ученик самостоятельно дописывает продолжение по ситуации, условию или своей допустимой идее.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E16",
+      "family": "E",
+      "name": "Make It True for You",
+      "catalogPages": "48",
+      "catalogHeadings": [
+        "Make It True for You"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "готовое высказывание или модель. Ученик выбирает либо изменяет содержание, чтобы оно соответствовало ему или заданному персонажу, сохраняя конструкцию. Ответ устный или письменный.",
+      "supersededFlags": []
+    },
+    {
+      "code": "E17",
+      "family": "E",
+      "name": "Chat Exchange",
+      "catalogPages": "49",
+      "catalogHeadings": [
+        "Chat Exchange"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "ситуация и сообщение собеседника; ученик пишет ответ и продолжает переписку, учитывая следующие связанные реплики преподавателя или подготовленного сценария.",
+      "supersededFlags": []
+    },
+    {
+      "code": "Q01",
+      "family": "Q",
+      "name": "Questions & Discussion",
+      "catalogPages": "49",
+      "catalogHeadings": [
+        "Questions & Discussion"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "вопросы по ситуации предыдущего задания, опыту или мнению. Ученик отвечает, объясняет выбор и задаёт встречные вопросы — в пределах задачи и доступного языка.",
+      "supersededFlags": []
+    },
+    {
+      "code": "Q02",
+      "family": "Q",
+      "name": "Рассказ по выполненному упражнению",
+      "catalogPages": "50",
+      "catalogHeadings": [
+        "Рассказ по выполненному упражнению"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "картинки, факты, восстановленные фразы или результат предыдущей работы. Ученик объединяет их в короткий связный устный рассказ; возможны начало и знакомые связки.",
+      "supersededFlags": []
+    },
+    {
+      "code": "L01",
+      "family": "L",
+      "name": "True / False по аудио",
+      "catalogPages": "51",
+      "catalogHeadings": [
+        "True / False по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и готовые утверждения → ученик слушает и выбирает True или False для каждого пункта.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          7
+        ],
+        "headings": [
+          "True / False"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L02",
+      "family": "L",
+      "name": "Single Choice по аудио",
+      "catalogPages": "52",
+      "catalogHeadings": [
+        "Single Choice по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "смысловой вопрос, запись и текстовые варианты → ученик выбирает один ответ по содержанию.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          8
+        ],
+        "headings": [
+          "Один текстовый ответ"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L03",
+      "family": "L",
+      "name": "Image Single Choice по аудио",
+      "catalogPages": "52",
+      "catalogHeadings": [
+        "Image Single Choice по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись, вопрос и несколько картинок → ученик выбирает одно изображение, соответствующее нужной информации.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          9
+        ],
+        "headings": [
+          "Одна картинка"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L04",
+      "family": "L",
+      "name": "Image Multiple Select по аудио",
+      "catalogPages": "53",
+      "catalogHeadings": [
+        "Image Multiple Select по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись, вопрос и набор картинок → ученик отмечает все изображения, отвечающие условию.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          10
+        ],
+        "headings": [
+          "Несколько картинок"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L05",
+      "family": "L",
+      "name": "Картинки по порядку звучания",
+      "catalogPages": "53",
+      "catalogHeadings": [
+        "Картинки по порядку звучания"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и перемешанные картинки → ученик располагает изображения в порядке упоминания.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          11
+        ],
+        "headings": [
+          "Картинки по порядку"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L06",
+      "family": "L",
+      "name": "Текстовые элементы по порядку звучания",
+      "catalogPages": "54",
+      "catalogHeadings": [
+        "Текстовые элементы по порядку звучания"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и перемешанные готовые реплики, фразы или другие текстовые элементы → ученик упорядочивает их по появлению в аудио.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          12
+        ],
+        "headings": [
+          "Фразы по порядку"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L07",
+      "family": "L",
+      "name": "Вписать услышанное без подсказки",
+      "catalogPages": "54",
+      "catalogHeadings": [
+        "Вписать услышанное без подсказки"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и текст, диалог или предложения с пустыми полями → ученик вводит услышанные слова, формы или выражения; объём ответа задаётся условием.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          13
+        ],
+        "headings": [
+          "Вписать услышанное"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L08",
+      "family": "L",
+      "name": "Вписать услышанное с подсказкой",
+      "catalogPages": "55",
+      "catalogHeadings": [
+        "Вписать услышанное с подсказкой"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и пропуск с локальной подсказкой → ученик слушает и вводит ответ нужного типа. Подсказка светло-серая, исчезает при нажатии согласно описанию PDF.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          14
+        ],
+        "headings": [
+          "Вписать с подсказкой"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L09",
+      "family": "L",
+      "name": "Dropdown по аудио",
+      "catalogPages": "55",
+      "catalogHeadings": [
+        "Dropdown по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и предложения, диалог или текст с выпадающими списками → ученик выбирает услышанный либо соответствующий содержанию вариант в каждом поле.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          15
+        ],
+        "headings": [
+          "Выбор в выпадающих списках"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L10",
+      "family": "L",
+      "name": "Matching: сведения из одной записи",
+      "catalogPages": "55",
+      "catalogHeadings": [
+        "Matching — сведения из одной записи"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "одна запись и два набора текстовых элементов → ученик устанавливает пары по услышанным сведениям: человек–действие, предмет–место, событие–деталь и подобные связи.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          16
+        ],
+        "headings": [
+          "Пары по одной записи"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L11",
+      "family": "L",
+      "name": "Matching: несколько записей и картинки",
+      "catalogPages": "56",
+      "catalogHeadings": [
+        "Matching — несколько записей и картинки"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "несколько коротких фрагментов с отдельными плеерами и перемешанные изображения → ученик подбирает картинку к каждой записи.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          17
+        ],
+        "headings": [
+          "Записи и картинки"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L12",
+      "family": "L",
+      "name": "Краткий ответ по аудио",
+      "catalogPages": "56",
+      "catalogHeadings": [
+        "Краткий ответ по аудио"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "запись и вопрос о содержании → ученик извлекает факт и отвечает коротко устно или письменно; нужный способ указан в условии.",
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          18
+        ],
+        "headings": [
+          "Короткий ответ"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "T01",
+      "family": "T",
+      "name": "True / False по тексту",
+      "catalogPages": "57",
+      "catalogHeadings": [
+        "True / False по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и готовые утверждения → ученик читает и определяет True или False для каждого пункта.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T02",
+      "family": "T",
+      "name": "Single Choice по тексту",
+      "catalogPages": "57",
+      "catalogHeadings": [
+        "Single Choice по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст, вопрос и несколько текстовых вариантов → ученик выбирает один подходящий ответ.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T03",
+      "family": "T",
+      "name": "Image Single Choice по тексту",
+      "catalogPages": "57",
+      "catalogHeadings": [
+        "Image Single Choice по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст, вопрос и несколько изображений → ученик выбирает одну картинку по условию.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T04",
+      "family": "T",
+      "name": "Image Multiple Select по тексту",
+      "catalogPages": "58",
+      "catalogHeadings": [
+        "Image Multiple Select по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст, вопрос и набор картинок → ученик отмечает все изображения, соответствующие заданию.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T05",
+      "family": "T",
+      "name": "Картинки по порядку в тексте",
+      "catalogPages": "58",
+      "catalogHeadings": [
+        "Картинки по порядку в тексте"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и перемешанные изображения → ученик выстраивает картинки в порядке упоминания либо событий, заданном условием.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T06",
+      "family": "T",
+      "name": "Текстовые элементы по порядку",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Текстовые элементы по порядку"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и перемешанные события, шаги, реплики или части сообщения → ученик восстанавливает последовательность по прочитанному.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T07",
+      "family": "T",
+      "name": "Краткий ответ по тексту",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Краткий ответ по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и вопрос → ученик находит сведения и отвечает словом, фразой или коротким предложением; ответ записывается в отдельное поле или таблицу.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T08",
+      "family": "T",
+      "name": "Восстановить сведения без подсказки",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Восстановить сведения без подсказки"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и предложения, резюме, заметки или таблица с пропусками → ученик вписывает недостающую информацию по прочитанному.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T09",
+      "family": "T",
+      "name": "Восстановить сведения с подсказкой",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Восстановить сведения с подсказкой"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и поля с локальными подсказками → ученик находит сведения нужного типа и вписывает их. Светло-серая подсказка внутри поля исчезает при нажатии согласно описанию.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T10",
+      "family": "T",
+      "name": "Dropdown по тексту",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Dropdown по тексту"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "связный текст и выпадающие списки в изложении, ответах или самом тексте → ученик выбирает варианты по сведениям и смысловым связям прочитанного.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T11",
+      "family": "T",
+      "name": "Matching: сведения из текста",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Matching — сведения из текста"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "один или несколько текстов и два набора элементов → ученик соединяет людей и действия, сообщения и ситуации, вопросы и ответы либо сведения и изображения.",
+      "supersededFlags": []
+    },
+    {
+      "code": "T12",
+      "family": "T",
+      "name": "Matching: текст и заголовок",
+      "catalogPages": "59",
+      "catalogHeadings": [
+        "Matching — текст и заголовок"
+      ],
+      "role": "exercise",
+      "source": "03-ENG_Exercise_Catalog_-.pdf",
+      "mechanic": "несколько коротких текстов или абзацев и перемешанные заголовки → ученик выбирает заголовок к каждому; возможен лишний вариант.",
+      "supersededFlags": []
+    },
+    {
+      "code": "W05",
+      "family": "W",
+      "name": "слово и короткое пояснение по общему признаку",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "10-W_WORDS_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "10-W_WORDS_-.pdf",
+        "pages": [
+          7
+        ],
+        "headings": [
+          "слово и короткое пояснение по общему"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L13",
+      "family": "L",
+      "name": "Несколько текстовых ответов",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          19
+        ],
+        "headings": [
+          "Несколько текстовых ответов"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L14",
+      "family": "L",
+      "name": "Распределение по группам",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          20
+        ],
+        "headings": [
+          "Распределение по группам"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L15",
+      "family": "L",
+      "name": "Подписи по аудио",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          21
+        ],
+        "headings": [
+          "Подписи по аудио"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L16",
+      "family": "L",
+      "name": "Собрать и проверить",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          22
+        ],
+        "headings": [
+          "Собрать и проверить"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L17",
+      "family": "L",
+      "name": "Выбрать ответную реплику",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          23
+        ],
+        "headings": [
+          "Выбрать ответную реплику"
+        ]
+      },
+      "supersededFlags": []
+    },
+    {
+      "code": "L18",
+      "family": "L",
+      "name": "Самостоятельная реплика",
+      "catalogPages": null,
+      "catalogHeadings": [],
+      "role": "exercise",
+      "source": "12-L_LISTENING_-.pdf",
+      "addedAfterCatalog": true,
+      "latestSource": {
+        "file": "12-L_LISTENING_-.pdf",
+        "pages": [
+          24
+        ],
+        "headings": [
+          "Самостоятельная реплика"
+        ]
+      },
+      "supersededFlags": []
+    }
+  ],
+  "discrepancies": [
+    {
+      "id": "new-codes",
+      "issue": "W05 (latest W p7) and L13–L18 (latest L pp19–24) are missing from 73-label catalog/handbook; current inventory80 labels/79 leaves.",
+      "resolution": "Use 7 latest source-backed additions; leave original codes unchanged."
+    },
+    {
+      "id": "no-invented-codes",
+      "issue": "E10 is explicitly absent in handbook. I/A are not exercise families in provided sources.",
+      "resolution": "Do not fill gaps or invent I/A based on user examples."
+    },
+    {
+      "id": "w03-parent",
+      "issue": "W03 names Word–Definition family. W03A and W03B are actual variants.",
+      "resolution": "Group A/B, no independent W03 exercise."
+    },
+    {
+      "id": "word-language-boundary",
+      "issue": "Catalog pp10–11 permits accessible definitions at earlier levels. Latest W pp3–5 explicitly uses W02 before midpoint A2.2 and W03A/B from midpoint A2.2.",
+      "resolution": "Use dedicated W selection rule."
+    },
+    {
+      "id": "p02-optional",
+      "issue": "Handbook final section calls P02 mandatory, latest P pp1–2 says optional for introduced chunks, ordinary grammar does not require it.",
+      "resolution": "P02 optional, maximumone, after phrasesintroduced."
+    },
+    {
+      "id": "d-flexible",
+      "issue": "Latest D pp9–10 says D01–04 are pedagogical actions, not immutable mechanics. E09/E08/E02 adaptations keep E code when no D action fits.",
+      "resolution": "No new D codes for these variants."
+    },
+    {
+      "id": "r-contexts",
+      "issue": "Catalog p21 reuses R01–03 for Words, pp27–29 reuse for Grammar/Lexis.",
+      "resolution": "One code per R format, not separate duplicate leaves."
+    },
+    {
+      "id": "speaking-final",
+      "issue": "Catalog p60 suggests new final scenario; handbook and latest S p8 allow repeating opening and require independent final attempt before Use.",
+      "resolution": "Do not require new scenario. Hide final help initially."
+    },
+    {
+      "id": "e11-misleading-caption",
+      "issue": "E11 screenshot p46 says Choose correct options but description requires full written sentences.",
+      "resolution": "Use written-sentence instruction, not screenshotmistake."
+    },
+    {
+      "id": "w03b-reference",
+      "issue": "W03B screenshot p11 shows connected paragraph with repetitions; text rule asks one independent natural example per target. W03A has no own screenshot.",
+      "resolution": "W03A no examples; W03B one natural independent example per targetword."
+    },
+    {
+      "id": "p01-asset-reference",
+      "issue": "Catalogp13 describes P01 but has no own screenshot/audio; images underneathareE03. LatestPp1 shows actual P01 example.",
+      "resolution": "Use latest P01 word+example two rows/two independent audio controls, visibletext."
+    }
+  ]
+}

@@ -447,14 +447,23 @@
       .map(lesson => structure?.withBlocks ? structure.withBlocks(lesson) : lesson)
       .map(lesson => teacher ? {...lesson,teacherInfo:teacher.get(lesson)} : lesson);
 
-    const templateGroups = [
-      ['materials','templates-materials','Материалы / элементы','Audio, Text, Image, Rule, Useful phrases и Possible answers.'],
-      ['mechanics','templates','Механики ответа','Переиспользуемые действия ученика. Варианты одной механики находятся внутри её карточки.'],
-      ['compositions','templates-compositions','Композиции / примеры','Примеры сборки материалов и механик. Комбинации не ограничены этим списком.']
-    ].map(([group,id,title,summary]) => ({id,title,summary,templateGroup:true,stages:templates
-      .filter(exercise => (exercise.catalogGroup || 'mechanics') === group)
-      .map(exercise => ({menu:exercise.label,navigationTitle:exercise.title,navigationDescription:exercise.description,exercise}))})).filter(group => group.stages.length);
-    const templateLesson = templateGroups.find(group => group.id === 'templates') || templateGroups[0];
+    const templateFamilies = [
+      ['W','Words','Introduce words through pictures, translations, meanings or short situations.'],
+      ['P','Listen & Repeat','Listen to words or introduced phrases and repeat them.'],
+      ['D','Guided Discovery','Notice meaning, form or use in examples before reading the rule.'],
+      ['R','Rules','Read an explanation, comparison, reference or visual scheme.'],
+      ['E','Practice','Practice words, grammar and constructions with the source exercise formats.'],
+      ['Q','Questions & Discussion','Discuss questions or talk about a completed exercise.'],
+      ['L','Listening','Listen and respond using the appropriate listening task.'],
+      ['T','Reading','Read and respond using the appropriate reading task.'],
+      ['S','Speaking','Speak from a picture, question or short situation.']
+    ];
+    const legacyFamily = { 'audio-template':'L','text-template':'T','image-template':'S','rule-template':'R','phrases-template':'S','answers-template':'R','repeat-template':'P','audio-task-template':'L','text-task-template':'T','image-task-template':'S','speaking-template':'S','sequence-template':'D' };
+    const templateGroups = templateFamilies.map(([family,title,summary]) => ({
+      id:`templates-${family}`,title:`${family} · ${title}`,summary,templateGroup:true,templateFamily:family,
+      stages:templates.filter(exercise => (exercise.catalogFamily || legacyFamily[exercise.id] || 'E') === family)
+        .map(exercise => ({menu:exercise.label || exercise.title,navigationTitle:exercise.catalogTitle || exercise.title,navigationDescription:exercise.description,exercise}))
+    })).filter(group => group.stages.length);
 
     function topics(route) {
       if (route.view === 'templates') return templateGroups;
@@ -475,7 +484,9 @@
       const requestedExercise = params.get('exercise');
       const templateMatch = view === 'templates' && templateGroups.flatMap(group => group.stages.map(stage => ({group,stage})))
         .find(({stage}) => stage.exercise.id === requestedExercise || stage.exercise.legacyIds?.includes(requestedExercise));
-      const lesson = templateMatch?.group || topics(route).find(lesson => lesson.id === params.get('lesson')) || (view === 'templates' ? templateLesson : null);
+      const legacyTemplateGroup = {'templates':'E','templates-materials':'W','templates-compositions':'S'}[params.get('lesson')];
+      const lesson = templateMatch?.group || topics(route).find(lesson => lesson.id === params.get('lesson')) ||
+        (view === 'templates' && legacyTemplateGroup ? templateGroups.find(group => group.templateFamily === legacyTemplateGroup) : null);
       if (lesson) {
         route.lesson = lesson.id;
         const block = lesson.blocks?.find(block => block.id === params.get('block'));

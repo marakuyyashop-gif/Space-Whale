@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const kit = require('../exercise-kit.js');
 const { createCatalog, levels } = require('../workspace-catalog.js');
 const root = path.join(__dirname, '..');
-const dataFiles = ['template-gallery.js', 'lesson-draft-first-day-school.js', 'lesson-draft-school-fair.js', 'course-content.js'];
+const dataFiles = ['template-source-index.js','template-source-core.js','template-source-practice.js','template-source-input.js','template-gallery.js', 'lesson-draft-first-day-school.js', 'lesson-draft-school-fair.js', 'course-content.js'];
 function content() {
   const window = { SpaceWhaleExerciseKit: kit };
   const context = vm.createContext({ window });
@@ -14,9 +14,9 @@ function content() {
   return JSON.parse(JSON.stringify({ lessons: window.SpaceWhaleContent, templates: window.SpaceWhaleTemplates }));
 }
 
-test('existing lessons and 21 catalog entries load as data without page-specific DOM', () => {
+test('existing lessons and 79 source catalog entries load as data without page-specific DOM', () => {
   const { lessons, templates } = content();
-  assert.equal(templates.length, 21);
+  assert.equal(templates.length, 79);
   assert.deepEqual(lessons.map(lesson => lesson.id), ['first-day-school', 'school-fair', 'a1-2-w4-l1', 'a1-2-w4-l2']);
   lessons.forEach(lesson => lesson.stages.forEach(stage => kit.validate(stage.exercise)));
   assert.equal(lessons.find(lesson => lesson.id === 'school-fair').stages[0].exercise.id, 'fair-reading');
@@ -90,7 +90,8 @@ test('stale or malformed deep links recover without selecting another course les
   const valid = catalog.normalize('?view=unassigned&lesson=school-fair&exercise=gone');
   assert.equal(valid.exercise, 'fair-reading');
   const gallery = catalog.normalize('?view=templates&exercise=bank-demo');
-  assert.equal(gallery.exercise, 'typed-template');
+  assert.equal(gallery.exercise, 'source-E04');
+  assert.equal(gallery.lesson, 'templates-E');
   assert.throws(() => createCatalog([...lessons, lessons[0]], templates), /Duplicate/);
   assert.throws(() => createCatalog([{...lessons[0],level:'A1.1',whale:8}], templates), /placement/);
 });
@@ -499,13 +500,13 @@ test('Stage completion is explicit, reversible and restored independently from m
 });
 
 
-test('templates form three groups and all legacy deep links reach their canonical card',()=>{
+test('templates form nine source families and all legacy deep links reach their canonical card',()=>{
   const {lessons,templates}=content(),catalog=createCatalog(lessons,templates);
   const groups=catalog.topics({view:'templates'});
-  assert.deepEqual(groups.map(group=>group.stages.length),[6,9,6]);
-  assert.equal(groups.flatMap(group=>group.stages).length,21);
+  assert.deepEqual(groups.map(group=>group.stages.length),[6,2,4,4,29,2,18,12,2]);
+  assert.equal(groups.flatMap(group=>group.stages).length,79);
   const aliases=templates.flatMap(def=>def.legacyIds);
-  assert.equal(aliases.length,31);assert.equal(new Set(aliases).size,31);
+  assert.ok(aliases.length>=52);assert.equal(new Set(aliases).size,aliases.length);
   for(const template of templates){
     for(const oldId of template.legacyIds){
       const route=catalog.normalize('?view=templates&lesson=templates&exercise='+oldId);

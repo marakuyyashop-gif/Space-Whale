@@ -71,6 +71,29 @@ test('typed bank stays typed, reports transformed answer, remote hydration does 
   assert.equal(s.host.querySelector('input'),input); assert.equal(input.hasAttribute('data-feedback'),false);
   s.click('Reset exercise'); assert.equal(s.host.querySelector('input').value,'');
 });
+test('spelling cues leave the native editor on focus without becoming answer text', () => {
+  const definitions = [
+    {version:1,id:'gap-cue-focus',kind:'gaps',title:'Complete.',inputMode:'text',items:[{id:'sentence',segments:['Choose a ',{id:'answer',answers:['drink'],placeholder:'d'},'.']}]},
+    {version:1,id:'writing-cue-focus',kind:'writing',title:'Write.',responseMode:'accepted',items:[{id:'answer',prompt:'A drink',acceptedAnswers:['drink'],placeholder:'d'}]},
+    {version:1,id:'multiline-cue-focus',kind:'writing',title:'Write.',responseMode:'open',items:[{id:'answer',prompt:'A short message',multiline:true,placeholder:'Hello'}]}
+  ];
+  for (const def of definitions) {
+    const s=setup(def),input=s.host.querySelector('input,textarea'),cue=input.getAttribute('placeholder');
+    assert.ok(cue);assert.equal(input.value,'');
+    s.fire(input,'focus');assert.equal(input.hasAttribute('placeholder'),false);
+    assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
+    s.fire(input,'blur');assert.equal(input.getAttribute('placeholder'),cue);assert.equal(input.value,'');
+    s.fire(input,'focus');input.value='drink';s.fire(input,'input');
+    assert.equal(input.hasAttribute('placeholder'),false);assert.equal(s.mount.getAnswers().answer,'drink');
+    s.fire(input,'blur');assert.equal(input.getAttribute('placeholder'),cue);assert.equal(input.value,'drink');
+    s.click('OK');assert.equal(s.mount.getAnswers().answer,'drink');
+    s.mount.setAnswers({answer:'remote'});
+    const hydrated=s.host.querySelector('input,textarea');assert.equal(hydrated.value,'remote');
+    assert.equal(hydrated.getAttribute('placeholder'),cue);
+    const readOnly=setup(def,{readOnly:true}),locked=readOnly.host.querySelector('input,textarea');
+    assert.equal(locked.disabled,true);readOnly.fire(locked,'focus');assert.equal(locked.getAttribute('placeholder'),cue);
+  }
+});
 test('inline dropdown closes after selection and updates only its gap', () => {
   const s = setup('inline-demo'); s.fire(s.host.querySelector('.ek-choice-trigger'),'click');
   s.fire(s.host.querySelectorAll('.ek-inline-option')[1],'click');

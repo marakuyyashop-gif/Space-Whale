@@ -105,6 +105,7 @@
   }
 
   let route = readRoute(location.search);
+  if(!liveMode&&route.view==='templates'&&!route.lesson)menuPanel='lesson';
   const wordFocus=window.SpaceWhaleWordFocus?.create({root:host,actor:classroom?.state?.clientId||'local',storageKey:`space-whale:word-focus:${classScope}`,canShare:()=>liveMode&&liveReady&&!pupilWaiting(),send:payload=>classroom.broadcast('word_focus',payload)});
   const lessonAudio=window.SpaceWhaleLessonAudio?.create({root:host,enable:document.getElementById('lessonAudioEnable'),isLive:()=>liveMode&&liveReady&&!pupilWaiting(),canControl:()=>liveRole==='teacher',exerciseId:()=>route.exercise,now:()=>Date.now()+guestClockOffset,send:payload=>classroom.syncAudio(payload),requestState:()=>classroom.broadcast('audio_request',{source_id:classroom.state.clientId}).catch(()=>{}),notice:text=>{notice.textContent=text;}});
 
@@ -272,6 +273,7 @@
   function chooseCollection(next) {
     const lessons=catalog.topics(next).filter(permitted).filter(lesson=>next.panel!=='class'||hasClassLesson(lesson)||guestAllowedLessons);
     tree.scrollTop=0;
+    if(next.view==='templates'){go({...next,lesson:'',exercise:'',block:'',section:'tasks'});return;}
     go({...next,lesson:lessons[0]?.id||'',exercise:'',section:'tasks'});
   }
   function setMenuPanel(name,restoreFocus=false){
@@ -308,8 +310,8 @@
     };
     selector(view==='templates'?'TPL':level?.id||'A','Level','levels','level');
     selector(view==='library'&&whale?`M${whale.id}`:'M','Module','modules','module');
-    selector(lessonIndex>=0?`L${lessonIndex+1}`:'L','Lesson','lesson','lesson');
-    if(lesson?.blocks&&route.section!=='self-study')lesson.blocks.forEach(block=>{
+    selector(view==='templates'?'L':lessonIndex>=0?`L${lessonIndex+1}`:'L',view==='templates'?'Exercise Templates':'Lesson','lesson','lesson');
+    if(view!=='templates'&&lesson?.blocks&&route.section!=='self-study')lesson.blocks.forEach(block=>{
       const control=button('',()=>{
         if(journeys[lesson.id])journeys[lesson.id].closed=false;
         const stage=lesson.stages.find(stage=>block.stageIds.includes(stage.exercise.id));
@@ -335,7 +337,16 @@
     if(!menuPanel)return;
     if(menuPanel==='profile'){heading.append(node('h2','Learner profile','workspace-panel-title'));return;}
     if(menuPanel==='levels')heading.append(node('h2','Levels','workspace-panel-title'));
-    else if(view!=='library'&&menuPanel!=='modules')heading.append(node('h2',view==='templates'?'Exercise templates':'Lessons','workspace-panel-title'));
+    else if(view==='templates'&&menuPanel!=='modules'){
+      if(menuPanel==='lesson-details'&&lesson){
+        const familyHeading=node('div','','workspace-template-heading');
+        const back=button('',()=>setMenuPanel('lesson'),'workspace-panel-back');
+        back.setAttribute('aria-label','Back to Exercise Templates');
+        back.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h12"/></svg>';
+        familyHeading.append(back,node('h2',lesson.title,'workspace-panel-title'));heading.append(familyHeading);
+      }else heading.append(node('h2','Exercise Templates','workspace-panel-title'));
+    }
+    else if(view!=='library'&&menuPanel!=='modules')heading.append(node('h2','Lessons','workspace-panel-title'));
     else{
       const path=node('nav','','workspace-course-path');path.setAttribute('aria-label','Course path');
       const separator=()=>path.append(node('span','/','workspace-path-separator'));
@@ -387,15 +398,32 @@
       const list=node('div','','workspace-panel-list');
       topics.forEach((item,index)=>{
         const label=view==='templates'?item.title:`Lesson ${item.lessonNumber||index+1} · ${item.title}`;
-        const card=option(label,teacher.lessonOverview(item),item.id===lesson?.id,()=>{menuPanel='lesson-details';chooseLesson(item);});
+        const card=option(label,view==='templates'?item.summary:teacher.lessonOverview(item),item.id===lesson?.id,()=>{menuPanel='lesson-details';chooseLesson(item);});
+        if(item.templateFamily)card.dataset.templateFamily=item.templateFamily;
         card.dataset.lesson=item.id;list.append(card);
       });
       if(!topics.length)list.append(node('p',whale?'No lessons available.':'Choose a module.','workspace-info-copy'));
       tree.append(list);return;
     }
     if(!lesson)return;
+    if(view==='templates'){
+      const list=node('nav','','workspace-panel-list');list.setAttribute('aria-label',`${lesson.title}: templates`);
+      lesson.stages.forEach(stage=>{
+        const active=route.exercise===stage.exercise.id;
+        const card=link('',{...route,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null},active,'workspace-panel-option');
+        if(active)card.classList.add('is-selected');
+        card.dataset.exercise=stage.exercise.id;
+        card.append(node('strong',stage.menu||stageLabel(stage)));
+        if(stage.navigationDescription){
+          const description=node('span','','workspace-option-description');
+          copy.appendDescription(description,stage.navigationDescription);card.append(description);
+        }
+        list.append(card);
+      });
+      tree.append(list);return;
+    }
     const overview=node('section','','workspace-lesson-overview');
-    const label=view==='templates'?lesson.title:`Lesson ${lesson.lessonNumber||lessonIndex+1} · ${lesson.title}`;
+    const label=`Lesson ${lesson.lessonNumber||lessonIndex+1} · ${lesson.title}`;
     overview.append(node('h2',label,'workspace-lesson-title'));
     copy.appendDescription(overview,teacher.lessonOverview(lesson));
     tree.append(overview);
@@ -578,7 +606,7 @@
     if (!stage || !visible) {
       const empty = node('section', '', 'workspace-empty');
       const block=visible&&route.section!=='self-study'?selected?.blocks?.find(block=>block.id===route.block):null;
-      empty.append(node('h1', block?block.title:selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : 'Choose a lesson')));
+      empty.append(node('h1', block?block.title:selected?.title || (liveRole === 'student' ? 'Ждём преподавателя' : route.view==='templates' ? 'Choose an exercise template.' : 'Choose a lesson')));
       if(block||selected||liveRole==='student')empty.append(node('p', block?'No exercises yet.':selected ? 'No exercises in this section yet.' : 'Задание появится, когда преподаватель откроет его.'));
       host.append(empty); document.title = 'Space Whale — Learning Space'; return;
     }
@@ -1061,9 +1089,7 @@
     dismissSidebarOverlays=close;
     document.addEventListener('pointerover',enter);document.addEventListener('focusin',enter);
     document.addEventListener('pointerout',leave);document.addEventListener('focusout',leave);
-    document.addEventListener('pointerdown',event=>{
-      close();if(menuPanel&&!menu.contains(event.target)&&!sidebar.contains(event.target))setMenuPanel(null);
-    });
+    document.addEventListener('pointerdown',close);
     document.addEventListener('keydown',event=>{if(event.key==='Escape'){close();if(menuPanel)setMenuPanel(null,true);}});
     document.addEventListener('scroll',close,true);window.addEventListener('resize',close);
   }

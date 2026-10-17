@@ -134,7 +134,7 @@
           for (const field of Object.keys(object)) if (!allowed.includes(field)) fail(`${name}: unsupported field ${field}`);
         };
         // Catalog metadata is never rendered as exercise content.
-        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description'], 'Speaking');
+        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs'], 'Speaking');
         if (def.image !== null) {
           only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
           if (!def.image.imagePending) text(def.image.image, 'image');
@@ -269,6 +269,8 @@
       def.items.forEach(item => {
         text(item.text, 'card text');
         media(item);
+        if (item.audio != null) audioSource(item.audio);
+        if (item.audioPending != null && typeof item.audioPending !== 'boolean') fail('matching audioPending must be boolean');
         if (def.layout === 'picture-word' && !item.image && !item.imagePending) fail('Picture-word items need images');
         key(item, valid);
         if (item.correctId != null) {
@@ -313,13 +315,19 @@
       if (['open','personal'].includes(def.responseMode) && item.acceptedAnswers) fail('Open writing cannot have acceptedAnswers');
     });
     if (def.kind === 'gaps') {
-      if (def.layout != null && !['sentences', 'paragraph', 'picture-rows'].includes(def.layout)) fail('Unsupported gaps layout');
+      if (def.layout != null && !['sentences', 'paragraph', 'picture-rows', 'table'].includes(def.layout)) fail('Unsupported gaps layout');
+      if (def.layout === 'table') {
+        array(def.tableColumns, 'tableColumns');
+        if (def.tableColumns.length < 2 || def.tableColumns.length > 6) fail('tableColumns needs 2–6 columns');
+        def.tableColumns.forEach(column => text(column, 'table column'));
+      } else if (def.tableColumns != null) fail('tableColumns requires table layout');
       if (def.inputMode != null && !['text', 'select'].includes(def.inputMode)) fail('Unsupported gaps inputMode');
       if (def.bank) { array(def.bank, 'bank'); def.bank.forEach(word => text(word, 'bank word')); }
       const used = new Set();
       def.items.forEach(item => {
         media(item);
         array(item.segments, 'segments');
+        if (def.layout === 'table' && item.segments.length !== def.tableColumns.length) fail('Table rows must match tableColumns');
         item.segments.forEach(segment => {
           if (typeof segment === 'string') return;
           safeId(segment?.id, 'gap id');
@@ -568,6 +576,16 @@
       if (className) el.className = className;
       if (text != null) el.textContent = text;
       return el;
+    };
+    // A spelling cue belongs to the unfocused empty field. Remove its native
+    // placeholder while editing instead of leaving a transparent placeholder
+    // line in the browser's text-control layout. Never change the answer value.
+    const placeholderCue = (input, cue) => {
+      if (!cue) return;
+      input.setAttribute('placeholder', cue);
+      if (config.readOnly) return;
+      input.addEventListener('focus', () => input.removeAttribute('placeholder'));
+      input.addEventListener('blur', () => input.setAttribute('placeholder', cue));
     };
     const button = (label, handler, className = 'ek-button') => {
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
@@ -1231,6 +1249,10 @@
           card.append(number);
           if (item.image || item.imagePending) card.append(illustration(item));
           if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
+          if (item.audio || item.audioPending) {
+            const replay=repeatAudioButton(item.audio,item.text,item.id);
+            replay.classList.add('ek-card-audio');card.append(replay);
+          }
           const chosen = () => def.options.find(option => option.id === answers[item.id]);
           const promptText = pictureWord ? `Picture ${itemNumber(item)}` : item.text;
           const refreshSlot = (matchItem, matchIndex, control) => {
@@ -1278,40 +1300,50 @@
           const bank = node('p', 'ek-word-list', def.bank.join(', '));
           bank.setAttribute('aria-label', 'Words to use'); body.append(bank);
         }
-        const pictureRows=def.layout==='picture-rows';
+        const pictureRows=def.layout==='picture-rows',tableLayout=def.layout==='table';
         if(pictureRows)body.append(pictureCues(def.items));
+        let tableBody;
+        if(tableLayout){
+          const wrap=node('div','ek-gap-table-wrap'),table=node('table','ek-gap-table'),head=node('thead'),row=node('tr'),number=node('th');
+          table.setAttribute('aria-label',def.title);number.setAttribute('scope','col');number.setAttribute('aria-label','Row');row.append(number);
+          def.tableColumns.forEach(title=>{const heading=node('th','',title);heading.setAttribute('scope','col');row.append(heading);});
+          tableBody=node('tbody');head.append(row);table.append(head,tableBody);wrap.append(table);body.append(wrap);
+        }
         def.items.forEach((item, index) => {
           const compact=pictureRows,container=compact?node('div','ek-picture-sentence'):body;
           if(compact)container.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
           if(!compact&&(item.image || item.imagePending))body.append(illustration(item));
-          const row = node('p', def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
+          const row = node(tableLayout?'tr':'p',tableLayout?'ek-table-row':def.layout === 'paragraph' ? 'ek-sentence ek-paragraph' : 'ek-sentence ek-numbered-sentence');
           if (def.preserveLines) row.style.whiteSpace = 'pre-wrap';
-          if (!compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${itemNumber(item)}. `));
+          if(tableLayout){const number=node('th','ek-table-row-number',String(itemNumber(item)));number.setAttribute('scope','row');row.append(number);}
+          else if (!compact && def.layout !== 'paragraph') row.append(node('span', 'ek-sentence-number', `${itemNumber(item)}. `));
           let gapIndex=0;
-          item.segments.forEach(segment => {
+          item.segments.forEach((segment,segmentIndex) => {
+            const target=tableLayout?node('td'):row;
+            if(tableLayout)row.append(target);
             if (typeof segment === 'string') {
-              if(item.highlights?.length) row.append(...Array.from(richText(segment,item.highlights).childNodes));
-              else row.append(doc.createTextNode(segment));
+              if(item.highlights?.length) target.append(...Array.from(richText(segment,item.highlights).childNodes));
+              else target.append(doc.createTextNode(segment));
               return;
             }
             gapIndex += 1;
             const number = itemNumber(item);
-            const label = `Sentence ${number}, gap ${gapIndex}`;
+            const label = tableLayout?`Row ${number}, ${def.tableColumns[segmentIndex]}`:`Sentence ${number}, gap ${gapIndex}`;
             const options = def.inputMode === 'text' ? null : segment.options || (def.inputMode === 'select' ? def.bank : null);
             if (options) {
-              const {wrap,opener}=inlinePicker(segment.id,label,options.map(value=>({id:value,text:value})),number);row.append(wrap);controls.set(segment.id,opener);return;
+              const {wrap,opener}=inlinePicker(segment.id,label,options.map(value=>({id:value,text:value})),number);target.append(wrap);controls.set(segment.id,opener);return;
             }
             const field = node('input', 'ek-gap ek-typed-gap');
             field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false;
             field.setAttribute('aria-label', label);
             field.value = answers[segment.id] || '';
-            if(segment.placeholder) field.placeholder = segment.placeholder;
+            placeholderCue(field, segment.placeholder);
             const resize = () => { field.style.width = `${Math.max(5, Math.min(28, field.value.length + 2))}ch`; };
             resize();
             field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
             controls.set(segment.id, field);
-            if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);wrap.append(badge,field);row.append(wrap);}else row.append(field);
-          }); container.append(row);if(compact)body.append(container);
+            if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);wrap.append(badge,field);target.append(wrap);}else target.append(field);
+          }); if(tableLayout)tableBody.append(row);else container.append(row);if(compact)body.append(container);
         });
       }
       if (def.kind === 'choice') def.items.forEach((item, index) => {
@@ -1438,7 +1470,7 @@
         if(compact)row.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
         const label = node('label', 'ek-writing', compact ? '' : `${itemNumber(item)}. ${item.prompt}`);
-        const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; if(item.placeholder)input.placeholder=item.placeholder; input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
+        const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; placeholderCue(input,item.placeholder); input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
         row.append(label);if(compact)body.append(row); controls.set(item.id, input);
@@ -1560,7 +1592,7 @@
         if(def.kind==='gaps')def.items.forEach(item=>{
           const row=markAttempt(node('li'),itemResult(item));row.setAttribute('value',String(itemNumber(item)));
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
-          else item.segments.forEach(segment=>row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…')));list.append(row);
+          else item.segments.forEach((segment,index)=>{if(def.layout==='table'&&index)row.append(doc.createTextNode(' · '));row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…'));});list.append(row);
         });
         else if(def.kind==='order')pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
         else if(def.kind==='matching'&&def.layout==='picture-word'){

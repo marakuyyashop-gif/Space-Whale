@@ -1,6 +1,6 @@
 # Space Whale — shared template catalog
 
-Catalog updated: 2026-10-03. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
+Catalog updated: 2026-10-17. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
 
 ## Fixed authoring formats across the workspace
 
@@ -13,45 +13,32 @@ All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title 
 - `exercise-theme.css`: typography, shared colors and template-specific shape tokens. Edit here to update every exercise using the shared kit.
 - `exercise-kit.css`: layouts for each reusable kind/layout; no lesson-specific selectors.
 - `exercise-kit.js`: validation, rendering, Check/Reset and the same answers/onChange contract used by Workspace realtime.
-- `template-gallery.js`: synthetic preview definitions only. No renderer copies and no course content.
+- `template-gallery.js`: source-code catalog assembly and legacy test fixtures. The three `template-source-*.js` content files contain source-aligned examples; no renderer copies or course registration.
 - `classroom.html?view=templates`: existing Workspace hosts the previews. Old `template-gallery.html` redirects here.
 
-Privacy is explicitly deferred after discussion with the owner. This preview is PUBLIC, not owner-only. It contains neutral placeholders and technical test tones only. Do not add confidential drafts, private content or admin tools here. Server-authorized Factory storage is a separate future task.
+Privacy is explicitly deferred after discussion with the owner. This preview is PUBLIC, not owner-only. It contains neutral instructional examples and existing approved artwork. Do not add confidential drafts, private content or admin tools here. Server-authorized Factory storage is a separate future task.
 
-## Catalog: three layers, 21 cards
+## Source-code catalog (2026-10-17)
 
-The existing Workspace selectors expose three groups without new pages, CSS, button styles or image sizing changes.
+The existing Workspace `Exercise Templates` menu uses the source families W, P, D, R, E, Q, L, T and S. Selecting a family opens its code list; a small round Back control returns to the family list without changing the mounted exercise. All rows use the same shared sidebar typography, full-width dividers and selected-state treatment. Clicking the exercise area does not close the menu; use its close control, rail toggle or Escape.
 
-| Layer | Cards |
-|---|---|
-| Materials / elements (6) | Audio; Text; Image; Rule; Useful phrases; Possible answers |
-| Response mechanics (9) | Matching; Single Choice; Multiple Select; Typed Input / Gap; Dropdown; Order; Sort; Image Label; Text / Writing field |
-| Composition examples (6) | Listen & Repeat; Audio + task; Text + task; Image + task; Speaking layout; Progressive sequence |
+| Family | Purpose | Templates |
+|---|---|---:|
+| W | Words | 6 |
+| P | Listen & Repeat | 2 |
+| D | Guided Discovery | 4 |
+| R | Rules | 4 |
+| E | Practice | 29 |
+| Q | Questions & Discussion | 2 |
+| L | Listening | 18 |
+| T | Reading | 12 |
+| S | Speaking | 2 |
 
-A title/instruction, feedback/OK and progressive reveal remain shared behavior, not new material types. The catalog is not an exhaustive list of permitted combinations. Combine existing `kind` definitions in a `stage`, or text/image/disclosure blocks in a `presentation`. No Listening+Choice or Reading+Gap renderer kinds are added. Speaking is an ungraded composition, not a separate response engine.
+There are 79 playable source-coded templates. W03 is the parent name for W03A/W03B, not a third exercise. W05 and L13–L18 come from the later dedicated Words/Listening files. The supplied sources contain no E10 or I/A families; do not invent missing codes. `docs/exercise-source-manifest.json` records all 80 code labels, source pages and conflicts resolved using later dedicated instructions. The source files themselves remain unchanged.
 
-`SpaceWhaleTemplates` contains the 21 visible cards with `catalogGroup`, `description` and `legacyIds`. Alternate text/image/word-bank examples live inside the corresponding mechanic's progressive preview. `SpaceWhaleTemplateExamples` retains the former 31 fixtures for regression tests; it is not a second catalog. All 31 old preview links resolve to their canonical card. Existing course IDs, definitions and answer IDs are unchanged; demonstration attempts need not migrate to a different composite structure.
+`template-source-index.js` stores canonical code names. `template-source-core.js`, `template-source-practice.js` and `template-source-input.js` contain preview content only. They use the existing shared kit and existing site artwork; they neither register course lessons nor alter their saved answers. Future formats must first have a confirmed source code and then a definition in the appropriate data file. The index and coverage test must agree.
 
-| Former catalog entries | Destination |
-|---|---|
-| Match the Halves; Picture–Word; Word–Definition | Matching variants |
-| Text / Image Single Choice | Single Choice variants |
-| Text / Image Multiple Select | Multiple Select variants |
-| Typed Gap; Typed Gap + Word Bank; Error Correction | Typed Input / Gap variants |
-| Inline Dropdown | Dropdown |
-| Sentence / Chunk Order; Picture / Event Order | Order variants |
-| Sort into Groups; Image Label; Open Writing | Sort; Image Label; Text / Writing field |
-| Global Audio; Global Audio with transcript | Audio with optional transcript |
-| Rule / Language Reference; Possible Answers | Rule; Possible answers |
-| Speaking / Presentation; Speaking · Use phrases | Speaking layout |
-| Listen & Repeat | Listen & Repeat composition |
-| Four Listening + task presets | Audio + task composition |
-| Reading + Choice; Reading + Gap | Text + task composition |
-| Stage; Guided Discovery | Progressive sequence, including discovery example |
-
-A source and its first response must be visible together. Use a non-progressive grouped stage for a source plus one task; the existing renderer automatically reveals multiple response components progressively while retaining the leading source. Ordinary explicit progressive sequences start with the first task, not a source-only step. A single material/task or a composition without further steps has no continuation arrow. Audio stays mounted while later tasks open and close.
-
-Audio fixtures use a locally generated, three-second test tone. They test real playback, not pronunciation. Replace audio URLs with actual recordings when authoring a lesson.
+`template-gallery.js` assembles the one visible source catalog and redirects old preview IDs to corresponding code cards. The former 31 technical fixtures and 21 neutral previews remain available only for renderer regression coverage; materials/mechanics/compositions are no longer menu categories. Their test tones are not used as language recordings in the source catalog. Source listening and repetition previews with no supplied recording use disabled pending players; do not generate, substitute or mislabel audio.
 
 ## Authoring contract
 
@@ -77,6 +64,8 @@ Common definition: `{ version: 1, id, kind, title, instruction? }`.
 | audio | `audio`, optional `transcript`; listen-repeat uses `items[{id,text,audio,example?,exampleAudio?}]` | no automatic grade |
 | rule-page | ordered text, image, rule or nested exercise blocks | child answers under block ID |
 | stage | `exercises[{id,exercise}]`, `progressive:true/false`, optional `layout:"grouped"` | child answers under block ID, plus `revealed` count |
+
+For a partially completed source table, use `gaps` with `layout:'table'` and `tableColumns` (2–6 headings). Each item is one row; its `segments` contain one text or existing gap object per column. Answer IDs and grading remain flat. Matching cards may opt into `item.audio` or `audioPending:true` for a separate replay control; this uses the existing audio transport.
 
 Typed gaps default to keyboard input. A bank is only a hint and may contain a base form different from the accepted answer. For a dropdown set `inputMode:'select'` and explicit options. Correct keys in the bank do not determine displayed option order.
 
@@ -112,7 +101,7 @@ After a shared change, run `npm ci` once, then `npm test`, then check the change
 - Use `kind:"stage", layout:"grouped"` for a source and its response component (audio/text plus one response component). Set the common title and instruction on the stage; child titles are hidden, optional child instructions remain available. Components keep their own answer state and local Check/Reset. Do not combine grouped layout with explicit progressive reveal. The renderer now automatically separates multiple independent response components into sequential steps, keeping leading source material with the first task and trailing support with the preceding task; answer IDs stay unchanged. Ordinary/progressive stages keep the large separation between independent exercises.
 - Grouped spacing: `--sw-component-gap`; independent exercise spacing: `--sw-stage-gap`.
 - The single `uiLabels.check` value in exercise-kit.js controls the validation button label for every shared exercise, including nested ones. Changing it to Done updates them on the next page load without changing validation behavior or lesson data. Exported as SpaceWhaleExerciseKit.uiLabels for configuration before mounting.
-- Preview audio is still a three-second test tone. Listening composition previews contain neutral content placeholders and no technical answer hints. Optional transcript behavior is available in the Audio material preview.
+- Source-code listening previews use neutral content with pending recordings when no authorized clip is supplied. Transcripts remain closed until their intended review step. Technical legacy fixtures retain their test tone for transport regression only.
 
 ## Approved monochrome direction
 

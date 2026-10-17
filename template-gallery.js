@@ -100,5 +100,36 @@
     preview('sequence-template','Progressive sequence','compositions',stage('sequence','Progressive sequence',[choice('sequence-choice'),gaps('sequence-gap'),byId('rule-page-demo')],true),['progressive-stage-demo','rule-page-demo'],'Первое задание видно сразу. Следующие шаги открываются стрелкой; Guided Discovery — один из примеров.')
   ];
   templates.forEach(definition => kit.validate(definition));
-  window.SpaceWhaleTemplates = templates;
+  // Earlier preview URLs remain resolvable; they are not a second visible catalog.
+  window.SpaceWhaleLegacyTemplates = templates;
+  const sourceTemplates = [
+    ...(window.SpaceWhaleSourceCoreTemplates || []),
+    ...(window.SpaceWhaleSourcePracticeTemplates || []),
+    ...(window.SpaceWhaleSourceInputTemplates || [])
+  ];
+  const oldLinks = {
+    W01:['picture-word-demo'],W03A:['word-definition-demo'],W04:['image-label-demo','image-label-template'],
+    P01:['listen-repeat-demo','repeat-template'],D01:['rule-page-demo','progressive-stage-demo','sequence-template'],
+    R01:['reference-demo','rule-template','possible-answers-demo','answers-template'],R04:['phrases-template'],
+    E01:['choice-demo','image-choice-demo','choice-template'],E02:['multiple-choice-demo','image-multiple-demo','multiple-template'],
+    E03:['inline-demo','dropdown-template'],E04:['bank-demo'],E05:['typed-demo','typed-template'],
+    E06:['matching-demo','matching-template'],E07:['sort-demo','sort-template'],
+    E08:['picture-order-demo'],E09:['order-demo','order-template'],E13:['error-correction-demo'],E14:['writing-demo','writing-template'],
+    L01:['audio-demo','audio-script-demo','audio-template'],L02:['listening-choice-demo','audio-task-template'],
+    L07:['listening-gap-demo'],L14:['listening-sort-demo'],L16:['listening-order-demo'],
+    T01:['reading-demo','text-template'],T02:['reading-choice-demo','text-task-template'],T08:['reading-gap-demo'],
+    S01:['presentation-demo','speaking-language-demo','speaking-template','image-task-template','image-template']
+  };
+  const familyOrder = ['W','P','D','R','E','Q','L','T','S'];
+  sourceTemplates.forEach(definition => {
+    const source = window.SpaceWhaleSourceIndex?.entries.find(entry => entry.code === definition.code && entry.role !== 'parent');
+    if (source) {
+      definition.catalogTitle = source.name;
+      definition.label = `${definition.code} · ${source.name}`;
+    }
+    definition.legacyIds = [...new Set([...(definition.legacyIds || []),...(oldLinks[definition.code] || [])])];
+    kit.validate(definition);
+  });
+  sourceTemplates.sort((a,b) => familyOrder.indexOf(a.catalogFamily)-familyOrder.indexOf(b.catalogFamily) || a.code.localeCompare(b.code,undefined,{numeric:true}));
+  window.SpaceWhaleTemplates = sourceTemplates.length ? sourceTemplates : templates;
 })();

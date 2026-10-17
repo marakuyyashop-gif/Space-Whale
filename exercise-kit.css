@@ -316,6 +316,7 @@
 }
 .exercise-kit .ek-repeat-item[hidden] { display: none; }
 .exercise-kit .ek-repeat-audio audio { display: none; }
+.exercise-kit .ek-card-audio { align-self:flex-start;margin-bottom:12px; }
 .exercise-kit .ek-repeat-play {
   width: calc(28px * var(--sw-control-scale,1));
   height: calc(28px * var(--sw-control-scale,1));
@@ -777,8 +778,7 @@
 .exercise-kit .ek-drag-placeholder{display:block;flex:none;pointer-events:none;border:0;border-radius:18px;background:color-mix(in srgb,var(--sw-neu-muted) 8%,transparent)}
 .exercise-kit.ek-modern .ek-writing-input{display:block;box-sizing:border-box;width:100%;height:calc(48px * var(--sw-control-scale,1));min-height:calc(48px * var(--sw-control-scale,1));padding:calc(10px * var(--sw-control-scale,1)) calc(18px * var(--sw-control-scale,1));border:0;outline:0;border-radius:calc(24px * var(--sw-control-scale,1));background:var(--sw-neu-feedback);box-shadow:var(--sw-neu-inset);font:inherit}
 .exercise-kit.ek-modern .ek-writing-input:focus{background:var(--sw-neu-checked);box-shadow:inset 2px 3px 9px #929ba344}
-.exercise-kit .ek-writing-input::placeholder{color:var(--sw-exercise-muted);opacity:.45}
-.exercise-kit .ek-writing-input:focus::placeholder{color:transparent;opacity:0}
+.exercise-kit .ek-writing-input::placeholder{font:inherit;line-height:inherit;color:var(--sw-exercise-muted);opacity:.45}
 .exercise-kit.ek-modern .ek-image-label-target{width:max-content;min-width:calc(112px * var(--sw-control-scale,1));max-width:45%;height:auto;min-height:calc(36px * var(--sw-control-scale,1));padding:calc(6px * var(--sw-control-scale,1)) calc(14px * var(--sw-control-scale,1));border:0;border-radius:calc(20px * var(--sw-control-scale,1));white-space:nowrap;overflow-wrap:normal;font-size:var(--ek-text-size);line-height:1.5;background:var(--sw-neu-surface);box-shadow:var(--sw-neu-small)}
 .exercise-kit.ek-modern .ek-image-label-bank .ek-token{white-space:nowrap;overflow-wrap:normal}
 .exercise-kit.ek-modern .ek-discovery-field{display:inline-flex;align-items:center;gap:10px;max-width:100%;padding:6px 12px 6px 8px;border-radius:24px;background:var(--sw-neu-feedback);box-shadow:var(--sw-neu-inset)}
@@ -958,7 +958,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern .ek-gap-number{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;min-width:32px;height:20px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ek-muted);font:400 var(--sw-exercise-caption-size)/1 var(--ek-font)}
 .exercise-kit.ek-modern .ek-gap-number::after{content:'';display:inline-grid;place-items:center;flex:none;width:var(--sw-feedback-marker-size);height:var(--sw-feedback-marker-size);border-radius:50%;background:transparent;color:#fff;font:600 calc(var(--sw-exercise-text-size,16px) * .6875)/1 var(--ek-font);visibility:hidden}
 .exercise-kit.ek-modern .ek-gap-number:is([data-result=correct],[data-result=retry])::after{content:var(--ek-feedback-glyph);background:var(--ek-feedback-mark);visibility:visible}
-.exercise-kit.ek-modern .ek-numbered-sentence .ek-gap-number,.exercise-kit.ek-modern .ek-picture-sentence .ek-gap-number{width:var(--sw-feedback-marker-size);min-width:var(--sw-feedback-marker-size);gap:0;font-size:0}
+.exercise-kit.ek-modern .ek-numbered-sentence .ek-gap-number,.exercise-kit.ek-modern .ek-picture-sentence .ek-gap-number,.exercise-kit.ek-modern .ek-gap-table .ek-gap-number{width:var(--sw-feedback-marker-size);min-width:var(--sw-feedback-marker-size);gap:0;font-size:0}
 .exercise-kit.ek-modern .ek-order-number:is([data-result=correct],[data-result=retry])::after{content:var(--ek-feedback-glyph);position:absolute;left:calc(100% + 4px);top:50%;transform:translateY(-50%);display:grid;place-items:center;width:var(--sw-feedback-marker-size);height:var(--sw-feedback-marker-size);border-radius:50%;background:var(--ek-feedback-mark);color:#fff;font:600 calc(var(--sw-exercise-text-size,16px) * .6875)/1 var(--ek-font)}
 .exercise-kit.ek-modern .ek-image-choice-option[data-feedback=correct]:not(:has(input:checked)){outline-style:dashed}
 .exercise-kit.ek-modern .ek-radio>input[data-feedback]{background:var(--ek-feedback-mark);box-shadow:none}
@@ -968,11 +968,20 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit .ek-result-symbol:is([data-result=correct],[data-result=retry]){visibility:visible}
 .exercise-kit .ek-result-symbol:is([data-result=correct],[data-result=retry])::after{content:var(--ek-feedback-glyph)}
 .exercise-kit .ek-picture-correction-card>.ek-attempt-marker{position:absolute;top:8px;right:10px;margin:0}
-/* Empty, focused and typed text use the same 16px / 24px native line box. */
-.exercise-kit.ek-modern .ek-typed-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;max-width:100%;margin:0 3px;padding:6px 10px 6px 8px;border-radius:22px;background:var(--sw-answer-surface);box-shadow:var(--sw-neu-inset);line-height:1.5}
-.exercise-kit.ek-modern.ek-reading-width input.ek-typed-gap{box-sizing:border-box;appearance:none;min-width:0;max-width:100%;margin:0;border:0;outline:none;background:transparent;box-shadow:none;vertical-align:middle;font:400 var(--ek-text-size)/1.5 var(--ek-font);height:2em;min-height:2em;padding:.25em 0;caret-color:var(--ek-ink)}
-.exercise-kit .ek-typed-gap::placeholder{color:var(--sw-exercise-muted);opacity:.45}
-.exercise-kit .ek-typed-gap:focus::placeholder{color:transparent;opacity:0}
+/* Keep decoration outside the native editor: its empty and typed line boxes
+   both have one explicit body-sized line, with no inner padding to clip it. */
+.exercise-kit.ek-modern .ek-typed-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;max-width:100%;margin:0 3px;padding:10px 10px 10px 8px;border-radius:22px;background:var(--sw-answer-surface);box-shadow:var(--sw-neu-inset);line-height:1.5}
+.exercise-kit.ek-modern.ek-reading-width input.ek-typed-gap{box-sizing:border-box;appearance:none;min-width:0;max-width:100%;margin:0;border:0;outline:none;background:transparent;box-shadow:none;vertical-align:middle;font:400 var(--ek-text-size)/calc(var(--ek-text-size) * 1.5) var(--ek-font);height:calc(var(--ek-text-size) * 1.5);min-height:calc(var(--ek-text-size) * 1.5);padding:0;caret-color:var(--ek-ink)}
+.exercise-kit .ek-typed-gap::placeholder{font:inherit;line-height:inherit;color:var(--sw-exercise-muted);opacity:.45}
+/* Opt-in response tables reuse gap controls and the shared answer state. */
+.exercise-kit .ek-gap-table-wrap{width:100%;min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--ek-line);border-radius:var(--ek-radius)}
+.exercise-kit .ek-gap-table{width:100%;border-collapse:separate;border-spacing:0;font:inherit;color:inherit;line-height:1.5}
+.exercise-kit .ek-gap-table :is(th,td){min-width:9ch;padding:12px;text-align:left;vertical-align:middle;border:0;border-bottom:1px solid var(--ek-line)}
+.exercise-kit .ek-gap-table th{font-weight:var(--sw-exercise-emphasis-weight,600);color:var(--sw-exercise-emphasis-ink,var(--ek-ink))}
+.exercise-kit .ek-gap-table :is(th,td)+:is(th,td){border-left:1px solid var(--ek-line)}
+.exercise-kit .ek-gap-table tbody tr:last-child>:is(th,td){border-bottom:0}
+.exercise-kit .ek-gap-table :is(thead th:first-child,.ek-table-row-number){min-width:0;width:2em;color:var(--ek-muted);font-weight:400}
+.exercise-kit .ek-gap-table :is(.ek-typed-wrap,.ek-inline-choice){margin:0}
 /* A promoted task heading uses the same primary title scale as its parent. */
 .exercise-kit .ek-title.ek-primary-title{font-size:var(--sw-exercise-title-size);font-weight:600}
 /* Explicit model semantics, with one grouped source before its questions. */

@@ -20,7 +20,7 @@ function fixture(guest=false,options={}){
  const context={window,document,location,history,localStorage:options.localStorage||storage(),sessionStorage:options.sessionStorage||storage(),navigator:{clipboard:{writeText:async url=>copied.push(url)}},URL,URLSearchParams,console,setTimeout:()=>1,clearTimeout(){},clearInterval(){}};
  if(options.ended)context.sessionStorage.setItem('space-whale:clock:guest:old-token',JSON.stringify({startedAt:1,readyAt:1,ended:true}));
  vm.createContext(context);
- for(const f of ['template-gallery.js','lesson-draft-first-day-school.js','lesson-draft-school-fair.js','course-content.js','whale1-content.js','lesson-structure.js','lesson-teacher-info.js','teacher-copy.js','collaboration-state.js'])vm.runInContext(fs.readFileSync(require.resolve('../'+f),'utf8'),context,{filename:f});
+ for(const f of ['template-source-index.js','template-source-core.js','template-source-input.js','template-source-practice.js','template-gallery.js','lesson-draft-first-day-school.js','lesson-draft-school-fair.js','course-content.js','whale1-content.js','lesson-structure.js','lesson-teacher-info.js','teacher-copy.js','collaboration-state.js'])vm.runInContext(fs.readFileSync(require.resolve('../'+f),'utf8'),context,{filename:f});
  if(options.lessons)window.SpaceWhaleContent.push(...options.lessons);
  vm.runInContext(fs.readFileSync(require.resolve('../workspace.js'),'utf8'),context,{filename:'workspace.js'});
  const click=el=>{assert.ok(el);el.dispatchEvent(new dom.Event('click',{bubbles:true}));};
@@ -242,17 +242,50 @@ test('teacher prepares video before Start and does not navigate away before serv
 });
 
 
-test('template groups remain reachable through the lesson panel in the same Workspace',async()=>{
- const s=fixture();await settled();openPanel(s,'level');s.click(panelOption(s,'Exercise templates'));
- assert.match(s.location.search,/view=templates/);assert.equal(s.document.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');
- for(const [title,count] of [['Материалы / элементы',6],['Механики ответа',9],['Композиции / примеры',6]]){
-   const group=panelOption(s,title);assert.ok(group);
-   chooseLesson(s,group.dataset.lesson);assert.match(s.location.search,/view=templates/);
-   assert.equal(s.document.querySelector('.workspace-lesson-title').textContent,title);
-   assert.equal(s.document.querySelector('#workspaceLessonPath'),null);
-   assert.equal(s.document.querySelectorAll('.workspace-block-stages a').length,count);
-   assert.ok(s.document.querySelector('#workspaceExercise h2'));
-   openPanel(s,'lesson');
+test('direct template catalog entry opens the family list without silently choosing an exercise',()=>{
+ const s=fixture(false,{search:'?view=templates'}),d=s.document;
+ assert.equal(d.querySelector('#workspaceMenuPanel').hidden,false);assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');
+ assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,'Exercise Templates');
+ assert.equal(d.querySelector('#workspaceExercise h1').textContent,'Choose an exercise template.');
+ assert.equal(s.mounts.length,0);assert.equal(new URLSearchParams(s.location.search).has('lesson'),false);assert.equal(new URLSearchParams(s.location.search).has('exercise'),false);
+ assert.equal(d.querySelectorAll('#workspaceTopics .workspace-panel-option[data-template-family]').length,9);
+ const content=d.querySelector('#workspaceExercise').firstElementChild;
+ s.event(d.querySelector('#workspaceExercise'),'pointerdown');assert.equal(d.querySelector('#workspaceMenuPanel').hidden,false);
+ s.event(d,'keydown',{key:'Escape'});assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);
+ openPanel(s,'lesson');assert.equal(d.querySelector('#workspaceMenuPanel').hidden,false);assert.equal(d.querySelector('#workspaceExercise').firstElementChild,content);
+});
+test('coded template families use shared rows and an in-place back control without remounting the exercise',async()=>{
+ const s=fixture();await settled();const d=s.document;
+ openPanel(s,'level');s.click(panelOption(s,'Exercise templates'));
+ assert.match(s.location.search,/view=templates/);assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');
+ assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,'Exercise Templates');
+ assert.equal(d.querySelector('#workspaceExercise h1').textContent,'Choose an exercise template.');assert.equal(new URLSearchParams(s.location.search).has('exercise'),false);
+ assert.equal(d.querySelector('.selector-lesson').textContent,'L');assert.equal(d.querySelector('.selector-lesson').getAttribute('aria-label'),'Exercise Templates');
+ const families=[...d.querySelectorAll('#workspaceTopics .workspace-panel-option[data-lesson]')].map(row=>({id:row.dataset.lesson,family:row.dataset.templateFamily,title:row.querySelector('strong').textContent}));
+ assert.deepEqual(families.map(group=>group.family),['W','P','D','R','E','Q','L','T','S']);
+ assert.equal(new Set(families.map(group=>group.family)).size,families.length);
+ for(const family of families){
+   chooseLesson(s,family.id);assert.match(s.location.search,/view=templates/);
+   assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,family.title);
+   const back=d.querySelector('#workspacePanelHeading .workspace-panel-back[aria-label="Back to Exercise Templates"]');assert.ok(back);
+   assert.equal(back.nextElementSibling,d.querySelector('#workspacePanelHeading h2'));
+   assert.equal(d.querySelector('.workspace-lesson-title'),null);assert.equal(d.querySelector('.workspace-lesson-overview'),null);
+   assert.equal(d.querySelector('#workspaceLessonBlocks'),null);assert.equal(d.querySelector('.workspace-lesson-actions'),null);
+   assert.equal(d.querySelector('#workspaceBlockControls').hidden,true);
+   const rows=[...d.querySelectorAll('#workspaceTopics .workspace-panel-option[data-exercise]')];assert.ok(rows.length);
+   for(const row of rows){assert.match(row.querySelector('strong').textContent,new RegExp('^'+family.family+'\\d{2}[A-Z]?\\b'));assert.ok(row.querySelector('.workspace-option-description'));}
+   const target=rows.at(-1);s.click(target);
+   assert.equal(new URLSearchParams(s.location.search).get('exercise'),target.dataset.exercise);
+   const selected=d.querySelector('#workspaceTopics .workspace-panel-option[aria-current="page"]');assert.ok(selected.classList.contains('is-selected'));
+   assert.equal(selected.dataset.exercise,target.dataset.exercise);
+   const root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search,mountCount=s.mounts.length;
+   s.click(d.querySelector('.workspace-panel-back'));
+   assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,'Exercise Templates');
+   assert.equal(d.querySelector('.workspace-panel-back'),null);assert.equal(d.querySelectorAll('#workspaceTopics .workspace-panel-option[data-lesson]').length,families.length);
+   assert.equal(root.firstElementChild,exercise);assert.equal(s.location.search,search);assert.equal(s.mounts.length,mountCount);
+   chooseLesson(s,family.id);const current=d.querySelector('#workspaceExercise').firstElementChild;
+   openPanel(s,'lesson');assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'lesson');
+   assert.equal(d.querySelector('#workspacePanelHeading h2').textContent,'Exercise Templates');assert.equal(d.querySelector('#workspaceExercise').firstElementChild,current);
  }
 });
 test('vertical rail keeps account, course, lesson and timer sections separate',()=>{
@@ -296,11 +329,14 @@ test('hover and keyboard focus show a label without opening a panel or changing 
  assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);assert.equal(root.firstElementChild,exercise);
  s.event(words,'focusout');assert.equal(tooltip.hidden,true);assert.equal(words.hasAttribute('aria-describedby'),false);
 });
-test('close button, Escape and outside click collapse the panel without remounting the exercise',()=>{
+test('menu stays open during exercise interaction and closes only through explicit controls or Escape',()=>{
  const s=fixture(),d=s.document,root=d.querySelector('#workspaceExercise'),exercise=root.firstElementChild,search=s.location.search;
  openPanel(s,'lesson');s.click(d.querySelector('#workspaceMenuClose'));assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);
  openPanel(s,'level');s.event(d,'keydown',{key:'Escape'});assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);
- openPanel(s,'module');s.event(root,'pointerdown');assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);
+ openPanel(s,'module');s.event(root,'pointerdown');s.click(root);
+ assert.equal(d.querySelector('#workspaceMenuPanel').hidden,false);assert.equal(d.querySelector('#workspaceMenuPanel').dataset.panel,'modules');
+ assert.equal(d.querySelector('.reference-app').classList.contains('workspace-menu-open'),true);
+ openPanel(s,'module');assert.equal(d.querySelector('#workspaceMenuPanel').hidden,true);
  assert.equal(s.location.search,search);assert.equal(root.firstElementChild,exercise);assert.equal(d.querySelector('.reference-app').classList.contains('workspace-menu-open'),false);
 });
 test('rail navigation and reload retain existing saved answers and stable exercise IDs',()=>{
