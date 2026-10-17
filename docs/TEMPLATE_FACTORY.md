@@ -118,7 +118,7 @@ The shared native system family comes from typography.css; 16px body, 20px prima
 
 ## Feedback contract (2026-09-26)
 
-- Closed tasks retain correct/retry indicators after OK. When an attempted task has an incorrect or unanswered item, its corrections section includes all keyed items in their original order and numbering, including items already answered correctly. This applies to matching, picture tasks, choices, gaps, sort and keyed writing. Legacy `feedback.showAnswers:false` does not suppress these essential corrections in the modern workspace. Two-option choices and dropdowns also reveal corrections. Gap corrections show complete sentences with muted context and restrained answer emphasis.
+- Closed tasks retain correct/retry indicators after OK. When an attempted task has an incorrect or unanswered item, text corrections include all keyed items in their original order and numbering, including items already answered correctly. Picture correction carousels are the exception: show only incorrect or unanswered pictures with their original numbers. This applies to the common Picture–Word Matching and keyed picture-Writing correction helper. Legacy `feedback.showAnswers:false` does not suppress these essential corrections in the modern workspace. Two-option choices and dropdowns also reveal corrections. Gap corrections show complete sentences with muted context and restrained answer emphasis.
 - Free writing and unkeyed gaps require teacher review; no AI grammar or semantic grading is connected. Writing confirms completed input with `Well done` without showing examples. Personal data can vary.
 - OK remains available after checking. Changing a response clears old feedback; reset clears both answers and feedback.
 
@@ -173,10 +173,16 @@ Phone matching grids keep two columns for picture-word and text/translation card
 
 Grammar highlights and correction answers use the surrounding family, type size and line height, with clear charcoal semibold emphasis. The single native family is defined in `typography.css`, with no third-party web-font requests. Rule examples keep a consistent paragraph rhythm. Shared composition rendering omits redundant generic instructions when the visible task heading already states the same action; specific instructions and context remain.
 
-Corrections contain all keyed source rows or picture cards, in their authored order and numbering, whenever any keyed item needs correction. Already-correct answers remain visible in that section. Open writing continues to show neutral completion without invented model answers or grading.
+Text corrections contain all keyed source rows in their authored order and numbering whenever any keyed item needs correction. Already-correct text answers remain visible. Picture correction carousels show only noncorrect source items, preserving original numbers instead of renumbering the filtered cards. Open writing continues to show neutral completion without invented model answers or grading.
 
 ## Actual-template refinement (2026-10-15)
 
-Refine the existing shared kit and Templates catalog directly. Do not create standalone design samples or alternate classroom scenes. Checked fields and chips keep white surfaces, thin result-colored outlines and compact circular check/cross markers. Remove obsolete dotted fills and competing result palettes. Corrections have one barely shaded rounded panel, readable body-sized text, unchanged source numbering and all keyed rows, including correct attempts. Each row/card carries the outcome of the learner's last checked attempt; the displayed canonical answer is not itself labeled as an incorrect answer.
+Refine the existing shared kit and Templates catalog directly. Do not create standalone design samples or alternate classroom scenes. Checked fields and chips keep white surfaces, thin result-colored outlines and compact circular check/cross markers. Remove obsolete dotted fills and competing result palettes. Corrections have one barely shaded rounded panel, readable body-sized text and unchanged source numbering. Text lists include correct attempts; picture carousels show only noncorrect pictures. Each row/card carries the outcome of the learner's last checked attempt; the displayed canonical answer is not itself labeled as an incorrect answer.
 
 Use one primary task heading. Explicit `presentation.blocks[].role: "examples"` groups model paragraphs with tighter internal spacing and larger separation from the title and subsequent questions; keep source text and exercise IDs unchanged. Other text blocks and dialogues retain their paragraph structure.
+
+## Compact Picture–Word trial (2026-10-17)
+
+Refine the shared picture-word layout, not individual W01 definitions. Keep three desktop columns and two phone columns, with smaller cards and a near-square contained illustration area. The selection field is flat #F7F7F8 with a quiet plus and a thin dashed border; checked borders use the shared correct/incorrect tokens. Other matching selectors keep their approved treatment until this trial is accepted. Small source-number circles and shared feedback symbols use centered geometry.
+
+Picture–Word dialogs use the same preferred width and media-frame height for differently proportioned pictures; artwork remains contained and the frame shrinks for short viewports. Picture corrections contain only noncorrect items and retain original source numbers; size them compactly without shrinking the separate picture-cue strips used by response exercises. No course/media/answer-ID changes are required.

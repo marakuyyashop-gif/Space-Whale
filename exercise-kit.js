@@ -613,6 +613,10 @@
       if(['gaps','choice','writing'].includes(def.kind))image.classList.add('ek-task-image');
       return image;
     };
+    const croppedArtFrame = (item,picture,className) => {
+      const frame=node('div',className),ratio=(item.imageWidth>0&&item.imageHeight>0?item.imageWidth/item.imageHeight:4/3)*item.crop.w/item.crop.h;
+      picture.style.setProperty('--ek-crop-art-ratio',String(ratio));frame.append(picture);return frame;
+    };
     const formatTime = value => {
       const seconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
       return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -848,9 +852,10 @@
       if (item.image || item.imagePending) {
         const picture=illustration(item),pictureDialog=dialog;
         pictureDialog.classList.add('ek-image-dialog');
+        if(pictureOnly)pictureDialog.classList.add('ek-picture-word-dialog');
         const fitPicture=(width,height)=>{
           const ratio=width>0&&height>0 ? width/height*(item.crop?item.crop.w/item.crop.h:1) : 4/5;
-          pictureDialog.style.setProperty('--ek-picture-dialog-width',Math.min(440,320*ratio+40)+'px');
+          if(!pictureOnly)pictureDialog.style.setProperty('--ek-picture-dialog-width',Math.min(440,320*ratio+40)+'px');
           pictureDialog.style.setProperty('--ek-dialog-image-ratio',String(ratio));
           if(pictureDialog.open)fitDialog();
         };
@@ -860,7 +865,8 @@
           picture.addEventListener('load',fitLoaded,{once:true});
           if(picture.complete&&picture.naturalWidth)fitLoaded();
         }
-        prompt.prepend(picture);
+        if(pictureOnly){const frame=node('div','ek-dialog-picture-frame');frame.append(picture);prompt.prepend(frame);}
+        else prompt.prepend(picture);
       }
       dialog.append(prompt);
       const choices = node('div', 'ek-options');
@@ -888,12 +894,31 @@
         const picture=prompt.querySelector('.ek-image');
         if(picture){
           const ratio=Number(currentDialog.style.getPropertyValue('--ek-dialog-image-ratio'))||.8;
-          if(pictureOnly)prompt.style.width='100%';
-          picture.style.width='100%';
-          const budget=()=>limit-(currentDialog.scrollHeight-picture.getBoundingClientRect().height)-2;
-          if(budget()<100){currentDialog.classList.add('ek-dialog-compact');}
-          const room=budget(),width=prompt.getBoundingClientRect().width;
-          if(Number.isFinite(room)&&width>0){picture.style.width=Math.min(width,Math.max(24,room)*ratio)+'px';if(pictureOnly)prompt.style.width=picture.style.width;}
+          const frame=prompt.querySelector('.ek-dialog-picture-frame');
+          if(frame){
+            prompt.style.width='100%';
+            const preferred=parseFloat(view?.getComputedStyle?.(currentDialog)?.getPropertyValue('--sw-picture-word-dialog-height'))||280;
+            const resizePicture=height=>{
+              const fitted=Math.max(0,height);currentDialog.style.setProperty('--ek-picture-dialog-height',fitted+'px');frame.style.height=fitted+'px';
+              picture.style.width='100%';picture.style.height='100%';
+              // A percentage background crop must retain its own aspect ratio;
+              // only the surrounding frame has the common dialog dimensions.
+              if(picture.classList.contains('ek-crop-image')){
+                const width=frame.getBoundingClientRect().width||prompt.getBoundingClientRect().width;
+                if(width>0){const artWidth=Math.min(width,fitted*ratio);picture.style.width=artWidth+'px';picture.style.height=artWidth/ratio+'px';}
+              }
+            };
+            resizePicture(preferred);
+            const budget=()=>limit-(currentDialog.scrollHeight-frame.getBoundingClientRect().height)-2;
+            if(budget()<100)currentDialog.classList.add('ek-dialog-compact');
+            const room=budget();if(Number.isFinite(room))resizePicture(Math.min(preferred,Math.max(0,room)));
+          }else{
+            picture.style.width='100%';
+            const budget=()=>limit-(currentDialog.scrollHeight-picture.getBoundingClientRect().height)-2;
+            if(budget()<100)currentDialog.classList.add('ek-dialog-compact');
+            const room=budget(),width=prompt.getBoundingClientRect().width;
+            if(Number.isFinite(room)&&width>0)picture.style.width=Math.min(width,Math.max(24,room)*ratio)+'px';
+          }
         }
         const box=currentDialog.getBoundingClientRect();
         currentDialog.style.left=((viewport?.offsetLeft||0)+(w-box.width)/2)+'px';
@@ -1247,7 +1272,10 @@
           const card = node('article', pictureWord ? 'ek-card ek-picture-word-card' : 'ek-card');
           const number = node('span', pictureWord ? 'ek-number ek-picture-number' : 'ek-number', String(itemNumber(item)));
           card.append(number);
-          if (item.image || item.imagePending) card.append(illustration(item));
+          if (item.image || item.imagePending) {
+            const picture=illustration(item);
+            card.append(pictureWord&&item.crop?croppedArtFrame(item,picture,'ek-picture-word-crop-frame'):picture);
+          }
           if (!pictureWord) card.append(node('p', 'ek-card-label', item.text));
           if (item.audio || item.audioPending) {
             const replay=repeatAudioButton(item.audio,item.text,item.id);
@@ -1555,12 +1583,12 @@
       const carousel=node('div','ek-picture-corrections'),track=node('div','ek-picture-correction-track');
       track.setAttribute('aria-label','Correct picture matches');track.tabIndex=0;
       items.forEach(item=>{
-        const answer=labelFor(item);if(!answer)return;
+        const result=itemResult(item),answer=labelFor(item);if(result==='correct'||!answer)return;
         const card=node('article','ek-picture-correction-card');
-        markAttempt(card,itemResult(item));
+        markAttempt(card,result);
         card.setAttribute('data-answer-number',String(itemNumber(item)));
         card.setAttribute('aria-label','Answer '+itemNumber(item));
-        if(item.image||item.imagePending)card.append(illustration(item));
+        if(item.image||item.imagePending){const picture=illustration(item);card.append(item.crop?croppedArtFrame(item,picture,'ek-picture-correction-crop-frame'):picture);}
         else if(item.prompt||item.text)card.append(node('span','ek-muted',item.prompt||item.text));
         card.append(node('strong','',answer));track.append(card);
       });
@@ -1578,8 +1606,8 @@
       });
       markOrderTokens();markChoiceOptions();
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
-      // One mistake opens the complete authored key, keeping correct responses
-      // in their original positions. Saved answers and grading are untouched.
+      // Text answers keep the full authored key; picture corrections focus on
+      // mistakes while retaining source numbers. Grading and saved answers stay intact.
       const attempted=Object.values(feedback).some(value=>value!=='empty');
       const corrections=attempted&&Object.values(feedback).some(value=>value==='retry'||value==='empty');
       const examples=[];

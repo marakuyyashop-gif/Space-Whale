@@ -362,14 +362,15 @@ test('sentence feedback marks individual positions, handles accepted orders and 
  assert.equal(alternative.host.querySelectorAll('.ek-order-target>.ek-token[data-feedback=correct]').length,5);
 });
 
-test('picture writing corrections keep correct and incorrect picture-word cards without exposing open-response samples',()=>{
+test('picture writing corrections omit correct pictures without exposing open-response samples',()=>{
  const def={version:1,id:'picture-recall',kind:'writing',title:'Write the words.',responseMode:'accepted',items:[
   {id:'cap',prompt:'Picture 1',image:'cap.webp',alt:'Picture 1',acceptedAnswers:['cap','a cap']},
   {id:'belt',prompt:'Picture 2',image:'belt.webp',alt:'Picture 2',acceptedAnswers:['belt','a belt']}]};
  const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
  s.mount.setAnswers({cap:'hat',belt:'a belt',__sw_checked:true});
  const cards=s.host.querySelectorAll('.ek-picture-corrections .ek-picture-correction-card');
- assert.equal(cards.length,2);assert.equal(cards[0].querySelector('img').src,'cap.webp');assert.equal(cards[0].querySelector('strong').textContent,'cap');assert.equal(cards[1].querySelector('strong').textContent,'belt');
+ assert.equal(cards.length,1);assert.equal(cards[0].querySelector('img').src,'cap.webp');assert.equal(cards[0].querySelector('strong').textContent,'cap');
+ assert.equal(cards[0].dataset.result,'retry');assert.equal(cards[0].querySelector('.ek-attempt-marker').textContent,'×');
  assert.ok(s.button('Next correct pictures'));s.click('Reset exercise');assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
 });
 
@@ -769,23 +770,64 @@ test('learner audio controls stay locked after metadata while response controls 
  assert.equal(Boolean(teacher.host.querySelector('.ek-audio-play').disabled),false);
  pupil.mount.destroy();teacher.mount.destroy();
 });
-test('picture dialog shrinks artwork to leave every answer row inside a short phone viewport',()=>{
- const s=setup({version:1,id:'compact-picture',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'coat',text:'Picture 1',image:'coat.webp',imageWidth:800,imageHeight:1000,alt:'Coat',correctId:'coat'}],options:[{id:'coat',text:'coat'}]});
- s.window.visualViewport={width:390,height:500,offsetLeft:0,offsetTop:0,addEventListener(){},removeEventListener(){}};
+test('picture-word dialogs keep a common frame and shrink its height before answer content on small viewports',()=>{
+ const words=['coat','skirt','hat'],items=words.map((word,i)=>({id:word,text:'Picture '+(i+1),image:word+'.webp',imageWidth:[800,300,1000][i],imageHeight:[1000,1200,500][i],alt:word,correctId:word}));
+ const s=setup({version:1,id:'compact-picture',kind:'matching',layout:'picture-word',title:'Match the pictures with the words.',items,options:words.map(word=>({id:word,text:word}))});
+ const listeners=new Map(),viewport={width:390,height:500,offsetLeft:0,offsetTop:0,addEventListener(type,fn){listeners.set(type,fn);},removeEventListener(type,fn){if(listeners.get(type)===fn)listeners.delete(type);}};s.window.visualViewport=viewport;
  const create=s.document.createElement.bind(s.document);
  s.document.createElement=tag=>{
    const el=create(tag);
-   if(tag==='img')el.getBoundingClientRect=()=>({height:el.style.width==='100%'?320:(parseFloat(el.style.width)||256)/.8});
-   if(tag==='div')el.getBoundingClientRect=()=>({width:256});
+   if(tag==='div')el.getBoundingClientRect=()=>({width:Math.min(360,viewport.width-32)-40,height:parseFloat(el.style.height)||0});
    if(tag==='dialog'){
-     Object.defineProperty(el,'scrollHeight',{get:()=>240+(el.querySelector('img')?.getBoundingClientRect().height||0)});
-     el.getBoundingClientRect=()=>({width:296,height:el.scrollHeight});
+     // Emulate measured title/options/padding separately from artwork; the
+     // fitter must reserve this content rather than shrinking the whole dialog.
+     Object.defineProperty(el,'scrollHeight',{get:()=>240+(parseFloat(el.querySelector('.ek-dialog-picture-frame')?.style.height)||0)});
+     el.getBoundingClientRect=()=>({width:Math.min(360,viewport.width-32),height:el.scrollHeight});
    }
    return el;
  };
- s.fire(s.host.querySelector('.ek-match-slot'),'click');
- const dialog=s.host.querySelector('dialog');assert.equal(dialog.style.maxHeight,'476px');assert.ok(dialog.scrollHeight<=476);assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'187.20000000000002px');
- s.mount.destroy();
+ for(const [width,height] of [[1280,900],[390,500],[320,568],[844,320]]){
+   Object.assign(viewport,{width,height});
+   const shapes=[];
+   for(const slot of s.host.querySelectorAll('.ek-match-slot')){
+     s.fire(slot,'click');const dialog=s.host.querySelector('dialog'),frame=dialog.querySelector('.ek-dialog-picture-frame'),image=frame.querySelector('img');
+     assert.ok(dialog.classList.contains('ek-picture-word-dialog'));assert.equal(dialog.style.maxHeight,(height-24)+'px');assert.equal(dialog.style.maxWidth,(width-24)+'px');
+     assert.ok(dialog.scrollHeight<=height-24,'all answer content remains inside the visible height');assert.ok(parseFloat(frame.style.height)<=280);assert.ok(parseFloat(frame.style.height)>0);
+     assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'100%');assert.equal(image.style.width,'100%');assert.equal(image.style.height,'100%');
+     assert.ok(!dialog.style.getPropertyValue('--ek-picture-dialog-width'),'artwork proportions do not set outer width');
+     shapes.push([dialog.getBoundingClientRect().width,frame.style.height]);
+     image.naturalWidth=50;image.naturalHeight=900;s.fire(image,'load');assert.equal(frame.style.height,shapes.at(-1)[1],'loading narrow art keeps the same frame');
+     s.fire(dialog.querySelector('.ek-close'),'click');assert.equal(listeners.size,0);
+   }
+   assert.deepEqual(shapes,[shapes[0],shapes[0],shapes[0]],'coat, skirt and hat use the same dialog dimensions');
+ }
+ s.fire(s.host.querySelector('.ek-match-slot'),'click');const frame=s.host.querySelector('.ek-dialog-picture-frame'),shortHeight=parseFloat(frame.style.height);
+ Object.assign(viewport,{height:800,offsetLeft:15,offsetTop:20});listeners.get('resize')();assert.equal(frame.style.height,'280px');assert.ok(parseFloat(frame.style.height)>shortHeight);
+ assert.equal(s.host.querySelector('dialog').style.left,'257px');s.mount.destroy();
+});
+
+test('a picture-word crop fits inside the common dialog frame without changing its shape',()=>{
+ const s=setup({version:1,id:'cropped-picture',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'hat',text:'Picture 1',image:'clothes.webp',imageWidth:1200,imageHeight:900,crop:{x:10,y:20,w:60,h:20},alt:'Hat',correctId:'hat'}],options:[{id:'hat',text:'hat'}]});
+ const create=s.document.createElement.bind(s.document);s.document.createElement=tag=>{const el=create(tag);if(tag==='div')el.getBoundingClientRect=()=>({width:320,height:parseFloat(el.style.height)||0});if(tag==='dialog'){Object.defineProperty(el,'scrollHeight',{get:()=>180+(parseFloat(el.querySelector('.ek-dialog-picture-frame')?.style.height)||0)});el.getBoundingClientRect=()=>({width:360,height:el.scrollHeight});}return el;};
+ s.fire(s.host.querySelector('.ek-match-slot'),'click');const dialog=s.host.querySelector('dialog'),frame=dialog.querySelector('.ek-dialog-picture-frame'),crop=frame.querySelector('.ek-crop-image');
+ assert.equal(frame.style.height,'280px');assert.equal(crop.style.width,'320px');assert.equal(crop.style.height,'80px');assert.ok(!dialog.style.getPropertyValue('--ek-picture-dialog-width'));
+ assert.match(crop.style.backgroundImage,/clothes.webp/);s.mount.destroy();
+});
+
+test('only cropped picture-word artwork uses a containing card frame with its original art ratio',()=>{
+ const s=setup({version:1,id:'crop-card-fit',kind:'matching',layout:'picture-word',title:'Match.',items:[
+  {id:'wide',text:'Picture 1',image:'clothes.webp',imageWidth:1200,imageHeight:900,crop:{x:10,y:20,w:60,h:20},alt:'Hat',correctId:'hat'},
+  {id:'fallback',text:'Picture 2',image:'clothes.webp',crop:{x:10,y:20,w:20,h:40},alt:'Coat',correctId:'coat'},
+  {id:'normal',text:'Picture 3',image:'skirt.webp',imageWidth:300,imageHeight:1200,alt:'Skirt',correctId:'skirt'}],options:['hat','coat','skirt'].map(word=>({id:word,text:word}))});
+ const cards=[...s.host.querySelectorAll('.ek-picture-word-card')],crops=[...s.host.querySelectorAll('.ek-picture-word-crop-frame>.ek-crop-image')];
+ assert.equal(crops.length,2);assert.equal(crops[0].style.getPropertyValue('--ek-crop-art-ratio'),'4');assert.equal(crops[1].style.getPropertyValue('--ek-crop-art-ratio'),String(2/3));
+ assert.equal(cards[2].querySelector('.ek-picture-word-crop-frame'),null);assert.equal(cards[2].querySelector('img').getAttribute('width'),'300');
+ assert.equal(crops[0].style.backgroundSize,'166.66666666666666% 500%');assert.match(crops[0].style.backgroundImage,/clothes.webp/);
+ assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);
+ const saved={wide:'hat',fallback:'hat',normal:'skirt',__sw_checked:true};s.mount.setAnswers(saved);s.click('OK');
+ const corrections=[...s.host.querySelectorAll('.ek-picture-corrections .ek-picture-correction-card')];assert.equal(corrections.length,1);assert.equal(corrections[0].getAttribute('data-answer-number'),'2');
+ const correctedCrop=corrections[0].querySelector('.ek-picture-correction-crop-frame>.ek-crop-image');assert.ok(correctedCrop);assert.equal(correctedCrop.style.getPropertyValue('--ek-crop-art-ratio'),String(2/3));
+ assert.equal(correctedCrop.style.backgroundSize,crops[1].style.backgroundSize);assert.deepEqual(s.mount.getAnswers(),saved);s.mount.destroy();
 });
 
 test('local and shared feedback reveal the following arrow with a comfortable bottom gap',()=>{
@@ -856,16 +898,24 @@ test('one mistaken closed response shows all four original answers without chang
  }
 });
 
-test('picture corrections keep all original cards after one correct match and retain navigation and answer state',()=>{
+test('picture corrections omit correct matches and retain original numbers, navigation and answer state',()=>{
  const words=['coat','hat','belt','scarf'];
  const s=setup({version:1,id:'all-picture-answers',kind:'matching',layout:'picture-word',title:'Match.',
   items:words.map((word,i)=>({id:'i'+i,text:'Picture '+(i+1),image:word+'.webp',alt:word,correctId:word})),options:words.map(word=>({id:word,text:word}))},{syncChecks:true});
  const saved={i0:'coat',i1:'belt',i2:'scarf',i3:'hat',__sw_checked:true};s.mount.setAnswers(saved);
  const cards=[...s.host.querySelectorAll('.ek-picture-correction-card')];
- assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),words);
- assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','2','3','4']);assert.deepEqual(cards.map(card=>card.dataset.result),['correct','retry','retry','retry']);
- assert.deepEqual(cards.map(card=>card.querySelector('img').src),words.map(word=>word+'.webp'));
+ assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),words.slice(1));
+ assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['2','3','4']);assert.deepEqual(cards.map(card=>card.dataset.result),['retry','retry','retry']);
+ assert.deepEqual(cards.map(card=>card.querySelector('.ek-attempt-marker').textContent),['×','×','×']);
+ assert.deepEqual(cards.map(card=>card.querySelector('img').src),words.slice(1).map(word=>word+'.webp'));
  assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,0);assert.ok(s.button('Next correct pictures'));
+ s.mount.setAnswers({i0:'coat',i1:'belt',__sw_checked:true});
+ const remaining=[...s.host.querySelectorAll('.ek-picture-correction-card')];
+ assert.deepEqual(remaining.map(card=>card.getAttribute('data-answer-number')),['2','3','4']);
+ assert.deepEqual(remaining.map(card=>card.dataset.result),['retry','empty','empty']);
+ assert.deepEqual(remaining.map(card=>card.querySelector('.ek-attempt-marker').textContent),['×','–','–']);
+ assert.equal(s.host.querySelectorAll('.ek-picture-correction-card[data-result="correct"]').length,0);
+ s.mount.setAnswers({...Object.fromEntries(words.map((word,i)=>['i'+i,word])),__sw_checked:true});assert.equal(s.host.querySelector('.ek-picture-corrections'),null);
 });
 
 test('a mixed picture and text writing key keeps original order and skips unkeyed prompts without renumbering',()=>{
@@ -874,11 +924,11 @@ test('a mixed picture and text writing key keeps original order and skips unkeye
   {id:'two',prompt:'Tell me your own idea.',possibleAnswers:['My personal idea']},
   {id:'three',prompt:'Third',acceptedAnswers:['belt']},
   {id:'four',prompt:'Fourth',acceptedAnswers:['scarf'],image:'scarf.webp',alt:'Scarf'}]};
- const s=setup(def,{syncChecks:true});s.mount.setAnswers({one:'coat',two:'Something personal',three:'hat',four:'scarf',__sw_checked:true});
+ const s=setup(def,{syncChecks:true});s.mount.setAnswers({one:'coat',two:'Something personal',three:'hat',four:'wrong',__sw_checked:true});
  const cards=[...s.host.querySelectorAll('.ek-picture-correction-card')];
- assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),['coat','belt','scarf']);
- assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['1','3','4']);
- assert.equal(cards[1].querySelector('img'),null);assert.match(cards[1].textContent,/Third/);
+ assert.deepEqual(cards.map(card=>card.querySelector('strong').textContent),['belt','scarf']);
+ assert.deepEqual(cards.map(card=>card.getAttribute('data-answer-number')),['3','4']);
+ assert.equal(cards[0].querySelector('img'),null);assert.match(cards[0].textContent,/Third/);
  assert.doesNotMatch(s.host.querySelector('.ek-results').textContent,/My personal idea|Something personal/);
 });
 
