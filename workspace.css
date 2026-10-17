@@ -7,7 +7,9 @@ body.unified-workspace[data-theme=dark]{--workspace-menu-ink:#eee;--workspace-me
 .unified-workspace .class-area{height:100dvh;min-width:0;width:auto;overflow:hidden}
 .unified-workspace .class-content{inset:0}
 .unified-workspace .lesson-scroll{padding:92px 44px 80px!important}
-.unified-workspace :is(.class-content,.lesson-scroll,#workspaceExercise){box-sizing:border-box;min-width:0;max-width:100%}
+.unified-workspace :is(.class-content,.lesson-scroll){box-sizing:border-box;min-width:0;max-width:100%}
+/* Center the bounded lesson column, not each of its smaller content blocks. */
+.unified-workspace #workspaceExercise{box-sizing:border-box;width:100%;min-width:0;max-width:var(--learning-column-width,704px);margin-inline:auto;text-align:left}
 
 .unified-workspace :is(.workspace-stage){background:var(--sw-neu-bg);color:var(--sw-neu-ink)}
 
@@ -144,7 +146,6 @@ body.unified-workspace,[data-theme=dark].unified-workspace{--sidebar-accent:#718
 .unified-workspace[data-workspace-role=student] .reference-app{height:100dvh}
 .unified-workspace[data-workspace-role=student] .lesson-scroll{padding:72px 16px max(32px,env(safe-area-inset-bottom))!important;scroll-padding-bottom:32px}
 
-.unified-workspace[data-workspace-role=student] #workspaceExercise{min-width:0;max-width:100%}
 }
 
 .workspace-session-tools:has(.workspace-notice:not(:empty)){display:block!important;flex:none}

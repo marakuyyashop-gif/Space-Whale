@@ -927,29 +927,29 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern .ek-match-answer-number:is([data-result=correct],[data-result=retry],[data-result=empty]){border-radius:50%;background:var(--ek-feedback-mark) var(--ek-feedback-icon) center/100% 100% no-repeat}
 .exercise-kit.ek-modern .ek-match-answer-number:is([data-result=correct],[data-result=retry],[data-result=empty])>.ek-number-label{visibility:hidden}
 .exercise-kit.ek-modern .ek-match-answer-number[data-result=empty]{background:var(--sw-feedback-incorrect-mark) var(--sw-feedback-cross-icon) center/100% 100% no-repeat}
-/* Definition cards keep up to two tracks, with the larger share for the meaning. */
-.exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid){--ek-grid-min:220px;width:100%;max-width:676px;margin-left:0;margin-right:auto;grid-template-columns:repeat(auto-fill,minmax(min(100%,max(var(--ek-grid-min),calc((100% - var(--ek-grid-gap))/2))),1fr));grid-auto-rows:1fr}
-.exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid)>.ek-card.ek-vocabulary-card{display:grid;grid-template-columns:minmax(min-content,.7fr) minmax(0,1.7fr);align-items:center;gap:8px;min-height:88px;height:100%;aspect-ratio:auto;padding:16px;border-radius:28px}
+/* Wrap whole text cards before squeezing words. Keep the same desktop column bases;
+   intrinsic minimums protect text, and a partial last row does not stretch. */
+.exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid){--ek-grid-min:220px;--ek-vocabulary-card-basis:calc((100% - var(--ek-grid-gap))/2);display:flex;flex-wrap:wrap;width:100%;max-width:676px;margin-left:0;margin-right:auto}
+.exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid)>.ek-card.ek-vocabulary-card{display:grid;flex:0 1 max(var(--ek-grid-min),var(--ek-vocabulary-card-basis));min-width:auto;max-width:100%;grid-template-columns:minmax(min-content,.7fr) minmax(min-content,1.7fr);align-items:center;gap:8px;min-height:88px;height:auto;aspect-ratio:auto;padding:16px;border-radius:28px}
 .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-number{position:absolute;top:12px;left:16px;margin:0}
 .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-label{grid-column:1;grid-row:1;min-width:0;margin:0;line-height:1.5;overflow-wrap:normal;word-break:normal;hyphens:none}
-.exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot{grid-column:2;grid-row:1;align-self:stretch;display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;min-height:56px;margin:0;padding:9px 12px;text-align:left}
-.exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:14px auto;align-content:center;justify-items:start;row-gap:6px;min-height:104px}
+.exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot{grid-column:2;grid-row:1;align-self:stretch;display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;min-width:auto;min-height:56px;margin:0;padding:9px 12px;text-align:left;overflow-wrap:break-word;word-break:normal;hyphens:none}
+.exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{display:grid;grid-template-columns:minmax(min-content,1fr);grid-template-rows:14px auto;align-content:center;justify-items:start;row-gap:6px;min-height:104px}
 .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-audio{grid-column:2;grid-row:2;margin:0}
-.exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid{--ek-grid-min:148px;grid-template-columns:repeat(auto-fill,minmax(min(100%,max(var(--ek-grid-min),calc((100% - var(--ek-grid-gap) - var(--ek-grid-gap))/3))),1fr))}
-.exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card{grid-template-columns:14px minmax(0,1fr);align-content:start}
+.exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid{--ek-grid-min:148px;--ek-vocabulary-card-basis:calc((100% - var(--ek-grid-gap) - var(--ek-grid-gap))/3)}
+.exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card{grid-template-columns:14px minmax(min-content,1fr);align-content:start}
 .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card>.ek-number{position:static;grid-column:1;grid-row:1;align-self:center}
 .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card>.ek-card-label{grid-column:2;grid-row:1}
 .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card>.ek-vocabulary-slot{grid-column:1/-1;grid-row:2}
 .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid>.ek-card.ek-vocabulary-card>.ek-card-audio{grid-column:1/-1;grid-row:3}
-.exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot>.ek-match-answer-label{flex:1;min-width:0;text-align:left}
+.exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot>.ek-match-answer-label{flex:1;min-width:0;text-align:left;overflow-wrap:break-word;word-break:normal;hyphens:none}
 .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot>.ek-match-answer-number{position:static;inset:auto;transform:none;flex:none;align-self:center}
 .exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot>.ek-match-answer-number{grid-column:1;grid-row:1}
 .exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot>.ek-match-answer-label{grid-column:1;grid-row:2;width:100%}
 .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot>.ek-match-answer-number[data-number=""]:not([data-result]){display:none}
-.exercise-kit.ek-modern .ek-card.ek-word-translation-card>.ek-vocabulary-slot>.ek-match-answer-label{overflow-wrap:anywhere;word-break:normal;hyphens:auto}
 /* Only correction cards shrink; numbered picture-cue strips keep their own dimensions. */
 .exercise-kit .ek-picture-corrections .ek-picture-correction-card{flex-basis:var(--sw-picture-correction-size,128px);border-radius:18px}
-.exercise-kit .ek-picture-corrections .ek-picture-correction-card>.ek-image{height:var(--sw-picture-correction-height,100px);padding:8px;box-sizing:border-box}
+.exercise-kit .ek-picture-corrections .ek-picture-correction-card>.ek-image{height:var(--sw-picture-correction-height,100px);min-height:0;padding:8px;box-sizing:border-box}
 .exercise-kit .ek-picture-corrections .ek-picture-correction-crop-frame{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;box-sizing:border-box;width:100%;height:var(--sw-picture-correction-height,100px);padding:8px;overflow:hidden}
 .exercise-kit .ek-picture-corrections .ek-picture-correction-crop-frame>.ek-crop-image{width:min(100%,calc((var(--sw-picture-correction-height,100px) - 16px) * var(--ek-crop-art-ratio)));height:auto;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:var(--ek-crop-art-ratio)!important;margin:0;border-radius:0}
 /* A fixed media track contains tall and wide artwork without intrinsic-size clipping. */
@@ -968,14 +968,13 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 @media(max-width:720px){.exercise-kit .ek-card-grid.ek-picture-word-grid{--ek-grid-gap:14px}}
 @media(max-width:600px){
   .exercise-kit .ek-card-grid.ek-picture-word-grid{--ek-grid-gap:12px}
-  .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid{--ek-grid-min:124px;grid-template-columns:repeat(auto-fill,minmax(min(100%,max(var(--ek-grid-min),calc((100% - var(--ek-grid-gap))/2))),1fr))}
+  .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid{--ek-grid-min:124px;--ek-vocabulary-card-basis:calc((100% - var(--ek-grid-gap))/2)}
   .exercise-kit.ek-modern .ek-card-grid.ek-word-definition-grid{--ek-grid-min:124px}
   .exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-word-slot{width:calc(100% - 20px);min-height:44px;margin:6px 10px 10px;font-size:var(--sw-exercise-small-size)}
-  .exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid)>.ek-card.ek-vocabulary-card{grid-template-columns:14px minmax(0,1fr);gap:8px;padding:12px;min-height:0}
+  .exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid)>.ek-card.ek-vocabulary-card{grid-template-columns:14px minmax(min-content,1fr);gap:8px;padding:12px;min-height:0}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-number{position:static;grid-column:1;grid-row:1;align-self:center}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-label{grid-column:2;grid-row:1}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-vocabulary-slot{grid-column:1/-1;grid-row:2;min-height:56px;font-size:var(--ek-text-size)}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-audio{grid-column:1/-1;grid-row:3}
-  .exercise-kit.ek-modern .ek-card.ek-word-translation-card>.ek-vocabulary-slot{padding:9px 4px;gap:6px}
   .exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{min-height:104px}
 }
