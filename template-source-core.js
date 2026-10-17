@@ -163,7 +163,7 @@
       matching('d04-pairs', 'Match the questions and answers.', [
         ['[Question 1]', '[Answer 1]'],
         ['[Question 2]', '[Answer 2]']
-      ], [1, 0], 'word-definition')
+      ], [1, 0], 'stacked-text')
     ]), 'Find correspondences using complete models that make the new relationship visible.', [catalog('26'), discovery('4')]),
 
     entry('R01', 'Rule — Short Explanation', base('r01', 'rule-page', 'Describe a person’s appearance.', {
@@ -199,51 +199,52 @@
     }), 'Group useful expressions by what the speaker wants to do in the conversation.', [catalog('30–31'), discovery('5–7')]),
 
     entry('S01', 'Picture Speaking', kit.speaking({
-      id: 's01', title: 'Choose clothes for a trip.',
-      image: {image: `${clothesBase}speaking.webp`, alt: 'A coat, sweater, hat, blouse, skirt, and suit.', imageWidth: 1448, imageHeight: 1086},
+      id: 's01', title: '[Task]',
+      image: {imagePending: true, alt: '[Image]', imageWidth: 1448, imageHeight: 1086},
       task: {
-        text: 'You are going away for the weekend. It will be cold outside, and you are also going to a restaurant. Look at the clothes. Tell your friend what you want to take and why.',
-        bullets: ['Choose clothes for walking outside.', 'Choose clothes for the restaurant.']
+        text: '[Situation]',
+        bullets: ['[Task 1]', '[Task 2]']
       },
       use: [{
-        words: ['coat', 'sweater', 'hat', 'blouse', 'skirt', 'suit'],
-        phrases: ['I want to take …', 'I need … because …', 'I think … is good for …']
+        words: ['[Word 1]', '[Word 2]', '[Word 3]', '[Word 4]', '[Word 5]', '[Word 6]'],
+        phrases: ['[Lexical chunk 1]', '[Lexical chunk 2]', '[Lexical chunk 3]']
       }]
     }), 'Use picture details, a concrete situation, and language support to speak for a clear purpose.', [catalog('1–6, 60'), speaking('5–8')]),
 
     entry('S02', 'Text Speaking', kit.speaking({
-      id: 's02', title: 'Choose a place for lunch.', image: null,
+      id: 's02', title: '[Task]', image: null,
       task: {
-        text: 'You and your friend have thirty minutes for lunch. The café next door has soup and sandwiches. The pizza place is ten minutes away. Decide where to eat together.',
-        bullets: ['Ask your friend what they want to eat.', 'Suggest a place and explain your choice.', 'Agree on one place.']
+        text: '[Situation]',
+        bullets: ['[Task 1]', '[Task 2]', '[Task 3]']
       },
       use: [{
-        words: ['soup', 'sandwich', 'pizza', 'near', 'far'],
-        phrases: ['What would you like to … ?', 'Let’s …', 'I’d rather … because …', 'That sounds …']
+        words: ['[Word 1]', '[Word 2]', '[Word 3]', '[Word 4]', '[Word 5]'],
+        phrases: ['[Lexical chunk 1]', '[Lexical chunk 2]', '[Lexical chunk 3]', '[Lexical chunk 4]']
       }]
     }), 'Speak from a short written situation or question, with appropriate language support.', [catalog('7, 60'), speaking('3–4, 7–8')]),
 
-    entry('Q01', 'Questions & Discussion', base('q01', 'presentation', 'Talk about shopping.', {
+    entry('Q01', 'Questions & Discussion', base('q01', 'presentation', 'Discuss the questions.', {
       blocks: [
-        {type: 'text', text: 'Where do you usually buy clothes?\nWhat is more important to you: price or comfort? Why?\nDo you prefer shopping alone or with someone?\nAsk your teacher one question about shopping.'}
+        {type: 'text', text: '[Question 1]\n[Question 2]\n[Question 3]\n[Follow-up question]'}
       ]
     }), 'Share experience or opinions, explain a choice, and ask the other person a question.', [catalog('49')]),
 
-    entry('Q02', 'Рассказ по выполненному упражнению', base('q02', 'stage', 'Complete the sentences. Then tell Alex’s story.', {
-      progressive: true,
-      requireCheckBeforeNext: true,
+    entry('Q02', 'Рассказ по выполненному упражнению', base('q02', 'stage', 'Choose the correct options.', {
+      optionalFollowUp: {title: '[Follow-up task]', prompt: '[Optional speaking task based on the completed sentences]'},
       exercises: [
-        {id: 'facts', exercise: matching('q02-facts', 'Match the sentence halves.', [
-          ['On Saturday, Alex visited his', 'sister.'],
-          ['He went there by', 'train.'],
-          ['After lunch, they walked in the', 'park.'],
-          ['Alex went home at', 'six.']
-        ], [2, 0, 3, 1])},
-        {id: 'story', exercise: base('q02-story', 'presentation', 'Tell Alex’s story.', {
-          blocks: [{type: 'text', text: 'Use the sentences you completed to tell Alex’s story. Start with “On Saturday, Alex …”. Connect the events with first, then, and after lunch.'}]
+        {id: 'facts', exercise: base('q02-facts', 'gaps', 'Choose the correct options.', {
+          inputMode: 'select',
+          items: Array.from({length: 4}, (_, index) => ({
+            id: `item-${index + 1}`,
+            segments: [`[Sentence beginning ${index + 1}] `, {
+              id: `item-${index + 1}`,
+              answers: [`[Sentence ending ${index + 1}]`],
+              options: [3, 1, 4, 2].map(number => `[Sentence ending ${number}]`)
+            }]
+          }))
         })}
       ]
-    }), 'Use the facts or results of the completed task to make a short connected spoken account.', [catalog('50')])
+    }), 'Choose sentence endings; the completed results may support a separately authored optional speaking task.', [catalog('50')])
   ];
 
   definitions.forEach(definition => kit.validate(definition));

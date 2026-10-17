@@ -168,6 +168,38 @@ test('inline Writing keeps prompt and editor together with one shared width and 
  assert.equal(s.host.querySelectorAll('input')[0].dataset.feedback,'correct');assert.equal(s.host.querySelectorAll('input')[1].dataset.feedback,'retry');
  assert.equal(s.host.querySelectorAll('.ek-answer-pairs li').length,2);
 });
+test('typed cue width survives focus, short edits and synchronized restoration without saving the cue',()=>{
+ const def={version:1,id:'cue-width',kind:'gaps',title:'Write.',items:[{id:'row',segments:[{id:'answer',answers:['Reed'],placeholder:'[Last name]'}]}]};
+ const s=setup(def),field=s.host.querySelector('input'),width=field.style.width;
+ s.fire(field,'focus');assert.equal(field.getAttribute('placeholder'),null);assert.equal(field.style.width,width);
+ field.value='R';s.fire(field,'input');assert.equal(field.style.width,width);assert.equal(s.mount.getAnswers().answer,'R');
+ s.mount.setAnswers({answer:'Reed'});assert.equal(s.host.querySelector('input'),field);assert.equal(field.style.width,width);
+ s.mount.setAnswers({});assert.equal(field.value,'');assert.equal(field.style.width,width);assert.equal(s.mount.getAnswers().answer,undefined);
+});
+test('compact source True False keeps all statement dropdowns together and their keyed feedback',()=>{
+ const task={version:1,id:'facts',kind:'choice',title:'Listen.',layout:'dropdown',numbered:true,items:[1,2,3].map(n=>({id:'fact'+n,prompt:'[Statement '+n+']',options:[{id:'true',text:'True'},{id:'false',text:'False'}],correctId:n===1?'true':'false'}))};
+ const def={version:1,id:'compact-facts',kind:'stage',catalogFamily:'L',title:'Listen.',layout:'grouped',exercises:[{id:'audio',exercise:{version:1,id:'source',kind:'audio',title:'Listen.',audioPending:true}},{id:'task',exercise:task}]};
+ const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelectorAll('.ek-numbered-choice').length,3);
+ const state={task:{fact1:'true',fact2:'false',fact3:'true',__sw_checked:true}};s.mount.setAnswers(state);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-choice-trigger')].map(field=>field.getAttribute('data-feedback')),['correct','correct','retry']);
+ assert.equal(s.host.querySelectorAll('.ek-stage-down').length,0);
+ const reader=setup(def,{syncChecks:true,readOnly:true});reader.mount.setAnswers(state);assert.ok([...reader.host.querySelectorAll('.ek-choice-trigger')].every(field=>field.disabled));assert.equal(reader.changes.length,0);
+});
+test('stacked Matching and audio picture choices retain keyed selection and in-field feedback',()=>{
+ for(const layout of ['stacked-text','audio-picture']){
+  const def={version:1,id:'stacked-'+layout,kind:'matching',catalogFamily:'T',title:'Match.',layout,items:[{id:'one',text:'[Long question 1]',correctId:'b'}],options:[{id:'a',text:'[Answer A]',...(layout==='audio-picture'?{imagePending:true,alt:'[Image A]'}:{})},{id:'b',text:'[Answer B]',...(layout==='audio-picture'?{imagePending:true,alt:'[Image B]'}:{})}]};
+  const s=setup(def,{syncChecks:true});s.fire(s.host.querySelector('.ek-match-slot'),'click');
+  if(layout==='audio-picture')assert.equal(s.host.querySelectorAll('.ek-options .ek-image-pending').length,2);
+  s.fire(s.host.querySelectorAll('.ek-options button')[1],'click');assert.equal(s.mount.getAnswers().one,'b');
+  s.click('OK');const slot=s.host.querySelector('.ek-match-slot');assert.equal(slot.getAttribute('data-feedback'),'correct');assert.ok(slot.contains(slot.querySelector('[data-result=correct]')));
+  s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.host.querySelector('.ek-match-slot').dataset.selected,'false');s.mount.destroy();
+ }
+});
+test('picture order corrections retain separate ordered labels and pending image slots',()=>{
+ const def={version:1,id:'picture-order-key',kind:'order',catalogFamily:'T',title:'Order.',layout:'image-grid',tokens:[{id:'a',text:'[Word 1]',imagePending:true,alt:'[Image 1]'},{id:'b',text:'[Word 2]',imagePending:true,alt:'[Image 2]'},{id:'c',text:'[Word 3]',imagePending:true,alt:'[Image 3]'}],correctOrder:['b','c','a']};
+ const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelectorAll('.ek-order-image-card .ek-image-pending').length,3);
+ s.mount.setAnswers({order:['a','b','c'],__sw_checked:true});assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(row=>row.textContent),['[Word 2]','[Word 3]','[Word 1]']);
+});
 test('single and multiple choices use real radios / checkboxes and exact set grading', () => {
   for (const id of ['choice-demo','image-choice-demo','multiple-choice-demo','image-multiple-demo']) {
     const s = setup(id); const multiple = id.includes('multiple'); const inputs = [...s.host.querySelectorAll('input')];
@@ -324,14 +356,15 @@ test('drag trailing click is suppressed, but keyboard Check is never swallowed',
   assert.equal(s.button('[Item 1]').getAttribute('data-feedback'),'correct');
 });
 
-test('audio waveform tracks time, greys on pause, retains seek and fills at the end', async () => {
+test('contour audio tracks time, retains paused progress and seek, and fills at the end', async () => {
   const s = setup('audio-demo');
   const audio = s.host.querySelector('audio');
   const player = s.host.querySelector('.ek-audio-player');
   const track = s.host.querySelector('.ek-audio-track');
   const range = s.host.querySelector('.ek-audio-range');
   assert.equal(player.dataset.state,'paused');assert.equal(range.disabled,true);
-  assert.equal(track.querySelectorAll('svg path').length,2);
+  const basePaths=[...track.querySelectorAll('.ek-audio-wave-base path')],fillPaths=[...track.querySelectorAll('.ek-audio-wave-fill path')];
+  assert.ok(basePaths.length>1);assert.deepEqual(basePaths.map(path=>path.getAttribute('d')),fillPaths.map(path=>path.getAttribute('d')));
   assert.equal(track.querySelector('.ek-audio-wave-base path').getAttribute('d'),track.querySelector('.ek-audio-wave-fill path').getAttribute('d'));
   audio.duration = 10;s.fire(audio,'loadedmetadata');assert.equal(range.disabled,false);
   s.click('Play audio');await Promise.resolve();

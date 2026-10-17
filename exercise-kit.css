@@ -1,5 +1,5 @@
 @import url("typography.css?v=20261015-readable-exercises");
-@import url("exercise-theme.css?v=20261017-matching-marker-anchor");
+@import url("exercise-theme.css?v=20261017-responsive-template-contours");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font);
@@ -878,7 +878,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 /* Keep decoration outside the native editor: its empty and typed line boxes
    both have one explicit body-sized line, with no inner padding to clip it. */
 .exercise-kit.ek-modern .ek-typed-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;max-width:100%;margin:0 3px;padding:10px 10px 10px 8px;border-radius:22px;background:var(--sw-answer-surface);box-shadow:var(--sw-neu-inset);line-height:1.5}
-.exercise-kit.ek-modern.ek-reading-width input.ek-typed-gap{box-sizing:border-box;appearance:none;min-width:0;max-width:100%;margin:0;border:0;outline:none;background:transparent;box-shadow:none;vertical-align:middle;font:400 var(--ek-text-size)/calc(var(--ek-text-size) * 1.5) var(--ek-font);height:calc(var(--ek-text-size) * 1.5);min-height:calc(var(--ek-text-size) * 1.5);padding:0;caret-color:var(--ek-ink)}
+.exercise-kit.ek-modern input.ek-typed-gap{box-sizing:border-box;appearance:none;min-width:0;max-width:100%;margin:0;border:0;outline:none;background:transparent;box-shadow:none;vertical-align:middle;font-family:var(--ek-font);font-size:var(--ek-text-size);font-weight:400;font-style:normal;line-height:normal;height:calc(var(--ek-text-size) * 1.5);min-height:calc(var(--ek-text-size) * 1.5);padding:0;caret-color:var(--ek-ink)}
 .exercise-kit .ek-typed-gap::placeholder{font:inherit;line-height:inherit;color:var(--sw-exercise-muted);opacity:.45}
 /* Opt-in response tables reuse gap controls and the shared answer state. */
 .exercise-kit .ek-gap-table-wrap{width:100%;min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--ek-line);border-radius:var(--ek-radius)}
@@ -1020,9 +1020,9 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
   background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none;
 }
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback],
-.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:has(>.ek-typed-gap[data-feedback]){background:var(--sw-answer-surface);box-shadow:none;border-color:transparent;border-style:solid}
+.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:has(>.ek-typed-gap[data-feedback]){background:var(--sw-picture-word-slot-surface);box-shadow:none;border-color:transparent;border-style:solid}
 
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]:hover:not(:disabled){background:var(--sw-answer-surface);box-shadow:none;transform:none}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]:hover:not(:disabled){background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none}
 
 /* Compact writing keeps each prompt and its response together, wrapping whole fields. */
 .exercise-kit .ek-writing.ek-writing-inline{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
@@ -1030,7 +1030,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit .ek-writing-inline>.ek-writing-input{flex:0 0 auto;width:min(var(--ek-writing-field-width,24ch),100%);max-width:100%}
 .exercise-kit .ek-writing-inline>.ek-writing-hint{flex-basis:100%}
 /* Instructions are task text; keep their normal body size and ink. */
-.exercise-kit.ek-modern.ek-flat-controls .ek-instruction{color:var(--ek-ink)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-instruction{font-size:calc(var(--ek-text-size) * .9375);font-weight:400;color:var(--sw-exercise-emphasis-ink)}
 .exercise-kit.ek-modern.ek-flat-controls .ek-audio-player{background:var(--sw-picture-word-slot-surface);border:1px solid var(--sw-picture-word-slot-border);box-shadow:none}
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-audio-play,.ek-repeat-play,.ek-check,.ek-stage-toggle),
 .exercise-kit.ek-flat-controls+.workspace-exercise-navigation .ek-stage-toggle{border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-picture-word-slot-surface);box-shadow:none}
@@ -1040,3 +1040,54 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern.ek-flat-controls .ek-inline-option:is(:hover,:focus-visible){box-shadow:none;transform:none}
 
 .exercise-kit.ek-modern.ek-flat-controls .ek-inline-menu{background:var(--sw-answer-surface);border:1px solid var(--sw-picture-word-slot-border);box-shadow:var(--sw-card-shadow)}
+
+/* Long prompts and audio clips use the same keyed Matching, with an answer below. */
+.exercise-kit.ek-modern .ek-card-grid:is(.ek-stacked-text-grid,.ek-audio-picture-grid){display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));grid-auto-rows:1fr;width:100%;max-width:704px;margin-inline:0}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card){display:flex;flex-direction:column;align-items:stretch;gap:12px;min-height:0;height:100%;padding:16px;border-radius:28px}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-number{position:static;inset:auto;transform:none}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-card-label{flex:1;min-width:0;margin:0;line-height:1.5;text-align:left;overflow-wrap:break-word;word-break:normal}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex:none;width:100%;min-height:var(--ek-matching-slot-height,44px);margin:0;padding:9px 12px;text-align:left}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot>.ek-match-answer-label{flex:1;min-width:0;text-align:left;overflow-wrap:break-word;word-break:normal}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot>.ek-match-answer-number{position:static;inset:auto;transform:none;flex:0 0 16px;width:16px;min-width:16px;max-width:16px;height:16px;min-height:16px;max-height:16px}
+.exercise-kit.ek-modern .ek-card.ek-audio-picture-card{display:grid;grid-template-columns:14px minmax(0,1fr) auto;grid-template-rows:auto 1fr;align-items:center}
+.exercise-kit.ek-modern .ek-audio-picture-card>.ek-card-label{grid-column:2;grid-row:1}
+.exercise-kit.ek-modern .ek-audio-picture-card>.ek-card-audio{grid-column:3;grid-row:1}
+.exercise-kit.ek-modern .ek-audio-picture-card>.ek-vocabulary-slot{grid-column:1/-1;grid-row:2}
+.exercise-kit .ek-dialog.ek-audio-picture-dialog{width:min(580px,calc(100vw - 24px))}
+.exercise-kit.ek-modern .ek-audio-picture-dialog .ek-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}
+.exercise-kit.ek-modern .ek-audio-picture-dialog .ek-option{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;width:100%;min-height:0;margin:0;padding:8px;text-align:center;border-radius:20px}
+.exercise-kit.ek-modern .ek-audio-picture-dialog .ek-option>.ek-image{display:grid;place-items:center;width:100%;height:var(--ek-audio-option-image-height,130px);min-height:0;max-height:none;margin:0;object-fit:contain;aspect-ratio:1;border-radius:12px}
+/* Every checked control keeps its original surface and vertical metrics. */
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-token,.ek-sort-token){display:inline-flex;align-items:center;justify-content:flex-start;box-sizing:border-box;flex:0 0 auto;max-width:100%;min-height:42px;line-height:1.5;white-space:normal;word-break:normal}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]{background:var(--sw-picture-word-slot-surface)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-writing-input:focus-visible{outline:0;outline-offset:0;box-shadow:none;border-color:var(--sw-exercise-muted)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:focus-within{outline:0;box-shadow:none;border-color:var(--sw-exercise-muted);border-style:solid}
+.exercise-kit .ek-transform-arrow{flex:none;color:var(--ek-muted);font-size:var(--ek-text-size);line-height:1}
+.exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice{position:relative;padding-left:1.55em;line-height:2.7}
+.exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice>.ek-sentence-number{position:absolute;left:0;top:0}
+.exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice .ek-gap-number:not([data-result]){display:none}
+/* Full square artwork, compact feedback inputs, no cropping. */
+.exercise-kit.ek-modern .ek-order-image-card{grid-template-rows:auto auto;width:138px;flex-basis:138px;min-height:0;padding:10px;gap:8px}
+.exercise-kit.ek-modern .ek-order-image-card>.ek-image{width:100%;height:auto;max-height:none;aspect-ratio:1;object-fit:contain}
+.exercise-kit.ek-modern .ek-order-image-card>.ek-order-number{position:relative;inset:auto;margin-bottom:2px}
+.exercise-kit.ek-modern .ek-image-choice-option>.ek-image{object-fit:contain}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type]{position:absolute;top:10px;right:10px;left:auto;bottom:auto;width:20px;min-width:20px;max-width:20px;height:20px;min-height:20px;max-height:20px;border-radius:50%}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type]:checked::after{inset:6px}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type][data-feedback]::after{inset:0}
+.exercise-kit.ek-modern .ek-image-label-index{position:absolute;z-index:2;color:var(--ek-muted);font-size:var(--sw-exercise-caption-size);line-height:1;pointer-events:none}
+.exercise-kit .ek-template-image{display:grid;place-items:center;width:min(100%,320px);aspect-ratio:4/3;border:1px dashed var(--sw-picture-word-slot-border);border-radius:24px;background:var(--sw-picture-word-slot-surface);color:var(--ek-muted)}
+.exercise-kit .ek-speaking-use-title{color:var(--ek-ink)}
+.exercise-kit .ek-image-pending{display:grid;place-items:center;color:var(--ek-muted);font-weight:400}
+/* Reference contour audio skin; progress remains tied to the existing media transport. */
+.exercise-kit.ek-modern .ek-audio-player{grid-template-columns:36px minmax(0,1fr) auto;gap:12px;padding:10px 14px;border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-picture-word-slot-surface);box-shadow:none}
+.exercise-kit.ek-modern .ek-audio-play{width:36px;height:36px;min-width:36px;min-height:36px;border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-picture-word-slot-surface);box-shadow:none}
+.exercise-kit.ek-modern .ek-audio-play:hover:not(:disabled){background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none}
+.exercise-kit .ek-audio-track{height:40px}
+.exercise-kit .ek-audio-wave{inset:0;color:var(--sw-audio-idle)}
+.exercise-kit .ek-audio-wave path{stroke-width:.75}
+.exercise-kit .ek-audio-wave-fill{color:var(--sw-audio-progress)}
+.exercise-kit .ek-audio-player[data-state=paused] .ek-audio-wave-fill{opacity:1}
+
+.exercise-kit.ek-modern.ek-flat-controls .ek-order-image-card{border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-answer-surface);box-shadow:var(--sw-card-shadow)}
+
+.exercise-kit.ek-modern.ek-flat-controls .ek-writing-input[data-feedback]:focus-visible{outline:1px solid var(--ek-feedback-color);outline-offset:-1px;border-color:transparent}

@@ -83,7 +83,7 @@
       {id:'blanket',prompt:'[Translation Word 1]',acceptedAnswers:['[Word 1]']},
       {id:'hanger',prompt:'[Translation Word 2]',acceptedAnswers:['[Word 2]']},
       {id:'toothbrush',prompt:'[Translation Word 3]',acceptedAnswers:['[Word 3]']}
-    ],{responseMode:'accepted'}));
+    ],{responseMode:'accepted',layout:'inline',transformationArrow:true,answerSize:'word'}));
 
   preview('E05B','Заполнить схему или таблицу','Restore missing forms in a partly completed table of a familiar model.',
     typed('e05b-table','Complete the table.',[
@@ -96,21 +96,21 @@
       {id:'late',text:'[Sentence beginning 1]',correctId:'catch'},
       {id:'empty',text:'[Sentence beginning 2]',correctId:'buy'},
       {id:'cold',text:'[Sentence beginning 3]',correctId:'coat'}
-    ],[option('coat','[Sentence ending 3]'),option('catch','[Sentence ending 1]'),option('buy','[Sentence ending 2]')]));
+    ],[option('coat','[Sentence ending 3]'),option('catch','[Sentence ending 1]'),option('buy','[Sentence ending 2]')],{layout:'stacked-text'}));
 
   preview('E06A','Matching: вопрос и ответ','Connect each question with its natural answer.',
     matching('e06a-questions','Match the questions and answers.',[
       {id:'time',text:'[Question 1]',correctId:'six'},
       {id:'price',text:'[Question 2]',correctId:'twenty'},
       {id:'place',text:'[Question 3]',correctId:'right'}
-    ],[option('twenty','[Answer 2]'),option('right','[Answer 3]'),option('six','[Answer 1]')]));
+    ],[option('twenty','[Answer 2]'),option('right','[Answer 3]'),option('six','[Answer 1]')],{layout:'stacked-text'}));
 
   preview('E06B','Matching: пример и слово','Identify the function illustrated by each short example.',
     matching('e06b-functions','Match each example with its function.',[
       {id:'tea',text:'[Example 1]',correctId:'offer'},
       {id:'window',text:'[Example 2]',correctId:'request'},
       {id:'train',text:'[Example 3]',correctId:'suggestion'}
-    ],[option('suggestion','[Function 3]'),option('offer','[Function 1]'),option('request','[Function 2]')]));
+    ],[option('suggestion','[Function 3]'),option('offer','[Function 1]'),option('request','[Function 2]')],{layout:'stacked-text'}));
 
   preview('E06C','Matching: слово и изменённая форма','Pair each base form with its changed form.',
     matching('e06c-forms','Match the words with their changed forms.',[
@@ -138,14 +138,14 @@
       {id:'ask',text:'[Lexical chunk beginning 1]',correctId:'help'},
       {id:'make',text:'[Lexical chunk beginning 2]',correctId:'decision'},
       {id:'pay',text:'[Lexical chunk beginning 3]',correctId:'card'}
-    ],[option('decision','[Lexical chunk ending 2]'),option('card','[Lexical chunk ending 3]'),option('help','[Lexical chunk ending 1]')]));
+    ],[option('decision','[Lexical chunk ending 2]'),option('card','[Lexical chunk ending 3]'),option('help','[Lexical chunk ending 1]')],{layout:'stacked-text'}));
 
   preview('E06G','Matching: фраза и значение','Connect each complete phrase with its meaning.',
     matching('e06g-meaning','Match the phrases and meanings.',[
       {id:'way',text:'[Phrase 1]',correctId:'coming'},
       {id:'works',text:'[Phrase 2]',correctId:'plan'},
       {id:'mind',text:'[Phrase 3]',correctId:'problem'}
-    ],[option('plan','[Meaning of Phrase 2]'),option('problem','[Meaning of Phrase 3]'),option('coming','[Meaning of Phrase 1]')],{layout:'word-definition'}));
+    ],[option('plan','[Meaning of Phrase 2]'),option('problem','[Meaning of Phrase 3]'),option('coming','[Meaning of Phrase 1]')],{layout:'stacked-text'}));
 
   preview('E07','Сортировка по категориям','Place forms in the groups defined by the learned rule.',
     base('e07-categories','sort','Sort the forms.',{
@@ -181,18 +181,18 @@
     }));
 
   preview('E12','Преобразовать слово','Type the form specified by the task.',
-    writing('e12-past','[Task]',[
+    writing('e12-past','Write the correct form.',[
       {id:'go',prompt:'[Word 1]',acceptedAnswers:['[Form of Word 1]']},
       {id:'take',prompt:'[Word 2]',acceptedAnswers:['[Form of Word 2]']},
       {id:'buy',prompt:'[Word 3]',acceptedAnswers:['[Form of Word 3]']}
-    ],{responseMode:'accepted',layout:'inline'}));
+    ],{responseMode:'accepted',layout:'inline',transformationArrow:true,answerSize:'word'}));
 
   preview('E13','Error Correction','Find the error in each sentence and write the corrected sentence.',
     writing('e13-correct','Correct the sentences.',[
       {id:'negative',prompt:'[Sentence with an error 1]',normalization:'translation',acceptedAnswers:['[Corrected sentence 1]']},
       {id:'question',prompt:'[Sentence with an error 2]',normalization:'translation',acceptedAnswers:['[Corrected sentence 2]']},
       {id:'positive',prompt:'[Sentence with an error 3]',normalization:'translation',acceptedAnswers:['[Corrected sentence 3]']}
-    ],{responseMode:'accepted',layout:'inline',instruction:'There is one error in each sentence. Write the whole sentence correctly.'}));
+    ],{responseMode:'accepted',layout:'inline',transformationArrow:true,instruction:'There is one error in each sentence. Write the whole sentence correctly.'}));
 
   preview('E14','Краткий письменный ответ','Write one short response to a clear incoming message.',
     writing('e14-reply','Reply to your friend.',[

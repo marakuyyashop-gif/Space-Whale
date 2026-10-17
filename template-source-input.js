@@ -6,15 +6,23 @@
   if (!kit) return;
   const base = (id, kind, title, data = {}) => ({ version: 1, id, kind, title, ...data });
   const opt = (id, text, data = {}) => ({ id, text, ...data });
-  const clothes = name => ({
-    image: `Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/${name}-cutout.webp`,
-    alt: `A ${name}`
+  const picture = (name, index) => ({
+    imagePending: true, imageWidth: 1, imageHeight: 1,
+    alt: `[Picture ${index}]`,
+    sourceArtwork: {
+      image: `Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-1/images/${name}-cutout.webp`,
+      alt: `A ${name}`
+    }
   });
-  const garmentOptions = () => [opt('hat', 'A hat', clothes('hat')), opt('coat', 'A coat', clothes('coat')), opt('sweater', 'A sweater', clothes('sweater'))];
+  const pictureOptions = () => [
+    opt('hat', '[Picture 2]', picture('hat', 2)),
+    opt('coat', '[Picture 1]', picture('coat', 1)),
+    opt('sweater', '[Picture 3]', picture('sweater', 3))
+  ];
   const audio = (code, title, script, suffix = 'audio') => base(`source-${code}-${suffix}`, 'audio', title, {
     audioPending: true, authorTranscript: script
   });
-  const text = (code, passage) => base(`source-${code}-text`, 'presentation', 'Read the text', {
+  const text = (code, passage, title) => base(`source-${code}-text`, 'presentation', title, {
     blocks: [{ type: 'text', text: passage }]
   });
   const sourceStage = (code, title, material, task, script = '') => base(`source-${code}`, 'stage', title, {
@@ -37,209 +45,197 @@
     }
     return stage;
   };
-  const reading = (code, title, passage, task) => sourceStage(code, title, [text(code, passage)], task);
+  const reading = (code, title, passage, task) => {
+    const stage = sourceStage(code, title, [text(code, passage, title)], task);
+    const prompt = task.kind === 'choice' && task.items.length === 1 ? task.items[0].prompt : '';
+    const instruction = task.instruction || (/^(?:read|choose)\b/i.test(prompt) ? prompt : '');
+    if (instruction) {
+      stage.instruction = instruction;
+      delete stage.exercises.find(block => block.id === 'task').exercise.instruction;
+    }
+    return stage;
+  };
   const response = (code, kind, data) => base(`source-${code}-response`, kind, 'Task', data);
   const trueFalse = (code, statements) => response(code, 'choice', {
+    layout: 'dropdown', numbered: true,
     items: statements.map(([prompt, correctId], i) => ({ id: `fact${i + 1}`, prompt,
       options: [opt('true', 'True'), opt('false', 'False')], correctId }))
   });
   const pictureChoice = (code, prompt, correct, multiple = false) => response(code, 'choice', {
     layout: 'image-grid', multiple,
-    items: [{ id: 'picture', prompt, options: garmentOptions(), ...(multiple ? { correctIds: correct } : { correctId: correct }) }]
+    items: [{ id: 'picture', prompt, options: pictureOptions(), ...(multiple ? { correctIds: correct } : { correctId: correct }) }]
   });
   const garmentOrder = code => response(code, 'order', {
     layout: 'image-grid',
-    tokens: [opt('sweater', 'A sweater', clothes('sweater')), opt('hat', 'A hat', clothes('hat')), opt('coat', 'A coat', clothes('coat'))],
+    tokens: [opt('sweater', '[Word 3]', picture('sweater', 3)), opt('hat', '[Word 2]', picture('hat', 2)), opt('coat', '[Word 1]', picture('coat', 1))],
     correctOrder: ['coat', 'hat', 'sweater']
   });
   const gap = (id, answers, data = {}) => ({ id, answers, ...data });
   const definitions = [
-    listening('L01', 'Listen and choose True or False',
-      'Our new apartment is on the second floor. There are two bedrooms and a small kitchen. The kitchen has a window, but the bathroom does not. We do not have a balcony.',
+    listening('L01', 'Listen and choose True or False', '[Transcript]',
       trueFalse('L01', [
-        ['There are two bedrooms.', 'true'],
-        ['The apartment has a balcony.', 'false'],
-        ['There is no window in the kitchen.', 'false']
+        ['[Statement 1]', 'true'], ['[Statement 2]', 'false'], ['[Statement 3]', 'false']
       ])),
-    listening('L02', 'Why is Daniel calling?',
-      'Hi, it is Daniel. I booked a table for seven tonight, but my train is late. Could we come at eight instead? There are still four of us. Please call me back.',
-      response('L02', 'choice', { instruction: 'Choose the correct answer.', items: [{
-        id: 'reason', prompt: 'Daniel wants to…',
-        options: [opt('people', 'change the number of people.'), opt('time', 'arrive an hour later.'), opt('cancel', 'cancel the booking.')], correctId: 'time'
+    listening('L02', '[Question]', '[Transcript]',
+      response('L02', 'choice', { instruction: 'Listen and choose one answer.', items: [{
+        id: 'reason', prompt: '[Question]',
+        options: [opt('people', '[Answer 1]'), opt('time', '[Answer 2]'), opt('cancel', '[Answer 3]')], correctId: 'time'
       }] })),
-    listening('L03', 'Which item does Nina buy?',
-      'I like the coat, but it costs too much. I already have a hat. This sweater is warm and the price is good. I will take it.',
-      pictureChoice('L03', 'Listen and choose one picture.', 'sweater')),
-    listening('L04', 'What does the speaker recommend?',
-      'It is cold and windy today. Wear your coat and a hat. Leave the sweater at home; it is not warm enough for this wind.',
-      pictureChoice('L04', 'Listen and choose all the recommended items.', ['coat', 'hat'], true)),
-    listening('L05', 'Put the pictures in the order you hear them',
-      'First, look at this coat. Next, here is the hat I bought yesterday. Finally, this is my favorite sweater.',
+    listening('L03', 'Listen and choose a picture', '[Transcript]',
+      pictureChoice('L03', 'Choose one picture.', 'sweater')),
+    listening('L04', 'Listen and select the correct pictures', '[Transcript]',
+      pictureChoice('L04', 'Choose all the correct pictures.', ['coat', 'hat'], true)),
+    listening('L05', 'Put the pictures in the order you hear them', '[Transcript]',
       garmentOrder('L05')),
-    listening('L06', 'Put the questions in the order you hear them',
-      'Do you work on Saturdays? Do you live near here? Do you have a car?',
+    listening('L06', 'Put the text in the order you hear it', '[Transcript]',
       response('L06', 'order', {
-        tokens: [opt('car', 'Do you have a car?'), opt('work', 'Do you work on Saturdays?'), opt('live', 'Do you live near here?')],
+        tokens: [opt('car', '[Text 3]'), opt('work', '[Text 1]'), opt('live', '[Text 2]')],
         correctOrder: ['work', 'live', 'car']
       })),
-    listening('L07', 'Listen and complete the message',
-      'Hi, Nina. I am at the station. The train is late. I will be home at seven. Please wait for me.',
+    listening('L07', 'Listen and complete the sentences', '[Transcript]',
       response('L07', 'gaps', { instruction: 'Write one word in each gap.', items: [
-        { id: 'place', segments: ['I am at the ', gap('station', ['station']), '.'] },
-        { id: 'problem', segments: ['The train is ', gap('late', ['late']), '.'] },
-        { id: 'time', segments: ['I will be home at ', gap('seven', ['seven', '7']), '.'] }
+        { id: 'place', segments: ['[Sentence beginning 1] ', gap('station', ['[Word 1]']), ' [Sentence ending 1]'] },
+        { id: 'problem', segments: ['[Sentence beginning 2] ', gap('late', ['[Word 2]']), ' [Sentence ending 2]'] },
+        { id: 'time', segments: ['[Sentence beginning 3] ', gap('seven', ['[Word 3]', '[Alternative for Word 3]']), ' [Sentence ending 3]'] }
       ] })),
-    listening('L08', 'Listen and complete the booking details',
-      'Hello. My name is Emma Reed. I would like a table for four at six thirty. My phone number is 555 0148.',
-      response('L08', 'gaps', { instruction: 'Write the missing details. Use the clues in the fields.', items: [
-        { id: 'surname', segments: ['Last name: ', gap('name', ['Reed'], { placeholder: 'last name' })] },
-        { id: 'people', segments: ['Number of people: ', gap('number', ['4', 'four'], { placeholder: 'number' })] },
-        { id: 'booking-time', segments: ['Time: ', gap('time', ['6:30', '6.30', 'six thirty'], { placeholder: 'time' })] }
+    listening('L08', 'Listen and complete the details', '[Transcript]',
+      response('L08', 'gaps', { instruction: 'Use the clue in each field.', items: [
+        { id: 'surname', segments: ['[Detail 1]: ', gap('name', ['[Answer 1]'], { placeholder: '[Clue 1]' })] },
+        { id: 'people', segments: ['[Detail 2]: ', gap('number', ['[Answer 2]', '[Alternative for Answer 2]'], { placeholder: '[Clue 2]' })] },
+        { id: 'booking-time', segments: ['[Detail 3]: ', gap('time', ['[Answer 3]', '[Alternative 1 for Answer 3]', '[Alternative 2 for Answer 3]'], { placeholder: '[Clue 3]' })] }
       ] })),
-    listening('L09', 'Listen and choose the missing details',
-      'The blue bus goes to the station. It leaves at nine and stops outside the library. The red bus goes to the airport.',
+    listening('L09', 'Listen and choose the missing details', '[Transcript]',
       response('L09', 'gaps', { inputMode: 'select', items: [
-        { id: 'route', segments: ['The blue bus goes to the ', gap('destination', ['station'], { options: ['airport', 'station', 'museum'] }), '.'] },
-        { id: 'departure', segments: ['It leaves at ', gap('time', ['nine'], { options: ['ten', 'eight', 'nine'] }), '.'] },
-        { id: 'stop', segments: ['It stops outside the ', gap('building', ['library'], { options: ['hotel', 'library', 'bank'] }), '.'] }
+        { id: 'route', segments: ['[Sentence beginning 1] ', gap('destination', ['[Answer 1]'], { options: ['[Option 1.1]', '[Answer 1]', '[Option 1.2]'] }), ' [Sentence ending 1]'] },
+        { id: 'departure', segments: ['[Sentence beginning 2] ', gap('time', ['[Answer 2]'], { options: ['[Option 2.1]', '[Option 2.2]', '[Answer 2]'] }), ' [Sentence ending 2]'] },
+        { id: 'stop', segments: ['[Sentence beginning 3] ', gap('building', ['[Answer 3]'], { options: ['[Option 3.1]', '[Answer 3]', '[Option 3.2]'] }), ' [Sentence ending 3]'] }
       ] })),
-    listening('L10', 'Match the people with their travel plans',
-      'Three friends are traveling today. Alex is going to the airport. Nina is taking a train to the city center. Omar is going to the beach by bus.',
+    listening('L10', 'Listen and match the information', '[Transcript]',
       response('L10', 'matching', {
-        items: [{ id: 'alex', text: 'Alex', correctId: 'airport' }, { id: 'nina', text: 'Nina', correctId: 'center' }, { id: 'omar', text: 'Omar', correctId: 'beach' }],
-        options: [opt('beach', 'the beach'), opt('airport', 'the airport'), opt('center', 'the city center')]
+        layout: 'word-definition',
+        items: [{ id: 'alex', text: '[Person 1]', correctId: 'airport' }, { id: 'nina', text: '[Person 2]', correctId: 'center' }, { id: 'omar', text: '[Person 3]', correctId: 'beach' }],
+        options: [opt('beach', '[Information 3]'), opt('airport', '[Information 1]'), opt('center', '[Information 2]')]
       })),
     sourceStage('L11', 'Match the recordings with the pictures', [], response('L11', 'matching', {
+      layout: 'audio-picture',
       items: [
-        { id: 'clip1', text: 'Recording 1', audioPending: true, authorTranscript: 'It is warm and soft. I wear it under my coat.', correctId: 'sweater' },
-        { id: 'clip2', text: 'Recording 2', audioPending: true, authorTranscript: 'I wear it on my head when it is cold.', correctId: 'hat' },
-        { id: 'clip3', text: 'Recording 3', audioPending: true, authorTranscript: 'It is long and warm. I put it on over my sweater.', correctId: 'coat' }
+        { id: 'clip1', text: '[Recording 1]', audioPending: true, authorTranscript: '[Transcript 1]', correctId: 'sweater' },
+        { id: 'clip2', text: '[Recording 2]', audioPending: true, authorTranscript: '[Transcript 2]', correctId: 'hat' },
+        { id: 'clip3', text: '[Recording 3]', audioPending: true, authorTranscript: '[Transcript 3]', correctId: 'coat' }
       ],
-      options: garmentOptions()
-    }), 'Recording 1: It is warm and soft. I wear it under my coat.\nRecording 2: I wear it on my head when it is cold.\nRecording 3: It is long and warm. I put it on over my sweater.'),
-    listening('L12', 'What time will the friends meet?',
-      'Nina: Shall we meet at six?\nAlex: I finish work at six. Could we meet at six thirty?\nNina: Yes, six thirty is fine. See you at the station.',
-      response('L12', 'writing', { responseMode: 'accepted', instruction: 'Listen and write the agreed time.', items: [{
-        id: 'meeting-time', prompt: 'Meeting time:', acceptedAnswers: ['6:30', '6.30', 'six thirty', '6:30 p.m.', '6:30 pm', '18:30']
+      options: pictureOptions()
+    }), '[Recording 1]: [Transcript 1]\n[Recording 2]: [Transcript 2]\n[Recording 3]: [Transcript 3]'),
+    listening('L12', 'Listen and write a short answer', '[Transcript]',
+      response('L12', 'writing', { responseMode: 'accepted', instruction: 'Write the answer from the recording.', items: [{
+        id: 'meeting-time', prompt: '[Question]', acceptedAnswers: ['[Answer]', '[Alternative answer 1]', '[Alternative answer 2]', '[Alternative answer 3]', '[Alternative answer 4]', '[Alternative answer 5]']
       }] })),
-    listening('L13', 'Which problems does the traveler have?',
-      'My train is delayed, and I cannot find my ticket. My phone is working, so I can call the hotel. I have my passport and my bag with me.',
-      response('L13', 'choice', { multiple: true, instruction: 'Listen and choose all the correct answers.', items: [{
-        id: 'problems', prompt: 'The traveler…',
-        options: [opt('phone', 'cannot use their phone.'), opt('ticket', 'cannot find their ticket.'), opt('bag', 'has lost their bag.'), opt('train', 'has to wait for their train.')],
+    listening('L13', 'Listen and select the correct answers', '[Transcript]',
+      response('L13', 'choice', { multiple: true, instruction: 'Choose all the correct options.', items: [{
+        id: 'problems', prompt: '[Question]',
+        options: [opt('phone', '[Answer 1]'), opt('ticket', '[Answer 2]'), opt('bag', '[Answer 3]'), opt('train', '[Answer 4]')],
         correctIds: ['ticket', 'train']
       }] })),
-    listening('L14', 'Who says these sentences?',
-      'Nina: I work in a café. I start at seven in the morning.\nAlex: I work in a hotel. I start at three in the afternoon.\nNina: I finish at two.\nAlex: I finish at ten at night.',
+    listening('L14', 'Listen and group the sentences', '[Transcript]',
       response('L14', 'sort', {
-        groups: [opt('nina', 'Nina'), opt('alex', 'Alex')],
+        groups: [opt('nina', '[Group 1]'), opt('alex', '[Group 2]')],
         items: [
-          { id: 'hotel', text: 'I work in a hotel.', correctId: 'alex' },
-          { id: 'seven', text: 'I start at seven in the morning.', correctId: 'nina' },
-          { id: 'ten', text: 'I finish at ten at night.', correctId: 'alex' },
-          { id: 'cafe', text: 'I work in a café.', correctId: 'nina' }
+          { id: 'hotel', text: '[Sentence 1]', correctId: 'alex' },
+          { id: 'seven', text: '[Sentence 2]', correctId: 'nina' },
+          { id: 'ten', text: '[Sentence 3]', correctId: 'alex' },
+          { id: 'cafe', text: '[Sentence 4]', correctId: 'nina' }
         ]
       })),
-    listening('L15', 'Listen and label the people',
-      'This is Ella. She has curly hair and is wearing headphones. Nina has short blonde hair and a blue bag. Ivy is wearing a pink hat and a pink sweater.',
+    listening('L15', 'Listen and label the picture', '[Transcript]',
       response('L15', 'image-label', {
-        image: 'Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/media/people-abc.webp',
-        alt: 'Three women: A has short blonde hair and a blue bag; B wears a pink hat; C has curly hair and headphones.',
+        imagePending: true, imageWidth: 1020, imageHeight: 388, alt: '[Image]',
+        sourceArtwork: {
+          image: 'Images/Текущие/assets/lesson-media/a1-2/module-4/lesson-4/media/people-abc.webp',
+          alt: 'Three women: A has short blonde hair and a blue bag; B wears a pink hat; C has curly hair and headphones.'
+        },
         items: [
-          { id: 'person-a', prompt: 'Person A', x: 17, y: 82, correctId: 'nina' },
-          { id: 'person-b', prompt: 'Person B', x: 50, y: 82, correctId: 'ivy' },
-          { id: 'person-c', prompt: 'Person C', x: 83, y: 82, correctId: 'ella' }
+          { id: 'person-a', prompt: 'A', label: 'A', labelX: 3, labelY: 8, x: 17, y: 82, correctId: 'nina' },
+          { id: 'person-b', prompt: 'B', label: 'B', labelX: 36, labelY: 8, x: 50, y: 82, correctId: 'ivy' },
+          { id: 'person-c', prompt: 'C', label: 'C', labelX: 69, labelY: 8, x: 83, y: 82, correctId: 'ella' }
         ],
-        options: [opt('ivy', 'Ivy'), opt('ella', 'Ella'), opt('nina', 'Nina')]
+        options: [opt('ivy', '[Label 2]'), opt('ella', '[Label 3]'), opt('nina', '[Label 1]')]
       })),
     base('source-L16', 'stage', 'Put the dialogue in order. Then listen and check', {
       layout: 'grouped',
       exercises: [
         { id: 'task', exercise: response('L16', 'order', {
           title: 'Put the dialogue in order. Then listen and check',
-          tokens: [opt('price', 'It is twenty dollars.'), opt('buy', 'Great. I will take it.'), opt('question', 'How much is this hat?')],
+          tokens: [opt('price', '[Dialogue line 2]'), opt('buy', '[Dialogue line 3]'), opt('question', '[Dialogue line 1]')],
           correctOrder: ['question', 'price', 'buy']
         }) },
-        { id: 'check-audio', exercise: audio('L16', 'Listen and check', 'How much is this hat?\nIt is twenty dollars.\nGreat. I will take it.') }
+        { id: 'check-audio', exercise: audio('L16', 'Listen and check', '[Transcript]') }
       ],
-      transcript: 'How much is this hat?\nIt is twenty dollars.\nGreat. I will take it.', transcriptAfter: ['task']
+      transcript: '[Transcript]', transcriptAfter: ['task']
     }),
-    listening('L17', 'Listen and choose the correct reply',
-      'Excuse me. Is this seat free?',
+    listening('L17', 'Listen and choose a reply', '[Transcript]',
       response('L17', 'choice', { items: [{
         id: 'reply', prompt: 'Choose one reply.',
-        options: [opt('time', 'It starts at seven.'), opt('free', 'Yes, you can sit here.'), opt('cost', 'It costs ten dollars.')], correctId: 'free'
+        options: [opt('time', '[Reply 1]'), opt('free', '[Reply 2]'), opt('cost', '[Reply 3]')], correctId: 'free'
       }] })),
-    listening('L18', 'Listen and offer your help',
-      'These bags are very heavy. I cannot carry them all.',
-      response('L18', 'writing', { responseMode: 'open', instruction: 'Write a short reply offering to carry a bag.',
-        authorExpectedMeaning: 'Offer practical help to carry one or more bags. Accept different natural replies; completion is not semantic grading.',
-        items: [{ id: 'help', prompt: 'Your reply:', multiline: false }]
+    listening('L18', 'Listen and write a reply', '[Transcript]',
+      response('L18', 'writing', { responseMode: 'open', instruction: 'Write your own reply.',
+        authorExpectedMeaning: '[Expected meaning]. Accept different natural replies; completion is not semantic grading.',
+        items: [{ id: 'help', prompt: '[Situation or question]', multiline: false }]
       })),
-    reading('T01', 'Read and choose True or False',
-      'Nina lives in a small apartment near the station. She walks to work because her café is only five minutes away. She works from Monday to Friday. She does not work on weekends. On Saturdays, she visits her sister.',
-      trueFalse('T01', [['Nina works in a café.', 'true'], ['She goes to work by train.', 'false'], ['She works on Saturdays.', 'false']])),
-    reading('T02', 'Why is Alex sending this message?',
-      'Hi, Nina. I cannot meet you at the café today. My train is delayed. Could we meet there tomorrow at the same time? Alex',
-      response('T02', 'choice', { instruction: 'Read and choose the correct answer.', items: [{
-        id: 'purpose', prompt: 'Alex wants to…',
-        options: [opt('place', 'meet in a different place.'), opt('day', 'meet on a different day.'), opt('cancel', 'stop meeting Nina.')], correctId: 'day'
+    reading('T01', 'Read and choose True or False', '[Text]',
+      trueFalse('T01', [['[Statement 1]', 'true'], ['[Statement 2]', 'false'], ['[Statement 3]', 'false']])),
+    reading('T02', '[Question]', '[Text]',
+      response('T02', 'choice', { instruction: 'Read and choose one answer.', items: [{
+        id: 'purpose', prompt: '[Question]',
+        options: [opt('place', '[Answer 1]'), opt('day', '[Answer 2]'), opt('cancel', '[Answer 3]')], correctId: 'day'
       }] })),
-    reading('T03', 'Which item does Nina need?',
-      'I am going to a park this afternoon. I have a warm coat and a sweater, but I need something for my head. It is very sunny today.',
-      pictureChoice('T03', 'Read and choose one picture.', 'hat')),
-    reading('T04', 'Which items are on the shopping list?',
-      'We need a coat for Alex and a sweater for Nina. We saw a nice hat yesterday, but Alex already has one. We are not buying another hat.',
-      pictureChoice('T04', 'Read and choose all the items they need to buy.', ['coat', 'sweater'], true)),
-    reading('T05', 'Put the pictures in the order they are mentioned',
-      'The shop has three special offers this week. The first is a long coat. Next, there is a blue hat. The last offer is a soft sweater.',
+    reading('T03', 'Read and choose a picture', '[Text]',
+      pictureChoice('T03', 'Choose one picture.', 'hat')),
+    reading('T04', 'Read and select the correct pictures', '[Text]',
+      pictureChoice('T04', 'Choose all the correct pictures.', ['coat', 'sweater'], true)),
+    reading('T05', 'Put the pictures in the order they are mentioned', '[Text]',
       garmentOrder('T05')),
-    reading('T06', 'Put the events in the correct order',
-      'Nina went to the station to meet Alex. While she was waiting, she bought a coffee. Alex arrived ten minutes later. They then walked to the café together.',
+    reading('T06', 'Put the events in the correct order', '[Text]',
       response('T06', 'order', {
-        tokens: [opt('arrive', 'Alex arrived.'), opt('walk', 'They walked to the café.'), opt('station', 'Nina went to the station.'), opt('coffee', 'Nina bought a coffee.')],
+        tokens: [opt('arrive', '[Event 3]'), opt('walk', '[Event 4]'), opt('station', '[Event 1]'), opt('coffee', '[Event 2]')],
         correctOrder: ['station', 'coffee', 'arrive', 'walk']
       })),
-    reading('T07', 'How many people can stay in the apartment?',
-      'Apartment available for the weekend. Two bedrooms, one bathroom, and a small kitchen. There is one double bed and two single beds. Up to four people can stay. The station is a ten-minute walk away.',
-      response('T07', 'writing', { responseMode: 'accepted', instruction: 'Read and write a number.', items: [{
-        id: 'guests', prompt: 'Number of guests:', acceptedAnswers: ['4', 'four']
+    reading('T07', 'Read and write a short answer', '[Text]',
+      response('T07', 'writing', { responseMode: 'accepted', instruction: 'Write the answer from the text.', items: [{
+        id: 'guests', prompt: '[Question]', acceptedAnswers: ['[Answer]', '[Alternative answer]']
       }] })),
-    reading('T08', 'Read and complete the notes',
-      'Hi, Alex. Our train leaves from platform six at nine thirty. Please meet me outside the station at nine. I have your ticket. Nina',
-      response('T08', 'gaps', { instruction: 'Write the missing details from the message.', items: [
-        { id: 'platform', segments: ['Platform: ', gap('platform-number', ['6', 'six'])] },
-        { id: 'departure', segments: ['Train departure: ', gap('departure-time', ['9:30', '9.30', 'nine thirty'])] },
-        { id: 'ticket', segments: ['Who has Alex’s ticket? ', gap('ticket-person', ['Nina'])] }
+    reading('T08', 'Read and complete the details', '[Text]',
+      response('T08', 'gaps', { instruction: 'Write the missing details.', items: [
+        { id: 'platform', segments: ['[Detail 1]: ', gap('platform-number', ['[Answer 1]', '[Alternative for Answer 1]'])] },
+        { id: 'departure', segments: ['[Detail 2]: ', gap('departure-time', ['[Answer 2]', '[Alternative 1 for Answer 2]', '[Alternative 2 for Answer 2]'])] },
+        { id: 'ticket', segments: ['[Detail 3]: ', gap('ticket-person', ['[Answer 3]'])] }
       ] })),
-    reading('T09', 'Read and complete the delivery details',
-      'Your order will arrive on Friday. The driver will bring it to 18 Green Street between two and four in the afternoon. Please call Ben if you need to change the address.',
-      response('T09', 'gaps', { items: [
-        { id: 'delivery-day', segments: ['Delivery day: ', gap('day', ['Friday'], { placeholder: 'day' })] },
-        { id: 'contact-person', segments: ['Contact: ', gap('person', ['Ben'], { placeholder: 'name' })] },
-        { id: 'house-number', segments: ['House number: ', gap('house', ['18', 'eighteen'], { placeholder: 'number' })] }
+    reading('T09', 'Read and complete the details', '[Text]',
+      response('T09', 'gaps', { instruction: 'Use the clue in each field.', items: [
+        { id: 'delivery-day', segments: ['[Detail 1]: ', gap('day', ['[Answer 1]'], { placeholder: '[Clue 1]' })] },
+        { id: 'contact-person', segments: ['[Detail 2]: ', gap('person', ['[Answer 2]'], { placeholder: '[Clue 2]' })] },
+        { id: 'house-number', segments: ['[Detail 3]: ', gap('house', ['[Answer 3]', '[Alternative for Answer 3]'], { placeholder: '[Clue 3]' })] }
       ] })),
-    reading('T10', 'Read and choose the missing details',
-      'Nina is taking the bus because her bike has a flat tire. The bus stop is near the library. She will get off at the station and meet Alex there.',
+    reading('T10', 'Read and choose the missing details', '[Text]',
       response('T10', 'gaps', { inputMode: 'select', items: [
-        { id: 'transport', segments: ['Nina is going by ', gap('vehicle', ['bus'], { options: ['train', 'bus', 'car'] }), '.'] },
-        { id: 'stop', segments: ['The bus stop is near the ', gap('place', ['library'], { options: ['station', 'hotel', 'library'] }), '.'] },
-        { id: 'meeting', segments: ['She will meet Alex at the ', gap('meeting-place', ['station'], { options: ['café', 'station', 'library'] }), '.'] }
+        { id: 'transport', segments: ['[Sentence beginning 1] ', gap('vehicle', ['[Answer 1]'], { options: ['[Option 1.1]', '[Answer 1]', '[Option 1.2]'] }), ' [Sentence ending 1]'] },
+        { id: 'stop', segments: ['[Sentence beginning 2] ', gap('place', ['[Answer 2]'], { options: ['[Option 2.1]', '[Option 2.2]', '[Answer 2]'] }), ' [Sentence ending 2]'] },
+        { id: 'meeting', segments: ['[Sentence beginning 3] ', gap('meeting-place', ['[Answer 3]'], { options: ['[Option 3.1]', '[Answer 3]', '[Option 3.2]'] }), ' [Sentence ending 3]'] }
       ] })),
-    reading('T11', 'Match the people with their jobs today',
-      'We are getting the apartment ready for our guests. Alex is cleaning the kitchen. Nina is buying food at the shop. Omar is taking the guests from the station to the apartment.',
+    reading('T11', 'Read and match the information', '[Text]',
       response('T11', 'matching', {
-        items: [{ id: 'alex', text: 'Alex', correctId: 'kitchen' }, { id: 'nina', text: 'Nina', correctId: 'food' }, { id: 'omar', text: 'Omar', correctId: 'guests' }],
-        options: [opt('guests', 'meeting the guests'), opt('kitchen', 'cleaning the kitchen'), opt('food', 'buying food')]
+        layout: 'word-definition',
+        items: [{ id: 'alex', text: '[Person 1]', correctId: 'kitchen' }, { id: 'nina', text: '[Person 2]', correctId: 'food' }, { id: 'omar', text: '[Person 3]', correctId: 'guests' }],
+        options: [opt('guests', '[Information 3]'), opt('kitchen', '[Information 1]'), opt('food', '[Information 2]')]
       })),
-    base('source-T12', 'matching', 'Match the messages with the headings', {
-      instruction: 'Read each message. There is one extra heading.',
+    base('source-T12', 'matching', 'Match the texts with the headings', {
+      layout: 'stacked-text',
+      instruction: 'Choose a heading for each text. There is one extra heading.',
       items: [
-        { id: 'message1', text: 'The café is closed today because the water is not working. We will open again tomorrow morning.', correctId: 'closed' },
-        { id: 'message2', text: 'I found a blue bag on the bus. It is at the ticket office. Please ask for it there.', correctId: 'lost' },
-        { id: 'message3', text: 'Your table is ready for six thirty. There are four places. Please call if your plans change.', correctId: 'booking' }
+        { id: 'message1', text: '[Text 1]', correctId: 'closed' },
+        { id: 'message2', text: '[Text 2]', correctId: 'lost' },
+        { id: 'message3', text: '[Text 3]', correctId: 'booking' }
       ],
-      options: [opt('booking', 'Your booking is confirmed'), opt('job', 'A new job'), opt('closed', 'A temporary closure'), opt('lost', 'A lost item has been found')]
+      options: [opt('booking', '[Heading 3]'), opt('job', '[Extra heading]'), opt('closed', '[Heading 1]'), opt('lost', '[Heading 2]')]
     })
   ];
   const titles = {

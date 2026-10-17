@@ -274,7 +274,7 @@
     }
     ids(def.items, 'items');
     if (def.kind === 'matching') {
-      if (def.layout != null && !['cards', 'picture-word', 'word-translation', 'word-definition'].includes(def.layout)) fail('Unsupported matching layout');
+      if (def.layout != null && !['cards', 'picture-word', 'word-translation', 'word-definition', 'stacked-text', 'audio-picture'].includes(def.layout)) fail('Unsupported matching layout');
       const valid = options(def.options);
       const assigned = new Set();
       def.items.forEach(item => {
@@ -480,7 +480,7 @@
       const handle=mount(host,stage,{...config,syncChecks:true,answers:unpack(config.answers),onChange:value=>config.onChange?.(pack(value))});
       return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>handle.setAnswers(unpack(value))};
     }
-    if((definition.progressiveQuestions||config.sequentialListening&&definition.kind==='choice')&&!config.showAllQuestions&&['choice','gaps'].includes(definition.kind)&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
+    if((definition.progressiveQuestions||config.sequentialListening&&definition.kind==='choice'&&!(flatControls&&definition.layout==='dropdown'))&&!config.showAllQuestions&&['choice','gaps'].includes(definition.kind)&&definition.items.length>1)return mountListeningQuestions(host,definition,config);
     const def = clone(definition);
     if(def.unifiedProgression)config={...config,unifiedProgression:true};
     // Independent tasks reveal in sequence; a reading/audio source stays with its task.
@@ -507,6 +507,7 @@
     const modern=!doc.body?.classList.contains('design-preview');
     let syncStage=null, syncTranscript=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
     let scrollFrame=null,disposed=false;
+    let matchingCleanup=()=>{},equalizeMatching=()=>{};
     // Include adjacent navigation, but never jump across another visible task.
     function rangeEnd(element,scroller){
       let end=element;
@@ -610,6 +611,11 @@
       });
       if(cue)input.addEventListener('blur', () => input.setAttribute('placeholder', cue));
     };
+    const typedCues = new WeakMap();
+    const sizeTypedField = input => {
+      const length=Math.max(String(input.value||'').length,String(typedCues.get(input)||'').length);
+      input.style.width=`${Math.max(5,Math.min(40,length+2))}ch`;
+    };
     const button = (label, handler, className = 'ek-button') => {
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
     };
@@ -618,6 +624,7 @@
         const blank = node('div', 'ek-image ek-image-pending'+(['gaps','choice','writing'].includes(def.kind)?' ek-task-image':''));
         blank.setAttribute('aria-label', item.alt || 'Изображение');
         blank.setAttribute('role', 'img');
+        if(flatControls)blank.textContent=item.alt||'[Image]';
         return blank;
       }
       if (item.crop) {
@@ -658,21 +665,20 @@
       }, 'ek-audio-play');
       play.setAttribute('aria-label', 'Play audio');
       const track = node('div', 'ek-audio-track');
-      // Decorative line, not a measured waveform. Fill follows actual media time.
-      const points = Array.from({length:601}, (_,x) => {
-        const t=x/600;
-        const envelope=Math.sin(Math.PI*t)**1.4;
-        const amplitude=5+9*(.5+.5*Math.sin(t*31));
-        const y=20+envelope*amplitude*Math.sin(t*185+1.2*Math.sin(t*23));
-        return `${x ? 'L' : 'M'}${x},${y.toFixed(2)}`;
-      }).join(' ');
+      // Decorative contour motif; only the colored progress follows actual media time.
+      const lobes=[[28,77,5],[77,127,4],[127,176,8],[176,242,5],[242,290,12],[290,348,8],[348,407,18],[407,456,5],[456,505,9],[505,556,6]];
+      const contours=[];
+      for(const scale of [.16,.3,.44,.58,.72,.86,1])for(const side of [-1,1])contours.push(Array.from({length:601},(_,x)=>{
+        const lobe=lobes.find(([start,end])=>x>=start&&x<=end);
+        const amplitude=lobe?lobe[2]*Math.sin(Math.PI*(x-lobe[0])/(lobe[1]-lobe[0]))**1.25:0;
+        return `${x?'L':'M'}${x},${(20+side*scale*amplitude).toFixed(2)}`;
+      }).join(' '));
       for (const layer of ['base', 'fill']) {
         const wave = node('div', `ek-audio-wave ek-audio-wave-${layer}`); wave.setAttribute('aria-hidden', 'true');
         const svg=doc.createElementNS('http://www.w3.org/2000/svg','svg');
         svg.setAttribute('viewBox','0 0 600 40');svg.setAttribute('preserveAspectRatio','none');
-        const path=doc.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d',points);path.setAttribute('vector-effect','non-scaling-stroke');
-        svg.append(path);wave.append(svg);track.append(wave);
+        contours.forEach(points=>{const path=doc.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',points);path.setAttribute('vector-effect','non-scaling-stroke');svg.append(path);});
+        wave.append(svg);track.append(wave);
       }
       const range = node('input', 'ek-audio-range'); range.type = 'range'; range.min = '0'; range.max = '100'; range.step = '0.1'; range.value = '0'; range.disabled = true; range.setAttribute('aria-label', 'Audio position');
       const time = node('span', 'ek-audio-time', '0:00 / 0:00');
@@ -843,8 +849,8 @@
     };
     const closeDialog = () => { if(dialog?.open)dialog.close(); };
     const onKeydown = event => { if (event.key === 'Escape') { if(dialog?.open)event.preventDefault();closeDialog(); dismissInline(); } };
-    const vocabularyMatching = def.kind === 'matching' && ['picture-word','word-translation','word-definition'].includes(def.layout);
-    const letteredMatching = vocabularyMatching && def.layout !== 'picture-word';
+    const vocabularyMatching = def.kind === 'matching' && ['picture-word','word-translation','word-definition','stacked-text','audio-picture'].includes(def.layout);
+    const letteredMatching = vocabularyMatching && !['picture-word','audio-picture'].includes(def.layout);
     const optionLetter = index => {let label='';for(let n=index+1;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
     const matchBadgeLabel = badge => badge.dataset.number?'Selected option '+badge.dataset.number:badge.closest('.ek-match-slot')?.dataset.selected==='true'?'Selected match; not checked':'No option selected';
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
@@ -899,12 +905,13 @@
       dialog.append(prompt);
       const choices = node('div', 'ek-options'+(letteredMatching?' ek-vocabulary-options':''));
       available.forEach((option,index) => {
-        const choice = button(letteredMatching?'':option.text, () => { onPick(option.id); closeDialog(); }, 'ek-option'+(letteredMatching?' ek-vocabulary-option':''));
+        const choice = button(letteredMatching||def.layout==='audio-picture'?'':option.text, () => { onPick(option.id); closeDialog(); }, 'ek-option'+(letteredMatching?' ek-vocabulary-option':''));
         if(letteredMatching){
           const letter=optionLetter(index),number=node('span','ek-option-number');number.append(node('span','ek-number-label',letter));number.setAttribute('aria-hidden','true');
           choice.append(number,node('span','ek-option-label',option.text));choice.setAttribute('aria-label',`${letter}: ${option.text}`);
         }
-        if (option.image) choice.prepend(illustration(option));
+        if (option.image || option.imagePending) choice.prepend(illustration(option));
+        if(def.layout==='audio-picture')choice.setAttribute('aria-label',option.text);
         choice.setAttribute('aria-pressed', String(selected === option.id));
         if (used.has(option.id) && selected !== option.id) {
           choice.classList.add('ek-option-used');
@@ -932,6 +939,11 @@
         const limit=Math.max(120,h-24);
         currentDialog.style.maxHeight=limit+'px';currentDialog.style.maxWidth=Math.max(120,w-24)+'px';
         currentDialog.classList.remove('ek-dialog-compact');
+        if(def.layout==='audio-picture'){
+          const rows=Math.ceil(available.length/2),reserved=currentDialog.scrollHeight-choices.getBoundingClientRect().height;
+          const room=(limit-reserved-Math.max(0,rows-1)*12)/Math.max(1,rows)-42;
+          currentDialog.style.setProperty('--ek-audio-option-image-height',Math.max(32,Math.min(130,room))+'px');
+        }
         const picture=prompt.querySelector('.ek-image');
         if(picture){
           const ratio=Number(currentDialog.style.getPropertyValue('--ek-dialog-image-ratio'))||.8;
@@ -1078,12 +1090,14 @@
     }
     function render() {
       dismissInline();
+      matchingCleanup();matchingCleanup=()=>{};equalizeMatching=()=>{};
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
       body.querySelectorAll('audio').forEach(audio => audio.pause());
       body.replaceChildren(); controls.clear(); paintControls.clear(); resultsBox.replaceChildren();
       if (isSpeaking(def)) {
         const picture = node('div', 'ek-speaking-image');
         if (def.image?.image) picture.append(illustration(def.image));
+        else if(def.catalogFamily==='S'&&def.image?.imagePending){picture.append(node('div','ek-template-image','[Image]'));}
         else picture.hidden = true;
         const task = node('div', 'ek-speaking-task');
         task.append(node('p', 'ek-copy', def.task.text));
@@ -1353,6 +1367,7 @@
             control.dataset.selected = String(Boolean(option));
             if(vocabularyMatching)control.querySelector('.ek-match-answer-number').setAttribute('aria-label',matchBadgeLabel(control.querySelector('.ek-match-answer-number')));
             control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
+            equalizeMatching();
           };
           const plus = button(chosen()?.text || (modern?'':'+'), () => {
             if(config.readOnly)return;
@@ -1390,6 +1405,24 @@
           controls.set(item.id, plus);paintControls.set(item.id,()=>refreshSlot(item,index,plus)); card.append(plus); grid.append(card);
         });
         body.append(grid);
+        if(def.layout==='stacked-text'||def.layout==='audio-picture'){
+          let frame=null;
+          const view=doc.defaultView;
+          const measure=()=>{
+            frame=null;if(disposed||!grid.isConnected||!view?.getComputedStyle)return;
+            const slots=[...grid.querySelectorAll('.ek-match-slot')];
+            const height=Math.ceil(Math.max(44,...slots.map(slot=>{
+              const style=view.getComputedStyle(slot),label=slot.querySelector('.ek-match-answer-label');
+              return Math.max(label?.scrollHeight||0,label?.getBoundingClientRect().height||0,16)+['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,key)=>sum+(parseFloat(style[key])||0),0);
+            })));
+            if(grid.style.getPropertyValue('--ek-matching-slot-height')!==height+'px')grid.style.setProperty('--ek-matching-slot-height',height+'px');
+          };
+          equalizeMatching=()=>{if(frame===null&&view?.requestAnimationFrame)frame=view.requestAnimationFrame(measure);};
+          const observer=view?.ResizeObserver?new view.ResizeObserver(equalizeMatching):null;observer?.observe(grid);
+          view?.addEventListener?.('resize',equalizeMatching);
+          matchingCleanup=()=>{observer?.disconnect();view?.removeEventListener?.('resize',equalizeMatching);if(frame!==null)view?.cancelAnimationFrame?.(frame);};
+          equalizeMatching();
+        }
       }
       if (def.kind === 'gaps') {
         if (def.bank && def.inputMode !== 'select' && (def.inputMode === 'text' || def.items.some(item=>item.segments.some(segment=>typeof segment!=='string'&&!segment.options)))) {
@@ -1434,7 +1467,8 @@
             field.setAttribute('aria-label', label);
             field.value = answers[segment.id] || '';
             placeholderCue(field, segment.placeholder);
-            const resize = () => { field.style.width = `${Math.max(5, Math.min(28, field.value.length + 2))}ch`; };
+            typedCues.set(field,segment.placeholder||'');
+            const resize = () => sizeTypedField(field);
             resize();
             field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
             controls.set(segment.id, field);
@@ -1446,6 +1480,8 @@
         if(item.image || item.imagePending)body.append(illustration(item));
         if (def.layout === 'dropdown') {
           const row = node('div', 'ek-discovery-choice');
+          row.classList.toggle('ek-numbered-choice',flatControls&&def.numbered===true);
+          if(flatControls&&def.numbered===true)row.append(node('span','ek-sentence-number',`${itemNumber(item)}. `));
           row.append(doc.createTextNode(`${item.prompt} `));
           const {wrap,opener}=inlinePicker(item.id,item.prompt,item.options,itemNumber(item));
           row.append(wrap);body.append(row);controls.set(item.id,opener);return;
@@ -1468,7 +1504,7 @@
             if (input.checked) selected.add(option.id); else selected.delete(option.id);
             changed(item.id, [...selected]);
           });
-          label.classList.toggle('ek-multiple-option',Boolean(def.multiple)); input.setAttribute('aria-label',option.text);label.append(input);if(def.layout!=='image-grid'||!option.image)label.append(node('span','',option.text)); if (option.image) label.append(illustration(option)); group.append(label);
+          label.classList.toggle('ek-multiple-option',Boolean(def.multiple)); input.setAttribute('aria-label',option.text);label.append(input);if(def.layout!=='image-grid'||!(option.image||option.imagePending))label.append(node('span','',option.text)); if (option.image||option.imagePending) label.append(illustration(option)); group.append(label);
         }); body.append(group); controls.set(item.id, group);
       });
       if (def.kind === 'image-label') {
@@ -1478,6 +1514,7 @@
         if(def.imagePending&&!def.image){image.style.aspectRatio=def.imageWidth>0&&def.imageHeight>0?`${def.imageWidth} / ${def.imageHeight}`:'4 / 3';image.style.minHeight='0';}
         else image.style.removeProperty('aspect-ratio');
         image.classList.add('ek-image-label-image'); stage.append(image);
+        def.items.filter(item=>item.label).forEach(item=>{const label=node('span','ek-image-label-index',item.label);label.style.left=`${item.labelX??item.x}%`;label.style.top=`${item.labelY??item.y}%`;stage.append(label);});
         const assign = (targetId, optionId) => {
           if(config.readOnly)return;
           if (optionId && !def.options.some(option => option.id === optionId)) return;
@@ -1516,7 +1553,7 @@
           const card = button('', handler, 'ek-order-image-card');
           card.setAttribute('aria-label', token.text || token.alt || `Picture ${index + 1}`);
           const number = node('span', 'ek-order-number', String(index + 1));
-          if (token.image) card.append(illustration(token));
+          if (token.image||token.imagePending) card.append(illustration(token));
           if (token.text) card.append(node('span', 'ek-order-image-label', token.text));
           card.prepend(number);
           return card;
@@ -1578,7 +1615,7 @@
         if(compact)row.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
         const label = node('label', 'ek-writing'+(inline?' ek-writing-inline':''), compact||inline ? '' : `${itemNumber(item)}. ${item.prompt}`);
-        if(inline){label.style.setProperty('--ek-writing-field-width',fieldWidth+'ch');label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));}
+        if(inline){label.style.setProperty('--ek-writing-field-width',(def.answerSize==='word'?10:fieldWidth)+'ch');label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));if(def.transformationArrow){const arrow=node('span','ek-transform-arrow','→');arrow.setAttribute('aria-hidden','true');label.append(arrow);}}
         const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; placeholderCue(input,item.placeholder); input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
@@ -1715,7 +1752,10 @@
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
           else item.segments.forEach((segment,index)=>{if(def.layout==='table'&&index)row.append(doc.createTextNode(' · '));row.append(typeof segment==='string'?node('span','ek-muted',segment):node('strong','',segment.feedbackAnswer||segment.answers?.join(' / ')||answers[segment.id]||'…'));});list.append(row);
         });
-        else if(def.kind==='order')pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
+        else if(def.kind==='order'){
+          if(def.layout==='image-grid')(def.correctOrder||def.acceptedOrders?.[0]||[]).forEach(id=>{const row=node('li');row.append(node('strong','',def.tokens.find(token=>token.id===id).text));list.append(row);});
+          else pair('',orderSentence(def,def.correctOrder||def.acceptedOrders?.[0]));
+        }
         else if(def.kind==='matching'&&def.layout==='picture-word'){
           pictureCorrections(def.items,item=>def.options.find(option=>option.id===item.correctId)?.text||'');
         }
@@ -1809,7 +1849,7 @@
           if (!isTypedGap) {const paint=paintControls.get(id);if(paint){paint();continue;}canPatchWithoutRender = false; break; }
           const value = answers[id] == null ? '' : String(answers[id]);
           if (control.value !== value) control.value = value;
-          control.style.width = `${Math.max(5, Math.min(28, value.length + 2))}ch`;
+          sizeTypedField(control);
         }
         if (canPatchWithoutRender) return;
       }
@@ -1843,7 +1883,7 @@
       getViewState,
       setViewState,
       setAnswers,
-      destroy: () => { disposed=true;if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { disposed=true;matchingCleanup();if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, speaking, isSpeaking, taskFinished, kinds, uiLabels, feedbackMessage, motion:{expand} };
