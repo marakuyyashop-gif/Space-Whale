@@ -218,7 +218,7 @@
                 version: 1,
                 id: 'a12w4l2-translation',
                 kind: 'matching',
-                layout: 'word-definition',
+                layout: 'word-translation',
                 title: 'Match the words with the Russian meanings.',
                 instruction: 'Make six pairs.',
                 items: [

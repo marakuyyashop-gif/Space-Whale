@@ -35,14 +35,14 @@
   --sw-audio-progress: #292b2f;
   --sw-matching-min-height: 148px;
   --sw-matching-ratio: auto;
-  --sw-picture-word-ratio:1.1;
+  --sw-picture-word-ratio:0.9090909091;
   --sw-picture-word-grid-width:624px;
   --sw-picture-word-dialog-width:360px;
-  --sw-picture-word-dialog-height:280px;
+  --sw-picture-word-dialog-height:330px;
   --sw-picture-correction-size:128px;
   --sw-picture-word-slot-surface:#f7f7f8;
   --sw-picture-word-slot-border:#d9d9de;
-  --sw-picture-word-number-border:#b8bbc0;
+  --sw-matching-number-surface:#747474;
   --sw-interaction-hover: #fff;
   --sw-interaction-selected: #fff;
   --sw-control-ring: #777b80;
@@ -81,7 +81,7 @@
 [data-theme=dark] {
   --sw-picture-word-slot-surface:#2b2e34;
   --sw-picture-word-slot-border:#555b64;
-  --sw-picture-word-number-border:#737983;
+  --sw-matching-number-surface:#737983;
   --sw-exercise-emphasis-ink:#e3e3e3;
   --sw-answer-surface:#2e3137;
   --sw-feedback-surface:#2b2e34;

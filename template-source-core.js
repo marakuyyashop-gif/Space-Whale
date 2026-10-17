@@ -64,7 +64,7 @@
       ['polite', 'вежливый'],
       ['lazy', 'ленивый'],
       ['noisy', 'шумный']
-    ], [3, 0, 5, 2, 1, 4]), 'Match English words with one precise Russian meaning for each word.', [catalog('10'), words('3')]),
+    ], [3, 0, 5, 2, 1, 4], 'word-translation'), 'Match English words with one precise Russian meaning for each word.', [catalog('10'), words('3')]),
 
     entry('W03A', 'Word–Definition Matching — без контекста', matching('w03a', 'Match the words with their meanings.',
       travelMeanings, [2, 0, 3, 1], 'word-definition'),

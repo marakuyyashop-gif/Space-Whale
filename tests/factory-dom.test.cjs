@@ -774,6 +774,7 @@ test('picture-word dialogs keep a common frame and shrink its height before answ
  const words=['coat','skirt','hat'],items=words.map((word,i)=>({id:word,text:'Picture '+(i+1),image:word+'.webp',imageWidth:[800,300,1000][i],imageHeight:[1000,1200,500][i],alt:word,correctId:word}));
  const s=setup({version:1,id:'compact-picture',kind:'matching',layout:'picture-word',title:'Match the pictures with the words.',items,options:words.map(word=>({id:word,text:word}))});
  const listeners=new Map(),viewport={width:390,height:500,offsetLeft:0,offsetTop:0,addEventListener(type,fn){listeners.set(type,fn);},removeEventListener(type,fn){if(listeners.get(type)===fn)listeners.delete(type);}};s.window.visualViewport=viewport;
+ s.window.getComputedStyle=el=>({getPropertyValue:name=>name==='--sw-picture-word-dialog-height'?'330px':'',paddingLeft:'12px',paddingRight:'12px',paddingTop:'12px',paddingBottom:'12px'});
  const create=s.document.createElement.bind(s.document);
  s.document.createElement=tag=>{
    const el=create(tag);
@@ -792,8 +793,9 @@ test('picture-word dialogs keep a common frame and shrink its height before answ
    for(const slot of s.host.querySelectorAll('.ek-match-slot')){
      s.fire(slot,'click');const dialog=s.host.querySelector('dialog'),frame=dialog.querySelector('.ek-dialog-picture-frame'),image=frame.querySelector('img');
      assert.ok(dialog.classList.contains('ek-picture-word-dialog'));assert.equal(dialog.style.maxHeight,(height-24)+'px');assert.equal(dialog.style.maxWidth,(width-24)+'px');
-     assert.ok(dialog.scrollHeight<=height-24,'all answer content remains inside the visible height');assert.ok(parseFloat(frame.style.height)<=280);assert.ok(parseFloat(frame.style.height)>0);
-     assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'100%');assert.equal(image.style.width,'100%');assert.equal(image.style.height,'100%');
+     assert.ok(dialog.scrollHeight<=height-24,'all answer content remains inside the visible height');assert.ok(parseFloat(frame.style.height)<=330);assert.ok(parseFloat(frame.style.height)>0);
+     assert.equal(dialog.querySelector('.ek-picture-prompt').style.width,'100%');assert.equal(parseFloat(image.style.width),frame.getBoundingClientRect().width-24);assert.equal(parseFloat(image.style.height),Math.max(0,parseFloat(frame.style.height)-24));
+     assert.equal(image.style.minWidth,'0');assert.equal(image.style.minHeight,'0');
      assert.ok(!dialog.style.getPropertyValue('--ek-picture-dialog-width'),'artwork proportions do not set outer width');
      shapes.push([dialog.getBoundingClientRect().width,frame.style.height]);
      image.naturalWidth=50;image.naturalHeight=900;s.fire(image,'load');assert.equal(frame.style.height,shapes.at(-1)[1],'loading narrow art keeps the same frame');
@@ -802,16 +804,65 @@ test('picture-word dialogs keep a common frame and shrink its height before answ
    assert.deepEqual(shapes,[shapes[0],shapes[0],shapes[0]],'coat, skirt and hat use the same dialog dimensions');
  }
  s.fire(s.host.querySelector('.ek-match-slot'),'click');const frame=s.host.querySelector('.ek-dialog-picture-frame'),shortHeight=parseFloat(frame.style.height);
- Object.assign(viewport,{height:800,offsetLeft:15,offsetTop:20});listeners.get('resize')();assert.equal(frame.style.height,'280px');assert.ok(parseFloat(frame.style.height)>shortHeight);
+ Object.assign(viewport,{height:800,offsetLeft:15,offsetTop:20});listeners.get('resize')();assert.equal(frame.style.height,'330px');assert.ok(parseFloat(frame.style.height)>shortHeight);
  assert.equal(s.host.querySelector('dialog').style.left,'257px');s.mount.destroy();
 });
 
 test('a picture-word crop fits inside the common dialog frame without changing its shape',()=>{
  const s=setup({version:1,id:'cropped-picture',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'hat',text:'Picture 1',image:'clothes.webp',imageWidth:1200,imageHeight:900,crop:{x:10,y:20,w:60,h:20},alt:'Hat',correctId:'hat'}],options:[{id:'hat',text:'hat'}]});
+ s.window.getComputedStyle=()=>({getPropertyValue:name=>name==='--sw-picture-word-dialog-height'?'330px':'',paddingLeft:'12px',paddingRight:'12px',paddingTop:'12px',paddingBottom:'12px'});
  const create=s.document.createElement.bind(s.document);s.document.createElement=tag=>{const el=create(tag);if(tag==='div')el.getBoundingClientRect=()=>({width:320,height:parseFloat(el.style.height)||0});if(tag==='dialog'){Object.defineProperty(el,'scrollHeight',{get:()=>180+(parseFloat(el.querySelector('.ek-dialog-picture-frame')?.style.height)||0)});el.getBoundingClientRect=()=>({width:360,height:el.scrollHeight});}return el;};
  s.fire(s.host.querySelector('.ek-match-slot'),'click');const dialog=s.host.querySelector('dialog'),frame=dialog.querySelector('.ek-dialog-picture-frame'),crop=frame.querySelector('.ek-crop-image');
- assert.equal(frame.style.height,'280px');assert.equal(crop.style.width,'320px');assert.equal(crop.style.height,'80px');assert.ok(!dialog.style.getPropertyValue('--ek-picture-dialog-width'));
+ assert.equal(frame.style.height,'330px');assert.equal(crop.style.width,'296px');assert.equal(crop.style.height,'74px');assert.ok(!dialog.style.getPropertyValue('--ek-picture-dialog-width'));
  assert.match(crop.style.backgroundImage,/clothes.webp/);s.mount.destroy();
+});
+
+test('vocabulary matching uses source numbers separately from chosen option numbers and checked results',()=>{
+ for(const layout of ['picture-word','word-translation','word-definition']){
+  const def={version:1,id:'vocabulary-'+layout,kind:'matching',layout,title:'Match the words.',items:[
+   {id:'coat',text:'coat',...(layout==='picture-word'?{image:'coat.webp',alt:'Coat'}:{}),correctId:'coat'},
+   {id:'hat',text:'hat',...(layout==='picture-word'?{image:'hat.webp',alt:'Hat'}:{}),correctId:'hat'}],options:[{id:'hat',text:'A hat'},{id:'coat',text:'A coat'}]};
+  const s=setup(def,{syncChecks:true}),slots=[...s.host.querySelectorAll('.ek-match-slot')];
+  const sourceNumbers=()=>[...s.host.querySelectorAll('.ek-card>.ek-number')].map(el=>el.textContent);
+  assert.deepEqual(sourceNumbers(),['1','2']);assert.equal(slots[0].querySelector('.ek-match-answer-number').textContent,'');
+  s.fire(slots[0],'click');const dialog=s.host.querySelector('.ek-vocabulary-dialog');
+  assert.deepEqual([...dialog.querySelectorAll('.ek-option-number')].map(el=>el.textContent),['1','2']);
+  assert.deepEqual([...dialog.querySelectorAll('.ek-option-label')].map(el=>el.textContent),['A hat','A coat']);
+  if(layout==='picture-word')assert.equal(dialog.querySelector('.ek-vocabulary-source'),null);
+  else assert.equal(dialog.querySelector('.ek-vocabulary-source').textContent,'coat');
+  s.click('A hat');assert.equal(slots[0].querySelector('.ek-match-answer-label').textContent,'A hat');
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,'1');
+  s.mount.setAnswers({coat:'hat',hat:'coat',__sw_checked:true});
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.result,'retry');assert.deepEqual(sourceNumbers(),['1','2']);
+  assert.equal(s.host.querySelectorAll('.ek-card>.ek-number[data-result]').length,0);
+  const count=s.changes.length;s.fire(slots[1],'click');const currentDialog=s.host.querySelector('dialog');
+  s.mount.setAnswers({coat:'hat',hat:'coat'});assert.equal(s.host.querySelector('dialog'),currentDialog);assert.equal(s.changes.length,count);
+  s.click('A hat');assert.deepEqual(s.mount.getAnswers(),{hat:'hat'});
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,'');assert.equal(slots[1].querySelector('.ek-match-answer-number').dataset.number,'1');
+  assert.equal(s.host.querySelectorAll('.ek-match-answer-number[data-result]').length,0);
+  s.mount.setAnswers({coat:'coat',hat:'hat',__sw_checked:true});assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.result,'correct');
+  assert.equal(s.changes.length,count+1);s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});
+  assert.equal(s.host.querySelectorAll('.ek-match-answer-number[data-result]').length,0);s.mount.destroy();
+ }
+ const generic=setup('matching-demo');assert.equal(generic.host.querySelector('.ek-match-answer-number'),null);
+ generic.fire(generic.host.querySelector('.ek-match-slot'),'click');assert.equal(generic.host.querySelector('.ek-option-number'),null);
+ generic.mount.destroy();
+});
+
+test('selection dialog closes only for a complete outside click and preserves the attempt and opener focus',()=>{
+ const s=setup('picture-word-demo',{syncChecks:true}),slot=s.host.querySelector('.ek-match-slot');
+ s.mount.setAnswers({item1:'option2',__sw_checked:true});const saved=s.mount.getAnswers(),changeCount=s.changes.length;
+ let focused=0;slot.focus=()=>{focused++;};
+ s.fire(slot,'click');const dialog=s.host.querySelector('dialog');dialog.getBoundingClientRect=()=>({left:100,right:400,top:100,bottom:500,width:300,height:400});
+ const gesture=(start,end)=>{s.fire(dialog,'pointerdown',{clientX:start[0],clientY:start[1]});s.fire(dialog,'click',{clientX:end[0],clientY:end[1]});};
+ gesture([110,110],[110,110]);assert.equal(dialog.open,true,'inside padding is not the backdrop');
+ gesture([110,110],[50,50]);assert.equal(dialog.open,true,'dragging from inside does not dismiss');
+ gesture([50,50],[110,110]);assert.equal(dialog.open,true,'a gesture ending inside does not dismiss');
+ s.fire(dialog,'pointerdown',{clientX:50,clientY:50});s.fire(dialog,'pointercancel');s.fire(dialog,'click',{clientX:50,clientY:50});assert.equal(dialog.open,true);
+ gesture([50,50],[50,50]);assert.equal(s.host.querySelector('dialog'),null);assert.equal(focused,1);
+ assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,changeCount);
+ s.fire(slot,'click');s.fire(s.host.querySelector('dialog'),'keydown',{key:'Escape'});assert.equal(s.host.querySelector('dialog'),null);
+ assert.deepEqual(s.mount.getAnswers(),saved);assert.equal(s.changes.length,changeCount);s.mount.destroy();
 });
 
 test('only cropped picture-word artwork uses a containing card frame with its original art ratio',()=>{

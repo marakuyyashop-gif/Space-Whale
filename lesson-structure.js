@@ -77,6 +77,7 @@ function responseSchema(def){
  const value=copy(def);
  function clean(d){
   for(const k of ['unifiedProgression','progressiveQuestions','highlights','feedbackHighlights','guide'])delete d[k];
+  if(d.kind==='matching')delete d.layout;
   if(['presentation','rule-page','audio'].includes(d.kind))return {id:d.id,kind:d.kind};
   if(d.kind==='stage')return {id:d.id,kind:d.kind,exercises:d.exercises.map(b=>({id:b.id,exercise:clean(b.exercise)}))};
   if(d.items)d.items=d.items.map(i=>{delete i.highlights;delete i.feedbackHighlights;return i;});

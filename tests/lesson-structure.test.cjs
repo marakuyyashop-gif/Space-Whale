@@ -16,6 +16,17 @@ test('old exercise links resolve into the corresponding section, and old respons
  for(const l of lessons)for(const s of l.stages)for(const old of s.legacySources||[]){const route=catalog.normalize(new URLSearchParams({view:'library',level:l.level,whale:l.whale,lesson:l.id,exercise:old.id}));assert.equal(route.exercise,s.exercise.id);const restored=structure.restore(s,{},source=>source.id===old.id?{one:'saved',__sw_checked:true}:{});assert.equal(restored[old.id].one,'saved');const current={one:'new'};assert.equal(structure.restore(s,current,()=>{throw Error('must not overwrite');}),current);}
  const original=app.SpaceWhaleContent.find(l=>l.id==='a1-2-w4-l4').stages.find(s=>s.exercise.id==='L4-discovery-rule').exercise;const changed=JSON.parse(JSON.stringify(original));changed.unifiedProgression=true;assert.ok(structure.compatible(JSON.stringify(original),JSON.stringify(changed)));
 });
+test('translation layout refinement retains saved responses but rejects changed answer keys',()=>{
+ const nested=def=>[def,...(def.exercises||[]).flatMap(block=>nested(block.exercise)),...(def.blocks||[]).filter(block=>block.type==='exercise').flatMap(block=>nested(block.exercise))];
+ const source=app.SpaceWhaleContent.find(l=>l.id==='a1-2-w4-l2').stages.flatMap(s=>nested(s.exercise)).find(def=>def.id==='a12w4l2-translation');
+ assert.equal(source.layout,'word-translation');
+ const old=JSON.parse(JSON.stringify(source));old.layout='word-definition';
+ assert.ok(structure.compatible(JSON.stringify(old),JSON.stringify(source)));
+ const changed=JSON.parse(JSON.stringify(source));changed.items[0].correctId=changed.items[1].correctId;
+ assert.equal(structure.compatible(JSON.stringify(old),JSON.stringify(changed)),false);
+ const view=setup(source),saved={tr1:source.items[0].correctId,__sw_checked:true};
+ view.handle.setAnswers(saved);assert.deepEqual(view.handle.getAnswers(),saved);view.handle.destroy();
+});
 test('Discovery starts with one question; no outer arrow bypasses it; flat keys and peer view restore',()=>{
  for(const id of Object.keys(plans)){
   const def=byRole(id,'focus').exercise,v=setup(def),p=setup(def,{navigationReadOnly:true});

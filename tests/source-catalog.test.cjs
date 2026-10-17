@@ -34,6 +34,15 @@ test('one family catalog exposes code rows and preserves source routes and old p
  }
  for(const def of [...window.SpaceWhaleLegacyTemplates,...window.SpaceWhaleTemplateExamples])assert.ok(aliases.has(def.id),def.id);
 });
+test('W02 uses the shared translation row while W03 keeps the definition row',()=>{
+ const translation=templates.find(def=>def.code==='W02');
+ assert.equal(translation.layout,'word-translation');
+ const view=mount(translation);
+ assert.equal(view.host.querySelectorAll('.ek-word-translation-card').length,translation.items.length);
+ assert.equal(view.host.querySelectorAll('.ek-vocabulary-slot').length,translation.items.length);
+ view.handle.destroy();
+ for(const code of ['W03A','W03B'])assert.ok(definitions(templates.find(def=>def.code===code)).some(def=>def.layout==='word-definition'));
+});
 test('all source-coded cards use the shared renderer; existing artwork paths resolve and missing audio stays pending',()=>{
  let audioCount=0;
  const checkMedia=node=>{
