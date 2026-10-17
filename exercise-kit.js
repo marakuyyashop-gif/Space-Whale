@@ -721,7 +721,7 @@
         body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
       }
       resultsBox.replaceChildren(); announce('');
-      if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label',lamp.classList.contains('ek-match-answer-number')?(lamp.dataset.number?'Selected option '+lamp.dataset.number:'No option selected'):'Not checked');});}
+      if(modern){status.hidden=true;resultsBox.hidden=true;lamps.forEach(lamp=>{delete lamp.dataset.result;lamp.setAttribute('aria-label',lamp.classList.contains('ek-match-answer-number')?matchBadgeLabel(lamp):'Not checked');});}
     };
     const save = () => { delete answers.__sw_skipped;if (config.syncChecks) delete answers.__sw_checked; clearFeedback();updateActions();config.onChange?.(clone(answers)); };
     // Drag actions update the same answers object as keyboard/click actions.
@@ -821,6 +821,9 @@
     const closeDialog = () => { if(dialog?.open)dialog.close(); };
     const onKeydown = event => { if (event.key === 'Escape') { if(dialog?.open)event.preventDefault();closeDialog(); dismissInline(); } };
     const vocabularyMatching = def.kind === 'matching' && ['picture-word','word-translation','word-definition'].includes(def.layout);
+    const letteredMatching = vocabularyMatching && def.layout !== 'picture-word';
+    const optionLetter = index => {let label='';for(let n=index+1;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
+    const matchBadgeLabel = badge => badge.dataset.number?'Selected option '+badge.dataset.number:badge.closest('.ek-match-slot')?.dataset.selected==='true'?'Selected match; not checked':'No option selected';
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-picture-practice',['gaps','writing'].includes(def.kind)&&def.layout==='picture-rows');
@@ -870,12 +873,12 @@
         else prompt.prepend(picture);
       }
       dialog.append(prompt);
-      const choices = node('div', 'ek-options'+(vocabularyMatching?' ek-vocabulary-options':''));
+      const choices = node('div', 'ek-options'+(letteredMatching?' ek-vocabulary-options':''));
       available.forEach((option,index) => {
-        const choice = button(vocabularyMatching?'':option.text, () => { onPick(option.id); closeDialog(); }, 'ek-option'+(vocabularyMatching?' ek-vocabulary-option':''));
-        if(vocabularyMatching){
-          const number=node('span','ek-option-number');number.append(node('span','ek-number-label',String(index+1)));number.setAttribute('aria-hidden','true');
-          choice.append(number,node('span','ek-option-label',option.text));choice.setAttribute('aria-label',option.text);
+        const choice = button(letteredMatching?'':option.text, () => { onPick(option.id); closeDialog(); }, 'ek-option'+(letteredMatching?' ek-vocabulary-option':''));
+        if(letteredMatching){
+          const letter=optionLetter(index),number=node('span','ek-option-number');number.append(node('span','ek-number-label',letter));number.setAttribute('aria-hidden','true');
+          choice.append(number,node('span','ek-option-label',option.text));choice.setAttribute('aria-label',`${letter}: ${option.text}`);
         }
         if (option.image) choice.prepend(illustration(option));
         choice.setAttribute('aria-pressed', String(selected === option.id));
@@ -1312,15 +1315,16 @@
             if(vocabularyMatching){
               let badge=control.querySelector('.ek-match-answer-number'),text=control.querySelector('.ek-match-answer-label');
               if(!badge){badge=node('span','ek-match-answer-number');badge.append(node('span','ek-number-label'));badge.setAttribute('role','img');text=node('span','ek-match-answer-label');control.replaceChildren(badge,text);}
-              const optionNumber=option?String(def.options.indexOf(option)+1):'';
+              const optionNumber=option&&letteredMatching?optionLetter(def.options.indexOf(option)):'';
               badge.dataset.number=optionNumber;badge.querySelector('.ek-number-label').textContent=optionNumber;
-              badge.setAttribute('aria-label',option?'Selected option '+optionNumber:'No option selected');
               text.textContent=option?.text||'';
             }else control.textContent = option?.text || (modern?'':'+');
             control.dataset.selected = String(Boolean(option));
+            if(vocabularyMatching)control.querySelector('.ek-match-answer-number').setAttribute('aria-label',matchBadgeLabel(control.querySelector('.ek-match-answer-number')));
             control.setAttribute('aria-label', `Choose a match for ${label}${option ? `: ${option.text}` : ''}`);
           };
           const plus = button(chosen()?.text || (modern?'':'+'), () => {
+            if(config.readOnly)return;
             const takenBy = new Map(
               Object.entries(answers)
                 .filter(([id, value]) => id !== item.id && value)
@@ -1348,6 +1352,10 @@
           }, 'ek-match-slot'+(vocabularyMatching?' ek-vocabulary-slot ek-'+def.layout+'-slot':''));
           refreshSlot(item,index,plus);
           plus.setAttribute('aria-haspopup', 'dialog');
+          if(pictureWord)card.addEventListener('click',event=>{
+            if(config.readOnly||plus.disabled||event.defaultPrevented||event.target.closest?.('button,a,input,select,textarea,audio,video,[role="button"],[contenteditable]'))return;
+            plus.click();
+          });
           controls.set(item.id, plus);paintControls.set(item.id,()=>refreshSlot(item,index,plus)); card.append(plus); grid.append(card);
         });
         body.append(grid);
@@ -1544,7 +1552,7 @@
         const lamp=def.kind==='matching'?(vocabularyMatching?control.querySelector('.ek-match-answer-number'):control.closest('.ek-card').querySelector('.ek-number')):(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number'));
         if(!lamp)return;
         if(!vocabularyMatching){lamp.dataset.number=lamp.dataset.number||lamp.textContent;lamp.classList.add('ek-result-lamp');}
-        lamp.setAttribute('role','img');lamp.setAttribute('aria-label',vocabularyMatching?(lamp.dataset.number?'Selected option '+lamp.dataset.number:'No option selected'):'Not checked');
+        lamp.setAttribute('role','img');lamp.setAttribute('aria-label',vocabularyMatching?matchBadgeLabel(lamp):'Not checked');
         if(def.kind==='matching'){ /* Reuse the number badge, without a second indicator. */ }
         else if(def.kind==='choice'){
           /* Discovery badge is already inside its field. */

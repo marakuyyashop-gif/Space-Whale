@@ -78,7 +78,7 @@ test('issue → perform → submit → open in a separate browser context preser
  const first=packs[0].steps[0].exercise;
  for(let i=0;i<first.items.length;i++){
   student.click(doc.querySelectorAll('.ek-match-slot')[i]);const key=first.items[i<2?1-i:i].correctId;const label=first.options.find(o=>o.id===key).text;
-  student.click([...doc.querySelectorAll('dialog .ek-option')].find(b=>(b.getAttribute('aria-label')||b.textContent)===label));
+  student.click([...doc.querySelectorAll('dialog .ek-option')].find(b=>(b.querySelector('.ek-option-label')?.textContent||b.textContent)===label));
  }
  student.click(doc.querySelector('.ek-check'));assert.ok(doc.querySelector('[data-feedback="retry"]'));
  student.click(doc.querySelector('[aria-label="Show next exercise"]'));
@@ -121,7 +121,7 @@ test('every published pack can complete every task through the shared UI and reo
     if(next())assert.equal(next().disabled,true,`${d.id} waits for OK`);
     if(d.kind==='matching')for(let i=0;i<d.items.length;i++){
      p.click(section.querySelectorAll('.ek-match-slot')[i]);const text=d.options.find(o=>o.id===d.items[i].correctId).text;
-     p.click([...doc.querySelectorAll('dialog .ek-option')].find(o=>(o.getAttribute('aria-label')||o.textContent)===text));
+     p.click([...doc.querySelectorAll('dialog .ek-option')].find(o=>(o.querySelector('.ek-option-label')?.textContent||o.textContent)===text));
     }
     if(d.kind==='gaps'){
      const gaps=d.items.flatMap(i=>i.segments.filter(s=>typeof s!=='string'));

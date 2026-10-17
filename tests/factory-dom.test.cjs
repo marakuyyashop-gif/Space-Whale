@@ -817,28 +817,38 @@ test('a picture-word crop fits inside the common dialog frame without changing i
  assert.match(crop.style.backgroundImage,/clothes.webp/);s.mount.destroy();
 });
 
-test('vocabulary matching uses source numbers separately from chosen option numbers and checked results',()=>{
+test('picture matches keep plain choices while text matches use letters separately from source numbers and checked results',()=>{
  for(const layout of ['picture-word','word-translation','word-definition']){
+  const pictured=layout==='picture-word';
   const def={version:1,id:'vocabulary-'+layout,kind:'matching',layout,title:'Match the words.',items:[
    {id:'coat',text:'coat',...(layout==='picture-word'?{image:'coat.webp',alt:'Coat'}:{}),correctId:'coat'},
-   {id:'hat',text:'hat',...(layout==='picture-word'?{image:'hat.webp',alt:'Hat'}:{}),correctId:'hat'}],options:[{id:'hat',text:'A hat'},{id:'coat',text:'A coat'}]};
+   {id:'hat',text:'hat',...(layout==='picture-word'?{image:'hat.webp',alt:'Hat'}:{}),correctId:'hat'}],options:[{id:'hat',text:'hat'},{id:'coat',text:'coat'}]};
   const s=setup(def,{syncChecks:true}),slots=[...s.host.querySelectorAll('.ek-match-slot')];
   const sourceNumbers=()=>[...s.host.querySelectorAll('.ek-card>.ek-number')].map(el=>el.textContent);
   assert.deepEqual(sourceNumbers(),['1','2']);assert.equal(slots[0].querySelector('.ek-match-answer-number').textContent,'');
   s.fire(slots[0],'click');const dialog=s.host.querySelector('.ek-vocabulary-dialog');
-  assert.deepEqual([...dialog.querySelectorAll('.ek-option-number')].map(el=>el.textContent),['1','2']);
-  assert.deepEqual([...dialog.querySelectorAll('.ek-option-label')].map(el=>el.textContent),['A hat','A coat']);
-  if(layout==='picture-word')assert.equal(dialog.querySelector('.ek-vocabulary-source'),null);
-  else assert.equal(dialog.querySelector('.ek-vocabulary-source').textContent,'coat');
-  s.click('A hat');assert.equal(slots[0].querySelector('.ek-match-answer-label').textContent,'A hat');
-  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,'1');
+  if(pictured){
+   assert.equal(dialog.querySelector('.ek-vocabulary-source'),null);
+   assert.equal(dialog.querySelector('.ek-vocabulary-options'),null);
+   assert.equal(dialog.querySelector('.ek-vocabulary-option'),null);
+   assert.equal(dialog.querySelector('.ek-option-number'),null);
+   assert.deepEqual([...dialog.querySelectorAll('.ek-option')].map(el=>el.textContent),['hat','coat']);
+  }else{
+   assert.equal(dialog.querySelector('.ek-vocabulary-source').textContent,'coat');
+   assert.deepEqual([...dialog.querySelectorAll('.ek-option-number')].map(el=>el.textContent),['A','B']);
+   assert.deepEqual([...dialog.querySelectorAll('.ek-option-label')].map(el=>el.textContent),['hat','coat']);
+   assert.equal(dialog.querySelector('.ek-option').getAttribute('aria-label'),'A: hat');
+  }
+  s.fire(dialog.querySelector('.ek-option'),'click');assert.equal(slots[0].querySelector('.ek-match-answer-label').textContent,'hat');
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,pictured?'':'A');
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').getAttribute('aria-label'),pictured?'Selected match; not checked':'Selected option A');
   s.mount.setAnswers({coat:'hat',hat:'coat',__sw_checked:true});
   assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.result,'retry');assert.deepEqual(sourceNumbers(),['1','2']);
   assert.equal(s.host.querySelectorAll('.ek-card>.ek-number[data-result]').length,0);
   const count=s.changes.length;s.fire(slots[1],'click');const currentDialog=s.host.querySelector('dialog');
   s.mount.setAnswers({coat:'hat',hat:'coat'});assert.equal(s.host.querySelector('dialog'),currentDialog);assert.equal(s.changes.length,count);
-  s.click('A hat');assert.deepEqual(s.mount.getAnswers(),{hat:'hat'});
-  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,'');assert.equal(slots[1].querySelector('.ek-match-answer-number').dataset.number,'1');
+  s.fire(currentDialog.querySelector('.ek-option'),'click');assert.deepEqual(s.mount.getAnswers(),{hat:'hat'});
+  assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.number,'');assert.equal(slots[1].querySelector('.ek-match-answer-number').dataset.number,pictured?'':'A');
   assert.equal(s.host.querySelectorAll('.ek-match-answer-number[data-result]').length,0);
   s.mount.setAnswers({coat:'coat',hat:'hat',__sw_checked:true});assert.equal(slots[0].querySelector('.ek-match-answer-number').dataset.result,'correct');
   assert.equal(s.changes.length,count+1);s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});
@@ -847,6 +857,23 @@ test('vocabulary matching uses source numbers separately from chosen option numb
  const generic=setup('matching-demo');assert.equal(generic.host.querySelector('.ek-match-answer-number'),null);
  generic.fire(generic.host.querySelector('.ek-match-slot'),'click');assert.equal(generic.host.querySelector('.ek-option-number'),null);
  generic.mount.destroy();
+});
+
+test('the whole picture card opens its picker without duplicating plus clicks or intercepting other controls',()=>{
+ const def={version:1,id:'whole-picture',kind:'matching',layout:'picture-word',title:'Match.',items:[{id:'coat',text:'coat',image:'coat.webp',alt:'Coat',audio:'coat.mp3',correctId:'coat'}],options:[{id:'coat',text:'coat'}]};
+ const s=setup(def),card=s.host.querySelector('.ek-card'),slot=card.querySelector('.ek-match-slot');
+ const openAndClose=target=>{
+  s.fire(target,'click');assert.equal(s.host.querySelectorAll('dialog').length,1);assert.equal(s.host.querySelector('dialog').open,true);
+  s.fire(s.host.querySelector('.ek-close'),'click');assert.equal(s.host.querySelector('dialog'),null);
+ };
+ for(const target of [card,card.querySelector('img'),card.querySelector('.ek-picture-word-media'),card.querySelector('.ek-number'),slot])openAndClose(target);
+ const play=card.querySelector('.ek-repeat-play');s.fire(play,'click');assert.equal(s.host.querySelector('dialog'),null);assert.equal(card.querySelector('audio').paused,false);
+ const link=s.document.createElement('a');link.href='#';link.textContent='Details';card.append(link);s.fire(link,'click');assert.equal(s.host.querySelector('dialog'),null);
+ const cancelled=s.document.createElement('span');card.append(cancelled);cancelled.addEventListener('click',event=>event.preventDefault());s.fire(cancelled,'click');assert.equal(s.host.querySelector('dialog'),null);
+ assert.deepEqual(s.mount.getAnswers(),{});assert.equal(s.changes.length,0);s.mount.destroy();
+ const locked=setup(def,{readOnly:true});assert.equal(locked.host.querySelector('.ek-match-slot').disabled,true);
+ for(const target of [locked.host.querySelector('.ek-card'),locked.host.querySelector('img'),locked.host.querySelector('.ek-match-slot')])locked.fire(target,'click');
+ assert.equal(locked.host.querySelector('dialog'),null);assert.deepEqual(locked.mount.getAnswers(),{});assert.equal(locked.changes.length,0);locked.mount.destroy();
 });
 
 test('selection dialog closes only for a complete outside click and preserves the attempt and opener focus',()=>{
