@@ -65,8 +65,8 @@
 
     entry('W03B', 'Word–Definition Matching — с примерами', grouped('w03b', 'Read the examples. Then match the words with their meanings.', [
       models('w03b-examples',
-        '[Example for Word 1]\n[Example for Word 2]\n[Example for Word 3]\n[Example for Word 4]',
-        ['[Example for Word 1]', '[Example for Word 2]', '[Example for Word 3]', '[Example for Word 4]']),
+        '[Example beginning 1] [Word 1] [Example ending 1]\n[Example beginning 2] [Word 2] [Example ending 2]\n[Example beginning 3] [Word 3] [Example ending 3]\n[Example beginning 4] [Word 4] [Example ending 4]',
+        ['[Word 1]', '[Word 2]', '[Word 3]', '[Word 4]']),
       matching('w03b-pairs', 'Match the words with their meanings.', wordMeanings, [1, 3, 0, 2], 'word-definition')
     ]), 'Read a natural example for each new word, then choose its English meaning.', [catalog('11'), words('5')]),
 

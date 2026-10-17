@@ -1129,16 +1129,18 @@ test('actual W03B presents one instruction and compact models label while keepin
  const sourceWords=def.exercises[1].exercise.items.map(item=>item.text);
  [...s.host.querySelectorAll('.ek-example-model')].forEach((model,index)=>{
   assert.equal(model.querySelector('.ek-example-number').textContent,`${index+1}.`);
-  assert.equal(model.querySelector('strong').textContent,`[Example for ${sourceWords[index].slice(1,-1)}]`,'each example keeps the same numbered target word as the matching card');
+  assert.deepEqual([...model.querySelectorAll('strong')].map(word=>word.textContent),[sourceWords[index]],'only the matching target word is bold');
+  const copy=model.querySelector('.ek-example-text');
+  assert.equal(copy.firstChild.nodeType,3);assert.equal(copy.lastChild.nodeType,3);
  });
  s.mount.setAnswers({'part-2':{'item-1':'answer-1',__sw_checked:true}});
  assert.equal(s.host.querySelector('.ek-word-definition-slot').getAttribute('data-feedback'),'correct');
  assert.equal(s.changes.length,0);assert.equal(JSON.stringify(def),before);
  const renamed=JSON.parse(before);renamed.id+='-variable';
- renamed.exercises[0].exercise.blocks[0].text=models.text.replaceAll('[Example for Word 1]','[Example for revised word]');
- renamed.exercises[0].exercise.blocks[0].highlights[0]='[Example for revised word]';
+ renamed.exercises[0].exercise.blocks[0].text=models.text.replaceAll('[Word 1]','[Revised word]');
+ renamed.exercises[0].exercise.blocks[0].highlights[0]='[Revised word]';
  renamed.exercises[1].exercise.items[0].text='[Revised word]';
- const variable=setup(renamed);assert.equal(variable.host.querySelector('.ek-example-model strong').textContent,'[Example for revised word]');
+ const variable=setup(renamed);assert.equal(variable.host.querySelector('.ek-example-model strong').textContent,'[Revised word]');
  assert.equal(variable.host.querySelector('.ek-card-label').textContent,'[Revised word]');
  assert.equal(variable.host.querySelector('.ek-example-number').textContent,'1.');
  const reader=setup(def,{readOnly:true,syncChecks:true});

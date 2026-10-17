@@ -68,7 +68,8 @@ test('Words catalog uses structural placeholders with stable keys, option order 
  assert.equal(imageLabel.imagePending,true);assert.equal(imageLabel.image,undefined);assert.ok(imageLabel.sourceArtwork.image);
  assert.deepEqual(imageLabel.items.map(item=>[item.id,item.x,item.y,item.correctId]),[['cabinet',17,9,'furniture'],['tea',50,46,'drink'],['hoodie',67,9,'clothing'],['apartment',17,91,'building'],['pastry',50,91,'food'],['store',83,91,'shop']]);
  const examples=words.find(def=>def.code==='W03B').exercises[0].exercise.blocks[0];
- assert.deepEqual(examples.text.split('\n'),[1,2,3,4].map(number=>`[Example for Word ${number}]`));assert.deepEqual(examples.highlights,examples.text.split('\n'));
+ assert.deepEqual(examples.text.split('\n'),[1,2,3,4].map(number=>`[Example beginning ${number}] [Word ${number}] [Example ending ${number}]`));
+ assert.deepEqual(examples.highlights,[1,2,3,4].map(number=>`[Word ${number}]`));
 });
 test('all source-coded cards use the shared renderer; existing artwork paths resolve and missing audio stays pending',()=>{
  let audioCount=0;
