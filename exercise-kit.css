@@ -841,7 +841,7 @@
 }
 
 /* Answer controls retain their white surface after checking. */
-body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-match-slot:not(:is(.ek-picture-word-slot,.ek-vocabulary-slot)),.ek-choice-trigger){background-color:#fff;background-image:none!important}
+body:not([data-theme=dark]) .exercise-kit.ek-modern:not(.ek-flat-controls) :is(.ek-match-slot:not(:is(.ek-picture-word-slot,.ek-vocabulary-slot)),.ek-choice-trigger){background-color:#fff;background-image:none!important}
 body:not([data-theme=dark]) .exercise-kit.ek-modern :is(.ek-card,.ek-radio,.ek-token,.ek-option,.ek-inline-option,.ek-writing-input){background-color:#fff}
 body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter:none}
 
@@ -978,3 +978,48 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-audio{grid-column:1/-1;grid-row:3}
   .exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{min-height:104px}
 }
+
+/* Reviewed Discovery/Practice catalog controls reuse the approved Words surface.
+   Inherited by nested tasks; W and the unreviewed Rules keep their current skin. */
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)){
+  border:1px dashed var(--sw-picture-word-slot-border);border-radius:20px;
+  background:var(--sw-picture-word-slot-surface);box-shadow:none;background-image:none;
+}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-match-slot:not(.ek-vocabulary-slot)){
+  width:auto;min-width:0;max-width:100%;height:auto;min-height:42px;
+  padding:8px 12px;gap:8px;text-align:left;line-height:1.5;
+}
+.exercise-kit.ek-modern.ek-flat-controls .ek-choice-trigger{display:inline-flex;align-items:center}
+.exercise-kit.ek-modern.ek-flat-controls .ek-choice-label{min-width:0;white-space:normal;overflow-wrap:break-word}
+.exercise-kit.ek-modern.ek-flat-controls .ek-discovery-choice .ek-choice-trigger{min-width:0}
+.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap{margin-inline:3px}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-token,.ek-order-target>.ek-token){padding:8px 12px}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-token,.ek-order-target>.ek-token)[data-feedback]{padding-left:36px}
+.exercise-kit.ek-modern.ek-flat-controls .ek-gap-number{
+  display:inline-grid;place-items:center;position:relative;flex:none;
+  width:var(--sw-feedback-marker-size);min-width:var(--sw-feedback-marker-size);height:var(--sw-feedback-marker-size);
+  gap:0;font-size:var(--sw-exercise-caption-size);line-height:1;
+}
+.exercise-kit.ek-modern.ek-flat-controls .ek-gap-number::after{display:none}
+.exercise-kit.ek-modern.ek-flat-controls .ek-gap-number[data-result]{font-size:0}
+.exercise-kit.ek-modern.ek-flat-controls .ek-gap-number[data-result]::after{
+  content:'';display:block;position:absolute;inset:0;width:100%;height:100%;visibility:visible;
+  border-radius:50%;background:var(--ek-feedback-mark) var(--ek-feedback-icon) center/100% 100% no-repeat;
+}
+.exercise-kit.ek-modern.ek-flat-controls .ek-gap-number[data-result=empty]::after{background:var(--sw-feedback-incorrect-mark) var(--sw-feedback-cross-icon) center/100% 100% no-repeat}
+.exercise-kit.ek-modern.ek-flat-controls .ek-question legend{padding:0}
+.exercise-kit.ek-modern.ek-flat-controls .ek-question-index{visibility:visible;background:transparent;color:var(--ek-muted);font-size:var(--sw-exercise-caption-size)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-question-index[data-result]{font-size:0;background:var(--ek-feedback-mark) var(--ek-feedback-icon) center/100% 100% no-repeat}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-numbered-sentence,.ek-gap-table,.ek-typed-wrap) .ek-gap-number:not([data-result]){display:none}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-group,.ek-order-target){border:1px dashed var(--sw-picture-word-slot-border);border-radius:20px;background:var(--sw-picture-word-slot-surface);box-shadow:none}
+.exercise-kit.ek-modern.ek-flat-controls .ek-sort-group h3{font-weight:400;font-size:var(--sw-exercise-small-size);color:var(--sw-exercise-index-ink)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type]{background:transparent;box-shadow:none;border:1px solid var(--sw-picture-word-slot-border)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type]:checked{background:var(--sw-exercise-muted);border-color:var(--sw-exercise-muted)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type][data-feedback]{background:var(--ek-feedback-mark);border-color:var(--ek-feedback-mark);box-shadow:none}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)):hover:not(:disabled){
+  background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none;
+}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback],
+.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:has(>.ek-typed-gap[data-feedback]){background:var(--sw-answer-surface);box-shadow:none;border-color:transparent;border-style:solid}
+
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]:hover:not(:disabled){background:var(--sw-answer-surface);box-shadow:none;transform:none}

@@ -104,6 +104,50 @@ test('inline dropdown closes after selection and updates only its gap', () => {
   assert.equal(s.host.querySelector('.ek-inline-menu').hidden,true);
   s.click('OK'); assert.equal(s.host.querySelector('.ek-choice-trigger').getAttribute('data-feedback'),'correct');
 });
+test('empty editors refresh their native selection after focus without moving a typed caret',()=>{
+ const originalFrame=globalThis.requestAnimationFrame;
+ try{
+ const definitions=[
+  {version:1,id:'empty-gap',kind:'gaps',title:'Write.',items:[{id:'row',segments:[{id:'answer',answers:['word']}]}]},
+  {version:1,id:'cue-gap',kind:'gaps',title:'Write.',items:[{id:'row',segments:[{id:'answer',answers:['word'],placeholder:'w'}]}]},
+  {version:1,id:'empty-writing',kind:'writing',title:'Write.',items:[{id:'answer',prompt:'Write.'}]},
+  {version:1,id:'empty-message',kind:'writing',title:'Write.',items:[{id:'answer',prompt:'Write.',multiline:true}]}
+ ];
+ for(const def of definitions){
+  const s=setup(def),input=s.host.querySelector('input,textarea'),frames=[],selections=[];
+  let focused=input,layouts=0;
+  Object.defineProperty(s.document,'activeElement',{get:()=>focused,configurable:true});
+  Object.defineProperty(input,'offsetHeight',{get:()=>{layouts++;return 24;},configurable:true});
+  input.setSelectionRange=(start,end)=>selections.push([start,end]);
+  s.window.requestAnimationFrame=callback=>{frames.push(callback);return frames.length;};
+  s.fire(input,'focus');assert.equal(selections.length,0);frames.shift()();
+  assert.deepEqual(selections,[[0,0]]);assert.equal(layouts,1);assert.equal(input.value,'');assert.equal(s.changes.length,0);
+  s.fire(input,'focus');input.value='typed before paint';frames.shift()();assert.equal(selections.length,1);
+  input.value='';s.fire(input,'focus');focused=null;frames.shift()();assert.equal(selections.length,1);
+  focused=input;s.fire(input,'focus');s.mount.destroy();frames.shift()();assert.equal(selections.length,1);
+ }
+ const locked=setup(definitions[0],{readOnly:true}),frames=[];
+ locked.window.requestAnimationFrame=callback=>frames.push(callback);locked.fire(locked.host.querySelector('input'),'focus');assert.equal(frames.length,0);
+ }finally{if(originalFrame===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=originalFrame;}
+});
+test('reviewed Discovery controls inherit the flat skin and replace their existing indices on check',()=>{
+ const def=sourceFixture('D02'),s=setup(def,{syncChecks:true});
+ assert.equal(s.host.classList.contains('ek-flat-controls'),true);
+ assert.equal(s.host.querySelector('.ek-discovery-host').classList.contains('ek-flat-controls'),true);
+ const control=s.host.querySelector('.ek-choice-trigger'),badge=control.querySelector('.ek-gap-number');
+ assert.equal(badge.textContent,'1');assert.ok(control.querySelector('.ek-choice-label'));
+ const child=s.host.querySelector('.ek-discovery-host');
+ s.fire(control,'click');s.fire(child.querySelector('[data-option-value=now]'),'click');
+ s.fire(child.querySelectorAll('.ek-choice-trigger')[1],'click');s.fire(child.querySelector('[data-option-value=yes]'),'click');
+ s.fire(child.querySelector('.ek-check'),'click');
+ assert.equal(control.querySelector('.ek-gap-number'),badge);assert.equal(badge.dataset.result,'correct');
+ s.fire(control,'click');s.fire(child.querySelector('[data-option-value=habit]'),'click');
+ s.fire(child.querySelector('.ek-check'),'click');
+ assert.equal(control.querySelector('.ek-gap-number'),badge);assert.equal(badge.dataset.result,'retry');
+ for(const code of ['W01','P01','R01']){
+  const untouched=setup(sourceFixture(code));assert.equal(untouched.host.classList.contains('ek-flat-controls'),false);untouched.mount.destroy();
+ }
+});
 test('single and multiple choices use real radios / checkboxes and exact set grading', () => {
   for (const id of ['choice-demo','image-choice-demo','multiple-choice-demo','image-multiple-demo']) {
     const s = setup(id); const multiple = id.includes('multiple'); const inputs = [...s.host.querySelectorAll('input')];

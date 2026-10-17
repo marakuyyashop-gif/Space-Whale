@@ -14,7 +14,7 @@
     definitions.push(result);
     return result;
   };
-  const matching = (id, title, items, options, data = {}) => base(id,'matching',title,{layout:'cards',items,options,...data});
+  const matching = (id, title, items, options, data = {}) => base(id,'matching',title,{layout:'word-definition',items,options,...data});
   const typed = (id, title, items, data = {}) => base(id,'gaps',title,{inputMode:'text',items,...data});
   const writing = (id, title, items, data = {}) => base(id,'writing',title,{responseMode:'open',items,...data});
   const art = (name, alt) => ({image:`Images/Текущие/assets/choice-${name}.svg`,alt});
@@ -26,198 +26,198 @@
 
   preview('E01','Single Choice','Choose one answer that fits the question and situation.',
     base('e01-choice','choice','Choose a reply.',{instruction:'Choose one answer.',items:[{
-      id:'reply',prompt:'A friend says, “I’m cold.” What can you offer?',
-      options:[option('question','Where is your coat?'),option('offer','Would you like my jacket?'),option('past','I was cold yesterday.')],correctId:'offer'
+      id:'reply',prompt:'[Question or situation 1]',
+      options:[option('question','[Answer option 1]'),option('offer','[Answer option 2]'),option('past','[Answer option 3]')],correctId:'offer'
     }]}));
 
   preview('E02','Multiple Select','Select every sentence that follows the given model.',
     base('e02-multiple','choice','Find the correct sentences.',{multiple:true,instruction:'Choose all the correct sentences.',items:[{
-      id:'sentences',prompt:'Which sentences use the present simple correctly?',
-      options:[option('negative','She doesn’t work on Sundays.'),option('wrong-question','Does she works here?'),option('positive','He works from home.'),option('wrong-negative','He don’t like coffee.')],correctIds:['negative','positive']
+      id:'sentences',prompt:'[Question about the target structure]',
+      options:[option('negative','[Sentence 1]'),option('wrong-question','[Sentence 2]'),option('positive','[Sentence 3]'),option('wrong-negative','[Sentence 4]')],correctIds:['negative','positive']
     }]}));
 
   preview('E03','Dropdown: отдельные предложения и реплики','Choose a form inside each separate sentence.',
-    base('e03-dropdown','gaps','Describe how the clothes look.',{inputMode:'select',items:[
-      row('coat',['This coat ',gap('coat-form','looks',{options:['look like','looks','look']}),' warm.']),
-      row('boots',['These boots ',gap('boots-form','look',{options:['looks','look like','look']}),' comfortable.']),
-      row('bag',['This bag ',gap('bag-form','looks like',{options:['look','looks like','looks']}),' my old one.'])
+    base('e03-dropdown','gaps','Complete the sentences.',{inputMode:'select',items:[
+      row('coat',['[Sentence beginning 1] ',gap('coat-form','[Option 1B]',{options:['[Option 1A]','[Option 1B]','[Option 1C]']}),' [Sentence ending 1]']),
+      row('boots',['[Sentence beginning 2] ',gap('boots-form','[Option 2C]',{options:['[Option 2A]','[Option 2B]','[Option 2C]']}),' [Sentence ending 2]']),
+      row('bag',['[Sentence beginning 3] ',gap('bag-form','[Option 3B]',{options:['[Option 3A]','[Option 3B]','[Option 3C]']}),' [Sentence ending 3]'])
     ]}));
 
   preview('E03A','Dropdown: связный текст','Use the whole text to choose the forms in its gaps.',
-    base('e03a-text','gaps','Read about Leo’s workday.',{inputMode:'select',layout:'paragraph',instruction:'Choose the correct forms.',items:[row('leo',[
-      'Leo ',gap('live','lives',{options:['are living','lives','live']}),' in Boston. Every morning, he ',
-      gap('travel','takes',{options:['take','is take','takes']}),' the bus to work. Today, he ',
-      gap('today','is working',{options:['are working','is working','work']}),' from home.'
+    base('e03a-text','gaps','Complete the text.',{inputMode:'select',layout:'paragraph',instruction:'Choose the correct forms.',items:[row('leo',[
+      '[Text beginning] ',gap('live','[Option 1B]',{options:['[Option 1A]','[Option 1B]','[Option 1C]']}),' [Text part 2] ',
+      gap('travel','[Option 2C]',{options:['[Option 2A]','[Option 2B]','[Option 2C]']}),' [Text part 3] ',
+      gap('today','[Option 3B]',{options:['[Option 3A]','[Option 3B]','[Option 3C]']}),' [Text ending]'
     ])]}));
 
   preview('E03B','Dropdown: перевод слова','Choose the translation of each English word.',
     base('e03b-translation','gaps','Choose the meaning of each word.',{inputMode:'select',items:[
-      row('curtain',['curtain — ',gap('curtain-meaning','штора',{options:['подушка','штора','ковёр']})]),
-      row('cushion',['cushion — ',gap('cushion-meaning','диванная подушка',{options:['диванная подушка','кресло','одеяло']})]),
-      row('carpet',['carpet — ',gap('carpet-meaning','ковёр',{options:['часы','занавеска','ковёр']})])
+      row('curtain',['[Word 1] — ',gap('curtain-meaning','[Translation option 1B]',{options:['[Translation option 1A]','[Translation option 1B]','[Translation option 1C]']})]),
+      row('cushion',['[Word 2] — ',gap('cushion-meaning','[Translation option 2A]',{options:['[Translation option 2A]','[Translation option 2B]','[Translation option 2C]']})]),
+      row('carpet',['[Word 3] — ',gap('carpet-meaning','[Translation option 3C]',{options:['[Translation option 3A]','[Translation option 3B]','[Translation option 3C]']})])
     ]}));
 
   preview('E04','Ввести пропуск с банком слов','Choose a base form from the bank and type the form needed in context.',
     typed('e04-bank','Complete the sentences.',[
-      row('ella',['Ella ',gap('watch','watches'),' a movie every Friday.']),
-      row('home',['We ',gap('be','are'),' at home.']),
-      row('sam',['Sam ',gap('go','goes'),' to work by bus.'])
-    ],{instruction:'Use the words in the bank. Change their form if needed.',bank:['watch','go','be']}));
+      row('ella',['[Sentence beginning 1] ',gap('watch','[Form of Word 1]'),' [Sentence ending 1]']),
+      row('home',['[Sentence beginning 2] ',gap('be','[Form of Word 2]'),' [Sentence ending 2]']),
+      row('sam',['[Sentence beginning 3] ',gap('go','[Form of Word 3]'),' [Sentence ending 3]'])
+    ],{instruction:'Use the words in the bank. Change their form if needed.',bank:['[Word 1]','[Word 3]','[Word 2]']}));
 
   preview('E04A','Ввести пропуск с подсказкой','Type the required form using the local base-form cue.',
     typed('e04a-cues','Complete the sentences.',[
-      row('routine',['Nora ',gap('work','works',{placeholder:'work'}),' in a café.']),
-      row('now',['She ',gap('make','is making',{placeholder:'make'}),' coffee right now.']),
-      row('yesterday',['Yesterday, she ',gap('finish','finished',{placeholder:'finish'}),' work at six.'])
+      row('routine',['[Sentence beginning 1] ',gap('work','[Form of Word 1]',{placeholder:'[Word 1]'}),' [Sentence ending 1]']),
+      row('now',['[Sentence beginning 2] ',gap('make','[Form of Word 2]',{placeholder:'[Word 2]'}),' [Sentence ending 2]']),
+      row('yesterday',['[Sentence beginning 3] ',gap('finish','[Form of Word 3]',{placeholder:'[Word 3]'}),' [Sentence ending 3]'])
     ],{instruction:'Use the verb in each field in the correct form.'}));
 
   preview('E05','Ввести пропуск без подсказки','Recall the missing language from the meaning and structure of the sentence.',
-    typed('e05-recall','Complete the time expressions.',[
-      row('time',['The train leaves ',gap('at','at'),' 9 a.m.']),
-      row('month',['My birthday is ',gap('in','in'),' July.']),
-      row('day',['We meet ',gap('on','on'),' Monday.'])
+    typed('e05-recall','Complete the sentences.',[
+      row('time',['[Sentence beginning 1] ',gap('at','[Word 1]'),' [Sentence ending 1]']),
+      row('month',['[Sentence beginning 2] ',gap('in','[Word 2]'),' [Sentence ending 2]']),
+      row('day',['[Sentence beginning 3] ',gap('on','[Word 3]'),' [Sentence ending 3]'])
     ],{instruction:'Write one word in each gap.'}));
 
   preview('E05A','Ввести слово по переводу-подсказке','Recall and type the English word from its translation.',
     writing('e05a-translation','Write the English words.',[
-      {id:'blanket',prompt:'одеяло',acceptedAnswers:['blanket']},
-      {id:'hanger',prompt:'вешалка для одежды',acceptedAnswers:['hanger']},
-      {id:'toothbrush',prompt:'зубная щётка',acceptedAnswers:['toothbrush']}
+      {id:'blanket',prompt:'[Translation Word 1]',acceptedAnswers:['[Word 1]']},
+      {id:'hanger',prompt:'[Translation Word 2]',acceptedAnswers:['[Word 2]']},
+      {id:'toothbrush',prompt:'[Translation Word 3]',acceptedAnswers:['[Word 3]']}
     ],{responseMode:'accepted'}));
 
   preview('E05B','Заполнить схему или таблицу','Restore missing forms in a partly completed table of a familiar model.',
-    typed('e05b-table','Complete the indefinite pronouns.',[
-      row('people',['People',gap('everybody','everybody'),'somebody','anybody',gap('nobody','nobody')]),
-      row('things',['Things','everything',gap('something','something'),gap('anything','anything'),'nothing'])
-    ],{layout:'table',tableColumns:['Group','every-','some-','any-','no-']}));
+    typed('e05b-table','Complete the table.',[
+      row('people',['[Group 1]',gap('everybody','[Form 1.1]'),'[Form 1.2]','[Form 1.3]',gap('nobody','[Form 1.4]')]),
+      row('things',['[Group 2]','[Form 2.1]',gap('something','[Form 2.2]'),gap('anything','[Form 2.3]'),'[Form 2.4]'])
+    ],{layout:'table',tableColumns:['Group','[Column 1]','[Column 2]','[Column 3]','[Column 4]']}));
 
   preview('E06','Matching: части предложения','Join sentence beginnings and endings to make complete statements.',
     matching('e06-halves','Match the sentence halves.',[
-      {id:'late',text:'If we leave now,',correctId:'catch'},
-      {id:'empty',text:'There isn’t any milk,',correctId:'buy'},
-      {id:'cold',text:'It’s cold outside,',correctId:'coat'}
-    ],[option('coat','so take your coat.'),option('catch','we can catch the bus.'),option('buy','so I need to buy some.')]));
+      {id:'late',text:'[Sentence beginning 1]',correctId:'catch'},
+      {id:'empty',text:'[Sentence beginning 2]',correctId:'buy'},
+      {id:'cold',text:'[Sentence beginning 3]',correctId:'coat'}
+    ],[option('coat','[Sentence ending 3]'),option('catch','[Sentence ending 1]'),option('buy','[Sentence ending 2]')]));
 
   preview('E06A','Matching: вопрос и ответ','Connect each question with its natural answer.',
     matching('e06a-questions','Match the questions and answers.',[
-      {id:'time',text:'What time does the shop close?',correctId:'six'},
-      {id:'price',text:'How much is this bag?',correctId:'twenty'},
-      {id:'place',text:'Where is the fitting room?',correctId:'right'}
-    ],[option('twenty','It’s twenty dollars.'),option('right','It’s on your right.'),option('six','At six o’clock.')]));
+      {id:'time',text:'[Question 1]',correctId:'six'},
+      {id:'price',text:'[Question 2]',correctId:'twenty'},
+      {id:'place',text:'[Question 3]',correctId:'right'}
+    ],[option('twenty','[Answer 2]'),option('right','[Answer 3]'),option('six','[Answer 1]')]));
 
   preview('E06B','Matching: пример и слово','Identify the function illustrated by each short example.',
     matching('e06b-functions','Match each example with its function.',[
-      {id:'tea',text:'Would you like some tea?',correctId:'offer'},
-      {id:'window',text:'Could you open the window, please?',correctId:'request'},
-      {id:'train',text:'Let’s take the train.',correctId:'suggestion'}
-    ],[option('suggestion','a suggestion'),option('offer','an offer'),option('request','a request')]));
+      {id:'tea',text:'[Example 1]',correctId:'offer'},
+      {id:'window',text:'[Example 2]',correctId:'request'},
+      {id:'train',text:'[Example 3]',correctId:'suggestion'}
+    ],[option('suggestion','[Function 3]'),option('offer','[Function 1]'),option('request','[Function 2]')]));
 
   preview('E06C','Matching: слово и изменённая форма','Pair each base form with its changed form.',
-    matching('e06c-forms','Match the verbs with their past forms.',[
-      {id:'buy',text:'buy',correctId:'bought'},
-      {id:'meet',text:'meet',correctId:'met'},
-      {id:'go',text:'go',correctId:'went'}
-    ],[option('went','went'),option('bought','bought'),option('met','met')]));
+    matching('e06c-forms','Match the words with their changed forms.',[
+      {id:'buy',text:'[Word 1]',correctId:'bought'},
+      {id:'meet',text:'[Word 2]',correctId:'met'},
+      {id:'go',text:'[Word 3]',correctId:'went'}
+    ],[option('went','[Form of Word 3]'),option('bought','[Form of Word 1]'),option('met','[Form of Word 2]')]));
 
   preview('E06D','Matching Image and Phrase','Match each picture with a sentence describing its action.',
     matching('e06d-picture-phrase','Match the pictures and sentences.',[
-      {id:'cooking',text:'Cooking',...art('cooking','A person cooking'),correctId:'dinner'},
-      {id:'reading',text:'Reading',...art('reading','A person reading a book'),correctId:'book'},
-      {id:'cycling',text:'Cycling',...art('cycling','A person riding a bicycle'),correctId:'bike'}
-    ],[option('bike','The person is riding a bike.'),option('dinner','The person is making dinner.'),option('book','The person is reading a book.')],{layout:'picture-word'}));
+      {id:'cooking',text:'[Picture 1]',...art('cooking','A person cooking'),correctId:'dinner'},
+      {id:'reading',text:'[Picture 2]',...art('reading','A person reading a book'),correctId:'book'},
+      {id:'cycling',text:'[Picture 3]',...art('cycling','A person riding a bicycle'),correctId:'bike'}
+    ],[option('bike','[Sentence for Picture 3]'),option('dinner','[Sentence for Picture 1]'),option('book','[Sentence for Picture 2]')],{layout:'picture-word'}));
 
   preview('E06E','Matching: деятельность и предмет','Connect each activity with the object used for it.',
     matching('e06e-activity-object','Match the objects with the activities.',[
-      {id:'remote',text:'TV remote',...objectArt.remote,correctId:'channel'},
-      {id:'keyboard',text:'Keyboard',...objectArt.keyboard,correctId:'type'},
-      {id:'mouse',text:'Mouse',...objectArt.mouse,correctId:'pointer'}
-    ],[option('type','type a message'),option('pointer','move the pointer'),option('channel','change the TV channel')],{layout:'picture-word'}));
+      {id:'remote',text:'[Object 1]',...objectArt.remote,correctId:'channel'},
+      {id:'keyboard',text:'[Object 2]',...objectArt.keyboard,correctId:'type'},
+      {id:'mouse',text:'[Object 3]',...objectArt.mouse,correctId:'pointer'}
+    ],[option('type','[Activity for Object 2]'),option('pointer','[Activity for Object 3]'),option('channel','[Activity for Object 1]')],{layout:'picture-word'}));
 
   preview('E06F','Matching: части словосочетания','Join the parts of familiar expressions.',
     matching('e06f-chunks','Match the parts of the expressions.',[
-      {id:'ask',text:'ask',correctId:'help'},
-      {id:'make',text:'make',correctId:'decision'},
-      {id:'pay',text:'pay',correctId:'card'}
-    ],[option('decision','a decision'),option('card','by card'),option('help','for help')]));
+      {id:'ask',text:'[Lexical chunk beginning 1]',correctId:'help'},
+      {id:'make',text:'[Lexical chunk beginning 2]',correctId:'decision'},
+      {id:'pay',text:'[Lexical chunk beginning 3]',correctId:'card'}
+    ],[option('decision','[Lexical chunk ending 2]'),option('card','[Lexical chunk ending 3]'),option('help','[Lexical chunk ending 1]')]));
 
   preview('E06G','Matching: фраза и значение','Connect each complete phrase with its meaning.',
     matching('e06g-meaning','Match the phrases and meanings.',[
-      {id:'way',text:'I’m on my way.',correctId:'coming'},
-      {id:'works',text:'That works for me.',correctId:'plan'},
-      {id:'mind',text:'Never mind.',correctId:'problem'}
-    ],[option('plan','That plan is good for me.'),option('problem','It’s not a problem.'),option('coming','I’m coming now.')],{layout:'word-definition'}));
+      {id:'way',text:'[Phrase 1]',correctId:'coming'},
+      {id:'works',text:'[Phrase 2]',correctId:'plan'},
+      {id:'mind',text:'[Phrase 3]',correctId:'problem'}
+    ],[option('plan','[Meaning of Phrase 2]'),option('problem','[Meaning of Phrase 3]'),option('coming','[Meaning of Phrase 1]')],{layout:'word-definition'}));
 
   preview('E07','Сортировка по категориям','Place forms in the groups defined by the learned rule.',
-    base('e07-categories','sort','Sort the comparison forms.',{
-      groups:[option('comparative','Comparative'),option('superlative','Superlative')],
-      items:[{id:'best',text:'the best',correctId:'superlative'},{id:'cheaper',text:'cheaper',correctId:'comparative'},{id:'expensive',text:'the most expensive',correctId:'superlative'},{id:'comfortable',text:'more comfortable',correctId:'comparative'}]
+    base('e07-categories','sort','Sort the forms.',{
+      groups:[option('comparative','[Group 1]'),option('superlative','[Group 2]')],
+      items:[{id:'best',text:'[Form 1]',correctId:'superlative'},{id:'cheaper',text:'[Form 2]',correctId:'comparative'},{id:'expensive',text:'[Form 3]',correctId:'superlative'},{id:'comfortable',text:'[Form 4]',correctId:'comparative'}]
     }));
 
   preview('E08','Sort','Arrange the items on a clearly defined scale.',
-    base('e08-frequency','order','Order the frequency words.',{
-      instruction:'Put the words in order from 0% to 100%.',
-      tokens:[option('often','often'),option('never','never'),option('always','always'),option('sometimes','sometimes')],
+    base('e08-frequency','order','Order the words.',{
+      instruction:'Put the words in the correct order on the scale.',
+      tokens:[option('often','[Word 3]'),option('never','[Word 1]'),option('always','[Word 4]'),option('sometimes','[Word 2]')],
       correctOrder:['never','sometimes','often','always']
     }));
 
   preview('E09','Word Order: составить предложение','Arrange all the supplied words to make a question.',
     base('e09-question','order','Make a question.',{
       instruction:'Put the words in the correct order.',sentenceCase:true,
-      tokens:[option('your','your'),option('work','work?'),option('does','does'),option('where','where'),option('sister','sister')],
+      tokens:[option('your','[Word 3]'),option('work','[Word 5]'),option('does','[Word 2]'),option('where','[Word 1]'),option('sister','[Word 4]')],
       correctOrder:['where','does','your','sister','work']
     }));
 
   preview('E11','Написать предложение по подсказкам','Build and write complete sentences from meaning cues.',
     writing('e11-sentences','Write complete sentences.',[
-      {id:'want',prompt:'want / a new coat / because / cold'},
-      {id:'work',prompt:'sister / work / café / every day'},
-      {id:'now',prompt:'right now / wait / bus'}
+      {id:'want',prompt:'[Cue 1A] / [Cue 1B] / [Cue 1C] / [Cue 1D]'},
+      {id:'work',prompt:'[Cue 2A] / [Cue 2B] / [Cue 2C] / [Cue 2D]'},
+      {id:'now',prompt:'[Cue 3A] / [Cue 3B] / [Cue 3C]'}
     ],{instruction:'Use the cues. Add the grammar and words you need.'}));
 
   preview('E11A','Устно восстановить фразу по изображению','Recover the missing language and say the sentence aloud using the picture.',
-    kit.speaking({id:'e11a-oral',title:'Say what is happening.',image:art('cooking','A person cooking'),
+    kit.speaking({id:'e11a-oral',title:'Complete the sentence aloud.',image:art('cooking','A person cooking'),
       task:{text:'Look at the picture. Complete the sentence aloud.'},
-      use:[{words:['cook'],phrases:['Right now, the person …']}]
+      use:[{words:['[Word 1]'],phrases:['[Sentence beginning 1] …']}]
     }));
 
   preview('E12','Преобразовать слово','Type the form specified by the task.',
-    writing('e12-past','Write the past forms.',[
-      {id:'go',prompt:'go',acceptedAnswers:['went']},
-      {id:'take',prompt:'take',acceptedAnswers:['took']},
-      {id:'buy',prompt:'buy',acceptedAnswers:['bought']}
+    writing('e12-past','Write the required forms.',[
+      {id:'go',prompt:'[Word 1]',acceptedAnswers:['[Form of Word 1]']},
+      {id:'take',prompt:'[Word 2]',acceptedAnswers:['[Form of Word 2]']},
+      {id:'buy',prompt:'[Word 3]',acceptedAnswers:['[Form of Word 3]']}
     ],{responseMode:'accepted'}));
 
   preview('E13','Error Correction','Find the error in each sentence and write the corrected sentence.',
     writing('e13-correct','Correct the sentences.',[
-      {id:'negative',prompt:'She don’t like coffee.',normalization:'translation',acceptedAnswers:["She doesn’t like coffee."]},
-      {id:'question',prompt:'Where does he lives?',normalization:'translation',acceptedAnswers:['Where does he live?']},
-      {id:'positive',prompt:'My brother work in a hotel.',normalization:'translation',acceptedAnswers:['My brother works in a hotel.']}
+      {id:'negative',prompt:'[Sentence with an error 1]',normalization:'translation',acceptedAnswers:['[Corrected sentence 1]']},
+      {id:'question',prompt:'[Sentence with an error 2]',normalization:'translation',acceptedAnswers:['[Corrected sentence 2]']},
+      {id:'positive',prompt:'[Sentence with an error 3]',normalization:'translation',acceptedAnswers:['[Corrected sentence 3]']}
     ],{responseMode:'accepted',instruction:'There is one error in each sentence. Write the whole sentence correctly.'}));
 
   preview('E14','Краткий письменный ответ','Write one short response to a clear incoming message.',
     writing('e14-reply','Reply to your friend.',[
-      {id:'reply',prompt:'Alex: Are you free this evening? Tell Alex if you are free and explain why.'}
+      {id:'reply',prompt:'[Incoming message 1] [Reply task 1]'}
     ],{instruction:'Write one or two sentences.'}));
 
   preview('E15','Завершить предложение','Supply your own suitable ending after each given beginning.',
     writing('e15-endings','Finish the sentences.',[
-      {id:'work',prompt:'After work, I usually …'},
-      {id:'rain',prompt:'If it rains tomorrow, …'},
-      {id:'because',prompt:'I want to learn English because …'}
+      {id:'work',prompt:'[Sentence beginning 1] …'},
+      {id:'rain',prompt:'[Sentence beginning 2] …'},
+      {id:'because',prompt:'[Sentence beginning 3] …'}
     ],{instruction:'Write only the missing endings. Use your own ideas.'}));
 
   preview('E16','Make It True for You','Keep the model and change the content to describe your own life.',
     writing('e16-personal','Make the sentences true for you.',[
-      {id:'coffee',prompt:'I drink coffee every morning.'},
-      {id:'travel',prompt:'I go to work by bus.'},
-      {id:'weekend',prompt:'I work on Sundays.'}
-    ],{responseMode:'personal',instruction:'Keep the present simple. Change each sentence if needed.'}));
+      {id:'coffee',prompt:'[Model sentence 1]'},
+      {id:'travel',prompt:'[Model sentence 2]'},
+      {id:'weekend',prompt:'[Model sentence 3]'}
+    ],{responseMode:'personal',instruction:'Keep the target structure. Change each sentence if needed.'}));
 
   preview('E17','Chat Exchange','Continue a connected three-turn chat using a prepared partner script.',
-    base('e17-chat','stage','Arrange a meeting in a chat.',{progressive:true,requireCheckBeforeNext:true,exercises:[
-      {id:'time',exercise:writing('e17-time','Reply to Alex.',[{id:'reply',prompt:'Alex: Can we meet tomorrow? What time are you free?'}])},
-      {id:'place',exercise:writing('e17-place','Choose a place.',[{id:'reply',prompt:'Alex: That time works for me. Where shall we meet?'}])},
-      {id:'bring',exercise:writing('e17-bring','Finish the chat.',[{id:'reply',prompt:'Alex: Good idea. What should I bring?'}])}
+    base('e17-chat','stage','Continue the chat.',{progressive:true,requireCheckBeforeNext:true,exercises:[
+      {id:'time',exercise:writing('e17-time','Reply to your partner.',[{id:'reply',prompt:'[Partner message 1]'}])},
+      {id:'place',exercise:writing('e17-place','Continue the exchange.',[{id:'reply',prompt:'[Partner message 2]'}])},
+      {id:'bring',exercise:writing('e17-bring','Finish the chat.',[{id:'reply',prompt:'[Partner message 3]'}])}
     ]}));
 
   window.SpaceWhaleSourcePracticeTemplates = definitions;

@@ -466,6 +466,8 @@
   }
   function mount(host, definition, config = {}) {
     validate(definition);
+    const flatControls = config.flatControls === true || ['D','E'].includes(definition.catalogFamily);
+    if(flatControls)config={...config,flatControls:true};
     // A follow-up task or rule uses the existing teacher-controlled sequence, while
     // preserving the original flat response IDs and saved checks.
     if(definition.followUp){
@@ -592,11 +594,21 @@
     // placeholder while editing instead of leaving a transparent placeholder
     // line in the browser's text-control layout. Never change the answer value.
     const placeholderCue = (input, cue) => {
-      if (!cue) return;
-      input.setAttribute('placeholder', cue);
+      if(cue)input.setAttribute('placeholder', cue);
       if (config.readOnly) return;
-      input.addEventListener('focus', () => input.removeAttribute('placeholder'));
-      input.addEventListener('blur', () => input.setAttribute('placeholder', cue));
+      input.addEventListener('focus', () => {
+        if(cue)input.removeAttribute('placeholder');
+        // Refresh the native empty selection after the focused editor has laid out.
+        // Never move a caret in text the learner has already entered.
+        const refresh=()=>{
+          if(disposed||doc.activeElement!==input||input.value)return;
+          void input.offsetHeight;
+          input.setSelectionRange?.(0,0);
+        };
+        if(doc.defaultView?.requestAnimationFrame)doc.defaultView.requestAnimationFrame(refresh);
+        else refresh();
+      });
+      if(cue)input.addEventListener('blur', () => input.setAttribute('placeholder', cue));
     };
     const button = (label, handler, className = 'ek-button') => {
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
@@ -836,6 +848,7 @@
     const optionLetter = index => {let label='';for(let n=index+1;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
     const matchBadgeLabel = badge => badge.dataset.number?'Selected option '+badge.dataset.number:badge.closest('.ek-match-slot')?.dataset.selected==='true'?'Selected match; not checked':'No option selected';
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
+    host.classList.toggle('ek-flat-controls',flatControls);
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-picture-practice',['gaps','writing'].includes(def.kind)&&def.layout==='picture-rows');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
@@ -994,7 +1007,8 @@
       menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
       const badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);
       const paint = () => {
-        opener.replaceChildren(badge, doc.createTextNode(options.find(option=>option.id===answers[id])?.text || '\u00a0'));
+        const selectedText=options.find(option=>option.id===answers[id])?.text || '\u00a0';
+        opener.replaceChildren(badge,flatControls?node('span','ek-choice-label',selectedText):doc.createTextNode(selectedText));
         opener.setAttribute('aria-label', `${label}: ${options.find(option=>option.id===answers[id])?.text || 'choose an answer'}`);
         opener.dataset.selected = String(Boolean(answers[id]));
         menu.querySelectorAll('[data-option-value]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.optionValue === answers[id])));
@@ -1126,7 +1140,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise,index)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { flatControls, unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise,index)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1222,6 +1236,7 @@
             section.append(child);
             page.append(section);
             const handle = mount(child, block.exercise, {
+              flatControls,
               discovery: true,
               hideHeading:hiddenChildHeading(def,block.exercise),
               itemNumbers:config.itemNumbers,
@@ -1437,7 +1452,11 @@
         }
         const group = node('fieldset', def.layout === 'image-grid' ? 'ek-question ek-image-choice' : 'ek-question');
         const legend=node('legend');
-        if(item.promptHighlights?.length){legend.append(...richText(`${itemNumber(item)}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
+        if(flatControls){
+          const index=node('span','ek-question-index',String(itemNumber(item)));index.dataset.number=String(itemNumber(item));
+          legend.append(index,...richText(item.prompt,item.promptHighlights||[]).childNodes);
+        }
+        else if(item.promptHighlights?.length){legend.append(...richText(`${itemNumber(item)}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
         else legend.textContent=`${itemNumber(item)}. ${item.prompt}`;
         group.append(legend);
         item.options.forEach(option => {
@@ -1568,7 +1587,7 @@
       lamps.clear();
       controls.forEach((control,id)=>{
         if(!['matching','gaps','choice'].includes(def.kind))return;
-        if(def.kind==='choice'&&control.tagName==='FIELDSET'){const legend=control.querySelector('legend');let badge=legend.querySelector('.ek-result-symbol');if(!badge){badge=node('span','ek-result-symbol');legend.prepend(badge);}badge.setAttribute('role','img');badge.setAttribute('aria-label','Not checked');lamps.set(id,badge);return;}
+        if(def.kind==='choice'&&control.tagName==='FIELDSET'){const legend=control.querySelector('legend');let badge=legend.querySelector(flatControls?'.ek-question-index':'.ek-result-symbol');if(!badge){badge=node('span','ek-result-symbol');legend.prepend(badge);}badge.classList.add('ek-result-symbol');badge.setAttribute('role','img');badge.setAttribute('aria-label','Not checked');lamps.set(id,badge);return;}
         const lamp=def.kind==='matching'?(vocabularyMatching?control.querySelector('.ek-match-answer-number'):control.closest('.ek-card').querySelector('.ek-number')):(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number'));
         if(!lamp)return;
         if(!vocabularyMatching){lamp.dataset.number=lamp.dataset.number||lamp.textContent;lamp.classList.add('ek-result-lamp');}

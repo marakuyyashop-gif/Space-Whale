@@ -96,31 +96,33 @@
       layout: 'listen-repeat',
       audioPending: true,
       items: [
-        {id: 'study', text: 'study', example: 'My friends study English at home.'},
-        {id: 'learn', text: 'learn', example: 'Jonathan wants to learn English for work.'},
-        {id: 'teach', text: 'teach', example: 'Anna and Mark teach English.'},
-        {id: 'take-notes', text: 'take notes', example: 'My sister takes notes on her phone.'}
+        {id: 'study', text: '[Word 1]', example: '[Sentence with Word 1]'},
+        {id: 'learn', text: '[Word 2]', example: '[Sentence with Word 2]'},
+        {id: 'teach', text: '[Word 3]', example: '[Sentence with Word 3]'},
+        {id: 'take-notes', text: '[Word 4]', example: '[Sentence with Word 4]'}
       ]
-    }), 'Repeat each new word and then its example sentence; each line has a separate audio control.', [catalog('13'), repeat('1, 3')]),
+    }), 'Repeat each word and its example sentence; the number of word–example pairs follows the word list.', [catalog('13'), repeat('1, 3')]),
 
     entry('P02', 'Listen & Repeat — Grammar / Lexis', base('p02', 'audio', 'Listen and repeat.', {
       layout: 'listen-repeat',
       audioPending: true,
       items: [
-        {id: 'offer', text: 'Do you want me to make you a cup of coffee?'},
-        {id: 'request', text: 'Could you help me with this bag?'},
-        {id: 'response', text: 'Of course. Here you are.'}
+        {id: 'offer', text: '[Lexical chunk 1]'},
+        {id: 'request', text: '[Lexical chunk 2]'},
+        {id: 'response', text: '[Lexical chunk 3]'}
       ]
     }), 'Repeat introduced expressions that need pronunciation practice, with one recording per line.', [catalog('32'), repeat('2–3')]),
 
     entry('D01', 'Complete the Rule', base('d01', 'rule-page', 'Look at the examples and complete the rules.', {
       blocks: [
-        {type: 'text', role: 'examples', text: 'I work at home.\nYou work at home.\nHe works at home.\nShe works at home.', highlights: ['work', 'works']},
+        {type: 'text', role: 'examples',
+          text: '[Example beginning 1] [Target structure 1] [Example ending 1]\n[Example beginning 2] [Target structure 2] [Example ending 2]\n[Example beginning 3] [Target structure 3] [Example ending 3]\n[Example beginning 4] [Target structure 4] [Example ending 4]',
+          highlights: ['[Target structure 1]', '[Target structure 2]', '[Target structure 3]', '[Target structure 4]']},
         {type: 'exercise', id: 'conclusion', exercise: base('d01-conclusion', 'gaps', 'Complete the rules.', {
           inputMode: 'select',
           items: [
-            {id: 'base-form', segments: ['After I and you, use ', {id: 'base', options: ['works', 'work'], answers: ['work']}, '.']},
-            {id: 's-form', segments: ['After he and she, use ', {id: 's', options: ['work', 'works'], answers: ['works']}, '.']}
+            {id: 'base-form', segments: ['[Rule beginning 1] ', {id: 'base', options: ['[Rule ending 2]', '[Rule ending 1]', '[Rule ending 3]'], answers: ['[Rule ending 1]']}, '.']},
+            {id: 's-form', segments: ['[Rule beginning 2] ', {id: 's', options: ['[Rule ending 1]', '[Rule ending 2]', '[Rule ending 3]'], answers: ['[Rule ending 2]']}, '.']}
           ]
         })}
       ]
@@ -128,11 +130,13 @@
 
     entry('D02', 'Meaning Choice', base('d02', 'rule-page', 'Read the examples and choose the meaning.', {
       blocks: [
-        {type: 'text', role: 'examples', text: 'Leo is reading now. His book is open.\nKate reads on the train every morning.', highlights: ['is reading now', 'reads', 'every morning']},
+        {type: 'text', role: 'examples',
+          text: '[Example beginning 1] [Target structure 1] [Example ending 1]\n[Example beginning 2] [Target structure 2] [Example ending 2]',
+          highlights: ['[Target structure 1]', '[Target structure 2]']},
         {type: 'exercise', id: 'meaning', exercise: base('d02-meaning', 'choice', 'Choose the meaning.', {
           items: [
-            {id: 'now', prompt: '“Leo is reading now.” When does this happen?', options: [option('habit', 'As a habit.'), option('now', 'At this moment.')], correctId: 'now'},
-            {id: 'routine', prompt: '“Kate reads on the train every morning.” Is this a regular activity?', options: [option('yes', 'Yes.'), option('no', 'No.')], correctId: 'yes'}
+            {id: 'now', prompt: '[Question about Example 1]', options: [option('habit', '[Meaning 1A]'), option('now', '[Meaning 1B]')], correctId: 'now'},
+            {id: 'routine', prompt: '[Question about Example 2]', options: [option('yes', '[Meaning 2A]'), option('no', '[Meaning 2B]')], correctId: 'yes'}
           ]
         })}
       ]
@@ -140,27 +144,26 @@
 
     entry('D03', 'Sort the Examples', grouped('d03', 'Read the examples. Sort them into two groups.', [
       models('d03-examples',
-        'I walk to work every day. Today I am taking the bus.\nSam usually cooks at home. He is eating at a café now.',
-        ['walk', 'am taking', 'usually cooks', 'is eating']),
+        '[Sentence 1] [Sentence 2]\n[Sentence 3] [Sentence 4]'),
       base('d03-groups', 'sort', 'Sort the examples.', {
-        groups: [option('now', 'Happening now'), option('routine', 'Regular activities')],
+        groups: [option('now', '[Group 1]'), option('routine', '[Group 2]')],
         items: [
-          {id: 'today', text: 'Today I am taking the bus.', correctId: 'now'},
-          {id: 'daily', text: 'I walk to work every day.', correctId: 'routine'},
-          {id: 'usual', text: 'Sam usually cooks at home.', correctId: 'routine'},
-          {id: 'cafe', text: 'He is eating at a café now.', correctId: 'now'}
+          {id: 'today', text: '[Sentence 2]', correctId: 'now'},
+          {id: 'daily', text: '[Sentence 1]', correctId: 'routine'},
+          {id: 'usual', text: '[Sentence 3]', correctId: 'routine'},
+          {id: 'cafe', text: '[Sentence 4]', correctId: 'now'}
         ]
       })
     ]), 'Group complete examples to notice a specific difference in meaning or form.', [catalog('25'), discovery('4')]),
 
     entry('D04', 'Match the Examples', grouped('d04', 'Read the examples. Then match the questions and answers.', [
       models('d04-examples',
-        'A: What does your brother look like?\nB: He is tall and has dark hair.\nA: What is your brother like?\nB: He is friendly and helpful.',
-        ['What does your brother look like?', 'What is your brother like?']),
+        '[Question beginning 1] [Target structure 1] [Question ending 1]\n[Answer 1]\n[Question beginning 2] [Target structure 2] [Question ending 2]\n[Answer 2]',
+        ['[Target structure 1]', '[Target structure 2]']),
       matching('d04-pairs', 'Match the questions and answers.', [
-        ['What does Eva look like?', 'She is short and has curly hair.'],
-        ['What is Eva like?', 'She is polite and helpful.']
-      ], [1, 0])
+        ['[Question 1]', '[Answer 1]'],
+        ['[Question 2]', '[Answer 2]']
+      ], [1, 0], 'word-definition')
     ]), 'Find correspondences using complete models that make the new relationship visible.', [catalog('26'), discovery('4')]),
 
     entry('R01', 'Rule — Short Explanation', base('r01', 'rule-page', 'Describe a person’s appearance.', {
