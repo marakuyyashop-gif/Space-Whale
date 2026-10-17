@@ -78,15 +78,15 @@
     ]), 'Read a natural example for each new word, then choose its English meaning.', [catalog('11'), words('5')]),
 
     entry('W04', 'Image Label', base('w04', 'image-label', 'Label the picture.', {
-      image: categoriesSheet,
+      image: categoriesSheet, imageWidth: 1448, imageHeight: 1086,
       alt: 'A cabinet, a cup of tea, a hoodie, an apartment building, a pastry, and a shop in six separate areas.',
       items: [
-        {id: 'cabinet', x: 17, y: 44, correctId: 'furniture'},
-        {id: 'tea', x: 50, y: 44, correctId: 'drink'},
-        {id: 'hoodie', x: 83, y: 44, correctId: 'clothing'},
-        {id: 'apartment', x: 17, y: 89, correctId: 'building'},
-        {id: 'pastry', x: 50, y: 89, correctId: 'food'},
-        {id: 'store', x: 83, y: 89, correctId: 'shop'}
+        {id: 'cabinet', x: 17, y: 9, prompt: 'Label for the cabinet', correctId: 'furniture'},
+        {id: 'tea', x: 50, y: 46, prompt: 'Label for the cup', correctId: 'drink'},
+        {id: 'hoodie', x: 67, y: 9, prompt: 'Label for the hoodie', correctId: 'clothing'},
+        {id: 'apartment', x: 17, y: 91, prompt: 'Label for the apartment building', correctId: 'building'},
+        {id: 'pastry', x: 50, y: 91, prompt: 'Label for the pastry', correctId: 'food'},
+        {id: 'store', x: 83, y: 91, prompt: 'Label for the storefront', correctId: 'shop'}
       ],
       options: ['shop', 'clothing', 'food', 'furniture', 'building', 'drink'].map(word => option(word, word))
     }), 'Place words at the right objects or areas of one shared picture.', [catalog('12'), words('6')]),
@@ -96,7 +96,7 @@
       ['neighbor', 'live next door'],
       ['relative', 'part of the same family'],
       ['friend', 'enjoy spending free time together']
-    ], [2, 0, 3, 1]), 'Match words with short clues organized around one clear feature.', [words('7')]),
+    ], [2, 0, 3, 1], 'word-definition'), 'Match words with short clues organized around one clear feature.', [words('7')]),
 
     entry('P01', 'Listen & Repeat — Words', base('p01', 'audio', 'Listen and repeat.', {
       layout: 'listen-repeat',

@@ -16,8 +16,18 @@
   };
   const sameTaskCopy = (first,second) => Boolean(first&&second)&&taskCopyKey(first)===taskCopyKey(second);
   const mechanismTitles = new Set(['matching','gaps','dropdown','inline dropdown','single choice','multiple choice','multiple select','text single choice','image single choice','text multiple select','image multiple select','typed input','typed input / gap','text / writing field','typed gap','typed gap + word bank','writing','open writing','global audio','reading','order','sort','image label']);
-  const hiddenChildHeading = (parent,child) => sameTaskCopy(parent.title,child.title)||mechanismTitles.has(taskCopy(child.title));
   const hasExampleModels = def => ['presentation','rule-page'].includes(def.kind)&&def.blocks?.some(block=>block.type==='text'&&block.role==='examples');
+  const isExamplesPresentation = def => def.kind==='presentation'&&hasExampleModels(def)&&taskCopy(def.title)==='examples';
+  const hiddenChildHeading = (parent,child,index) => {
+    if(sameTaskCopy(parent.title,child.title)||mechanismTitles.has(taskCopy(child.title)))return true;
+    // A read-then-match instruction already names the task following its models.
+    // Keep other authored child tasks and headings independent.
+    if(child.kind!=='matching'||parent.kind!=='stage'||!parent.exercises.slice(0,index).some(block=>hasExampleModels(block.exercise)))return false;
+    return [parent.title,parent.instruction].some(copy=>{
+      const task=taskCopy(copy).match(/^(?:read|look at|study) (?:the )?examples[.!?;,:\s]+(?:then\s+)?(.+)$/);
+      return task&&sameTaskCopy(task[1],child.title);
+    });
+  };
   const hasSpecificChildHeading = def => {
     if(def.kind!=='stage'||!mechanismTitles.has(taskCopy(def.title)))return false;
     const child=def.exercises.find(block=>!['presentation','audio'].includes(block.exercise.kind))?.exercise||def.exercises[0]?.exercise;
@@ -832,7 +842,7 @@
     host.classList.toggle('ek-stage-sequence',def.kind==='stage'&&def.progressive===true);
     host.replaceChildren();
     host.classList.toggle('ek-model-material',hasExampleModels(def));
-    if(!config.hideHeading&&!hasSpecificChildHeading(def))host.append(node('h2', config.primaryHeading?'ek-title ek-primary-title':'ek-title', def.title));
+    if(!config.hideHeading&&!hasSpecificChildHeading(def)&&!isExamplesPresentation(def))host.append(node('h2', config.primaryHeading?'ek-title ek-primary-title':'ek-title', def.title));
     if(def.instruction && !redundantInstruction(def))host.append(node('p', 'ek-instruction', def.instruction));
     const body = node('div', 'ek-body');
     const actions = node('div', 'ek-actions');
@@ -966,8 +976,9 @@
       }
       return el;
     }
-    function exampleModels(block){
+    function exampleModels(block,label=false){
       const models=node('div','ek-example-group');models.setAttribute('role','group');models.setAttribute('aria-label','Examples');
+      if(label)models.append(node('p','ek-examples-label','Examples:'));
       block.text.split(/\r?\n+/).filter(text=>text.trim()).forEach(text=>{const model=richText(text,block.highlights,block.emphasis);model.classList.add('ek-example-model');models.append(model);});
       return models;
     }
@@ -1081,7 +1092,7 @@
             detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
             body.append(detail);
           }
-          else if(block.role==='examples')body.append(exampleModels(block));
+          else if(block.role==='examples')body.append(exampleModels(block,isExamplesPresentation(def)));
           else body.append(richText(block.text, block.highlights, block.emphasis));
         });
       }
@@ -1110,7 +1121,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise,index)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1438,8 +1449,9 @@
       if (def.kind === 'image-label') {
         const wrap = node('div', 'ek-image-label-wrap');
         const stage = node('div', 'ek-image-label-stage');
-        const image = illustration({image:def.image, alt:def.alt}); image.classList.add('ek-image-label-image'); stage.append(image);
+        const image = illustration({image:def.image, alt:def.alt,imageWidth:def.imageWidth,imageHeight:def.imageHeight}); image.style.removeProperty('aspect-ratio'); image.classList.add('ek-image-label-image'); stage.append(image);
         const assign = (targetId, optionId) => {
+          if(config.readOnly)return;
           if (optionId && !def.options.some(option => option.id === optionId)) return;
           Object.keys(answers).forEach(id => { if (answers[id] === optionId) delete answers[id]; });
           changed(targetId, optionId); render();
@@ -1646,7 +1658,8 @@
       markOrderTokens();markChoiceOptions();
       status.textContent=feedbackMessage(feedback,def.kind);status.hidden=false;
       // Text answers keep the full authored key; picture corrections focus on
-      // mistakes while retaining source numbers. Grading and saved answers stay intact.
+      // mistakes while image labels retain feedback at their image targets.
+      // Grading and saved answers stay intact.
       const attempted=Object.values(feedback).some(value=>value!=='empty');
       const corrections=attempted&&Object.values(feedback).some(value=>value==='retry'||value==='empty');
       const examples=[];
@@ -1655,7 +1668,7 @@
       }));
       const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
       const pair=(prompt,answer,item)=>{if(!answer)return;const row=markAttempt(node('li'),item?itemResult(item):feedback.order||'empty');if(item)row.setAttribute('value',String(itemNumber(item)));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
-      if(corrections){
+      if(corrections&&def.kind!=='image-label'){
         if(def.kind==='gaps')def.items.forEach(item=>{
           const row=markAttempt(node('li'),itemResult(item));row.setAttribute('value',String(itemNumber(item)));
           if(item.feedbackText){const sentence=richText(item.feedbackText,item.feedbackHighlights||[]);sentence.classList.add('ek-muted');row.append(sentence);}
