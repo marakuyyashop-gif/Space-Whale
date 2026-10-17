@@ -1,5 +1,5 @@
 @import url("typography.css?v=20261015-readable-exercises");
-@import url("exercise-theme.css?v=20261017-responsive-template-contours");
+@import url("exercise-theme.css?v=20261018-functional-control-sizes");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font);
@@ -737,7 +737,6 @@
 /* Intrinsic tracks follow the available workspace width; keep at most three columns. */
 .exercise-kit.ek-modern .ek-card-grid{grid-auto-rows:1fr;align-items:stretch}
 .exercise-kit.ek-modern .ek-card-grid>.ek-card{box-sizing:border-box;min-width:0;height:100%}
-.exercise-kit.ek-modern input.ek-writing-input{line-height:1.5}
 .exercise-kit .ek-feedback-heading{display:block;margin:0 0 8px;font-size:var(--ek-text-size);font-weight:600}
 
 .exercise-kit .ek-bank[hidden],.exercise-kit .ek-check[hidden],.exercise-kit .ek-skip[hidden]{display:none!important}
@@ -878,7 +877,6 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 /* Keep decoration outside the native editor: its empty and typed line boxes
    both have one explicit body-sized line, with no inner padding to clip it. */
 .exercise-kit.ek-modern .ek-typed-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;max-width:100%;margin:0 3px;padding:10px 10px 10px 8px;border-radius:22px;background:var(--sw-answer-surface);box-shadow:var(--sw-neu-inset);line-height:1.5}
-.exercise-kit.ek-modern input.ek-typed-gap{box-sizing:border-box;appearance:none;min-width:0;max-width:100%;margin:0;border:0;outline:none;background:transparent;box-shadow:none;vertical-align:middle;font-family:var(--ek-font);font-size:var(--ek-text-size);font-weight:400;font-style:normal;line-height:normal;height:calc(var(--ek-text-size) * 1.5);min-height:calc(var(--ek-text-size) * 1.5);padding:0;caret-color:var(--ek-ink)}
 .exercise-kit .ek-typed-gap::placeholder{font:inherit;line-height:inherit;color:var(--sw-exercise-muted);opacity:.45}
 /* Opt-in response tables reuse gap controls and the shared answer state. */
 .exercise-kit .ek-gap-table-wrap{width:100%;min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--ek-line);border-radius:var(--ek-radius)}
@@ -980,20 +978,20 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 }
 
 /* Reviewed catalog controls reuse the approved Words surface.
-   Inherited by nested tasks; W and the unreviewed Rules keep their current skin. */
+   Inherited by nested tasks; W keeps its approved skin; rule panels are styled separately. */
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-writing-input,.ek-sort-token,.ek-token,.ek-option,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)){
   border:1px dashed var(--sw-picture-word-slot-border);border-radius:20px;
   background:var(--sw-picture-word-slot-surface);box-shadow:none;background-image:none;
 }
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-match-slot:not(.ek-vocabulary-slot)){
-  width:auto;min-width:0;max-width:100%;height:auto;min-height:42px;
-  padding:8px 12px;gap:8px;text-align:left;line-height:1.5;
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-match-slot:not(.ek-vocabulary-slot)){
+  width:auto;min-width:0;max-width:100%;height:auto;min-height:var(--sw-inline-control-height);
+  padding:var(--sw-inline-padding-block) var(--sw-inline-padding-inline);gap:6px;text-align:left;line-height:1.5;
 }
 .exercise-kit.ek-modern.ek-flat-controls .ek-choice-trigger{display:inline-flex;align-items:center}
 .exercise-kit.ek-modern.ek-flat-controls .ek-choice-label{min-width:0;white-space:normal;overflow-wrap:break-word}
 .exercise-kit.ek-modern.ek-flat-controls .ek-discovery-choice .ek-choice-trigger{min-width:0}
 .exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap{margin-inline:3px}
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-token,.ek-order-target>.ek-token){padding:8px 12px}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-token,.ek-order-target>.ek-token){padding:var(--sw-inline-padding-block) var(--sw-inline-padding-inline)}
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-sort-token,.ek-order-target>.ek-token)[data-feedback]{padding-left:36px}
 .exercise-kit.ek-modern.ek-flat-controls .ek-gap-number{
   display:inline-grid;place-items:center;position:relative;flex:none;
@@ -1027,7 +1025,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 /* Compact writing keeps each prompt and its response together, wrapping whole fields. */
 .exercise-kit .ek-writing.ek-writing-inline{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 .exercise-kit .ek-writing-inline>.ek-writing-prompt{min-width:0;max-width:100%;white-space:pre-wrap;overflow-wrap:break-word}
-.exercise-kit .ek-writing-inline>.ek-writing-input{flex:0 0 auto;width:min(var(--ek-writing-field-width,24ch),100%);max-width:100%}
+.exercise-kit .ek-writing-inline>.ek-writing-input{flex:0 1 auto;min-width:0;max-width:100%}
 .exercise-kit .ek-writing-inline>.ek-writing-hint{flex-basis:100%}
 /* Instructions are task text; keep their normal body size and ink. */
 .exercise-kit.ek-modern.ek-flat-controls .ek-instruction{font-size:calc(var(--ek-text-size) * .9375);font-weight:400;color:var(--sw-exercise-emphasis-ink)}
@@ -1042,11 +1040,11 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern.ek-flat-controls .ek-inline-menu{background:var(--sw-answer-surface);border:1px solid var(--sw-picture-word-slot-border);box-shadow:var(--sw-card-shadow)}
 
 /* Long prompts and audio clips use the same keyed Matching, with an answer below. */
-.exercise-kit.ek-modern .ek-card-grid:is(.ek-stacked-text-grid,.ek-audio-picture-grid){display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));grid-auto-rows:1fr;width:100%;max-width:704px;margin-inline:0}
+.exercise-kit.ek-modern .ek-card-grid:is(.ek-stacked-text-grid,.ek-audio-picture-grid){--ek-stacked-min:180px;--ek-stacked-basis:calc((100% - var(--ek-grid-gap) - var(--ek-grid-gap))/3);display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,max(var(--ek-stacked-min),var(--ek-stacked-basis))),1fr));grid-auto-rows:1fr;width:100%;max-width:704px;margin-inline:0}
 .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card){display:flex;flex-direction:column;align-items:stretch;gap:12px;min-height:0;height:100%;padding:16px;border-radius:28px}
 .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-number{position:static;inset:auto;transform:none}
 .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-card-label{flex:1;min-width:0;margin:0;line-height:1.5;text-align:left;overflow-wrap:break-word;word-break:normal}
-.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex:none;width:100%;min-height:var(--ek-matching-slot-height,44px);margin:0;padding:9px 12px;text-align:left}
+.exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex:none;width:100%;min-height:var(--ek-matching-slot-height,var(--ek-matching-slot-min-height,var(--sw-matching-long-slot-height)));margin:0;padding:9px 12px;text-align:left}
 .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot>.ek-match-answer-label{flex:1;min-width:0;text-align:left;overflow-wrap:break-word;word-break:normal}
 .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card)>.ek-vocabulary-slot>.ek-match-answer-number{position:static;inset:auto;transform:none;flex:0 0 16px;width:16px;min-width:16px;max-width:16px;height:16px;min-height:16px;max-height:16px}
 .exercise-kit.ek-modern .ek-card.ek-audio-picture-card{display:grid;grid-template-columns:14px minmax(0,1fr) auto;grid-template-rows:auto 1fr;align-items:center}
@@ -1058,17 +1056,17 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern .ek-audio-picture-dialog .ek-option{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;width:100%;min-height:0;margin:0;padding:8px;text-align:center;border-radius:20px}
 .exercise-kit.ek-modern .ek-audio-picture-dialog .ek-option>.ek-image{display:grid;place-items:center;width:100%;height:var(--ek-audio-option-image-height,130px);min-height:0;max-height:none;margin:0;object-fit:contain;aspect-ratio:1;border-radius:12px}
 /* Every checked control keeps its original surface and vertical metrics. */
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-token,.ek-sort-token){display:inline-flex;align-items:center;justify-content:flex-start;box-sizing:border-box;flex:0 0 auto;max-width:100%;min-height:42px;line-height:1.5;white-space:normal;word-break:normal}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-token,.ek-sort-token){display:inline-flex;align-items:center;justify-content:flex-start;box-sizing:border-box;flex:0 0 auto;max-width:100%;min-height:var(--sw-inline-control-height);line-height:1.5;white-space:normal;word-break:normal}
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]{background:var(--sw-picture-word-slot-surface)}
 .exercise-kit.ek-modern.ek-flat-controls .ek-writing-input:focus-visible{outline:0;outline-offset:0;box-shadow:none;border-color:var(--sw-exercise-muted)}
 .exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:focus-within{outline:0;box-shadow:none;border-color:var(--sw-exercise-muted);border-style:solid}
 .exercise-kit .ek-transform-arrow{flex:none;color:var(--ek-muted);font-size:var(--ek-text-size);line-height:1}
-.exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice{position:relative;padding-left:1.55em;line-height:2.7}
+.exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice{position:relative;padding-left:1.55em;line-height:1.5}
 .exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice>.ek-sentence-number{position:absolute;left:0;top:0}
 .exercise-kit.ek-modern.ek-flat-controls .ek-numbered-choice .ek-gap-number:not([data-result]){display:none}
 /* Full square artwork, compact feedback inputs, no cropping. */
-.exercise-kit.ek-modern .ek-order-image-card{grid-template-rows:auto auto;width:138px;flex-basis:138px;min-height:0;padding:10px;gap:8px}
-.exercise-kit.ek-modern .ek-order-image-card>.ek-image{width:100%;height:auto;max-height:none;aspect-ratio:1;object-fit:contain}
+.exercise-kit.ek-modern .ek-order-image-card{grid-template-rows:auto auto auto;width:138px;flex-basis:138px;min-height:0;padding:10px;gap:8px}
+.exercise-kit.ek-modern .ek-order-image-card>.ek-image{width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:1;object-fit:contain}
 .exercise-kit.ek-modern .ek-order-image-card>.ek-order-number{position:relative;inset:auto;margin-bottom:2px}
 .exercise-kit.ek-modern .ek-image-choice-option>.ek-image{object-fit:contain}
 .exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type]{position:absolute;top:10px;right:10px;left:auto;bottom:auto;width:20px;min-width:20px;max-width:20px;height:20px;min-height:20px;max-height:20px;border-radius:50%}
@@ -1091,3 +1089,44 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern.ek-flat-controls .ek-order-image-card{border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-answer-surface);box-shadow:var(--sw-card-shadow)}
 
 .exercise-kit.ek-modern.ek-flat-controls .ek-writing-input[data-feedback]:focus-visible{outline:1px solid var(--ek-feedback-color);outline-offset:-1px;border-color:transparent}
+
+/* A compact field is one native editor family, whether typed or selected. */
+.exercise-kit.ek-modern .ek-writing-input.ek-response-input{font-family:var(--ek-font);font-size:var(--ek-text-size);font-weight:400;font-style:normal;line-height:normal;caret-color:var(--ek-ink)}
+.exercise-kit.ek-modern .ek-response-input.ek-compact-input{display:inline-block;box-sizing:border-box;flex:0 1 auto;width:6ch;min-width:0;max-width:100%;height:var(--sw-inline-control-height);min-height:var(--sw-inline-control-height);margin:0;padding:var(--sw-inline-padding-block) var(--sw-inline-padding-inline);border-radius:16px;vertical-align:middle}
+.exercise-kit.ek-modern .ek-typed-wrap{min-height:var(--sw-inline-control-height);padding:0;gap:6px;line-height:1.5}
+.exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap{min-height:var(--sw-inline-control-height);padding:0;gap:6px}
+.exercise-kit.ek-modern .ek-typed-wrap>.ek-response-input.ek-compact-input{flex:0 1 auto;height:calc(var(--sw-inline-control-height) - 2px);min-height:calc(var(--sw-inline-control-height) - 2px);border:0;outline:0;background:transparent;box-shadow:none}
+.exercise-kit.ek-modern .ek-typed-wrap>.ek-gap-number[data-result]{margin-left:10px}
+.exercise-kit.ek-modern .ek-growing-input{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:break-word}
+.exercise-kit .ek-compact-choice>.ek-gap-number:not([data-result]){display:none}
+.exercise-kit.ek-modern.ek-flat-controls:has(>.ek-body>.ek-numbered-choice)>.ek-body{gap:12px}
+.exercise-kit.ek-modern.ek-flat-controls.ek-reading-width .ek-sentence{line-height:2.15}
+/* Text selection marks follow the compact round-input scale, with square corners. */
+.exercise-kit.ek-modern .ek-radio>input[type=checkbox]{width:14px;min-width:14px;max-width:14px;height:14px;min-height:14px;max-height:14px;border-radius:4px}
+.exercise-kit.ek-modern .ek-radio>input[type=checkbox]:checked::after{inset:3px;border-radius:2px}
+.exercise-kit.ek-modern .ek-radio>input[type=checkbox][data-feedback]::after{inset:0;border-radius:4px}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type=checkbox]{width:20px;min-width:20px;max-width:20px;height:20px;min-height:20px;max-height:20px;border-radius:5px}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type=checkbox]:checked::after{inset:5px;border-radius:2px}
+.exercise-kit.ek-modern.ek-flat-controls .ek-image-choice-option>input[type=checkbox][data-feedback]::after{inset:0;border-radius:5px}
+/* Reserve sentence-length matches before a choice is made. */
+.exercise-kit.ek-modern .ek-stacked-text-grid{--ek-matching-slot-min-height:var(--sw-matching-long-slot-height)}
+.exercise-kit.ek-modern .ek-audio-picture-grid{--ek-matching-slot-min-height:44px}
+.exercise-kit.ek-modern .ek-word-definition-grid{--ek-matching-slot-min-height:104px}
+.exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{min-height:var(--ek-matching-slot-height,104px)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-picture-word-grid{--ek-matching-slot-min-height:var(--sw-matching-long-slot-height)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-picture-word-card>.ek-picture-word-slot{flex:none;min-height:var(--ek-matching-slot-height,var(--sw-matching-long-slot-height))}
+/* Order trays fit their contents and wrap whole items at the working-column edge. */
+.exercise-kit.ek-modern.ek-flat-controls .ek-order-target{box-sizing:border-box;width:max-content;min-width:min(100%,160px);max-width:100%;min-height:0;padding:12px;gap:10px;border-radius:28px;align-content:center}
+/* Informational rules form one pale panel; Discovery tasks retain separate rule panels. */
+.exercise-kit.ek-modern :is(.ek-rule-summary,.ek-rule-block){box-sizing:border-box;max-width:100%;padding:22px;border:1px dashed var(--sw-picture-word-slot-border);border-radius:32px;background:var(--sw-picture-word-slot-surface);box-shadow:none}
+.exercise-kit.ek-modern .ek-rule-summary{gap:18px}
+.exercise-kit.ek-modern .ek-rule-summary .ek-rule-block{padding:0;border:0;border-radius:0;background:transparent}
+.exercise-kit.ek-modern .ek-rule-formula{margin:14px 0 0;padding:0;border-radius:0;background:transparent;font-weight:400}
+@media(max-width:600px){
+ .exercise-kit.ek-modern .ek-card-grid:is(.ek-stacked-text-grid,.ek-audio-picture-grid){--ek-grid-gap:12px;--ek-stacked-min:120px;--ek-stacked-basis:calc((100% - var(--ek-grid-gap))/2)}
+ .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card){padding:12px;gap:10px}
+ .exercise-kit.ek-modern :is(.ek-rule-summary,.ek-rule-block){padding:18px;border-radius:28px}
+ .exercise-kit.ek-modern .ek-rule-summary .ek-rule-block{padding:0}
+}
+
+.exercise-kit.ek-modern.ek-flat-controls.ek-reading-width>.ek-body,.exercise-kit.ek-modern.ek-flat-controls:has(>.ek-body>.ek-writing-inline)>.ek-body{gap:12px}

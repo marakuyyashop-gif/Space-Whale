@@ -166,37 +166,50 @@
       ], [1, 0], 'stacked-text')
     ]), 'Find correspondences using complete models that make the new relationship visible.', [catalog('26'), discovery('4')]),
 
-    entry('R01', 'Rule — Short Explanation', base('r01', 'rule-page', 'Describe a person’s appearance.', {
+    entry('R01', 'Rule — Short Explanation', base('r01', 'rule-page', '[Rule heading]', {
       blocks: [
-        {type: 'text', text: 'Use be with an adjective to describe a person. Use have or has with a noun to talk about their hair, eyes, or other features.'},
-        {type: 'text', role: 'examples', text: 'Eva is tall.\nShe has dark hair.', highlights: ['is', 'has']}
+        {type: 'text', text: '[Meaning or situation] [Target construction] [Explanation of form and use]', highlights: ['[Target construction]']},
+        {type: 'text', role: 'examples',
+          text: '[Example beginning 1] [Target construction] [Example ending 1]\n[Example beginning 2] [Target construction] [Example ending 2]',
+          highlights: ['[Target construction]']}
       ]
-    }), 'Explain one meaning or construction in connected text, followed by a clear example.', [catalog('21, 27'), discovery('5–7')]),
+    }), 'Explain one meaning or construction in connected text, followed by a clear example.', [catalog('21, 27'), discovery('5–7, 12')]),
 
-    entry('R02', 'Rule — Contrast', base('r02', 'rule-page', 'Appearance or personality?', {
+    entry('R02', 'Rule — Contrast', base('r02', 'rule-page', '[Contrasting constructions]', {
       blocks: [
-        {type: 'text', text: 'Ask What does someone look like? when you want to know about their appearance. The answer describes their height, hair, or other visible features.'},
-        {type: 'text', role: 'examples', text: 'What does Ben look like?\nHe is tall and has short hair.', highlights: ['What does Ben look like?']},
-        {type: 'text', text: 'Ask What is someone like? when you want to know about their character. The answer describes how they behave with other people.'},
-        {type: 'text', role: 'examples', text: 'What is Ben like?\nHe is friendly and helpful.', highlights: ['What is Ben like?']}
+        {type: 'text',
+          text: '[Criterion for choosing a construction]\n[Meaning or situation 1] [Target structure 1] [Explanation of form and use 1]',
+          highlights: ['[Target structure 1]']},
+        {type: 'text', role: 'examples',
+          text: '[Example beginning 1] [Target structure 1] [Example ending 1]\n[Response to Example 1]',
+          highlights: ['[Target structure 1]']},
+        {type: 'text', text: '[Meaning or situation 2] [Target structure 2] [Explanation of form and use 2]', highlights: ['[Target structure 2]']},
+        {type: 'text', role: 'examples',
+          text: '[Example beginning 2] [Target structure 2] [Example ending 2]\n[Response to Example 2]',
+          highlights: ['[Target structure 2]']}
       ]
-    }), 'Compare models in the same order and show a clear reason for choosing each one.', [catalog('21, 28'), discovery('5–7')]),
+    }), 'Compare models in the same order and show a clear reason for choosing each one.', [catalog('21, 28'), discovery('5–7, 12')]),
 
-    entry('R03', 'Rule — Visual', base('r03', 'rule-page', 'Build a present simple question.', {
+    entry('R03', 'Rule — Visual', base('r03', 'rule-page', '[Schema heading]', {
       blocks: [
-        {type: 'text', text: 'Put do before I, you, we, or they to ask about a regular activity. Keep the main verb in its base form.'},
-        {type: 'rule', formula: 'do + I / you / we / they + base verb + … ?', examples: ['Do you work at home?', 'Do they like coffee?']}
+        {type: 'text', text: '[Explanation of the relationship shown in the schema]'},
+        {type: 'rule', formula: '[First element] + [Target structure] + [Following element]',
+          examples: ['[Example beginning 1] [Target structure] [Example ending 1]', '[Example beginning 2] [Target structure] [Example ending 2]'],
+          highlights: ['[Target structure]']}
       ]
-    }), 'Show a language relationship or word order through a compact labeled schema.', [catalog('21, 29'), discovery('5–7')]),
+    }), 'Show a language relationship or word order through a compact labeled schema.', [catalog('21, 29'), discovery('5–7, 12')]),
 
-    entry('R04', 'Rule — Useful Language', base('r04', 'rule-page', 'Ask for help in a store.', {
+    entry('R04', 'Rule — Useful Language', base('r04', 'rule-page', '[Communicative purpose]', {
       blocks: [
-        {type: 'text', text: 'Use these phrases to ask an assistant for an item, choose a size, and respond to help.'},
-        {type: 'rule', title: 'Ask for an item', examples: ['I’m looking for …', 'Do you have … ?']},
-        {type: 'rule', title: 'Ask for a different size', examples: ['Do you have this in a smaller size?', 'Could I try a larger size?']},
-        {type: 'rule', title: 'Respond', examples: ['Yes, please.', 'No, thank you.']}
+        {type: 'text', text: '[Shared communicative situation]'},
+        {type: 'rule', title: '[Communication function 1]', text: '[When these expressions are used 1]',
+          examples: ['[Lexical chunk 1]', '[Lexical chunk 2]'], highlights: ['[Lexical chunk 1]', '[Lexical chunk 2]']},
+        {type: 'rule', title: '[Communication function 2]', text: '[When these expressions are used 2]',
+          examples: ['[Lexical chunk 3]', '[Lexical chunk 4]'], highlights: ['[Lexical chunk 3]', '[Lexical chunk 4]']},
+        {type: 'rule', title: '[Communication function 3]', text: '[When these expressions are used 3]',
+          examples: ['[Lexical chunk 5]', '[Lexical chunk 6]'], highlights: ['[Lexical chunk 5]', '[Lexical chunk 6]']}
       ]
-    }), 'Group useful expressions by what the speaker wants to do in the conversation.', [catalog('30–31'), discovery('5–7')]),
+    }), 'Group useful expressions by what the speaker wants to do in the conversation.', [catalog('30–31'), discovery('5–7, 12')]),
 
     entry('S01', 'Picture Speaking', kit.speaking({
       id: 's01', title: '[Task]',

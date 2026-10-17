@@ -25,5 +25,17 @@ test('A2 packs reuse media/full rules and mount six independent translation fiel
 test('checked multiple select exposes explicit accessible results and clears them on edit',()=>{
  const def={version:1,id:'feedback-choice',kind:'choice',title:'Choose.',multiple:true,items:[{id:'1',prompt:'Choose both.',options:[{id:'a',text:'A'},{id:'b',text:'B'},{id:'c',text:'C'}],correctIds:['a','b']}]};
  const {document}=parseHTML('<html><body><main></main></body></html>'),host=document.querySelector('main');const h=kit.mount(host,def,{syncChecks:true});
- h.setAnswers({'1':['a','b'],__sw_checked:true});const badge=host.querySelector('.ek-result-symbol');assert.equal(badge.dataset.result,'correct');assert.equal(badge.getAttribute('aria-label'),'Correct');h.setAnswers({'1':['c'],__sw_checked:true});assert.equal(host.querySelector('.ek-result-symbol').dataset.result,'retry');h.setAnswers({'1':[]});assert.ok(!host.querySelector('.ek-result-symbol').dataset.result);h.destroy();
+ const prompt=host.querySelector('legend').textContent;
+ h.setAnswers({'1':['a','b'],__sw_checked:true});
+ let legend=host.querySelector('legend'),options=[...host.querySelectorAll('.ek-radio input')];
+ assert.equal(legend.textContent,prompt);assert.equal(legend.querySelector('.ek-result-symbol'),null);
+ assert.deepEqual(options.map(input=>input.getAttribute('data-feedback')),['correct','correct',null]);
+ assert.deepEqual(options.map(input=>input.getAttribute('aria-description')),['Correct answer','Correct answer',null]);
+ h.setAnswers({'1':['c'],__sw_checked:true});
+ legend=host.querySelector('legend');options=[...host.querySelectorAll('.ek-radio input')];
+ assert.equal(legend.textContent,prompt);assert.equal(legend.querySelector('.ek-result-symbol'),null);
+ assert.deepEqual(options.map(input=>input.getAttribute('data-feedback')),['correct','correct','retry']);
+ assert.deepEqual(options.map(input=>input.getAttribute('aria-description')),['Correct answer','Correct answer','Incorrect answer']);
+ assert.deepEqual(options.map(input=>input.getAttribute('aria-label')),['A','B','C']);
+ h.setAnswers({'1':[]});assert.ok([...host.querySelectorAll('.ek-radio input')].every(input=>!input.hasAttribute('data-feedback')&&!input.hasAttribute('aria-description')));h.destroy();
 });

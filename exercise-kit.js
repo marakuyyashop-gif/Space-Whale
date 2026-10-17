@@ -507,7 +507,7 @@
     const modern=!doc.body?.classList.contains('design-preview');
     let syncStage=null, syncTranscript=null, syncRules=null, rulesOpen=null, syncRepeat=null, repeatIndex=0;
     let scrollFrame=null,disposed=false;
-    let matchingCleanup=()=>{},equalizeMatching=()=>{};
+    let matchingCleanup=()=>{},equalizeMatching=()=>{},editorCleanup=()=>{};
     // Include adjacent navigation, but never jump across another visible task.
     function rangeEnd(element,scroller){
       let end=element;
@@ -611,10 +611,36 @@
       });
       if(cue)input.addEventListener('blur', () => input.setAttribute('placeholder', cue));
     };
-    const typedCues = new WeakMap();
-    const sizeTypedField = input => {
-      const length=Math.max(String(input.value||'').length,String(typedCues.get(input)||'').length);
-      input.style.width=`${Math.max(5,Math.min(40,length+2))}ch`;
+    const responseEditors = new WeakMap();
+    const sizeResponseField = input => {
+      const spec=responseEditors.get(input);if(!spec?.compact)return;
+      const length=Math.max(String(input.value||'').length,String(spec.cue||'').length);
+      input.style.width=`${Math.max(6,length+2)}ch`;
+      if(!spec.growing)return;
+      // A sentence starts as one compact native editor, then wraps at the
+      // available row width instead of hiding its beginning in a scrolled input.
+      input.style.height='auto';
+      if(input.scrollHeight>0){
+        const style=doc.defaultView?.getComputedStyle?.(input);
+        const border=(parseFloat(style?.borderTopWidth)||0)+(parseFloat(style?.borderBottomWidth)||0);
+        input.style.height=Math.ceil(Math.max(parseFloat(style?.minHeight)||0,input.scrollHeight+border))+'px';
+      }
+    };
+    const responseEditor = (value,cue,{compact=false,multiline=false,growing=false}={}) => {
+      const input=node(multiline||growing?'textarea':'input','ek-writing-input ek-response-input'+(compact?' ek-compact-input':'')+(growing?' ek-growing-input':''));
+      if(multiline||growing)input.rows=growing?1:5;else input.type='text';
+      input.value=value||'';responseEditors.set(input,{compact,growing,cue:cue||''});
+      placeholderCue(input,cue);sizeResponseField(input);return input;
+    };
+    const resizeResponseEditors = () => controls.forEach(control=>sizeResponseField(control));
+    const watchResponseEditors = () => {
+      resizeResponseEditors();
+      if(!body.querySelector('.ek-growing-input'))return;
+      const view=doc.defaultView;let width=body.getBoundingClientRect().width;
+      const resize=()=>resizeResponseEditors();
+      const observer=view?.ResizeObserver?new view.ResizeObserver(()=>{const next=body.getBoundingClientRect().width;if(next!==width){width=next;resize();}}):null;
+      observer?.observe(body);view?.addEventListener?.('resize',resize);view?.visualViewport?.addEventListener?.('resize',resize);
+      editorCleanup=()=>{observer?.disconnect();view?.removeEventListener?.('resize',resize);view?.visualViewport?.removeEventListener?.('resize',resize);};
     };
     const button = (label, handler, className = 'ek-button') => {
       const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', handler); return el;
@@ -744,7 +770,7 @@
     const clearFeedback = () => {
       feedback = {};
       controls.forEach(control => control.removeAttribute('data-feedback'));
-      if(def.kind==='choice')body.querySelectorAll('.ek-radio[data-feedback],.ek-radio input[data-feedback]').forEach(control=>control.removeAttribute('data-feedback'));
+      if(def.kind==='choice')body.querySelectorAll('.ek-radio[data-feedback],.ek-radio input[data-feedback]').forEach(control=>{control.removeAttribute('data-feedback');control.removeAttribute('aria-description');});
       if(def.kind==='order'){
         body.querySelectorAll('.ek-order-target [data-feedback]').forEach(token=>{token.removeAttribute('data-feedback');token.removeAttribute('aria-description');});
         body.querySelectorAll('.ek-order-number[data-result]').forEach(badge=>{delete badge.dataset.result;badge.removeAttribute('aria-label');});
@@ -1017,7 +1043,7 @@
       const wrap = node('span', 'ek-inline-choice');
       const menu = node('span', 'ek-inline-menu'); menu.hidden = true;
       menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', `Options for ${label}`);
-      const badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);
+      const badge=node('span','ek-gap-number','');badge.dataset.number='';
       const paint = () => {
         const selectedText=options.find(option=>option.id===answers[id])?.text || '\u00a0';
         opener.replaceChildren(badge,flatControls?node('span','ek-choice-label',selectedText):doc.createTextNode(selectedText));
@@ -1055,7 +1081,7 @@
         view?.addEventListener?.('resize',placeMenu);doc.addEventListener('scroll',placeMenu,true);
         view?.visualViewport?.addEventListener('resize',placeMenu);view?.visualViewport?.addEventListener('scroll',placeMenu);
         menu.querySelector('button')?.focus({preventScroll:true});
-      }, 'ek-gap ek-choice-trigger');
+      }, 'ek-gap ek-choice-trigger ek-compact-choice');
       opener.setAttribute('aria-expanded', 'false');
       options.forEach((entry, optionIndex) => {
         const value=entry.id;
@@ -1091,6 +1117,7 @@
     function render() {
       dismissInline();
       matchingCleanup();matchingCleanup=()=>{};equalizeMatching=()=>{};
+      editorCleanup();editorCleanup=()=>{};
       nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; nestedMountsByBlock.clear();
       body.querySelectorAll('audio').forEach(audio => audio.pause());
       body.replaceChildren(); controls.clear(); paintControls.clear(); resultsBox.replaceChildren();
@@ -1210,7 +1237,7 @@
         if(transcript){body.append(transcript);syncTranscript();}
       }
       if (def.kind === 'rule-page') {
-        const page = node('div', 'ek-rule-page');
+        const page = node('div', 'ek-rule-page'+(!def.blocks.some(block=>block.type==='exercise')?' ek-rule-summary':''));
         const revealable=[]; let afterExercise=false;
         def.blocks.forEach((block, index) => {
           if (block.type === 'text') {
@@ -1227,10 +1254,10 @@
             if (possibleAnswers) section.append(node('summary', '', POSSIBLE_ANSWERS_TITLE));
             else if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
             if (block.text) section.append(richText(block.text, block.highlights));
-            if (block.formula) section.append(node('div', 'ek-rule-formula', block.formula));
+            if (block.formula) {const formula=node('div','ek-rule-formula');formula.append(...richText(block.formula,block.highlights||[]).childNodes);section.append(formula);}
             if (block.examples?.length) {
               const examples = node('div', 'ek-rule-examples');
-              block.examples.forEach(example => examples.append(node('p', 'ek-rule-example', example)));
+              block.examples.forEach(example => {const line=richText(example,block.highlights||[]);line.classList.add('ek-rule-example');examples.append(line);});
               section.append(examples);
             }
             if(afterExercise && !possibleAnswers) revealable.push(section);
@@ -1405,16 +1432,35 @@
           controls.set(item.id, plus);paintControls.set(item.id,()=>refreshSlot(item,index,plus)); card.append(plus); grid.append(card);
         });
         body.append(grid);
-        if(def.layout==='stacked-text'||def.layout==='audio-picture'){
+        if(['stacked-text','word-definition','audio-picture'].includes(def.layout)||pictureWord&&def.answerSize==='sentence'){
           let frame=null;
           const view=doc.defaultView;
           const measure=()=>{
             frame=null;if(disposed||!grid.isConnected||!view?.getComputedStyle)return;
-            const slots=[...grid.querySelectorAll('.ek-match-slot')];
-            const height=Math.ceil(Math.max(44,...slots.map(slot=>{
+            const slots=[...grid.querySelectorAll('.ek-match-slot')].filter(slot=>slot.getBoundingClientRect().width>0);
+            if(!slots.length)return;
+            const base=parseFloat(view.getComputedStyle(grid).getPropertyValue('--ek-matching-slot-min-height'))||(def.layout==='word-definition'?104:def.layout==='audio-picture'?44:84);
+            const probe=node('span','ek-match-answer-label');probe.setAttribute('aria-hidden','true');
+            Object.assign(probe.style,{position:'absolute',visibility:'hidden',pointerEvents:'none',display:'block',height:'auto',minHeight:'0',maxHeight:'none',margin:'0',padding:'0',border:'0',boxSizing:'content-box'});
+            grid.append(probe);
+            const measured=new Map();
+            const height=Math.ceil(Math.max(base,...slots.map(slot=>{
               const style=view.getComputedStyle(slot),label=slot.querySelector('.ek-match-answer-label');
-              return Math.max(label?.scrollHeight||0,label?.getBoundingClientRect().height||0,16)+['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,key)=>sum+(parseFloat(style[key])||0),0);
+              const labelStyle=view.getComputedStyle(label||slot),stacked=def.layout==='word-definition';
+              const inset=['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,key)=>sum+(parseFloat(style[key])||0),0);
+              const sideInset=['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth'].reduce((sum,key)=>sum+(parseFloat(style[key])||0),0);
+              const width=Math.max(1,slot.getBoundingClientRect().width-sideInset-(stacked?0:24));
+              const signature=[width,...['fontFamily','fontSize','fontWeight','fontStyle','lineHeight','letterSpacing','wordSpacing'].map(key=>labelStyle[key])].join('|');
+              let contentHeight=measured.get(signature);
+              if(contentHeight===undefined){
+                for(const key of ['fontFamily','fontSize','fontWeight','fontStyle','lineHeight','letterSpacing','wordSpacing','overflowWrap','wordBreak','hyphens'])probe.style[key]=labelStyle[key];
+                probe.style.width=width+'px';contentHeight=16;
+                for(const option of def.options){probe.textContent=option.text;contentHeight=Math.max(contentHeight,probe.scrollHeight||0,probe.getBoundingClientRect().height||0);}
+                measured.set(signature,contentHeight);
+              }
+              return contentHeight+inset+(stacked?20:0);
             })));
+            probe.remove();
             if(grid.style.getPropertyValue('--ek-matching-slot-height')!==height+'px')grid.style.setProperty('--ek-matching-slot-height',height+'px');
           };
           equalizeMatching=()=>{if(frame===null&&view?.requestAnimationFrame)frame=view.requestAnimationFrame(measure);};
@@ -1462,17 +1508,12 @@
             if (options) {
               const {wrap,opener}=inlinePicker(segment.id,label,options.map(value=>({id:value,text:value})),number);target.append(wrap);controls.set(segment.id,opener);return;
             }
-            const field = node('input', 'ek-gap ek-typed-gap');
-            field.type = 'text'; field.autocomplete = 'off'; field.spellcheck = false;
+            const field = responseEditor(answers[segment.id],segment.placeholder,{compact:true});field.classList.add('ek-typed-gap');
+            field.autocomplete = 'off'; field.spellcheck = false;
             field.setAttribute('aria-label', label);
-            field.value = answers[segment.id] || '';
-            placeholderCue(field, segment.placeholder);
-            typedCues.set(field,segment.placeholder||'');
-            const resize = () => sizeTypedField(field);
-            resize();
-            field.addEventListener('input', () => { resize(); changed(segment.id, field.value); });
+            field.addEventListener('input', () => { sizeResponseField(field); changed(segment.id, field.value); });
             controls.set(segment.id, field);
-            if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number',String(number));badge.dataset.number=String(number);wrap.append(badge,field);target.append(wrap);}else target.append(field);
+            if(modern){const wrap=node('span','ek-typed-wrap'),badge=node('span','ek-gap-number','');badge.dataset.number='';wrap.append(badge,field);target.append(wrap);}else target.append(field);
           }); if(tableLayout)tableBody.append(row);else container.append(row);if(compact)body.append(container);
         });
       }
@@ -1607,16 +1648,15 @@
       if (def.kind === 'writing') {
         if(def.layout==='picture-rows')body.append(pictureCues(def.items));
         const inline=def.layout==='inline';
-        const answerLengths=def.items.flatMap(item=>(item.acceptedAnswers||item.possibleAnswers||[]).map(text=>text.length+2));
-        const fieldWidth=Math.max(14,Math.min(40,answerLengths.length?Math.max(...answerLengths):24));
         def.items.forEach((item, index) => {
         const compact=def.layout==='picture-rows';
         const row=compact?node('div','ek-picture-sentence'):body;
         if(compact)row.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
         const label = node('label', 'ek-writing'+(inline?' ek-writing-inline':''), compact||inline ? '' : `${itemNumber(item)}. ${item.prompt}`);
-        if(inline){label.style.setProperty('--ek-writing-field-width',(def.answerSize==='word'?10:fieldWidth)+'ch');label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));if(def.transformationArrow){const arrow=node('span','ek-transform-arrow','→');arrow.setAttribute('aria-hidden','true');label.append(arrow);}}
-        const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; placeholderCue(input,item.placeholder); input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
+        if(inline){label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));if(def.transformationArrow){const arrow=node('span','ek-transform-arrow','→');arrow.setAttribute('aria-hidden','true');label.append(arrow);}}
+        const input = responseEditor(answers[item.id],item.placeholder,{compact:inline&&!item.multiline,multiline:Boolean(item.multiline),growing:inline&&!item.multiline&&def.answerSize!=='word'});
+        input.addEventListener('input', () => {sizeResponseField(input);changed(item.id, input.value);});label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
         row.append(label);if(compact)body.append(row); controls.set(item.id, input);
@@ -1629,7 +1669,7 @@
       lamps.clear();
       controls.forEach((control,id)=>{
         if(!['matching','gaps','choice'].includes(def.kind))return;
-        if(def.kind==='choice'&&control.tagName==='FIELDSET'){const legend=control.querySelector('legend');let badge=legend.querySelector(flatControls?'.ek-question-index':'.ek-result-symbol');if(!badge){badge=node('span','ek-result-symbol');legend.prepend(badge);}badge.classList.add('ek-result-symbol');badge.setAttribute('role','img');badge.setAttribute('aria-label','Not checked');lamps.set(id,badge);return;}
+        if(def.kind==='choice'&&control.tagName==='FIELDSET'){if(def.multiple)return;const legend=control.querySelector('legend');let badge=legend.querySelector(flatControls?'.ek-question-index':'.ek-result-symbol');if(!badge){badge=node('span','ek-result-symbol');legend.prepend(badge);}badge.classList.add('ek-result-symbol');badge.setAttribute('role','img');badge.setAttribute('aria-label','Not checked');lamps.set(id,badge);return;}
         const lamp=def.kind==='matching'?(vocabularyMatching?control.querySelector('.ek-match-answer-number'):control.closest('.ek-card').querySelector('.ek-number')):(control.querySelector('.ek-gap-number')||control.parentElement.querySelector('.ek-gap-number'));
         if(!lamp)return;
         if(!vocabularyMatching){lamp.dataset.number=lamp.dataset.number||lamp.textContent;lamp.classList.add('ek-result-lamp');}
@@ -1694,8 +1734,8 @@
         group.querySelectorAll('.ek-radio').forEach(label=>{
           const input=label.querySelector('input'),selected=def.multiple?Array.isArray(answers[item.id])&&answers[item.id].includes(input.value):answers[item.id]===input.value;
           const result=correct.includes(input.value)?'correct':selected?'retry':null;
-          if(result){label.dataset.feedback=result;input.dataset.feedback=result;}
-          else{label.removeAttribute('data-feedback');input.removeAttribute('data-feedback');}
+          if(result){label.dataset.feedback=result;input.dataset.feedback=result;input.setAttribute('aria-description',result==='correct'?'Correct answer':'Incorrect answer');}
+          else{label.removeAttribute('data-feedback');input.removeAttribute('data-feedback');input.removeAttribute('aria-description');}
         });
       });
     }
@@ -1838,6 +1878,7 @@
           if (!field) return;
           const value = answers[item.id] == null ? '' : String(answers[item.id]);
           if (field.value !== value) field.value = value;
+          sizeResponseField(field);
         });
         return;
       }
@@ -1849,7 +1890,7 @@
           if (!isTypedGap) {const paint=paintControls.get(id);if(paint){paint();continue;}canPatchWithoutRender = false; break; }
           const value = answers[id] == null ? '' : String(answers[id]);
           if (control.value !== value) control.value = value;
-          sizeTypedField(control);
+          sizeResponseField(control);
         }
         if (canPatchWithoutRender) return;
       }
@@ -1871,7 +1912,7 @@
       actions.querySelectorAll('button,input,textarea,select').forEach(control => { control.disabled = true; });
     };
     const originalRender = render;
-    render = () => { const before=layoutSnapshot();originalRender();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate();updateActions();renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); if(disclosureState)applyDisclosures(disclosureState); };
+    render = () => { const before=layoutSnapshot();originalRender();watchResponseEditors();animateLayout(before); if(modern){status.hidden=true;resultsBox.hidden=true;} decorate();updateActions();renderReadOnly(); if (config.syncChecks && answers.__sw_checked) checkFeedback(); if(disclosureState)applyDisclosures(disclosureState); };
 
     host.addEventListener('keydown', onKeydown); doc.addEventListener('pointerdown', onOutside);
     host.addEventListener('click', dragClick, true);
@@ -1883,7 +1924,7 @@
       getViewState,
       setViewState,
       setAnswers,
-      destroy: () => { disposed=true;matchingCleanup();if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
+      destroy: () => { disposed=true;matchingCleanup();editorCleanup();if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
   const api = { validate, grade, mount, speaking, isSpeaking, taskFinished, kinds, uiLabels, feedbackMessage, motion:{expand} };

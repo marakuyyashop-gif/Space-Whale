@@ -4,6 +4,10 @@
    Keep type-specific changes under their named tokens; never style one lesson ID. */
 :root {
   --sw-exercise-text-size: 16px;
+  --sw-inline-control-height: 32px;
+  --sw-inline-padding-block: 3px;
+  --sw-inline-padding-inline: 10px;
+  --sw-matching-long-slot-height: 84px;
   --sw-control-scale: 1; /* All workspace controls; 1 keeps the approved size. */
   --sw-exercise-title-size: calc(var(--sw-exercise-text-size) * 1.25);
   --sw-exercise-compact-text-size: calc(var(--sw-exercise-text-size) * 1);

@@ -126,7 +126,7 @@ test('every published pack can complete every task through the shared UI and reo
     if(d.kind==='gaps'){
      const gaps=d.items.flatMap(i=>i.segments.filter(s=>typeof s!=='string'));
      for(let i=0;i<gaps.length;i++){
-      const el=section.querySelectorAll(d.inputMode==='select'?'.ek-choice-trigger':'input.ek-gap')[i];
+      const el=section.querySelectorAll(d.inputMode==='select'?'.ek-choice-trigger':'input.ek-typed-gap')[i];
       if(d.inputMode==='select'){p.click(el);p.click([...section.querySelectorAll('.ek-inline-choice')[i].querySelectorAll('.ek-inline-option')].find(e=>e.textContent===gaps[i].answers[0]));}
       else type(el,gaps[i].answers[0]);
      }

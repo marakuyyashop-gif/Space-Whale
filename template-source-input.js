@@ -84,7 +84,7 @@
     listening('L03', 'Listen and choose a picture', '[Transcript]',
       pictureChoice('L03', 'Choose one picture.', 'sweater')),
     listening('L04', 'Listen and select the correct pictures', '[Transcript]',
-      pictureChoice('L04', 'Choose all the correct pictures.', ['coat', 'hat'], true)),
+      pictureChoice('L04', 'Choose ALL the correct pictures.', ['coat', 'hat'], true)),
     listening('L05', 'Put the pictures in the order you hear them', '[Transcript]',
       garmentOrder('L05')),
     listening('L06', 'Put the text in the order you hear it', '[Transcript]',
@@ -130,7 +130,7 @@
         id: 'meeting-time', prompt: '[Question]', acceptedAnswers: ['[Answer]', '[Alternative answer 1]', '[Alternative answer 2]', '[Alternative answer 3]', '[Alternative answer 4]', '[Alternative answer 5]']
       }] })),
     listening('L13', 'Listen and select the correct answers', '[Transcript]',
-      response('L13', 'choice', { multiple: true, instruction: 'Choose all the correct options.', items: [{
+      response('L13', 'choice', { multiple: true, instruction: 'Choose ALL the correct options.', items: [{
         id: 'problems', prompt: '[Question]',
         options: [opt('phone', '[Answer 1]'), opt('ticket', '[Answer 2]'), opt('bag', '[Answer 3]'), opt('train', '[Answer 4]')],
         correctIds: ['ticket', 'train']
@@ -191,7 +191,7 @@
     reading('T03', 'Read and choose a picture', '[Text]',
       pictureChoice('T03', 'Choose one picture.', 'hat')),
     reading('T04', 'Read and select the correct pictures', '[Text]',
-      pictureChoice('T04', 'Choose all the correct pictures.', ['coat', 'sweater'], true)),
+      pictureChoice('T04', 'Choose ALL the correct pictures.', ['coat', 'sweater'], true)),
     reading('T05', 'Put the pictures in the order they are mentioned', '[Text]',
       garmentOrder('T05')),
     reading('T06', 'Put the events in the correct order', '[Text]',

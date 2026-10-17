@@ -31,7 +31,7 @@
     }]}));
 
   preview('E02','Multiple Select','Select every sentence that follows the given model.',
-    base('e02-multiple','choice','Find the correct sentences.',{multiple:true,instruction:'Choose all the correct sentences.',items:[{
+    base('e02-multiple','choice','Find the correct sentences.',{multiple:true,instruction:'Choose ALL the correct sentences.',items:[{
       id:'sentences',prompt:'[Question about the target structure]',
       options:[option('negative','[Sentence 1]'),option('wrong-question','[Sentence 2]'),option('positive','[Sentence 3]'),option('wrong-negative','[Sentence 4]')],correctIds:['negative','positive']
     }]}));
@@ -124,14 +124,14 @@
       {id:'cooking',text:'[Picture 1]',...art('cooking','A person cooking'),correctId:'dinner'},
       {id:'reading',text:'[Picture 2]',...art('reading','A person reading a book'),correctId:'book'},
       {id:'cycling',text:'[Picture 3]',...art('cycling','A person riding a bicycle'),correctId:'bike'}
-    ],[option('bike','[Sentence for Picture 3]'),option('dinner','[Sentence for Picture 1]'),option('book','[Sentence for Picture 2]')],{layout:'picture-word'}));
+    ],[option('bike','[Sentence for Picture 3]'),option('dinner','[Sentence for Picture 1]'),option('book','[Sentence for Picture 2]')],{layout:'picture-word',answerSize:'sentence'}));
 
   preview('E06E','Matching: деятельность и предмет','Connect each activity with the object used for it.',
     matching('e06e-activity-object','Match the objects with the activities.',[
       {id:'remote',text:'[Object 1]',...objectArt.remote,correctId:'channel'},
       {id:'keyboard',text:'[Object 2]',...objectArt.keyboard,correctId:'type'},
       {id:'mouse',text:'[Object 3]',...objectArt.mouse,correctId:'pointer'}
-    ],[option('type','[Activity for Object 2]'),option('pointer','[Activity for Object 3]'),option('channel','[Activity for Object 1]')],{layout:'picture-word'}));
+    ],[option('type','[Activity for Object 2]'),option('pointer','[Activity for Object 3]'),option('channel','[Activity for Object 1]')],{layout:'picture-word',answerSize:'sentence'}));
 
   preview('E06F','Matching: части словосочетания','Join the parts of familiar expressions.',
     matching('e06f-chunks','Match the parts of the expressions.',[
@@ -214,10 +214,10 @@
     ],{responseMode:'personal',instruction:'Keep the target structure. Change each sentence if needed.'}));
 
   preview('E17','Chat Exchange','Continue a connected three-turn chat using a prepared partner script.',
-    base('e17-chat','stage','Continue the chat.',{progressive:true,requireCheckBeforeNext:true,exercises:[
+    base('e17-chat','stage','Reply to your partner.',{progressive:true,requireCheckBeforeNext:true,exercises:[
       {id:'time',exercise:writing('e17-time','Reply to your partner.',[{id:'reply',prompt:'[Partner message 1]'}])},
-      {id:'place',exercise:writing('e17-place','Continue the exchange.',[{id:'reply',prompt:'[Partner message 2]'}])},
-      {id:'bring',exercise:writing('e17-bring','Finish the chat.',[{id:'reply',prompt:'[Partner message 3]'}])}
+      {id:'place',exercise:writing('e17-place','Reply to your partner.',[{id:'reply',prompt:'[Partner message 2]'}])},
+      {id:'bring',exercise:writing('e17-bring','Reply to your partner.',[{id:'reply',prompt:'[Partner message 3]'}])}
     ]}));
 
   window.SpaceWhaleSourcePracticeTemplates = definitions;

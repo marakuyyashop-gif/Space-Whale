@@ -130,12 +130,12 @@ test('empty editors refresh their native selection after focus without moving a 
  locked.window.requestAnimationFrame=callback=>frames.push(callback);locked.fire(locked.host.querySelector('input'),'focus');assert.equal(frames.length,0);
  }finally{if(originalFrame===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=originalFrame;}
 });
-test('reviewed Discovery controls inherit the flat skin and replace their existing indices on check',()=>{
+test('reviewed Discovery controls inherit the flat skin and show result markers without internal indices',()=>{
  const def=sourceFixture('D02'),s=setup(def,{syncChecks:true});
  assert.equal(s.host.classList.contains('ek-flat-controls'),true);
  assert.equal(s.host.querySelector('.ek-discovery-host').classList.contains('ek-flat-controls'),true);
  const control=s.host.querySelector('.ek-choice-trigger'),badge=control.querySelector('.ek-gap-number');
- assert.equal(badge.textContent,'1');assert.ok(control.querySelector('.ek-choice-label'));
+ assert.equal(badge.textContent,'');assert.equal(badge.dataset.number,'');assert.ok(control.querySelector('.ek-choice-label'));
  const child=s.host.querySelector('.ek-discovery-host');
  s.fire(control,'click');s.fire(child.querySelector('[data-option-value=now]'),'click');
  s.fire(child.querySelectorAll('.ek-choice-trigger')[1],'click');s.fire(child.querySelector('[data-option-value=yes]'),'click');
@@ -159,13 +159,13 @@ test('authored Writing samples appear only for the explicit opt-in and keep open
  const input=s.host.querySelector('input');input.value='Edited';s.fire(input,'input');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
  const ordinary=setup({...def,id:'ordinary-writing',showAuthoredSamples:false},{syncChecks:true});ordinary.mount.setAnswers(state);assert.equal(ordinary.host.querySelector('.ek-writing-answers'),null);
 });
-test('inline Writing keeps prompt and editor together with one shared width and unchanged answer keys',()=>{
+test('inline Writing keeps prompt and compact editor together with unchanged answer keys',()=>{
  const def={version:1,id:'inline-writing',kind:'writing',layout:'inline',title:'[Task]',responseMode:'accepted',items:[{id:'short',prompt:'[Word 1]',acceptedAnswers:['went']},{id:'long',prompt:'[Word 2]',acceptedAnswers:['a longer accepted form']}]};
  const s=setup(def,{syncChecks:true}),rows=[...s.host.querySelectorAll('.ek-writing-inline')];
  assert.equal(rows.length,2);assert.equal(rows[0].querySelector('.ek-writing-prompt').textContent,'1. [Word 1]');
- assert.equal(rows[0].style.getPropertyValue('--ek-writing-field-width'),rows[1].style.getPropertyValue('--ek-writing-field-width'));
+ assert.deepEqual([...s.host.querySelectorAll('.ek-response-input')].map(input=>input.style.width),['6ch','6ch']);
  s.mount.setAnswers({short:'went',long:'wrong',__sw_checked:true});
- assert.equal(s.host.querySelectorAll('input')[0].dataset.feedback,'correct');assert.equal(s.host.querySelectorAll('input')[1].dataset.feedback,'retry');
+ assert.equal(s.host.querySelectorAll('textarea')[0].dataset.feedback,'correct');assert.equal(s.host.querySelectorAll('textarea')[1].dataset.feedback,'retry');
  assert.equal(s.host.querySelectorAll('.ek-answer-pairs li').length,2);
 });
 test('typed cue width survives focus, short edits and synchronized restoration without saving the cue',()=>{
@@ -175,6 +175,46 @@ test('typed cue width survives focus, short edits and synchronized restoration w
  field.value='R';s.fire(field,'input');assert.equal(field.style.width,width);assert.equal(s.mount.getAnswers().answer,'R');
  s.mount.setAnswers({answer:'Reed'});assert.equal(s.host.querySelector('input'),field);assert.equal(field.style.width,width);
  s.mount.setAnswers({});assert.equal(field.value,'');assert.equal(field.style.width,width);assert.equal(s.mount.getAnswers().answer,undefined);
+});
+test('shared native compact editors grow for typed and synchronized answers while sentence editors wrap vertically',()=>{
+ const definitions=[
+  {version:1,id:'compact-gap-growth',kind:'gaps',title:'Write.',items:[{id:'row',segments:[{id:'answer',answers:['word']}]}]},
+  {version:1,id:'compact-word-growth',kind:'writing',layout:'inline',answerSize:'word',title:'Write.',responseMode:'accepted',items:[{id:'answer',prompt:'[Word]',acceptedAnswers:['word']}]},
+  {version:1,id:'compact-sentence-growth',kind:'writing',layout:'inline',title:'Correct.',responseMode:'accepted',items:[{id:'answer',prompt:'[Sentence]',acceptedAnswers:['word']}]}
+ ];
+ const text='A substantially longer answer which must remain entirely editable when the available column narrows.';
+ for(const def of definitions){
+  const s=setup(def,{syncChecks:true}),field=s.host.querySelector('input,textarea');
+  assert.ok(field.matches('.ek-writing-input.ek-response-input.ek-compact-input'));
+  assert.equal(field.style.width,'6ch');assert.equal(field.value,'');
+  if(field.tagName==='TEXTAREA'){
+   assert.equal(field.rows,1);assert.ok(field.classList.contains('ek-growing-input'));
+   Object.defineProperty(field,'scrollHeight',{configurable:true,get:()=>field.value.length>40?64:30});
+  }
+  field.value=text;s.fire(field,'input');assert.ok(parseFloat(field.style.width)>40);assert.equal(s.mount.getAnswers().answer,text);
+  if(field.tagName==='TEXTAREA')assert.equal(field.style.height,'64px');
+  const changes=s.changes.length;s.mount.setAnswers({answer:'word',__sw_checked:true});
+  assert.equal(s.host.querySelector('input,textarea'),field);assert.equal(field.value,'word');assert.equal(field.style.width,'6ch');assert.equal(field.dataset.feedback,'correct');assert.equal(s.changes.length,changes);
+  s.mount.setAnswers({answer:text});assert.ok(parseFloat(field.style.width)>40);assert.equal(field.hasAttribute('data-feedback'),false);
+  const reader=setup(def,{readOnly:true,syncChecks:true}),locked=reader.host.querySelector('input,textarea');reader.mount.setAnswers({answer:text});
+  assert.equal(locked.disabled,true);assert.equal(locked.value,text);assert.ok(parseFloat(locked.style.width)>40);assert.equal(reader.changes.length,0);
+  s.mount.setAnswers({});assert.equal(field.value,'');assert.equal(field.style.width,'6ch');reader.mount.destroy();s.mount.destroy();
+ }
+ const message=setup({version:1,id:'ordinary-message',kind:'writing',title:'Reply.',items:[{id:'reply',prompt:'[Message]',multiline:true}]}),field=message.host.querySelector('textarea');
+ assert.equal(field.rows,5);assert.equal(field.classList.contains('ek-compact-input'),false);assert.equal(field.style.getPropertyValue('width')||'','');message.mount.destroy();
+});
+test('Multiple Select grades its answer options without replacing the question index with a result',()=>{
+ const def={version:1,id:'multiple-legend',catalogFamily:'E',kind:'choice',multiple:true,title:'Choose ALL the correct options.',items:[{id:'question',prompt:'[Question about the target structure]',options:[{id:'a',text:'[Option A]'},{id:'b',text:'[Option B]'},{id:'c',text:'[Option C]'}],correctIds:['a','c']}]};
+ const s=setup(def,{syncChecks:true}),initial=s.host.querySelector('legend').textContent;
+ const assertPlainLegend=view=>{const legend=view.host.querySelector('legend'),index=legend.querySelector('.ek-question-index');assert.equal(legend.textContent,initial);assert.equal(index.textContent,'1');assert.equal(index.hasAttribute('data-result'),false);assert.equal(legend.querySelector('.ek-result-symbol,.ek-result-lamp'),null);};
+ assertPlainLegend(s);
+ s.mount.setAnswers({question:['b'],__sw_checked:true});
+ assertPlainLegend(s);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-radio input')].map(input=>input.dataset.feedback),['correct','retry','correct']);
+ const option=s.host.querySelector('input[value=a]');option.checked=true;s.fire(option,'change');assert.equal(s.host.querySelector('.ek-radio[data-feedback]'),null);assertPlainLegend(s);
+ const reader=setup(def,{syncChecks:true,readOnly:true});reader.mount.setAnswers({question:['a','c'],__sw_checked:true});
+ assertPlainLegend(reader);assert.equal(reader.changes.length,0);
+ s.mount.destroy();reader.mount.destroy();
 });
 test('compact source True False keeps all statement dropdowns together and their keyed feedback',()=>{
  const task={version:1,id:'facts',kind:'choice',title:'Listen.',layout:'dropdown',numbered:true,items:[1,2,3].map(n=>({id:'fact'+n,prompt:'[Statement '+n+']',options:[{id:'true',text:'True'},{id:'false',text:'False'}],correctId:n===1?'true':'false'}))};
@@ -523,9 +563,10 @@ test('nested feedback remains visible when another stage opens and closes',()=>{
 
 test('inline and typed gap feedback stays inside the field alongside its original sentence number',()=>{
   for(const id of ['inline-demo','typed-demo']){
-    const s=setup(id);const field=s.host.querySelector('.ek-gap');
+    const s=setup(id);const field=s.host.querySelector('.ek-choice-trigger,.ek-typed-gap');
     const badge=s.host.querySelector('.ek-gap-number');
     assert.ok(field.contains(badge)||field.parentElement.contains(badge));
+    assert.equal(badge.textContent,'');assert.equal(badge.dataset.number,'');
     assert.equal(s.host.querySelectorAll('.ek-sentence-number').length,1);assert.equal(s.host.querySelector('.ek-sentence-number').textContent,'1. ');
     s.click('OK');assert.equal(badge.dataset.result,'empty');
     if(id==='inline-demo'){
@@ -1153,13 +1194,13 @@ test('last-attempt correction markers distinguish correct, wrong and unanswered 
  const field=teacher.host.querySelector('input');field.value='coat again';teacher.fire(field,'input');assert.equal(teacher.host.querySelector('.ek-attempt-marker'),null);assert.equal(teacher.host.querySelectorAll('[data-feedback]').length,0);assert.equal(teacher.mount.getAnswers().__sw_checked,undefined);
 });
 
-test('multiple gaps share the original sentence number while accessible gap positions stay distinct',()=>{
+test('multiple compact gaps omit internal ordinals while sentence numbers and accessible positions stay distinct',()=>{
  const def={version:1,id:'sentence-numbers',kind:'gaps',title:'Complete the sentences.',inputMode:'text',items:[
   {id:'first',segments:['I ',{id:'one',answers:['am']},' wearing a ',{id:'two',answers:['coat']},'.']},
   {id:'second',segments:['It ',{id:'three',answers:['is']},' cold.']}]};
  const s=setup(def,{syncChecks:true});
  assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ']);
- assert.deepEqual([...s.host.querySelectorAll('.ek-gap-number')].map(el=>el.dataset.number),['1','1','2']);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-gap-number')].map(el=>el.dataset.number),['','','']);
  assert.deepEqual([...s.host.querySelectorAll('input')].map(el=>el.getAttribute('aria-label')),['Sentence 1, gap 1','Sentence 1, gap 2','Sentence 2, gap 1']);
  s.mount.setAnswers({one:'am',two:'wrong',three:'wrong',__sw_checked:true});assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(el=>[el.getAttribute('value'),el.dataset.result]),[['1','retry'],['2','retry']]);
 });
@@ -1172,7 +1213,7 @@ test('progressive second and third questions retain the same number in prompts, 
   const s=setup(def,{syncChecks:true});s.mount.setAnswers({...state,__sw_choice_revealed:3,__sw_choice_checked:['item1','item2','item3']});
   assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(el=>el.getAttribute('value')),['2','3']);
   if(kind==='choice')assert.deepEqual([...s.host.querySelectorAll('legend')].map(el=>el.textContent),['1. Question 1','2. Question 2','3. Question 3']);
-  else{assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ','3. ']);assert.deepEqual([...s.host.querySelectorAll('.ek-choice-trigger>.ek-gap-number')].map(el=>el.dataset.number),['1','2','3']);}
+  else{assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ','3. ']);assert.deepEqual([...s.host.querySelectorAll('.ek-choice-trigger>.ek-gap-number')].map(el=>el.dataset.number),['','','']);}
   assert.equal(s.changes.length,0);
  }
 });

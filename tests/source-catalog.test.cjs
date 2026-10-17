@@ -71,6 +71,54 @@ test('Words catalog uses structural placeholders with stable keys, option order 
  assert.deepEqual(examples.text.split('\n'),[1,2,3,4].map(number=>`[Example beginning ${number}] [Word ${number}] [Example ending ${number}]`));
  assert.deepEqual(examples.highlights,[1,2,3,4].map(number=>`[Word ${number}]`));
 });
+test('Rules catalog retains four explanation roles with reusable bracket content, not topic exercises',()=>{
+ const rules=templates.filter(def=>def.catalogFamily==='R');
+ assert.deepEqual(rules.map(def=>[def.code,def.id,def.kind]),['R01','R02','R03','R04'].map(code=>[code,`source-${code}`,'rule-page']));
+ for(const def of rules){
+  const visible=[def.title,...def.blocks.flatMap(block=>[block.title,block.text,block.formula,...(block.examples||[])].filter(Boolean))];
+  for(const text of visible){
+   assert.match(text,/\[[^\]]+\]/,`${def.code}: substitution content is explicit`);
+   assert.equal(text.replace(/\[[^\]]+\]/g,'').replace(/[\s+.,:;!?→/–—-]/g,''),'',`${def.code}: no fixed lesson topic outside placeholders`);
+  }
+  assert.ok(def.blocks.every(block=>['text','rule'].includes(block.type)),`${def.code}: explanation stays informational`);
+ }
+ const byCode=Object.fromEntries(rules.map(def=>[def.code,def]));
+ assert.match(byCode.R01.blocks[0].text,/Meaning or situation/);
+ assert.match(byCode.R02.blocks[0].text,/Criterion for choosing/);
+ assert.ok(byCode.R02.blocks.some(block=>block.text?.includes('[Target structure 1]')));
+ assert.ok(byCode.R02.blocks.some(block=>block.text?.includes('[Target structure 2]')));
+ assert.ok(byCode.R03.blocks.some(block=>block.formula?.includes('[First element]')&&block.formula.includes('[Following element]')));
+ const functions=byCode.R04.blocks.filter(block=>block.type==='rule');
+ assert.ok(functions.length>=2,'Useful Language retains separate communication functions');
+ assert.ok(functions.every(block=>/^\[Communication function \d+\]$/.test(block.title)&&block.examples?.length),'Each function retains its own phrases');
+});
+test('Rules render one summary panel with target-only model emphasis and no answer disclosure',()=>{
+ for(const def of templates.filter(card=>card.catalogFamily==='R')){
+  const s=mount(def),panel=s.host.querySelector('.ek-rule-summary');
+  assert.ok(panel,def.code);assert.equal(s.host.querySelectorAll('.ek-rule-summary').length,1,def.code);
+  assert.equal(panel.querySelectorAll('.ek-rule-section').length,def.blocks.length,`${def.code}: all explanation blocks share the panel`);
+  assert.equal(s.host.querySelectorAll('details,summary,input,select,textarea,.ek-check,.ek-feedback').length,0,`${def.code}: no answer task or Possible answers`);
+  assert.doesNotMatch(s.host.textContent,/Possible answers|Past answers/i,def.code);
+  const targets=new Set(def.blocks.flatMap(block=>block.highlights||[]));
+  const emphasis=[...panel.querySelectorAll('strong')];
+  assert.ok(emphasis.length>0,`${def.code}: target emphasis remains visible`);
+  for(const strong of emphasis)assert.ok(targets.has(strong.textContent),`${def.code}: only target fragments are bold`);
+  const modelLines=[...panel.querySelectorAll('.ek-example-text,.ek-rule-example')];
+  assert.ok(modelLines.length>0,`${def.code}: examples or speech models remain present`);
+  if(def.code!=='R04'){
+   const contextual=modelLines.filter(line=>line.textContent.includes('[Example beginning'));
+   assert.ok(contextual.length>0,`${def.code}: examples retain ordinary surrounding context`);
+   for(const line of contextual){assert.equal(line.querySelectorAll('strong').length,1);assert.notEqual(line.textContent,line.querySelector('strong').textContent);}
+  }else assert.ok(modelLines.every(line=>line.querySelector('strong')?.textContent===line.textContent),'Useful Language emphasizes each complete target chunk');
+  if(def.code==='R03'){
+   const formula=panel.querySelector('.ek-rule-formula');
+   assert.equal(formula.querySelector('strong').textContent,'[Target structure]');
+   assert.equal(formula.querySelectorAll('strong').length,1);
+   assert.match(formula.textContent,/^\[First element\] \+ \[Target structure\] \+ \[Following element\]$/);
+  }
+  assert.equal(s.changes.length,0);s.handle.destroy();
+ }
+});
 test('all source-coded cards use the shared renderer; existing artwork paths resolve and missing audio stays pending',()=>{
  let audioCount=0;
  const checkMedia=node=>{
