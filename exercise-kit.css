@@ -926,7 +926,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit .ek-match-answer-label{display:block;min-width:0;max-width:100%;text-align:center}
 .exercise-kit.ek-modern .ek-match-slot>.ek-match-answer-number{position:absolute;top:8px;left:8px;width:14px;min-width:14px;max-width:14px;height:14px;min-height:14px;max-height:14px;font-size:9px}
 .exercise-kit.ek-modern .ek-match-answer-number[data-number=""]:not([data-result]){visibility:hidden}
-.exercise-kit.ek-modern .ek-match-answer-number:is([data-result=correct],[data-result=retry],[data-result=empty]){background:var(--ek-feedback-mark) var(--ek-feedback-icon) center/100% 100% no-repeat}
+.exercise-kit.ek-modern .ek-match-answer-number:is([data-result=correct],[data-result=retry],[data-result=empty]){border-radius:50%;background:var(--ek-feedback-mark) var(--ek-feedback-icon) center/100% 100% no-repeat}
 .exercise-kit.ek-modern .ek-match-answer-number:is([data-result=correct],[data-result=retry],[data-result=empty])>.ek-number-label{visibility:hidden}
 .exercise-kit.ek-modern .ek-match-answer-number[data-result=empty]{background:var(--sw-feedback-incorrect-mark) var(--sw-feedback-cross-icon) center/100% 100% no-repeat}
 /* Two vocabulary cards share each row; source and answer remain distinct. */
