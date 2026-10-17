@@ -904,7 +904,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 /* Vocabulary matching keeps one flat answer treatment and bounded artwork. */
 .exercise-kit .ek-card-grid.ek-picture-word-grid{width:100%;max-width:var(--sw-picture-word-grid-width,600px);margin-left:0;margin-right:auto}
 .exercise-kit .ek-card.ek-picture-word-card,.exercise-kit.ek-modern .ek-card.ek-picture-word-card{cursor:pointer;position:relative;display:flex;flex-direction:column;gap:0;min-height:0;height:100%;aspect-ratio:auto;padding:0;overflow:hidden}
-.exercise-kit .ek-picture-word-media{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;box-sizing:border-box;width:100%;min-width:0;min-height:0;aspect-ratio:var(--sw-picture-word-ratio,1.16);padding:14px;overflow:hidden}
+.exercise-kit .ek-picture-word-media{flex:none;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;box-sizing:border-box;width:100%;min-width:0;min-height:0;aspect-ratio:var(--sw-picture-word-ratio,1.16);padding:14px;overflow:hidden}
 .exercise-kit.ek-modern .ek-picture-word-media>.ek-image:not(.ek-crop-image){display:block;box-sizing:border-box;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:auto!important;object-fit:contain;object-position:center;border-radius:0;margin:0}
 .exercise-kit .ek-picture-word-media>.ek-crop-image{width:min(100%,calc(100% * var(--ek-crop-art-ratio) / var(--sw-picture-word-ratio,1.16)));height:auto;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:var(--ek-crop-art-ratio)!important;margin:0;border-radius:0}
 .exercise-kit.ek-modern .ek-card>.ek-number,.exercise-kit.ek-modern :is(.ek-number,.ek-picture-cue-number,.ek-order-number),.exercise-kit.ek-modern .ek-match-answer-number:not([data-result]){display:grid;place-items:center;flex:none;box-sizing:border-box;width:14px;min-width:14px;max-width:14px;height:14px;min-height:14px;max-height:14px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--sw-exercise-index-ink);font-size:10px;font-weight:400;line-height:1;font-variant-numeric:tabular-nums;text-align:center}
@@ -912,7 +912,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern :is(.ek-number,.ek-option-number,.ek-match-answer-number)>.ek-number-label{display:block;line-height:1;transform:translateY(-.5px)}
 .exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-number{position:absolute;top:12px;left:16px;z-index:2}
 .exercise-kit.ek-modern :is(.ek-picture-word-card,.ek-vocabulary-card)>.ek-match-slot{position:relative;inset:auto;align-self:center;display:grid;place-items:center;min-width:0;min-height:calc(44px * var(--sw-control-scale,1));padding:calc(9px * var(--sw-control-scale,1)) calc(24px * var(--sw-control-scale,1));border:1px dashed var(--sw-picture-word-slot-border,#d9d9de);border-radius:24px;background:var(--sw-picture-word-slot-surface,#f7f7f8);box-shadow:none;outline:0;overflow:visible;color:var(--ek-ink);font-size:var(--ek-text-size);line-height:1.5;text-align:center;white-space:normal;word-break:normal;overflow-wrap:break-word}
-.exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-word-slot{width:calc(100% - 20px);min-height:44px;margin:6px 10px 10px;border-radius:20px}
+.exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-word-slot{flex:1 0 auto;width:calc(100% - 20px);min-height:44px;margin:6px 10px 10px;border-radius:20px}
 .exercise-kit.ek-modern :is(.ek-picture-word-card,.ek-vocabulary-card)>.ek-match-slot:is(:hover,:active,:focus-visible){background:var(--sw-picture-word-slot-surface,#f7f7f8);box-shadow:none;transform:none;border-color:var(--sw-picture-word-slot-border,#d9d9de);border-style:dashed}
 .exercise-kit.ek-modern :is(.ek-picture-word-card,.ek-vocabulary-card)>.ek-match-slot::after{content:'';position:absolute;left:50%;right:auto;top:50%;width:12px;height:12px;border:0;transform:translate(-50%,-50%);background:linear-gradient(var(--ek-muted),var(--ek-muted)) center/10px 1.4px no-repeat,linear-gradient(var(--ek-muted),var(--ek-muted)) center/1.4px 10px no-repeat}
 .exercise-kit.ek-modern :is(.ek-picture-word-card,.ek-vocabulary-card)>.ek-match-slot[data-selected=true]::after{display:none}
@@ -970,7 +970,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
   .exercise-kit .ek-card-grid.ek-picture-word-grid{--ek-grid-gap:12px}
   .exercise-kit.ek-modern .ek-card-grid.ek-word-translation-grid{--ek-grid-min:124px;--ek-vocabulary-card-basis:calc((100% - var(--ek-grid-gap))/2)}
   .exercise-kit.ek-modern .ek-card-grid.ek-word-definition-grid{--ek-grid-min:124px}
-  .exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-word-slot{width:calc(100% - 20px);min-height:44px;margin:6px 10px 10px;font-size:var(--sw-exercise-small-size)}
+  .exercise-kit.ek-modern .ek-picture-word-card>.ek-picture-word-slot{flex:1 0 auto;width:calc(100% - 20px);min-height:44px;margin:6px 10px 10px;font-size:var(--sw-exercise-small-size)}
   .exercise-kit.ek-modern .ek-card-grid:is(.ek-word-translation-grid,.ek-word-definition-grid)>.ek-card.ek-vocabulary-card{grid-template-columns:14px minmax(min-content,1fr);gap:8px;padding:12px;min-height:0}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-number{position:static;grid-column:1;grid-row:1;align-self:center}
   .exercise-kit.ek-modern .ek-card:is(.ek-word-translation-card,.ek-word-definition-card)>.ek-card-label{grid-column:2;grid-row:1}
@@ -979,9 +979,9 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
   .exercise-kit.ek-modern .ek-card.ek-word-definition-card>.ek-word-definition-slot{min-height:104px}
 }
 
-/* Reviewed Discovery/Practice catalog controls reuse the approved Words surface.
+/* Reviewed catalog controls reuse the approved Words surface.
    Inherited by nested tasks; W and the unreviewed Rules keep their current skin. */
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)){
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-typed-wrap,.ek-writing-input,.ek-sort-token,.ek-token,.ek-option,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)){
   border:1px dashed var(--sw-picture-word-slot-border);border-radius:20px;
   background:var(--sw-picture-word-slot-surface);box-shadow:none;background-image:none;
 }
@@ -1016,10 +1016,27 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type]{background:transparent;box-shadow:none;border:1px solid var(--sw-picture-word-slot-border)}
 .exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type]:checked{background:var(--sw-exercise-muted);border-color:var(--sw-exercise-muted)}
 .exercise-kit.ek-modern.ek-flat-controls .ek-radio>input[type][data-feedback]{background:var(--ek-feedback-mark);border-color:var(--ek-feedback-mark);box-shadow:none}
-.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)):hover:not(:disabled){
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-token,.ek-option,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot)):hover:not(:disabled){
   background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none;
 }
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-writing-input,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback],
 .exercise-kit.ek-modern.ek-flat-controls .ek-typed-wrap:has(>.ek-typed-gap[data-feedback]){background:var(--sw-answer-surface);box-shadow:none;border-color:transparent;border-style:solid}
 
 .exercise-kit.ek-modern.ek-flat-controls :is(.ek-choice-trigger,.ek-sort-token,.ek-order-target>.ek-token,.ek-radio,.ek-match-slot:not(.ek-vocabulary-slot))[data-feedback]:hover:not(:disabled){background:var(--sw-answer-surface);box-shadow:none;transform:none}
+
+/* Compact writing keeps each prompt and its response together, wrapping whole fields. */
+.exercise-kit .ek-writing.ek-writing-inline{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.exercise-kit .ek-writing-inline>.ek-writing-prompt{min-width:0;max-width:100%;white-space:pre-wrap;overflow-wrap:break-word}
+.exercise-kit .ek-writing-inline>.ek-writing-input{flex:0 0 auto;width:min(var(--ek-writing-field-width,24ch),100%);max-width:100%}
+.exercise-kit .ek-writing-inline>.ek-writing-hint{flex-basis:100%}
+/* Instructions are task text; keep their normal body size and ink. */
+.exercise-kit.ek-modern.ek-flat-controls .ek-instruction{color:var(--ek-ink)}
+.exercise-kit.ek-modern.ek-flat-controls .ek-audio-player{background:var(--sw-picture-word-slot-surface);border:1px solid var(--sw-picture-word-slot-border);box-shadow:none}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-audio-play,.ek-repeat-play,.ek-check,.ek-stage-toggle),
+.exercise-kit.ek-flat-controls+.workspace-exercise-navigation .ek-stage-toggle{border:1px solid var(--sw-picture-word-slot-border);background:var(--sw-picture-word-slot-surface);box-shadow:none}
+.exercise-kit.ek-modern.ek-flat-controls :is(.ek-audio-play,.ek-repeat-play,.ek-check,.ek-stage-toggle):hover:not(:disabled),
+.exercise-kit.ek-flat-controls+.workspace-exercise-navigation .ek-stage-toggle:hover:not(:disabled){background:var(--sw-picture-word-slot-surface);box-shadow:none;transform:none}
+
+.exercise-kit.ek-modern.ek-flat-controls .ek-inline-option:is(:hover,:focus-visible){box-shadow:none;transform:none}
+
+.exercise-kit.ek-modern.ek-flat-controls .ek-inline-menu{background:var(--sw-answer-surface);border:1px solid var(--sw-picture-word-slot-border);box-shadow:var(--sw-card-shadow)}

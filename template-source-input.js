@@ -25,7 +25,18 @@
     ],
     ...(script ? { transcript: script, transcriptAfter: ['task'] } : {})
   });
-  const listening = (code, title, script, task) => sourceStage(code, title, [audio(code, 'Recording', script)], task, script);
+  const listening = (code, title, script, task) => {
+    // A source and its task share one heading. Put the interaction instruction
+    // directly below it, before the player, rather than after the recording.
+    const stage = sourceStage(code, title, [audio(code, title, script)], task, script);
+    const prompt=task.kind==='choice'&&task.items.length===1?task.items[0].prompt:'';
+    const instruction=task.instruction||(/^(?:listen|choose)\b/i.test(prompt)?prompt:'');
+    if (instruction) {
+      stage.instruction = instruction;
+      delete stage.exercises.find(block => block.id === 'task').exercise.instruction;
+    }
+    return stage;
+  };
   const reading = (code, title, passage, task) => sourceStage(code, title, [text(code, passage)], task);
   const response = (code, kind, data) => base(`source-${code}-response`, kind, 'Task', data);
   const trueFalse = (code, statements) => response(code, 'choice', {
@@ -52,7 +63,7 @@
       ])),
     listening('L02', 'Why is Daniel calling?',
       'Hi, it is Daniel. I booked a table for seven tonight, but my train is late. Could we come at eight instead? There are still four of us. Please call me back.',
-      response('L02', 'choice', { instruction: 'Listen and choose the correct answer.', items: [{
+      response('L02', 'choice', { instruction: 'Choose the correct answer.', items: [{
         id: 'reason', prompt: 'Daniel wants to…',
         options: [opt('people', 'change the number of people.'), opt('time', 'arrive an hour later.'), opt('cancel', 'cancel the booking.')], correctId: 'time'
       }] })),

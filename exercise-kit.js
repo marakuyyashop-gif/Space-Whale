@@ -466,7 +466,7 @@
   }
   function mount(host, definition, config = {}) {
     validate(definition);
-    const flatControls = config.flatControls === true || ['D','E'].includes(definition.catalogFamily);
+    const flatControls = config.flatControls === true || ['D','E','L','T','Q','S'].includes(definition.catalogFamily);
     if(flatControls)config={...config,flatControls:true};
     // A follow-up task or rule uses the existing teacher-controlled sequence, while
     // preserving the original flat response IDs and saved checks.
@@ -1140,7 +1140,7 @@
           const child = node('div', 'ek-stage-host'); section.append(child); stack.append(section);
           // Source media and lead-ins are materials, not separately skippable tasks.
           const onSkip=!config.allowMaterialSkip&&['presentation','audio'].includes(block.exercise.kind)?undefined:()=>{if(config.independentSteps&&index!==visibleCount-1)return;const next=stageStops.find(stop=>stop>visibleCount);if(next){answers.revealed=next;syncStage(next,true);viewChanged();}else config.onSkip?.();};
-          const handle = mount(child, block.exercise, { flatControls, unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise,index)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
+          const handle = mount(child, block.exercise, { flatControls, hidePrompt:flatControls&&block.exercise.items?.length===1&&[def.title,def.instruction].some(copy=>sameTaskCopy(copy,block.exercise.items[0].prompt)), unifiedProgression:config.unifiedProgression,repeatAll:config.repeatAll,allowMaterialSkip:config.allowMaterialSkip,independentSteps:config.independentSteps,primaryHeading:Boolean(config.primaryHeading||hasSpecificChildHeading(def)),hideHeading:hiddenChildHeading(def,block.exercise,index)||(config.independentSteps&&block.exercise.kind==='rule-page'&&block.exercise.blocks?.[0]?.title===block.exercise.title), itemNumbers:config.itemNumbers,sequentialListening:!config.independentSteps&&def.exercises.slice(0,index).some(source=>source.exercise.kind==='audio'), audioPath:(config.audioPath||def.id)+':'+block.id,onSkip,syncDisclosures:Boolean(config.syncDisclosures),syncChecks: Boolean(config.syncChecks || def.transcriptAfter || def.requireCheckBeforeNext), readOnly: Boolean(config.readOnly), audioReadOnly:Boolean(config.audioReadOnly), navigationReadOnly:Boolean(config.navigationReadOnly), onViewChange:(config.onViewChange||config.unifiedProgression)?()=>{if(config.unifiedProgression)updateNavigation();viewChanged();}:undefined, answers: answers[block.id] || {}, onChange: value => { answers[block.id] = value; save(); syncTranscript?.(); if(def.requireCheckBeforeNext)updateNavigation(); } });
           nestedMounts.push(handle); nestedMountsByBlock.set(block.id, handle);
           return section;
         };
@@ -1458,6 +1458,7 @@
         }
         else if(item.promptHighlights?.length){legend.append(...richText(`${itemNumber(item)}. ${item.prompt}`,item.promptHighlights).childNodes);legend.style.whiteSpace='pre-line';}
         else legend.textContent=`${itemNumber(item)}. ${item.prompt}`;
+        if(config.hidePrompt){legend.hidden=true;group.setAttribute('aria-label',item.prompt);}
         group.append(legend);
         item.options.forEach(option => {
           const label = node('label', def.layout === 'image-grid' ? 'ek-radio ek-image-choice-option' : 'ek-radio'); const input = node('input'); input.type = def.multiple ? 'checkbox' : 'radio'; input.name = `${def.id}-${item.id}`; input.value = option.id; input.checked = def.multiple ? (Array.isArray(answers[item.id]) && answers[item.id].includes(option.id)) : answers[item.id] === option.id;
@@ -1568,12 +1569,16 @@
       }
       if (def.kind === 'writing') {
         if(def.layout==='picture-rows')body.append(pictureCues(def.items));
+        const inline=def.layout==='inline';
+        const answerLengths=def.items.flatMap(item=>(item.acceptedAnswers||item.possibleAnswers||[]).map(text=>text.length+2));
+        const fieldWidth=Math.max(14,Math.min(40,answerLengths.length?Math.max(...answerLengths):24));
         def.items.forEach((item, index) => {
         const compact=def.layout==='picture-rows';
         const row=compact?node('div','ek-picture-sentence'):body;
         if(compact)row.append(node('span','ek-picture-response-number',`${itemNumber(item)}.`));
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
-        const label = node('label', 'ek-writing', compact ? '' : `${itemNumber(item)}. ${item.prompt}`);
+        const label = node('label', 'ek-writing'+(inline?' ek-writing-inline':''), compact||inline ? '' : `${itemNumber(item)}. ${item.prompt}`);
+        if(inline){label.style.setProperty('--ek-writing-field-width',fieldWidth+'ch');label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));}
         const input = node(item.multiline?'textarea':'input','ek-writing-input'); if(item.multiline)input.rows=5;else input.type='text'; input.value = answers[item.id] || ''; placeholderCue(input,item.placeholder); input.addEventListener('input', () => changed(item.id, input.value)); label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
@@ -1694,6 +1699,9 @@
       if(def.kind==='gaps')def.items.forEach(item=>item.segments.forEach(segment=>{
         if(typeof segment!=='string' && !segment.answers && feedback[segment.id]!=='empty' && segment.possibleAnswers?.length)examples.push(['',segment.possibleAnswers.join(' / ')]);
       }));
+      if(def.kind==='writing'&&def.showAuthoredSamples===true&&def.revealPossibleAnswers===true)def.items.forEach(item=>{
+        if(feedback[item.id]==='review'&&item.possibleAnswers?.length)examples.push([item.prompt,item.possibleAnswers[0]]);
+      });
       const solution=node('li','ek-correction'),list=node('ol','ek-answer-pairs');solution.append(list);
       const pair=(prompt,answer,item)=>{if(!answer)return;const row=markAttempt(node('li'),item?itemResult(item):feedback.order||'empty');if(item)row.setAttribute('value',String(itemNumber(item)));if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);};
       const imageLabelTranslations=def.kind==='image-label'&&def.options.some(option=>option.translation);
@@ -1725,6 +1733,7 @@
       if(list.children.length){solution.prepend(node('strong','ek-feedback-heading',def.kind==='order'?'Correct Answer':'Correct answers'));resultsBox.append(solution);}
       if(examples.length){
         const section=node('li','ek-correction ek-writing-answers'),container=def.revealPossibleAnswers?node('details','ek-disclosure'):section;container.append(node(def.revealPossibleAnswers?'summary':'strong','ek-feedback-heading',POSSIBLE_ANSWERS_TITLE));if(container!==section)section.append(container);
+        if(def.kind==='writing'&&def.showAuthoredSamples===true&&def.revealPossibleAnswers)container.open=true;
         const list=node('ul','ek-answer-pairs');examples.forEach(([prompt,answer])=>{const row=node('li');if(prompt)row.append(node('span','ek-muted',prompt),doc.createTextNode(' — '));row.append(node('strong','',answer));list.append(row);});container.append(list);resultsBox.append(section);decorateDisclosures();
       }
       if(attempted && def.responseMode==='personal')status.textContent=Object.values(feedback).includes('empty')?'Заполните оставшиеся поля.':'Well done';

@@ -169,10 +169,10 @@
 
   preview('E11','Написать предложение по подсказкам','Build and write complete sentences from meaning cues.',
     writing('e11-sentences','Write complete sentences.',[
-      {id:'want',prompt:'[Cue 1A] / [Cue 1B] / [Cue 1C] / [Cue 1D]'},
-      {id:'work',prompt:'[Cue 2A] / [Cue 2B] / [Cue 2C] / [Cue 2D]'},
-      {id:'now',prompt:'[Cue 3A] / [Cue 3B] / [Cue 3C]'}
-    ],{instruction:'Use the cues. Add the grammar and words you need.'}));
+      {id:'want',prompt:'[Cue 1A] / [Cue 1B] / [Cue 1C] / [Cue 1D]',possibleAnswers:['[Possible sentence 1]']},
+      {id:'work',prompt:'[Cue 2A] / [Cue 2B] / [Cue 2C] / [Cue 2D]',possibleAnswers:['[Possible sentence 2]']},
+      {id:'now',prompt:'[Cue 3A] / [Cue 3B] / [Cue 3C]',possibleAnswers:['[Possible sentence 3]']}
+    ],{showAuthoredSamples:true,revealPossibleAnswers:true,instruction:'Use the cues. Add the grammar and words you need.'}));
 
   preview('E11A','Устно восстановить фразу по изображению','Recover the missing language and say the sentence aloud using the picture.',
     kit.speaking({id:'e11a-oral',title:'Complete the sentence aloud.',image:art('cooking','A person cooking'),
@@ -181,18 +181,18 @@
     }));
 
   preview('E12','Преобразовать слово','Type the form specified by the task.',
-    writing('e12-past','Write the required forms.',[
+    writing('e12-past','[Task]',[
       {id:'go',prompt:'[Word 1]',acceptedAnswers:['[Form of Word 1]']},
       {id:'take',prompt:'[Word 2]',acceptedAnswers:['[Form of Word 2]']},
       {id:'buy',prompt:'[Word 3]',acceptedAnswers:['[Form of Word 3]']}
-    ],{responseMode:'accepted'}));
+    ],{responseMode:'accepted',layout:'inline'}));
 
   preview('E13','Error Correction','Find the error in each sentence and write the corrected sentence.',
     writing('e13-correct','Correct the sentences.',[
       {id:'negative',prompt:'[Sentence with an error 1]',normalization:'translation',acceptedAnswers:['[Corrected sentence 1]']},
       {id:'question',prompt:'[Sentence with an error 2]',normalization:'translation',acceptedAnswers:['[Corrected sentence 2]']},
       {id:'positive',prompt:'[Sentence with an error 3]',normalization:'translation',acceptedAnswers:['[Corrected sentence 3]']}
-    ],{responseMode:'accepted',instruction:'There is one error in each sentence. Write the whole sentence correctly.'}));
+    ],{responseMode:'accepted',layout:'inline',instruction:'There is one error in each sentence. Write the whole sentence correctly.'}));
 
   preview('E14','Краткий письменный ответ','Write one short response to a clear incoming message.',
     writing('e14-reply','Reply to your friend.',[

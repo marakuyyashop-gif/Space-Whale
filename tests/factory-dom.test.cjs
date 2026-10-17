@@ -148,6 +148,26 @@ test('reviewed Discovery controls inherit the flat skin and replace their existi
   const untouched=setup(sourceFixture(code));assert.equal(untouched.host.classList.contains('ek-flat-controls'),false);untouched.mount.destroy();
  }
 });
+test('authored Writing samples appear only for the explicit opt-in and keep open responses ungraded',()=>{
+ const def={version:1,id:'authored-writing-samples',kind:'writing',title:'Write.',responseMode:'open',showAuthoredSamples:true,revealPossibleAnswers:true,items:[{id:'one',prompt:'[Cue 1]',possibleAnswers:['[Possible sentence 1]']},{id:'two',prompt:'[Cue 2]',possibleAnswers:['[Possible sentence 2]']}]};
+ const s=setup(def,{syncChecks:true});assert.equal(s.host.querySelector('.ek-writing-answers'),null);
+ const state={one:'A personal answer.',two:'Another personal answer.',__sw_checked:true};
+ s.mount.setAnswers(state);assert.deepEqual(kit.grade(def,state),{one:'review',two:'review'});
+ assert.equal(s.host.querySelector('.ek-writing-answers details').open,true);
+ assert.deepEqual([...s.host.querySelectorAll('.ek-writing-answers strong')].map(el=>el.textContent),['[Possible sentence 1]','[Possible sentence 2]']);
+ const reader=setup(def,{readOnly:true,syncChecks:true});reader.mount.setAnswers(state);assert.equal(reader.host.querySelector('.ek-writing-answers details').open,true);assert.equal(reader.changes.length,0);
+ const input=s.host.querySelector('input');input.value='Edited';s.fire(input,'input');assert.equal(s.host.querySelector('.ek-writing-answers'),null);
+ const ordinary=setup({...def,id:'ordinary-writing',showAuthoredSamples:false},{syncChecks:true});ordinary.mount.setAnswers(state);assert.equal(ordinary.host.querySelector('.ek-writing-answers'),null);
+});
+test('inline Writing keeps prompt and editor together with one shared width and unchanged answer keys',()=>{
+ const def={version:1,id:'inline-writing',kind:'writing',layout:'inline',title:'[Task]',responseMode:'accepted',items:[{id:'short',prompt:'[Word 1]',acceptedAnswers:['went']},{id:'long',prompt:'[Word 2]',acceptedAnswers:['a longer accepted form']}]};
+ const s=setup(def,{syncChecks:true}),rows=[...s.host.querySelectorAll('.ek-writing-inline')];
+ assert.equal(rows.length,2);assert.equal(rows[0].querySelector('.ek-writing-prompt').textContent,'1. [Word 1]');
+ assert.equal(rows[0].style.getPropertyValue('--ek-writing-field-width'),rows[1].style.getPropertyValue('--ek-writing-field-width'));
+ s.mount.setAnswers({short:'went',long:'wrong',__sw_checked:true});
+ assert.equal(s.host.querySelectorAll('input')[0].dataset.feedback,'correct');assert.equal(s.host.querySelectorAll('input')[1].dataset.feedback,'retry');
+ assert.equal(s.host.querySelectorAll('.ek-answer-pairs li').length,2);
+});
 test('single and multiple choices use real radios / checkboxes and exact set grading', () => {
   for (const id of ['choice-demo','image-choice-demo','multiple-choice-demo','image-multiple-demo']) {
     const s = setup(id); const multiple = id.includes('multiple'); const inputs = [...s.host.querySelectorAll('input')];
