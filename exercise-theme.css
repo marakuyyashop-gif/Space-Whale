@@ -20,8 +20,12 @@
   --sw-action-hover: #fff;
   --sw-action-ink: #000;
   --sw-exercise-muted: #686b70;
-  --sw-exercise-emphasis-ink: #333;
-  --sw-exercise-emphasis-weight: 600;
+  --sw-exercise-emphasis-ink: var(--sw-exercise-ink);
+  --sw-exercise-emphasis-weight: 650;
+  --sw-rule-term-surface: #e9e9ed;
+  --sw-rule-formula-surface: #eeeef1;
+  --sw-rule-condition-surface: #e7efe8;
+  --sw-rule-result-surface: #f5efda;
   --sw-exercise-line: #dedfe2;
   --sw-exercise-surface: #fff;
   --sw-exercise-soft: #fff;
@@ -98,7 +102,11 @@
   --sw-example-divider:#454950;
   --sw-exercise-index-ink:#a8a8af;
   --sw-card-shadow:0 0 20px #0000003d,0 4px 18px #00000020;
-  --sw-exercise-emphasis-ink:#e3e3e3;
+  --sw-exercise-emphasis-ink:#eef0f3;
+  --sw-rule-term-surface:#3c4149;
+  --sw-rule-formula-surface:#333840;
+  --sw-rule-condition-surface:#34483c;
+  --sw-rule-result-surface:#4c4633;
   --sw-answer-surface:#2e3137;
   --sw-feedback-surface:#2b2e34;
   --sw-feedback-context:#b7b7be;

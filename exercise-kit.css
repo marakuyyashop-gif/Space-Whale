@@ -1,5 +1,5 @@
 @import url("typography.css?v=20261015-readable-exercises");
-@import url("exercise-theme.css?v=20261018-functional-control-sizes");
+@import url("exercise-theme.css?v=20261018-rule-highlights");
 /* Shared exercise tokens. Intentionally scoped: existing workspace background is untouched. */
 .exercise-kit {
   --ek-font: var(--sw-exercise-font);
@@ -8,6 +8,7 @@
   --ek-gap: var(--sw-component-gap, 24px);
   --ek-radius: var(--sw-exercise-radius, 16px);
   --ek-ink: var(--sw-exercise-ink, #292b2f);
+  --sw-exercise-emphasis-ink: var(--ek-ink);
   --ek-muted: var(--sw-exercise-muted, #686b70);
   --ek-line: var(--sw-exercise-line, #dedfe2);
   --ek-card: var(--sw-exercise-surface, #fff);
@@ -69,7 +70,7 @@
 .exercise-kit .ek-radio .ek-image { width: calc(110px * var(--sw-control-scale,1)); }
 .exercise-kit .ek-copy { margin: 0; white-space: pre-wrap; }
 /* Inline teaching emphasis follows its sentence, including native font metrics. */
-.exercise-kit :is(strong,b) { font-family: inherit; font-size: inherit; line-height: inherit; font-weight: var(--sw-exercise-emphasis-weight,600); color: var(--sw-exercise-emphasis-ink,var(--ek-muted)); }
+.exercise-kit :is(strong,b) { font-family: inherit; font-size: inherit; line-height: inherit; font-weight: var(--sw-exercise-emphasis-weight,650); color: var(--sw-exercise-emphasis-ink,var(--ek-ink)); }
 /* Fixed Speaking composition. Content cannot introduce panels or controls. */
 .exercise-kit .ek-speaking-image > .ek-image { display: block; width: auto; max-width: min(100%, 560px); height: auto; margin: 0; border-radius: var(--ek-radius); }
 .exercise-kit .ek-speaking-task, .exercise-kit .ek-speaking-use, .exercise-kit .ek-speaking-group { min-width: 0; }
@@ -390,13 +391,30 @@
 }
 .exercise-kit .ek-rule-formula {
   margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #f2f2f3;
-  font-weight: var(--sw-exercise-emphasis-weight,600);
-  color: var(--sw-exercise-emphasis-ink,var(--ek-muted));
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--sw-rule-formula-surface);
+  font-weight: 400;
+  color: var(--ek-ink);
   line-height: var(--sw-exercise-line-height,1.65);
+  overflow-wrap: break-word;
+  word-break: normal;
 }
+/* Teaching highlights wrap with their text; they are not answer-state colors. */
+.exercise-kit .ek-rule-highlight {
+  padding: .08em .32em;
+  border-radius: 7px;
+  background: var(--sw-rule-term-surface);
+  color: var(--sw-exercise-emphasis-ink,var(--ek-ink));
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  line-height: inherit;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.exercise-kit .ek-rule-highlight--condition { background: var(--sw-rule-condition-surface); }
+.exercise-kit .ek-rule-highlight--result { background: var(--sw-rule-result-surface); }
 .exercise-kit .ek-rule-examples {
   display: grid;
   gap: 5px;
@@ -516,7 +534,7 @@
 .exercise-kit .ek-correction { list-style: none; margin-top: 16px; padding: 16px; border: 1px solid var(--ek-line); border-radius: var(--ek-radius); background: var(--ek-card); }
 .exercise-kit .ek-correction p { margin: 8px 0 0; }
 .exercise-kit .ek-correction-line .ek-muted { font-size: 1em; }
-.exercise-kit .ek-correction-line strong { color: var(--sw-exercise-emphasis-ink,var(--ek-muted)); font-weight: var(--sw-exercise-emphasis-weight,600); }
+.exercise-kit .ek-correction-line strong { color: var(--sw-exercise-emphasis-ink,var(--ek-ink)); font-weight: var(--sw-exercise-emphasis-weight,650); }
 .exercise-kit .ek-stage-stack { display: grid; grid-template-columns:minmax(0,1fr); min-width:0; gap: var(--sw-stage-gap, 48px); }
 .exercise-kit .ek-stage-section { min-width: 0; scroll-margin-top: 24px; }
 .exercise-kit .ek-stage-section + .ek-stage-section { border-top: 1px solid var(--ek-line); padding-top: var(--sw-stage-gap, 48px); }
@@ -625,7 +643,7 @@
 .exercise-kit.ek-modern .ek-answer-pairs{margin:0;padding-left:1.65em;font-size:var(--ek-text-size);line-height:1.65;color:var(--sw-feedback-context)}
 .exercise-kit.ek-modern .ek-answer-pairs li{padding:4px 0 4px 3px;overflow-wrap:anywhere}
 .exercise-kit.ek-modern .ek-answer-pairs li::marker,.exercise-kit.ek-modern .ek-muted{color:var(--ek-muted)}
-.exercise-kit.ek-modern .ek-answer-pairs strong{font-family:inherit;font-size:inherit;line-height:inherit;color:var(--sw-exercise-emphasis-ink,var(--ek-muted));font-weight:var(--sw-exercise-emphasis-weight,600)}
+.exercise-kit.ek-modern .ek-answer-pairs strong{font-family:inherit;font-size:inherit;line-height:inherit;color:var(--sw-exercise-emphasis-ink,var(--ek-ink));font-weight:var(--sw-exercise-emphasis-weight,650)}
 .exercise-kit .ek-answer-pairs .ek-muted{font-size:inherit;line-height:inherit;color:var(--sw-feedback-context)}
 .exercise-kit.ek-modern .ek-dialog{padding:28px;border:0;border-radius:28px;background:var(--sw-neu-bg);color:var(--ek-ink);box-shadow:18px 24px 60px #151a224d}
 .exercise-kit.ek-modern .ek-dialog::backdrop{background:#16181c44;backdrop-filter:blur(5px)}
@@ -701,7 +719,6 @@
 .exercise-kit.ek-modern .ek-discovery-field .ek-discovery-select{min-width:0;max-width:100%;margin:0;padding:3px 8px;box-shadow:none;background:transparent;border:0;border-radius:0;outline:0;font:inherit}
 .exercise-kit.ek-modern .ek-discovery-field:focus-within{background:var(--sw-neu-checked)}
 .exercise-kit.ek-modern .ek-rule-block{border:0;border-radius:28px;padding:24px;background:var(--sw-neu-feedback);box-shadow:none}
-.exercise-kit.ek-modern .ek-rule-formula{background:var(--sw-neu-checked);border-radius:18px}
 .exercise-kit.ek-modern .ek-rule-text-section .ek-rule-section-title{font-size:var(--ek-text-size);font-weight:400;color:var(--ek-muted)}
 .exercise-kit.ek-modern .ek-disclosure{padding:0;overflow:hidden}
 .exercise-kit.ek-modern .ek-disclosure>summary{padding:18px 24px;font-weight:600}
@@ -894,7 +911,7 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit .ek-example-model{display:grid;grid-template-columns:1.25em minmax(0,1fr);column-gap:6px;margin:0;font-style:italic;font-size:var(--ek-text-size);line-height:var(--sw-exercise-line-height,1.65)}
 .exercise-kit .ek-example-number{font-style:normal;font-weight:400;color:var(--sw-exercise-index-ink);font-variant-numeric:tabular-nums}
 .exercise-kit .ek-examples-label{margin:0 0 calc(var(--sw-example-label-gap,8px) - var(--sw-example-row-gap,6px));font-size:var(--ek-text-size);font-weight:600;line-height:var(--sw-exercise-line-height,1.65);font-style:normal;color:var(--ek-ink)}
-.exercise-kit .ek-example-model strong{font-weight:650;color:var(--sw-exercise-emphasis-ink)}
+.exercise-kit .ek-example-model strong{font-weight:var(--sw-exercise-emphasis-weight,650);color:var(--sw-exercise-emphasis-ink,var(--ek-ink))}
 .exercise-kit>.ek-body>.ek-stage-stack:has(>.ek-stage-models){gap:0}
 .exercise-kit>.ek-body>.ek-stage-stack>.ek-stage-section.ek-stage-models+.ek-stage-section.ek-stage-model-questions{margin-top:var(--sw-task-content-gap,20px);padding-top:0;border-top:0}
 @media(max-width:600px){.exercise-kit.ek-modern .ek-card-grid .ek-match-slot{padding-left:calc(30px * var(--sw-control-scale,1))}.exercise-kit.ek-modern .ek-card-grid .ek-match-slot::before{left:calc(8px * var(--sw-control-scale,1))}}
@@ -1121,7 +1138,6 @@ body:not([data-theme=dark]) .exercise-kit .ek-button:hover:not(:disabled){filter
 .exercise-kit.ek-modern :is(.ek-rule-summary,.ek-rule-block){box-sizing:border-box;max-width:100%;padding:22px;border:1px dashed var(--sw-picture-word-slot-border);border-radius:32px;background:var(--sw-picture-word-slot-surface);box-shadow:none}
 .exercise-kit.ek-modern .ek-rule-summary{gap:18px}
 .exercise-kit.ek-modern .ek-rule-summary .ek-rule-block{padding:0;border:0;border-radius:0;background:transparent}
-.exercise-kit.ek-modern .ek-rule-formula{margin:14px 0 0;padding:0;border-radius:0;background:transparent;font-weight:400}
 @media(max-width:600px){
  .exercise-kit.ek-modern .ek-card-grid:is(.ek-stacked-text-grid,.ek-audio-picture-grid){--ek-grid-gap:12px;--ek-stacked-min:120px;--ek-stacked-basis:calc((100% - var(--ek-grid-gap))/2)}
  .exercise-kit.ek-modern .ek-card:is(.ek-stacked-text-card,.ek-audio-picture-card){padding:12px;gap:10px}

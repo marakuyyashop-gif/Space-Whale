@@ -1021,16 +1021,32 @@
       host.append(dialog); dialog.showModal();fitDialog();
       view?.addEventListener?.('resize',fitDialog);view?.visualViewport?.addEventListener('resize',fitDialog);view?.visualViewport?.addEventListener('scroll',fitDialog);
     }
-    function richText(value, highlights = [], emphasis = []) {
+    function ruleHighlightTone(value) {
+      const text=value.replace(/’/g,"'").replace(/\s+/g,' ').trim();
+      if(/^had(?:\s*\/\s*hadn't)?\s*\+\s*V3$/i.test(text)||/^hadn't\s*\+\s*V3$/i.test(text))return 'condition';
+      if(/^would(?:\s*\/\s*wouldn't)?\s+have\s*\+\s*V3$/i.test(text)||/^wouldn't\s+have\s*\+\s*V3$/i.test(text)||/^would(?:\s*\/\s*wouldn't)?\s*\+\s*base verb$/i.test(text))return 'result';
+      return 'term';
+    }
+    function richText(value, highlights = [], emphasis = [], rule = false) {
       const el = node('p', 'ek-copy');
-      const pieces = [...highlights.map(text => ({text,tag:'strong'})), ...emphasis.map(text => ({text,tag:'em'}))]
-        .filter(part => typeof part.text === 'string' && part.text.length).sort((a,b) => b.text.length - a.text.length);
+      const pieces = [...highlights.map(text => ({text,tag:'strong'})), ...emphasis.map(text => ({text,tag:'em'}))];
+      if(rule){
+        // Only exact grammatical labels/formula fragments receive automatic marks.
+        // Ordinary uses of if/had/would and all learner answers stay untouched.
+        const labels=/\b(?:if|result)[-\u2011 ]part\b/gi;
+        const forms=/\bhad(?:\s*\/\s*hadn['’]t)?\s*\+\s*V3\b|\bhadn['’]t\s*\+\s*V3\b|\bwould(?:\s*\/\s*wouldn['’]t)?\s+have\s*\+\s*V3\b|\bwouldn['’]t\s+have\s*\+\s*V3\b|\bwould(?:\s*\/\s*wouldn['’]t)?\s*\+\s*base verb\b/gi;
+        for(const match of value.matchAll(labels))pieces.push({text:match[0],tag:'span',start:match.index});
+        for(const match of value.matchAll(forms))pieces.push({text:match[0],tag:'strong',start:match.index});
+      }
+      const ordered=pieces.filter(part => typeof part.text === 'string' && part.text.length).sort((a,b) => b.text.length - a.text.length);
+      let cursor = 0;
       let rest = value;
       while (rest) {
         let at = -1, match;
-        for (const part of pieces) { const i = rest.indexOf(part.text); if (i >= 0 && (at < 0 || i < at)) { at = i; match = part; } }
+        for (const part of ordered) { const i = part.start==null?rest.indexOf(part.text):part.start<cursor?-1:part.start-cursor; if (i >= 0 && (at < 0 || i < at)) { at = i; match = part; } }
         if (at < 0) { el.append(doc.createTextNode(rest)); break; }
-        el.append(doc.createTextNode(rest.slice(0, at)), node(match.tag, '', match.text)); rest = rest.slice(at + match.text.length);
+        const className=rule&&match.tag!=='em'?'ek-rule-highlight ek-rule-highlight--'+ruleHighlightTone(match.text):'';
+        el.append(doc.createTextNode(rest.slice(0, at)), node(match.tag, className, match.text)); cursor += at + match.text.length; rest = value.slice(cursor);
       }
       return el;
     }
@@ -1259,7 +1275,7 @@
           if (block.type === 'text') {
             const section = node('section', 'ek-rule-section ek-rule-text-section');
             if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
-            section.append(block.role==='examples'?exampleModels(block):richText(block.text, block.highlights));
+            section.append(block.role==='examples'?exampleModels(block):richText(block.text, block.highlights, [], true));
             if(afterExercise)revealable.push(section);page.append(section);
           }
           if (block.type === 'rule') {
@@ -1269,8 +1285,8 @@
               : node('section', 'ek-rule-section ek-rule-block');
             if (possibleAnswers) section.append(node('summary', '', POSSIBLE_ANSWERS_TITLE));
             else if (block.title) section.append(node('h3', 'ek-rule-section-title', block.title));
-            if (block.text) section.append(richText(block.text, block.highlights));
-            if (block.formula) {const formula=node('div','ek-rule-formula');formula.append(...richText(block.formula,block.highlights||[]).childNodes);section.append(formula);}
+            if (block.text) section.append(richText(block.text, block.highlights, [], true));
+            if (block.formula) {const formula=node('div','ek-rule-formula');formula.append(...richText(block.formula,block.highlights||[],[],true).childNodes);section.append(formula);}
             if (block.examples?.length) {
               const examples = node('div', 'ek-rule-examples');
               block.examples.forEach(example => {const line=richText(example,block.highlights||[]);line.classList.add('ek-rule-example');examples.append(line);});
