@@ -1,6 +1,6 @@
 /* Approved B1.1 / Module 2 opening and final Speaking.
  * Each lesson reuses one authored source at both ends with independent state IDs.
- * L1 retains its approved five scenes; L2–L4 await the owner's task wording.
+ * Original uploaded artwork and the owner's approved task wording, 2026-10-18.
  */
 (() => {
   'use strict';
@@ -17,11 +17,10 @@
   const use=[{
     words:['submit an application','get a qualification','miss an opportunity','achieve a goal','postpone a decision','face difficulties'],
     phrases:[
-      'If … had / hadn’t …, … would / wouldn’t have …',
-      '… would / wouldn’t have … if … had / hadn’t …',
-      'get — got — gotten'
+      '1. If … had / hadn’t …, … would / wouldn’t have …',
+      '2. … would / wouldn’t have … if … had / hadn’t …'
     ]
-  }];
+  },{phrases:['get — got — gotten']}];
   const careerSpeaking=role=>({
     version:1,id:'B11M02L01_S01_'+role.toUpperCase(),kind:'stage',templateRole:'composition',
     title,progressive:true,
@@ -29,7 +28,7 @@
       id:person.toLowerCase(),
       exercise:kit.speaking({
         id:'B11M02L01_S01_'+(role==='opening'?'OPENING_':'')+person,templateCode:'S01',title,
-        arrangement:'image-support',
+        arrangement:'image-support-below',
         image:{image:'Images/B1/module 1/'+file,alt,imageWidth:1484,imageHeight:1060},
         use
       })
@@ -40,9 +39,50 @@
     [3,'28476544-a11a-4b4e-9769-93ba0bc65f34.png','Six situations involving missed opportunities, disagreements and regrets.'],
     [4,'73f1a4c8-a1bb-4936-82e4-8e3c638754c7.png','Six workplace situations involving responsibility, problems and teamwork.']
   ];
+  const tasks={
+    2:{
+      title:'Difficult decisions',
+      task:{text:'These situations happened at work last month. Ask your tutor what they would have done. Then answer the same questions as a member of the team and compare the decisions.'},
+      use:[{
+        words:['be under pressure','take on responsibility','express concerns','look into the problem','explore alternatives','reach an agreement'],
+        phrases:[
+          'Would you have ... if ... had / hadn’t ...?',
+          'What / How would you have ...?',
+          'Yes, I would have. · No, I wouldn’t have.',
+          'If I’d ..., I’d have ...',
+          'I would’ve ... · I wouldn’t have ...'
+        ]
+      }]
+    },
+    3:{
+      title:'Regrets',
+      task:{text:'The people in the pictures regret something that happened. Speak for each person:',bullets:[
+        'say how they feel;',
+        'say what they wish had been different.'
+      ]},
+      use:[{
+        words:['disappointed','embarrassed','guilty','ashamed','miserable','betrayed'],
+        phrases:['I feel ...','I wish I had / hadn’t ...','If only I had / hadn’t ...','I wish I’d ...','If only ... hadn’t ...']
+      }]
+    },
+    4:{
+      title:'Character and choices',
+      task:{text:'Look at the time labels. For each person:',bullets:[
+        'describe the personality trait;',
+        'explain how a different personality would change the situation or result.'
+      ]},
+      use:[{
+        words:['independent','reliable','competitive','self-confident','determined','stubborn'],
+        phrases:[
+          'If ... were / weren’t ..., ... would / wouldn’t ...',
+          'If ... had / hadn’t been ..., ... would / wouldn’t have ...'
+        ]
+      }]
+    }
+  };
   const photoSpeaking=(number,file,alt,role)=>kit.speaking({
-    id:'B11M02L0'+number+'_S01_'+role.toUpperCase(),templateCode:'S01',title:'Speaking',
-    arrangement:'image-only',image:{image:'Images/'+file,alt,imageWidth:1448,imageHeight:1086}
+    id:'B11M02L0'+number+'_S01_'+role.toUpperCase(),templateCode:'S01',...tasks[number],
+    image:{image:'Images/'+file,alt,imageWidth:1448,imageHeight:1086}
   });
   const lessons=[
     [1,careerSpeaking],

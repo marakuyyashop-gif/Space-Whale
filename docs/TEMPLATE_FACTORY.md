@@ -10,6 +10,8 @@ All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title 
 
 The owner-approved `arrangement:'image-support'` is an opt-in within the same Speaking factory: one brief title, image left and Use right, wrapping at the actual content width. This arrangement permits omitting `task` when the title is the full instruction. Original media proportions and all default Speaking behavior remain intact. Native progressive stages reveal multiple pictures through teacher arrows; do not create lesson-specific windows or markup.
 
+For lengthy support, the same factory offers `arrangement:'image-support-below'`: contained artwork at the existing working-column width followed by Use, with the same optional-task contract. Every phrase is its own normal-font paragraph, with authored model numbers if requested; do not merge patterns into one paragraph or add Words/Phrases headings. The shared font, 704px column, artwork proportions and default Speaking contract remain unchanged.
+
 An explicit request to place supplied Speaking artwork before task wording is ready uses `arrangement:'image-only'` in that same factory: real `image`, generic `title:'Speaking'`, and no `task` or `use`. The validator rejects missing artwork and added task/support in this variant. It never generates placeholder copy. Mirrored opening/final exercises share authored content and retain distinct stable IDs for independent state; completed default/image-support tasks remain unchanged.
 
 ## One source of truth

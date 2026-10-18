@@ -26,7 +26,7 @@ test('Speaking preserves fixed order and open support with no controls in any vi
     const groups = [...host.querySelectorAll('.ek-speaking-group')];
     assert.equal(groups.length,2);
     assert.equal(groups[0].firstElementChild.textContent,'polite · helpful');
-    assert.equal(groups[0].lastElementChild.textContent,'What is she like?\nShe is ...');
+    assert.deepEqual([...groups[0].querySelectorAll('.ek-speaking-phrases')].map(line=>line.textContent),['What is she like?','She is ...']);
     assert.equal(host.querySelector('button, details, input, textarea, select, dialog'),null);
     assert.deepEqual(kit.grade(definition,{}),{});
     handle.setAnswers({});handle.setViewState({disclosures:[false]},false);

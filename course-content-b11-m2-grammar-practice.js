@@ -1,7 +1,7 @@
 /* B1.1 / Module 2 — approved non-audio Grammar Practice after Discovery and Rule.
  * Source: the user's Grammar Practice text, 2026-10-18.
  * Content, keys and model answers live here; all appearance and interaction come
- * from the shared E01 / E03A / E11 / E11A / Q01 template registry.
+ * from the shared E01 / E03 / E03A / E04 / E11 / E11A / Q01 registry.
  */
 (() => {
   'use strict';
@@ -28,6 +28,64 @@
     {
       lessonId: 'b1-1-w2-l1',
       tasks: [
+        {time: '2 min', exercise: {
+          version: 1, id: 'B11M02L01_E03_GRAMMAR_PRACTICE', templateCode: 'E03', kind: 'gaps',
+          title: 'Complete the sentences.', instruction: 'Choose the correct options.', inputMode: 'select',
+          items: [
+            {id: 'application', segments: [
+              'I submitted my application on time and got an interview. If I ',
+              gap('application-condition', ['hadn’t submitted', 'wouldn’t have submitted', 'didn’t submit'], 'hadn’t submitted'),
+              ' it on time, I wouldn’t have had the interview.'
+            ]},
+            {id: 'qualification', segments: [
+              'Alex didn’t take the final exam. He ',
+              gap('qualification-result', ['had gotten', 'would get', 'would have gotten'], 'would have gotten'),
+              ' the qualification if he had passed it.'
+            ]},
+            {id: 'opportunity', segments: [
+              'We postponed the decision and lost the last place on the course. We ',
+              gap('opportunity-result', ['would have missed', 'wouldn’t have missed', 'hadn’t missed'], 'wouldn’t have missed'),
+              ' the opportunity if we had decided sooner.'
+            ]}
+          ]
+        }},
+        {time: '3 min', exercise: {
+          version: 1, id: 'B11M02L01_E04_GRAMMAR_PRACTICE', templateCode: 'E04', kind: 'gaps',
+          title: 'Complete the sentences.', instruction: 'Use each verb in the bank once. Change its form.', inputMode: 'text',
+          bank: ['postpone', 'face', 'get', 'miss', 'submit', 'achieve'],
+          items: [
+            {id: 'application', segments: [
+              'Clara sent her application after the deadline. If she ',
+              {id: 'application-condition', answers: ['had submitted'], normalization: 'english'},
+              ' an application earlier, she would have had an interview.'
+            ]},
+            {id: 'qualification', segments: [
+              'Daniel passed the final exam and got his certificate. He ',
+              {id: 'qualification-result', answers: ['wouldn’t have gotten', 'would not have gotten', 'wouldn’t have got', 'would not have got'], normalization: 'english'},
+              ' the qualification if he hadn’t passed.'
+            ]},
+            {id: 'decision', segments: [
+              'The deadline was Friday, but I waited until Monday to decide. If I ',
+              {id: 'decision-condition', answers: ['hadn’t postponed', 'had not postponed'], normalization: 'english'},
+              ' the decision, I wouldn’t have missed the opportunity.'
+            ]},
+            {id: 'goal', segments: [
+              'We planned to open our café in May, but the building work finished late. We ',
+              {id: 'goal-result', answers: ['would have achieved'], normalization: 'english'},
+              ' our goal if the work had finished on time.'
+            ]},
+            {id: 'opportunity', segments: [
+              'Lena applied just before the deadline. She ',
+              {id: 'opportunity-result', answers: ['would have missed'], normalization: 'english'},
+              ' the opportunity if she hadn’t applied in time.'
+            ]},
+            {id: 'difficulties', segments: [
+              'The software was hard to use, and nobody helped us. We ',
+              {id: 'difficulties-result', answers: ['wouldn’t have faced', 'would not have faced'], normalization: 'english'},
+              ' so many difficulties if a colleague had shown us how it worked.'
+            ]}
+          ]
+        }},
         {time: '3 min', exercise: writing(
           'B11M02L01_E11_GRAMMAR_PRACTICE',
           'Change the past',
@@ -37,15 +95,6 @@
             {id: 'leo', prompt: 'Leo did not get the qualification. He did not achieve his goal.\n(Start with the result.)', possibleAnswers: ['Leo would have achieved his goal if he had gotten the qualification.']},
             {id: 'sam', prompt: 'Sam faced difficulties with the form. He did not submit an application.\n(Start with If.)', possibleAnswers: ['If Sam hadn’t faced difficulties with the form, he would have submitted an application.']}
           ]
-        )},
-        {time: '1 min', exercise: oral(
-          'B11M02L01_E11A_GRAMMAR_PRACTICE',
-          'Say it aloud',
-          'Look at the timeline. Change the past and say one complete sentence.',
-          'l1-timeline.svg',
-          'The team faced difficulties. As a result, the team did not achieve its goal.',
-          'Do not write the sentence first.',
-          ['If the team hadn’t faced difficulties, it would have achieved its goal.']
         )}
       ]
     },
@@ -207,7 +256,10 @@
     if (index < 0) throw new Error('Load the B1.1 Module 2 outline before its grammar practice: ' + lessonId);
     const lesson = window.SpaceWhaleContent[index];
     const ownIds = new Set(tasks.map(({exercise}) => exercise.id));
-    const stages = lesson.stages.filter(stage => !ownIds.has(stage.exercise.id));
+    const replacedIds = new Set(ownIds);
+    // Only the owner's retired L1 timeline is removed when an old pack is reapplied.
+    if (lessonId === 'b1-1-w2-l1') replacedIds.add('B11M02L01_E11A_GRAMMAR_PRACTICE');
+    const stages = lesson.stages.filter(stage => !replacedIds.has(stage.exercise.id));
     const newStages = tasks.map(({exercise, time}) => ({
       menu: 'Grammar Practice', navigationTitle: exercise.title, navigationBlock: 'language',
       section: 'tasks', role: 'practice', guide: {time}, exercise
@@ -219,7 +271,7 @@
     stages.splice(after + 1, 0, ...newStages);
 
     const structure = (lesson.structure || []).map(section => ({
-      ...section, sources: section.sources.filter(id => !ownIds.has(id))
+      ...section, sources: section.sources.filter(id => !replacedIds.has(id))
     })).filter(section => section.sources.length);
     const practice = structure.find(section => section.role === 'practice');
     if (practice) practice.sources.push(...ownIds);

@@ -148,7 +148,7 @@
         };
         // Catalog metadata is never rendered as exercise content.
         only(def, ['version','id','kind','layout','title','image','task','use','arrangement','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs','templateCode','templatePart','templateRole'], 'Speaking');
-        if(def.arrangement!=null&&!['image-support','image-only'].includes(def.arrangement))fail('Unsupported Speaking arrangement');
+        if(def.arrangement!=null&&!['image-support','image-support-below','image-only'].includes(def.arrangement))fail('Unsupported Speaking arrangement');
         if (def.image !== null) {
           only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
           if (!def.image.imagePending) text(def.image.image, 'image');
@@ -161,7 +161,7 @@
           if(def.task!=null||def.use!=null)fail('Image-only Speaking cannot contain task or Use');
           return def;
         }
-        if(def.task!=null||def.arrangement!=='image-support'){
+        if(def.task!=null||!['image-support','image-support-below'].includes(def.arrangement)){
           only(def.task, ['text','bullets'], 'Speaking task');
           text(def.task.text, 'Speaking task text');
           if (def.task.bullets != null) {
@@ -1155,6 +1155,7 @@
       body.replaceChildren(); controls.clear(); paintControls.clear(); resultsBox.replaceChildren();
       if (isSpeaking(def)) {
         const picture = node('div', 'ek-speaking-image');
+        if(def.arrangement==='image-support-below')picture.classList.add('ek-speaking-image-wide');
         if (def.image?.image) picture.append(illustration(def.image));
         else if(def.catalogFamily==='S'&&def.image?.imagePending){picture.append(node('div','ek-template-image','[Image]'));}
         else picture.hidden = true;
@@ -1172,14 +1173,18 @@
           def.use.forEach(group => {
             const content = node('div', 'ek-speaking-group');
             if (group.words?.length) content.append(node('p', 'ek-copy ek-speaking-words', group.words.join(' · ')));
-            if (group.phrases?.length) content.append(node('p', 'ek-copy ek-speaking-phrases', group.phrases.join('\n')));
+            (group.phrases||[]).forEach(phrase=>content.append(node('p', 'ek-copy ek-speaking-phrases', phrase)));
             use.append(content);
           });
           if(def.arrangement==='image-support'){
             const row=node('div','ek-speaking-aside'),support=node('div','ek-speaking-support');
             if(task)support.append(task);
             support.append(use);row.append(picture,support);body.append(row);
-          }else body.append(picture, task, use);
+          }else {
+            body.append(picture);
+            if(task)body.append(task);
+            body.append(use);
+          }
         }
       } else if (def.kind === 'presentation') {
         const renderBlock=block=>{

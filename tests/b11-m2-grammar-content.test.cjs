@@ -1,4 +1,4 @@
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),{createHash}=require('node:crypto');
 const {parseHTML}=require('linkedom'),kit=require('../exercise-kit.js'),{createCatalog}=require('../workspace-catalog.js');
 const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8'),plain=value=>JSON.parse(JSON.stringify(value));
 const additions=['course-content-b11-m2-discovery-rules.js','course-content-b11-m2-grammar-practice.js'];
@@ -23,7 +23,7 @@ function keyedAnswers(def){
 }
 
 test('four lessons add only approved focus/practice blocks and retain other authors’ content on reload',()=>{
- const {app,before,apply}=fixture(),expectedCodes=[['E11','E11A'],['E11','Q01'],['E01','E11','E11A'],['E03A','E11','E11A']];
+ const {app,before,apply}=fixture(),expectedCodes=[['E03','E04','E11'],['E11','Q01'],['E01','E11','E11A'],['E03A','E11','E11A']];
  for(const [i,lesson] of app.SpaceWhaleContent.entries()){
   assert.deepEqual(plain(lesson.stages.filter(s=>!['focus','practice'].includes(s.role))),before[i].stages);
   for(const key of ['words','teacherInfo','title','id','level','whale'])assert.deepEqual(plain(lesson[key]),before[i][key]);
@@ -40,7 +40,7 @@ test('four lessons add only approved focus/practice blocks and retain other auth
 test('all supplied closed answers grade through the same registered templates',()=>{
  const {app}=fixture(),closed=app.SpaceWhaleContent.flatMap(l=>newStages(l).flatMap(s=>definitions(s.exercise))).filter(d=>['gaps','matching','choice'].includes(d.kind));
  let count=0;for(const def of closed){kit.validate(def);const view=kit.templates.resolve(def);assert.equal(kit.templates.profileFor(view.templateCode,view.kind,view.templatePart).supported,true,def.id);const results=Object.values(kit.grade(def,keyedAnswers(def)));assert.ok(results.every(r=>r==='correct'),def.id);count+=results.length;}
- assert.equal(count,25);
+ assert.equal(count,34);
  const choices=closed.find(d=>d.templateCode==='E01');assert.deepEqual(Array.from(choices.items,i=>i.correctId),['B','A','B','C']);
  const contrast=closed.find(d=>d.templateCode==='E03A');assert.deepEqual(Object.values(keyedAnswers(contrast)),['were','would apply','had been','would have applied','were','would trust','had been','would have finished']);
  const discovery=closed.find(d=>d.kind==='matching'&&d.templateCode==='D04');assert.deepEqual(Array.from(discovery.items,i=>i.correctId),['sentence-4','sentence-2','sentence-1','sentence-3']);
@@ -60,8 +60,71 @@ test('open written production has 15 fields, no false exact-match grading, and s
 
 test('oral tasks keep factual media and supplied help, without written inputs or exposed model answers',()=>{
  const {app}=fixture(),oral=app.SpaceWhaleContent.flatMap(l=>newStages(l).map(s=>s.exercise)).filter(d=>['E11A','Q01'].includes(d.templateCode));
- assert.equal(oral.length,4);
+ assert.equal(oral.length,3);
  for(const def of oral){kit.validate(def);const v=mount(def);assert.equal(v.host.querySelectorAll('input,textarea,.ek-check').length,0);for(const image of v.host.querySelectorAll('img'))assert.ok(fs.existsSync(path.join(root,image.getAttribute('src'))));assert.equal(v.host.textContent.includes('Image contents'),false);assert.equal(v.host.textContent.includes('[Image]'),false);assert.equal(v.host.textContent.includes('If the team hadn’t faced difficulties'),false);assert.equal(v.host.textContent.includes('I wish I hadn’t told the private story'),false);v.handle.destroy();}
+});
+
+test('L1 uses the approved three dropdowns and six bank-based typed gaps before unchanged E11',()=>{
+ const {app}=fixture(),lesson=app.SpaceWhaleContent.find(l=>l.id==='b1-1-w2-l1');
+ const practice=lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise),[select,typed,writing]=practice;
+ assert.deepEqual(Array.from(practice,d=>d.id),['B11M02L01_E03_GRAMMAR_PRACTICE','B11M02L01_E04_GRAMMAR_PRACTICE','B11M02L01_E11_GRAMMAR_PRACTICE']);
+ assert.deepEqual(plain(lesson.structure.find(s=>s.role==='practice').sources),Array.from(practice,d=>d.id));
+ assert.equal(select.inputMode,'select');assert.equal(select.items.length,3);assert.equal(select.title,'Complete the sentences.');assert.equal(select.instruction,'Choose the correct options.');assert.equal(select.bank,undefined);
+ const selectedGaps=select.items.map(i=>i.segments.find(s=>typeof s==='object'));
+ assert.deepEqual(plain(selectedGaps.map(g=>g.options)),[
+  ['hadn’t submitted','wouldn’t have submitted','didn’t submit'],
+  ['had gotten','would get','would have gotten'],
+  ['would have missed','wouldn’t have missed','hadn’t missed']
+ ]);
+ assert.deepEqual(Object.values(keyedAnswers(select)),['hadn’t submitted','would have gotten','wouldn’t have missed']);
+ assert.deepEqual(plain(select.items.map(i=>i.segments.filter(s=>typeof s==='string'))),[
+  ['I submitted my application on time and got an interview. If I ',' it on time, I wouldn’t have had the interview.'],
+  ['Alex didn’t take the final exam. He ',' the qualification if he had passed it.'],
+  ['We postponed the decision and lost the last place on the course. We ',' the opportunity if we had decided sooner.']
+ ]);
+ assert.equal(typed.inputMode,'text');assert.equal(typed.items.length,6);assert.equal(typed.title,'Complete the sentences.');assert.equal(typed.instruction,'Use each verb in the bank once. Change its form.');
+ assert.deepEqual(plain(typed.bank),['postpone','face','get','miss','submit','achieve']);
+ assert.deepEqual(Object.values(keyedAnswers(typed)),['had submitted','wouldn’t have gotten','hadn’t postponed','would have achieved','would have missed','wouldn’t have faced']);
+ assert.deepEqual(plain(typed.items.map(i=>i.segments.filter(s=>typeof s==='string'))),[
+  ['Clara sent her application after the deadline. If she ',' an application earlier, she would have had an interview.'],
+  ['Daniel passed the final exam and got his certificate. He ',' the qualification if he hadn’t passed.'],
+  ['The deadline was Friday, but I waited until Monday to decide. If I ',' the decision, I wouldn’t have missed the opportunity.'],
+  ['We planned to open our café in May, but the building work finished late. We ',' our goal if the work had finished on time.'],
+  ['Lena applied just before the deadline. She ',' the opportunity if she hadn’t applied in time.'],
+  ['The software was hard to use, and nobody helped us. We ',' so many difficulties if a colleague had shown us how it worked.']
+ ]);
+ for(const def of [select,typed]){const v=mount(def);assert.equal(v.host.getAttribute('data-template-code'),def.templateCode);assert.equal(v.host.textContent.includes('___'),false);assert.equal(v.host.querySelectorAll('.ek-correction').length,0);if(def===select){assert.equal(v.host.querySelectorAll('.ek-choice-trigger').length,3);assert.equal(v.host.querySelectorAll('input').length,0);}else{assert.equal(v.host.querySelectorAll('.ek-typed-gap').length,6);assert.equal(v.host.querySelectorAll('.ek-word-list').length,1);}v.handle.destroy();}
+ assert.equal(writing.kind,'writing');assert.deepEqual(Array.from(writing.items,i=>i.id),['nora','leo','sam']);
+});
+
+test('typed L1 negatives accept full forms and got/gotten without accepting the wrong tense or polarity',()=>{
+ const {app}=fixture(),typed=app.SpaceWhaleContent[0].stages.find(s=>s.exercise.templateCode==='E04').exercise;
+ const correct=keyedAnswers(typed);
+ for(const [id,variants] of [
+  ['qualification-result',['wouldn’t have gotten',"wouldn't have gotten",'would not have gotten','wouldn’t have got',"wouldn't have got",'would not have got']],
+  ['decision-condition',['hadn’t postponed',"hadn't postponed",'had not postponed']],
+  ['difficulties-result',['wouldn’t have faced',"wouldn't have faced",'would not have faced']]
+ ])for(const value of variants)assert.equal(kit.grade(typed,{...correct,[id]:value})[id],'correct',value);
+ for(const [id,value] of [['qualification-result','would have gotten'],['decision-condition','had postponed'],['difficulties-result','would not face']])assert.equal(kit.grade(typed,{...correct,[id]:value})[id],'retry',value);
+});
+
+test('retiring only L1 timeline preserves existing E11 and all L2–L4 grammar definitions on reload',()=>{
+ const {app,apply}=fixture(),hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
+ const expected={
+  'b1-1-w2-l2':'b049e1c4bcd12286d73486b0354bceba48922b88d0fba65de2974b057d735dc6',
+  'b1-1-w2-l3':'e42f73ceb7bce25f8b3b5892ebd35914c4b1cd39fa55d8407775218a10cec6d2',
+  'b1-1-w2-l4':'277739586c843e6761d3a1d0cdbf93e22a251e8195580e81b43172c578b59842'
+ };
+ for(const lesson of app.SpaceWhaleContent.slice(1))assert.equal(hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise)),expected[lesson.id],lesson.id+' keeps the approved grammar data');
+ const lesson=app.SpaceWhaleContent[0],retired='B11M02L01_E11A_GRAMMAR_PRACTICE';
+ assert.equal(hash(lesson.stages.find(s=>s.exercise.templateCode==='E11').exercise),'066cfbc4e035b2370ce90df259e24807688d6dcdc9756ff8daf1505cfeba2ff5');
+ const before=JSON.stringify(app.SpaceWhaleContent);
+ lesson.stages.push({menu:'Grammar Practice',role:'practice',section:'tasks',exercise:{version:1,id:retired,templateCode:'E11A',kind:'presentation',title:'Say it aloud',blocks:[{type:'text',text:'Retired timeline'}]}});
+ lesson.structure.find(s=>s.role==='practice').sources.push(retired);
+ apply();assert.equal(JSON.stringify(app.SpaceWhaleContent),before);
+ const catalog=createCatalog(app.SpaceWhaleContent,[]),composed=catalog.lessons.find(l=>l.id==='b1-1-w2-l1').stages.find(s=>s.role==='practice').exercise;
+ assert.equal(JSON.stringify(composed).includes(retired),false);assert.equal(JSON.stringify(composed).includes('l1-timeline.svg'),false);
+ assert.deepEqual(Array.from(composed.exercises,b=>b.id),['B11M02L01_E03_GRAMMAR_PRACTICE','B11M02L01_E04_GRAMMAR_PRACTICE','B11M02L01_E11_GRAMMAR_PRACTICE']);
 });
 
 test('each Rule stays behind its compact Discovery check and teacher arrow',()=>{
