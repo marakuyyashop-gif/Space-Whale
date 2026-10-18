@@ -12,17 +12,7 @@
     version: 1, id, templateCode: 'E11', kind: 'writing', title, instruction,
     responseMode: 'open', showAuthoredSamples: true, revealPossibleAnswers: true, items
   });
-  const oral = (id, title, instruction, file, alt, text, possibleAnswers) => ({
-    version: 1, id, templateCode: 'E11A', kind: 'presentation', title, instruction,
-    blocks: [
-      {type: 'image', image: 'assets/lesson-media/b1-1/module-2/grammar/' + file, alt},
-      {type: 'text', text}
-    ],
-    // These are reference keys, not initial learner scaffolds or exact-match grades.
-    authoring: {possibleAnswers}
-  });
   const gap = (id, options, answer) => ({id, options, answers: [answer]});
-  const option = (id, text) => ({id, text});
 
   const additions = [
     {
@@ -99,153 +89,591 @@
       ]
     },
     {
-      lessonId: 'b1-1-w2-l2',
-      tasks: [
-        {time: '4 min', exercise: writing(
-          'B11M02L02_E11_GRAMMAR_PRACTICE',
-          'Write the questions',
-          'Use the notes to write complete questions. Add a short answer where it is given.',
-          [
-            {id: 'responsibility', prompt: 'you / know the team was under pressure / take on responsibility?\nAnswer: yes', multiline: true, possibleAnswers: ['Would you have taken on the responsibility if you had known the team was under pressure?\nYes, I would have.']},
-            {id: 'agreement', prompt: 'the managers / explore more alternatives / reach an agreement?\nAnswer: no', multiline: true, possibleAnswers: ['Would the managers have reached an agreement if they had explored more alternatives?\nNo, they wouldn’t have.']},
-            {id: 'problem', prompt: 'you / the manager not look into the problem / what do?', possibleAnswers: ['What would you have done if the manager hadn’t looked into the problem?']},
-            {id: 'concerns', prompt: 'the team / express concerns earlier / how the decision change?', possibleAnswers: ['How would the decision have changed if the team had expressed its concerns earlier?']}
-          ]
-        )},
-        {time: '2 min', exercise: {
-          version: 1, id: 'B11M02L02_Q01_GRAMMAR_PRACTICE', templateCode: 'Q01', kind: 'presentation',
-          title: 'Ask your partner',
-          instruction: 'Use the notes to make two questions. Do not write them first.',
-          blocks: [
-            {type: 'text', text: '1. the team was under pressure → take on responsibility?\n2. the manager did not look into the problem → what do?'},
-            {type: 'text', text: 'Ask your partner both questions. Then switch roles and answer the same questions.'},
-            {type: 'disclosure', title: 'Help', text: 'Would you have … if …?\nWhat would you have done if …?'}
-          ],
-          authoring: {
-            possibleQuestions: [
-              'Would you have taken on the responsibility if the team had been under pressure?',
-              'What would you have done if the manager hadn’t looked into the problem?'
-            ],
-            responseGuidance: 'Answers may vary. They should answer the question and use would / wouldn’t have + V3.'
+      "lessonId": "b1-1-w2-l2",
+      "tasks": [
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L02_E03_GRAMMAR_PRACTICE",
+            "templateCode": "E03",
+            "title": "Complete the sentences.",
+            "kind": "gaps",
+            "instruction": "Choose the correct options.",
+            "inputMode": "select",
+            "items": [
+              {
+                "id": "approved-1",
+                "segments": [
+                  {
+                    "id": "approved-1-0",
+                    "options": [
+                      "Would have you",
+                      "Would you have",
+                      "Did you have"
+                    ],
+                    "answers": [
+                      "Would you have"
+                    ]
+                  },
+                  " taken on responsibility if the manager had asked you?"
+                ]
+              },
+              {
+                "id": "approved-2",
+                "segments": [
+                  "What ",
+                  {
+                    "id": "approved-2-1",
+                    "options": [
+                      "you would have done",
+                      "had you done",
+                      "would you have done"
+                    ],
+                    "answers": [
+                      "would you have done"
+                    ]
+                  },
+                  " if you had been under pressure?"
+                ]
+              },
+              {
+                "id": "approved-3",
+                "segments": [
+                  "“Would they have reached an agreement if they had explored more alternatives?” “Yes, they ",
+                  {
+                    "id": "approved-3-1",
+                    "options": [
+                      "did",
+                      "would have",
+                      "had"
+                    ],
+                    "answers": [
+                      "would have"
+                    ]
+                  },
+                  ".”"
+                ]
+              },
+              {
+                "id": "approved-4",
+                "segments": [
+                  "“Would you have accepted the extra work if you had been under pressure?” “No, I ",
+                  {
+                    "id": "approved-4-1",
+                    "options": [
+                      "wouldn’t have",
+                      "hadn’t",
+                      "didn’t"
+                    ],
+                    "answers": [
+                      "wouldn’t have"
+                    ]
+                  },
+                  ".”"
+                ]
+              },
+              {
+                "id": "approved-5",
+                "segments": [
+                  "“If I’d known about the mistake, I’d have expressed my concerns.” The first ’d means ",
+                  {
+                    "id": "approved-5-1",
+                    "options": [
+                      "had",
+                      "would",
+                      "did"
+                    ],
+                    "answers": [
+                      "had"
+                    ]
+                  },
+                  "; the second means ",
+                  {
+                    "id": "approved-5-3",
+                    "options": [
+                      "did",
+                      "had",
+                      "would"
+                    ],
+                    "answers": [
+                      "would"
+                    ]
+                  },
+                  "."
+                ]
+              },
+              {
+                "id": "approved-6",
+                "segments": [
+                  "If I’d looked into the problem earlier, I ",
+                  {
+                    "id": "approved-6-1",
+                    "options": [
+                      "would of",
+                      "would’ve",
+                      "would"
+                    ],
+                    "answers": [
+                      "would’ve"
+                    ]
+                  },
+                  " found a solution."
+                ]
+              }
+            ]
           }
-        }}
+        },
+        {
+          "time": "3 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L02_E11_GRAMMAR_PRACTICE",
+            "templateCode": "E11",
+            "title": "Write the questions.",
+            "kind": "writing",
+            "instruction": "Write Third Conditional questions. Add a short answer for 1 and 2.",
+            "responseMode": "open",
+            "showAuthoredSamples": true,
+            "revealPossibleAnswers": true,
+            "items": [
+              {
+                "id": "approved-1",
+                "prompt": "Leo / take on responsibility / manager / ask for help? — yes",
+                "possibleAnswers": [
+                  "Would Leo have taken on responsibility if the manager had asked for help? Yes, he would have."
+                ]
+              },
+              {
+                "id": "approved-2",
+                "prompt": "managers / reach an agreement / not explore alternatives? — no",
+                "possibleAnswers": [
+                  "Would the managers have reached an agreement if they hadn’t explored alternatives? No, they wouldn’t have."
+                ]
+              },
+              {
+                "id": "approved-3",
+                "prompt": "what / Anna / do / colleagues / not express concerns?",
+                "possibleAnswers": [
+                  "What would Anna have done if her colleagues hadn’t expressed their concerns?"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L02_Q01_GRAMMAR_PRACTICE",
+            "templateCode": "Q01",
+            "title": "Discuss the questions.",
+            "kind": "presentation",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "Your team had one afternoon to choose a new office. Two people disagreed with the manager but said nothing."
+              },
+              {
+                "type": "text",
+                "text": "1. Would you have expressed your concerns if you had been in that meeting? Why?\n2. What would you have done if the team hadn’t reached an agreement?"
+              }
+            ]
+          }
+        }
       ]
     },
     {
-      lessonId: 'b1-1-w2-l3',
-      tasks: [
-        {time: '2 min', exercise: {
-          version: 1, id: 'B11M02L03_E01_GRAMMAR_PRACTICE', templateCode: 'E01', kind: 'choice',
-          title: 'Choose the sentence that matches the speaker’s purpose',
-          items: [
-            {id: 'nina', prompt: 'You are Nina. You only want to say that you regret not apologizing.', options: [
-              option('A', 'If I had apologized, my friend would have forgiven me.'),
-              option('B', 'I wish I had apologized.'),
-              option('C', 'I didn’t apologize because I was angry.')
-            ], correctId: 'B'},
-            {id: 'leo', prompt: 'You are Leo. You want to explain how a different past action would have changed the result.', options: [
-              option('A', 'If I hadn’t shared the message, my friend wouldn’t have felt betrayed.'),
-              option('B', 'If only I hadn’t shared the message.'),
-              option('C', 'I felt guilty after sharing the message.')
-            ], correctId: 'A'},
-            {id: 'ava', prompt: 'You are Ava. You directly regret speaking rudely.', options: [
-              option('A', 'If I had spoken more politely, I wouldn’t have felt ashamed.'),
-              option('B', 'I wish I hadn’t spoken so rudely.'),
-              option('C', 'I spoke politely after that.')
-            ], correctId: 'B'},
-            {id: 'mark', prompt: 'You are Mark. You want to explain a different past result, not simply express regret.', options: [
-              option('A', 'If only I had prepared better.'),
-              option('B', 'I wish I had prepared better.'),
-              option('C', 'If I had prepared better, I wouldn’t have felt so embarrassed.')
-            ], correctId: 'C'}
-          ]
-        }},
-        {time: '4 min', exercise: writing(
-          'B11M02L03_E11_GRAMMAR_PRACTICE',
-          'Write two sentences',
-          'For each situation, write a direct regret with I wish or If only; then write a Third Conditional sentence showing a different result.',
-          [
-            {id: 'situation-1-regret', prompt: 'Situation 1\nYou shared a private message. Your friend felt betrayed. You now feel guilty.\nRegret:', possibleAnswers: ['I wish I hadn’t shared the private message.', 'If only I hadn’t shared the private message.']},
-            {id: 'situation-1-result', prompt: 'Different past result:', possibleAnswers: ['If I hadn’t shared the message, my friend wouldn’t have felt betrayed.']},
-            {id: 'situation-2-regret', prompt: 'Situation 2\nYou did not apologize. The argument continued. You felt miserable.\nRegret:', possibleAnswers: ['I wish I had apologized.', 'If only I had apologized.']},
-            {id: 'situation-2-result', prompt: 'Different past result:', possibleAnswers: ['If I had apologized, the argument would have ended.']}
-          ]
-        )},
-        {time: '1–2 min', exercise: oral(
-          'B11M02L03_E11A_GRAMMAR_PRACTICE',
-          'Say it aloud',
-          'Imagine you are Alex.',
-          'l3-regret.svg',
-          'Alex told a private story in front of other people. Alex’s friend felt embarrassed. Alex now feels ashamed.',
-          'Say one direct regret and one Third Conditional sentence.\nDo not write the sentences first.',
-          [
-            'I wish I hadn’t told the private story.',
-            'If only I hadn’t told the private story.',
-            'If I hadn’t told the story, my friend wouldn’t have felt embarrassed.'
-          ]
-        )}
+      "lessonId": "b1-1-w2-l3",
+      "tasks": [
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L03_E01_GRAMMAR_PRACTICE",
+            "templateCode": "E01",
+            "title": "Choose the sentence that matches the meaning.",
+            "kind": "choice",
+            "instruction": "Choose the correct option.",
+            "items": [
+              {
+                "id": "approved-1",
+                "prompt": "Nina didn’t apologize, and her friend felt disappointed. What can Nina say about a different past action and its result?",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "If only I had apologized."
+                  },
+                  {
+                    "id": "B",
+                    "text": "If I had apologized, my friend wouldn’t have felt so disappointed."
+                  },
+                  {
+                    "id": "C",
+                    "text": "I wish I had apologized."
+                  }
+                ],
+                "correctId": "B"
+              },
+              {
+                "id": "approved-2",
+                "prompt": "Which sentence usually expresses a stronger regret about the past?",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "I wish I hadn’t broken my promise."
+                  },
+                  {
+                    "id": "B",
+                    "text": "If I hadn’t broken my promise, my friend wouldn’t have felt betrayed."
+                  },
+                  {
+                    "id": "C",
+                    "text": "If only I hadn’t broken my promise."
+                  }
+                ],
+                "correctId": "C"
+              }
+            ]
+          }
+        },
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L03_E03_GRAMMAR_PRACTICE",
+            "templateCode": "E03",
+            "title": "Complete the sentences.",
+            "kind": "gaps",
+            "instruction": "Choose the correct options.",
+            "inputMode": "select",
+            "items": [
+              {
+                "id": "approved-1",
+                "segments": [
+                  "I arrived after the movie ended and felt disappointed. I wish I ",
+                  {
+                    "id": "approved-1-1",
+                    "options": [
+                      "would have arrived",
+                      "had arrived",
+                      "hadn’t arrived"
+                    ],
+                    "answers": [
+                      "had arrived"
+                    ]
+                  },
+                  " earlier."
+                ]
+              },
+              {
+                "id": "approved-2",
+                "segments": [
+                  "I laughed at Ben’s mistake, and he felt embarrassed. I’m ashamed of that. If only I ",
+                  {
+                    "id": "approved-2-1",
+                    "options": [
+                      "hadn’t laughed",
+                      "had laughed",
+                      "wouldn’t have laughed"
+                    ],
+                    "answers": [
+                      "hadn’t laughed"
+                    ]
+                  },
+                  " at him."
+                ]
+              },
+              {
+                "id": "approved-3",
+                "segments": [
+                  "My friend shared my private messages. I felt betrayed. I wish she ",
+                  {
+                    "id": "approved-3-1",
+                    "options": [
+                      "hasn’t shared",
+                      "wouldn’t have shared",
+                      "hadn’t shared"
+                    ],
+                    "answers": [
+                      "hadn’t shared"
+                    ]
+                  },
+                  " them."
+                ]
+              },
+              {
+                "id": "approved-4",
+                "segments": [
+                  "I didn’t tell Ella the truth, and I still feel guilty. I wish ",
+                  {
+                    "id": "approved-4-1",
+                    "options": [
+                      "I’d have told",
+                      "I told",
+                      "I’d told"
+                    ],
+                    "answers": [
+                      "I’d told"
+                    ]
+                  },
+                  " her."
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "time": "3 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L03_E11_GRAMMAR_PRACTICE",
+            "templateCode": "E11",
+            "title": "Write complete sentences.",
+            "kind": "writing",
+            "instruction": "The notes show what happened to you. Use I wish, If only and the Third Conditional, in that order.",
+            "responseMode": "open",
+            "showAuthoredSamples": true,
+            "revealPossibleAnswers": true,
+            "items": [
+              {
+                "id": "approved-1",
+                "prompt": "refuse invitation / spend evening alone / feel miserable",
+                "possibleAnswers": [
+                  "I wish I had accepted the invitation.",
+                  "I wish I hadn’t refused the invitation."
+                ]
+              },
+              {
+                "id": "approved-2",
+                "prompt": "make rude comment about colleague / feel ashamed",
+                "possibleAnswers": [
+                  "If only I hadn’t made that rude comment about my colleague."
+                ]
+              },
+              {
+                "id": "approved-3",
+                "prompt": "not practice presentation / forget what to say / feel embarrassed",
+                "possibleAnswers": [
+                  "If I had practiced my presentation, I wouldn’t have felt so embarrassed.",
+                  "If I had practiced my presentation, I wouldn’t have forgotten what to say."
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L03_E11A_GRAMMAR_PRACTICE",
+            "templateCode": "Q01",
+            "title": "Discuss the question.",
+            "kind": "presentation",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "You promised to help a friend move. You forgot, and your friend had to do everything alone."
+              },
+              {
+                "type": "text",
+                "text": "How do you feel now, and what do you wish you had done differently?"
+              }
+            ]
+          }
+        }
       ]
     },
     {
-      lessonId: 'b1-1-w2-l4',
-      tasks: [
-        {time: '2 min', exercise: {
-          version: 1, id: 'B11M02L04_E03A_GRAMMAR_PRACTICE', templateCode: 'E03A', kind: 'gaps',
-          title: 'Choose the correct options', inputMode: 'select', preserveLines: true,
-          items: [
-            {id: 'nora-now', segments: [
-              'Nora\nNora is not very self-confident now. There is a new job available next month.\nIf she ',
-              gap('nora-now-condition', ['had been', 'were'], 'were'),
-              ' more self-confident, she ',
-              gap('nora-now-result', ['would apply', 'would have applied'], 'would apply'),
-              ' for the job.'
-            ]},
-            {id: 'nora-past', segments: [
-              'Last year, Nora did not apply for a similar job because she was not self-confident.\nIf she ',
-              gap('nora-past-condition', ['had been', 'were'], 'had been'),
-              ' more self-confident then, she ',
-              gap('nora-past-result', ['would apply', 'would have applied'], 'would have applied'),
-              '.'
-            ]},
-            {id: 'leo-now', segments: [
-              'Leo\nLeo often forgets to finish tasks. His manager does not trust him with important work.\nIf Leo ',
-              gap('leo-now-condition', ['were', 'had been'], 'were'),
-              ' more reliable, his manager ',
-              gap('leo-now-result', ['would have trusted', 'would trust'], 'would trust'),
-              ' him with important work.'
-            ]},
-            {id: 'leo-past', segments: [
-              'Leo missed an important deadline last month, and the project finished late.\nIf he ',
-              gap('leo-past-condition', ['were', 'had been'], 'had been'),
-              ' more reliable, the project ',
-              gap('leo-past-result', ['would finish', 'would have finished'], 'would have finished'),
-              ' on time.'
-            ]}
-          ]
-        }},
-        {time: '4 min', exercise: writing(
-          'B11M02L04_E11_GRAMMAR_PRACTICE',
-          'Write complete sentences',
-          'Choose Second or Third Conditional.',
-          [
-            {id: 'ava', prompt: 'Now: Ava is not self-confident. She does not apply for the new job.', possibleAnswers: ['If Ava were more self-confident, she would apply for the new job.']},
-            {id: 'ben', prompt: 'Last month: Ben was not reliable. The project finished late.', possibleAnswers: ['If Ben had been more reliable, the project would have finished on time.']},
-            {id: 'mark', prompt: 'Now: Mark is stubborn. He does not listen to the team.', possibleAnswers: ['If Mark were less stubborn, he would listen to the team.']},
-            {id: 'lena', prompt: 'Last year: Lena was not determined. She did not finish the course.', possibleAnswers: ['If Lena had been more determined, she would have finished the course.']}
-          ]
-        )},
-        {time: '2 min', exercise: oral(
-          'B11M02L04_E11A_GRAMMAR_PRACTICE',
-          'Say the sentences aloud',
-          'Look at the two profile cards. Say one sentence about each situation.',
-          'l4-time-periods.svg',
-          'Card 1, Now: Eva is not independent. She does not make decisions on her own. Card 2, Last year: The team was not competitive. It did not enter the competition.',
-          'Do not write the sentences first.',
-          [
-            'If Eva were more independent, she would make decisions on her own.',
-            'If the team had been more competitive, it would have entered the competition.'
-          ]
-        )}
+      "lessonId": "b1-1-w2-l4",
+      "tasks": [
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L04_E03A_GRAMMAR_PRACTICE",
+            "templateCode": "E03",
+            "title": "Complete the sentences.",
+            "kind": "gaps",
+            "instruction": "Choose the correct options.",
+            "inputMode": "select",
+            "items": [
+              {
+                "id": "approved-1",
+                "segments": [
+                  "Nora is nervous about speaking in front of a group. If she ",
+                  {
+                    "id": "approved-1-1",
+                    "options": [
+                      "were",
+                      "had been"
+                    ],
+                    "answers": [
+                      "were"
+                    ]
+                  },
+                  " more self-confident now, she ",
+                  {
+                    "id": "approved-1-3",
+                    "options": [
+                      "would give",
+                      "would have given"
+                    ],
+                    "answers": [
+                      "would give"
+                    ]
+                  },
+                  " the presentation next week."
+                ]
+              },
+              {
+                "id": "approved-2",
+                "segments": [
+                  "Last week, Owen forgot to book our tickets, so we missed the concert. If he ",
+                  {
+                    "id": "approved-2-1",
+                    "options": [
+                      "had been",
+                      "were"
+                    ],
+                    "answers": [
+                      "had been"
+                    ]
+                  },
+                  " more reliable then, we ",
+                  {
+                    "id": "approved-2-3",
+                    "options": [
+                      "would go",
+                      "would have gone"
+                    ],
+                    "answers": [
+                      "would have gone"
+                    ]
+                  },
+                  " to the concert."
+                ]
+              },
+              {
+                "id": "approved-3",
+                "segments": [
+                  "I don’t care about winning, so I don’t enter competitions. I ",
+                  {
+                    "id": "approved-3-1",
+                    "options": [
+                      "would have entered",
+                      "would enter"
+                    ],
+                    "answers": [
+                      "would enter"
+                    ]
+                  },
+                  " the competition next month if I ",
+                  {
+                    "id": "approved-3-3",
+                    "options": [
+                      "had been",
+                      "were"
+                    ],
+                    "answers": [
+                      "were"
+                    ]
+                  },
+                  " more competitive now."
+                ]
+              },
+              {
+                "id": "approved-4",
+                "segments": [
+                  "Last year, Eva let her parents choose her college. She wanted to make the decision herself. Eva ",
+                  {
+                    "id": "approved-4-1",
+                    "options": [
+                      "would have chosen",
+                      "would choose"
+                    ],
+                    "answers": [
+                      "would have chosen"
+                    ]
+                  },
+                  " a college herself if she ",
+                  {
+                    "id": "approved-4-3",
+                    "options": [
+                      "were",
+                      "had been"
+                    ],
+                    "answers": [
+                      "had been"
+                    ]
+                  },
+                  " more independent then."
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "time": "3 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L04_E11_GRAMMAR_PRACTICE",
+            "templateCode": "E11",
+            "title": "Write complete sentences.",
+            "kind": "writing",
+            "instruction": "The cues show real situations. Imagine a different situation and result. Use the Second or Third Conditional.",
+            "responseMode": "open",
+            "showAuthoredSamples": true,
+            "revealPossibleAnswers": true,
+            "items": [
+              {
+                "id": "approved-1",
+                "prompt": "now / Ava / not self-confident / not apply for new job",
+                "possibleAnswers": [
+                  "If Ava were more self-confident, she would apply for the new job."
+                ]
+              },
+              {
+                "id": "approved-2",
+                "prompt": "last month / Ben / not reliable / team miss deadline",
+                "possibleAnswers": [
+                  "If Ben had been more reliable, the team wouldn’t have missed the deadline."
+                ]
+              },
+              {
+                "id": "approved-3",
+                "prompt": "now / Mark / stubborn / refuse to try team’s better idea",
+                "possibleAnswers": [
+                  "If Mark were less stubborn, he would try the team’s better idea."
+                ]
+              },
+              {
+                "id": "approved-4",
+                "prompt": "last year / Lena / determined / finish difficult course",
+                "possibleAnswers": [
+                  "If Lena hadn’t been so determined, she wouldn’t have finished the difficult course."
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "time": "2 min",
+          "exercise": {
+            "version": 1,
+            "id": "B11M02L04_E11A_GRAMMAR_PRACTICE",
+            "templateCode": "Q01",
+            "title": "Discuss the questions.",
+            "kind": "presentation",
+            "blocks": [
+              {
+                "type": "text",
+                "text": "1. If you were more independent, what would you do differently next month?\n2. Think of a chance you missed last year. What would you have done if you had been more self-confident?"
+              }
+            ],
+            "instruction": "Use real or imagined examples."
+          }
+        }
       ]
     }
   ];
