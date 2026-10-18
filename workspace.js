@@ -482,7 +482,12 @@
         toggle.disabled=studentLocked;toggle.setAttribute('aria-controls',contents.id);toggle.setAttribute('aria-expanded',String(!contents.hidden));
         toggle.setAttribute('aria-label',`${block.title}: exercises`);section.append(toggle);
         const tasks=node('nav','','workspace-block-stages');tasks.setAttribute('aria-label',`${block.title}: exercises`);
-        stages.forEach(stage=>tasks.append(link(stageLabel(stage),{...route,block:block.id,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null},route.exercise===stage.exercise.id,'workspace-stage-link')));
+        stages.forEach(stage=>{
+          const shortcuts=stage.navigationShortcuts||[];
+          const currentShortcut=shortcuts.find(item=>stage.exerciseAliases?.indexOf(item.id)+1===route.exerciseView?.revealed);
+          tasks.append(link(stageLabel(stage),{...route,block:block.id,exercise:stage.exercise.id,section:stageSection(stage),exerciseView:null},route.exercise===stage.exercise.id&&!currentShortcut,'workspace-stage-link'));
+          shortcuts.forEach(item=>tasks.append(link(item.title,{...route,block:block.id,exercise:item.id,section:stageSection(stage),exerciseView:null},route.exercise===stage.exercise.id&&currentShortcut?.id===item.id,'workspace-stage-link')));
+        });
         contents.append(tasks);
       }
       section.append(contents);structure.append(section);

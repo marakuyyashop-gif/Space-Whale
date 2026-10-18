@@ -16,6 +16,22 @@ test('Practice containers show the actual task heading while preserving specific
  const specific=setup({...def,title:'Discuss a different decision'});assert.deepEqual(specific.query('h2').map(e=>e.textContent),['Discuss a different decision',task.title]);specific.handle.destroy();
  const single=setup({...task,title:'Practice'});assert.equal(single.query('h2')[0].textContent,'Practice');single.handle.destroy();
 });
+test('B1 P01 menu shortcuts reveal all four recordings blocks without completing Words',()=>{
+ const window={SpaceWhaleExerciseKit:kit};
+ const html=fs.readFileSync(require.resolve('../classroom.html'),'utf8');
+ for(const [,file] of html.matchAll(/<script src="(course-content-b11-m2[^"?]*\.js)[^"]*"/g))vm.runInNewContext(fs.readFileSync(require.resolve('../'+file),'utf8'),{window});
+ const catalog=require('../workspace-catalog.js').createCatalog(window.SpaceWhaleContent,[]);
+ const lessons=catalog.lessons.filter(l=>/^b1-1-w2-l[1-4]$/.test(l.id));assert.equal(lessons.length,4);
+ for(const lesson of lessons){
+  const stage=lesson.stages.find(s=>s.role==='words'),shortcut=stage.navigationShortcuts[0];
+  assert.equal(shortcut.title,'Listen & Repeat');
+  assert.equal(catalog.normalize(new URLSearchParams({view:'library',level:'B1.1',whale:2,lesson:lesson.id,exercise:shortcut.id})).exercise,stage.exercise.id);
+  const view=setup(stage.exercise);view.handle.setViewState({revealed:stage.exerciseAliases.indexOf(shortcut.id)+1,children:{[shortcut.id]:{}}});
+  assert.equal(view.query('[data-template-code="P01"]').length,1);
+  assert.equal(view.query('[data-template-code="P01"]')[0].textContent.includes('Listen and repeat.'),true);
+  view.handle.destroy();
+ }
+});
 function answer(d){let a={};if(d.kind==='stage'){for(const b of d.exercises)a[b.id]=answer(b.exercise);a.revealed=d.exercises.length;return a;}if(d.kind==='gaps')for(const i of d.items)for(const g of i.segments)if(typeof g!=='string')a[g.id]=g.answers?.[0]||'response';if(['choice','matching','sort'].includes(d.kind))for(const i of d.items)a[i.id]=i.correctIds||i.correctId;if(d.kind==='writing')for(const i of d.items)a[i.id]=i.acceptedAnswers?.[0]||'My answer';if(d.kind==='order')a.order=d.correctOrder;if(d.items)a.__sw_checked=true;if(d.progressiveQuestions)a.__sw_choice_revealed=d.items.length;if(d.followUp)a.__sw_followup_revealed=2;return a;}
 test('four lessons use one explicit section builder, omit empty sections and keep originals unchanged',()=>{
  assert.equal(lessons.length,4);

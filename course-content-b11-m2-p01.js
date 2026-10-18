@@ -167,6 +167,7 @@
     stages.splice(wordsIndex + 1, 0, {
       menu: 'Listen & Repeat',
       navigationTitle: 'Listen & Repeat',
+      navigationShortcut: true,
       navigationBlock: 'words',
       section: 'tasks',
       role: 'words',

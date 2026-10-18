@@ -13,7 +13,7 @@ function compose(lesson){
   const exercise=single?copy(parts[0].exercise):{version:1,id:lesson.id+'-'+section.role,kind:'stage',title,progressive:true,requireCheckBeforeNext:true,exercises:parts.map(s=>({id:s.exercise.id,exercise:copy(s.exercise)}))};
   if(exercise.kind==='stage')exercise.unifiedProgression=true;
   return {...parts[0],menu:title,navigationTitle:title,section:'tasks',role:section.role,exercise,
-   ...(single?{}:{legacySources:parts.map(s=>({id:s.exercise.id,signature:JSON.stringify(s.exercise)})),exerciseAliases:parts.map(s=>s.exercise.id)}),
+   ...(single?{}:{legacySources:parts.map(s=>({id:s.exercise.id,signature:JSON.stringify(s.exercise)})),exerciseAliases:parts.map(s=>s.exercise.id),navigationShortcuts:parts.filter(s=>s.navigationShortcut===true).map(s=>({id:s.exercise.id,title:s.navigationTitle||s.menu||s.exercise.title}))}),
    guide:{...parts[0].guide,time:parts.reduce((n,s)=>n+(parseFloat(s.guide?.time)||0),0)+' min'}};
  });
  const untouched=lesson.stages.filter(s=>!used.has(s.exercise.id));
