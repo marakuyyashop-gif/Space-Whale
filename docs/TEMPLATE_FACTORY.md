@@ -1,16 +1,19 @@
 # Space Whale — shared template catalog
 
-Catalog updated: 2026-10-17. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
+Catalog and shared registry updated: 2026-10-18. This document supersedes the older interaction notes in EXERCISE_TEMPLATES.md and EXERCISE_COVERAGE_V2.md.
 
 ## Fixed authoring formats across the workspace
 
-Every new exercise fills an existing shared kind/layout. Do not create per-lesson controls, windows, labels, HTML or CSS. New formats and changes to the common layout require an explicit user request. Existing response mechanics keep their established behavior; a Speaking request does not change Writing, Matching, audio or navigation.
+Every new exercise declares an existing `templateCode` and fills its compatible shared kind. Do not create per-lesson controls, windows, labels, HTML or CSS. New formats and changes to the common layout require an explicit user request. Existing response mechanics keep their established behavior; a Speaking request does not change Writing, Matching, audio or navigation.
 
-All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title → image slot → task → Use:**. See [SPEAKING_TEMPLATE.md](SPEAKING_TEMPLATE.md) for the exact schema and authoring process. The renderer fixes this order, prints one bold `Use:`, places words before phrase models in each group, and supplies no disclosures, teacher notes, Test label or exercise buttons. Missing artwork leaves a hidden slot. Extra content/layout fields are rejected. The same renderer is used in the catalog and every lesson, including live teacher/student views. Legacy presentation definitions remain compatible until their content is deliberately revised.
+All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title → image slot → task → Use:**. See [SPEAKING_TEMPLATE.md](SPEAKING_TEMPLATE.md) for the exact schema and authoring process. The renderer fixes this order, prints one bold `Use:`, places words before phrase models in each group, and supplies no disclosures, teacher notes, Test label or exercise buttons. Missing artwork leaves a hidden slot. Extra content/layout fields are rejected. The same renderer is used in the catalog and every lesson, including live teacher/student views. Legacy presentation Speaking receives the same template identity and shared visual classes while retaining its original blocks, disclosures and role cards; only an explicitly requested content revision may replace those structures.
 
 ## One source of truth
 
-- `exercise-theme.css`: typography, shared colors and template-specific shape tokens. Edit here to update every exercise using the shared kit.
+- `exercise-template-profiles.js`: canonical visual settings for all 79 approved source templates, including compatible parts of compound templates. Edit a profile once to update its catalog preview, course exercises and homework on their next mount.
+- `exercise-template-bindings.js`: reviewed existing exercise IDs mapped to template codes/parts. Explicit material and composition roles prevent source text, recordings and mixed sequences from becoming unrelated response templates.
+- `exercise-templates.js`: resolves every `SpaceWhaleExerciseKit.mount` through those profiles, including nested catalog, course and homework definitions. Resolution creates a view copy; lesson text, IDs, answer keys, media, saved responses and reveal/progression data remain authored and unchanged.
+- `typography.css` and `exercise-theme.css`: the native font family, shared colors, type/size and shape tokens used by the registered templates.
 - `exercise-kit.css`: layouts for each reusable kind/layout; no lesson-specific selectors.
 - `exercise-kit.js`: validation, rendering, Check/Reset and the same answers/onChange contract used by Workspace realtime.
 - `template-gallery.js`: source-code catalog assembly and legacy test fixtures. The three `template-source-*.js` content files contain source-aligned examples; no renderer copies or course registration.
@@ -36,20 +39,24 @@ The existing Workspace `Exercise Templates` menu uses the source families W, P, 
 
 There are 79 playable source-coded templates. W03 is the parent name for W03A/W03B, not a third exercise. W05 and L13–L18 come from the later dedicated Words/Listening files. The supplied sources contain no E10 or I/A families; do not invent missing codes. `docs/exercise-source-manifest.json` records all 80 code labels, source pages and conflicts resolved using later dedicated instructions. The source files themselves remain unchanged.
 
-`template-source-index.js` stores canonical code names. `template-source-core.js`, `template-source-practice.js` and `template-source-input.js` contain preview content only. They use the existing shared kit and existing site artwork; they neither register course lessons nor alter their saved answers. Future formats must first have a confirmed source code and then a definition in the appropriate data file. The index and coverage test must agree.
+`template-source-index.js` stores canonical code names. `template-source-core.js`, `template-source-practice.js` and `template-source-input.js` contain preview content only. They use the existing shared kit and existing site artwork; they neither register course lessons nor alter their saved answers. A supported template has a confirmed source code, a canonical profile and preview content in the appropriate data file. Preview content is not a second place to set its visual layout. The index, profiles and coverage test must agree.
 
 `template-gallery.js` assembles the one visible source catalog and redirects old preview IDs to corresponding code cards. The former 31 technical fixtures and 21 neutral previews remain available only for renderer regression coverage; materials/mechanics/compositions are no longer menu categories. Their test tones are not used as language recordings in the source catalog. Source listening and repetition previews with no supplied recording use disabled pending players; do not generate, substitute or mislabel audio.
 
 ## Authoring contract
 
-1. Select an existing kind/layout. Store only text, IDs, answer keys and asset URLs in lesson data.
+1. Select the existing source `templateCode` and compatible shared `kind`; declare the code in new lesson definitions or add an explicit ID binding. Store authored text, IDs, answer keys, media and progression in lesson data, while visual settings come from its profile.
 2. Do not insert HTML, inline styles or copies of renderer logic into lesson data.
 3. Keep IDs stable after publication; saved attempts and realtime use them. A visual change does not require changing IDs or rewriting lessons.
 4. Call `SpaceWhaleExerciseKit.validate(definition)` before publishing.
 5. Register a real lesson through `window.SpaceWhaleContent` with its existing catalog lesson ID, level and whale. A stage's `exercise` can be a single definition or a shared `kind: 'stage'` definition.
 6. Sources may hold a copy of this authoring guide. The working template implementation remains in the website repository.
 
-Common definition: `{ version: 1, id, kind, title, instruction? }`.
+Common definition: `{ version: 1, id, templateCode, kind, title, instruction? }`. Compound templates can declare `templatePart`; their compatible kinds and part paths are listed in the profile. Codes are semantic identities, not new exercise/item IDs or visible renumbering. Mounted hosts expose `data-template-code` and `data-template-part` for inspection.
+
+An explicit `templateCode` takes priority over the catalog `code` and reviewed ID binding. Shared-mechanic inference supports older or generated homework definitions, but it does not establish a new lesson's teaching purpose: authors must choose the source code. A mixed `stage` stays a composition whose children retain their own codes; material roles keep source-only text/audio intact. Profile layout changes must preserve `picture-rows` image associations and table cells, never detach a cue from its response.
+
+`SpaceWhaleExerciseTemplates.profileFor(code, kind, part)` returns the applicable visual settings and `supported`, which must be checked when diagnosing a legacy kind/part. `configure(code, changes, {kind, part})` changes only allowed visual fields in memory and returns a restore callback. Without a selector it targets the first response kind of a compound template; specify `kind` and, when needed, the profile's exact part path to target another part. The change applies on the next mount, and the callback restores the previous profile. Persistent changes belong in `exercise-template-profiles.js`; neither this API nor a visual profile replaces lesson content, grading keys or saved work.
 
 | Kind | Content fields | Answers state |
 |---|---|---|
@@ -90,7 +97,7 @@ Useful Language disclosures open initially. Standalone Possible Answers disclosu
 
 ## Changes to appearance
 
-Examples: change `--sw-exercise-font` globally; adjust the desktop/compact/mobile type scales together for a global size change; set `--sw-matching-ratio: 1 / 1` for square text cards; adjust `--sw-picture-word-ratio` for picture cards. More substantial layout changes belong in exercise-kit.css and apply wherever that layout is used.
+Examples: change `--sw-exercise-font` globally; adjust the desktop/compact/mobile type scales together for a global size change; set `--sw-matching-ratio: 1 / 1` for square text cards; adjust `--sw-picture-word-ratio` for picture cards. Per-template visual settings belong in `exercise-template-profiles.js`; shared layout implementation belongs in `exercise-kit.css`. Both apply to compatible catalog, course and homework exercises through the same registry.
 
 After a shared change, run `npm ci` once, then `npm test`, then check the changed interactions in the preview and one existing lesson. Update stylesheet/script cache versions when publishing. Structural schema changes require separate compatibility work; visual changes do not.
 
@@ -203,9 +210,9 @@ The expanded Workspace panel adapts from 240–344px by default. Drag its right 
 
 ## Reviewed P, D and E catalog (2026-10-17)
 
-P01 fills each item with `[Word N]` and `[Sentence with Word N]`; the number of word/example pairs follows the authored items list. P02 fills each line with `[Lexical chunk N]`. Keep IDs, pending recordings, sequence and transport unchanged. Discovery model lines contain bracketed beginning/target/ending fragments; only the target structure belongs to highlights. D01 uses three rule-ending options per existing gap. D03 uses structural group/sentence names; D04 and text E matching reuse the approved `word-definition` layout. Practice sample text, banks, options, accepted forms and table cells are structural placeholders with the original keys and option orders. E05B retains its existing prefills and gaps. W, Rules and actual course content are unchanged.
+P01 fills each item with `[Word N]` and `[Sentence with Word N]`; the number of word/example pairs follows the authored items list. P02 fills each line with `[Lexical chunk N]`. Keep IDs, pending recordings, sequence and transport unchanged. Discovery model lines contain bracketed beginning/target/ending fragments; only the target structure belongs to highlights. D01 uses three rule-ending options per existing gap. D03 uses structural group/sentence names; D04 and long text E matching use the approved `stacked-text` layout; short E06C word/form pairs retain `word-definition`. Practice sample text, banks, options, accepted forms and table cells are structural placeholders with the original keys and option orders. E05B retains its existing prefills and gaps. Structural placeholders replace preview content only; actual course content is unchanged and receives its registered template visuals.
 
-The shared kit applies `ek-flat-controls` to source D/E/L/T/Q/S catalog entries and propagates it to nested tasks. Its optional `flatControls` mount configuration reuses the same approved control skin rather than defining a new exercise format. It uses the existing Words pale-gray surface, gray dashed borders and round corners without inset/hover shadows. Field width follows text; normal padding is symmetric. Compact dropdowns omit the internal index and reveal only their feedback circle after checking. Numbered sentence/table/typed fields show no hidden result gutter before checking; feedback adds its space after checking. Sorting group labels are regular-weight muted text. W/P/R and course definitions keep their current appearance.
+The registry selects the canonical `flatControls` setting for each template in the catalog, course and homework, including compatible nested tasks. A legacy mount flag is only a fallback for unbound composition containers; a bound template profile always takes precedence. It uses the existing Words pale-gray surface, gray dashed borders and round corners without inset/hover shadows. Field width follows text; normal padding is symmetric. Compact dropdowns omit the internal index and reveal only their feedback circle after checking. Numbered sentence/table/typed fields show no hidden result gutter before checking; feedback adds its space after checking. Sorting group labels are regular-weight muted text. W/P/R retain their approved profile settings; course content uses the same profiles rather than a gallery-only appearance branch.
 
 All headings/body/controls retain typography.css native system family. An empty editor focus removes an authored spelling cue, then refreshes layout and its native empty selection on the next animation frame; this also applies without a cue. Skip the refresh after blur, typing, disposal or for read-only views. Do not change response values or move selections in nonempty text.
 
@@ -213,11 +220,11 @@ All headings/body/controls retain typography.css native system family. An empty 
 
 Picture matching uses the existing equal-height grid cards with nonshrinking media frames and flex-growing answer slots. Thus every dashed answer field uses the largest label height, keeping media and input geometry stable. The 44px minimum and artwork containment stay intact.
 
-Writing may opt into `layout:'inline'`. Put its prompt and native field on one wrapping row; use the shared compact native editor, growing with its authored cue and entered text. E12/E13 use this layout; E12 has `[Task]` for the variable instruction. On narrow screens move a whole field down rather than squeezing text.
+Writing may opt into `layout:'inline'`. Put its prompt and native field on one wrapping row; use the shared compact native editor, growing with its authored cue and entered text. E12/E13 use this layout; E12's mechanic instruction is `Write the correct form.`. On narrow screens move a whole field down rather than squeezing text.
 
 The reviewed E11 explicitly supplies `items[].possibleAnswers`, `showAuthoredSamples:true` and `revealPossibleAnswers:true`. Only this author opt-in enables Writing samples after checking a nonempty response; the existing Possible answers disclosure starts open. Samples do not become accepted keys or semantic grades. Editing clears the feedback, and read-only checked hydration restores it. Other open/personal Writing retains Well done only.
 
-Listening uses one primary task heading, a normal-size instruction in the same text color, its player, then response controls. Move an existing interaction instruction above the audio and hide duplicate generic prompts; retain meaningful question stems. The audio child shares the parent title so the shared duplicate-heading rule suppresses Recording. Keep source recordings, transcripts, IDs and question sequence. Reviewed L/T/Q/S catalog controls reuse the same flat skin as D/E; their player frames and progression controls have no raised/inset shadows. Player waveform/transport is unchanged pending the user's visual choice.
+Listening uses one primary task heading, a normal-size instruction in the same text color, its player, then response controls. Move an existing interaction instruction above the audio and hide duplicate generic prompts; retain meaningful question stems. The audio child shares the parent title so the shared duplicate-heading rule suppresses Recording. Keep source recordings, transcripts, IDs and question sequence. Registered L/T/Q/S controls in previews and real lessons reuse the same flat skin as D/E; their player frames and progression controls have no raised/inset shadows. The approved shared contour player and its transport remain unchanged by template binding.
 
 
 ## Reviewed catalog continuation (2026-10-17 evening)

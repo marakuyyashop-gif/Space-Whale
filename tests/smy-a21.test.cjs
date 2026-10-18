@@ -71,7 +71,7 @@ test('story and question appear together, then one teacher-revealed multiline ru
  assert.equal(teacher.host.querySelectorAll('.ek-rule-block').length,1);assert.equal(student.host.querySelectorAll('.ek-rule-block').length,1);
  assert.match(teacher.host.querySelector('.ek-rule-block').textContent,/\n\n/);assert.equal(student.host.querySelector('.ek-stage-navigation').hidden,true);
  const movement=find('A2_MOVE_M04'),info=setup(movement),discovery=movement.exercises[0].exercise;
- assert.equal(info.host.querySelector('.ek-rule-block'),null);assert.equal(info.host.querySelectorAll('.ek-question').length,7);
+ assert.equal(info.host.querySelector('.ek-rule-block'),null);const fields=[...info.host.querySelectorAll('.ek-discovery-choice .ek-choice-trigger')];assert.equal(fields.length,7);assert.deepEqual(fields.map(field=>field.getAttribute('aria-label')),Array.from(discovery.items,item=>item.prompt+': choose an answer'));
  assert.equal(info.host.querySelector('.ek-stage-down').disabled,true);
  info.handle.setAnswers({[discovery.id]:{...Object.fromEntries(discovery.items.map(i=>[i.id,i.correctId])),__sw_checked:true}});
  assert.equal(info.host.querySelector('.ek-rule-block'),null);assert.equal(info.host.querySelector('.ek-stage-down').disabled,false);

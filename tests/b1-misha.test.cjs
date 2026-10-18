@@ -93,9 +93,10 @@ test('Multiple Select accepts either selection order and rejects extra answers',
  assert.equal(setup(d).host.querySelectorAll('input[type=checkbox]').length,4);
 });
 test('revised B1 advice correction uses six keyed sentence fields and retains canonical feedback',()=>{
- const d=find('B1D2-M09'),v=setup(d);assert.equal(v.host.querySelectorAll('input.ek-writing-input').length,6);
+ const d=find('B1D2-M09'),v=setup(d),fields=[...v.host.querySelectorAll('textarea.ek-writing-input.ek-growing-input')];assert.equal(fields.length,6);
  const answers=Object.fromEntries(d.items.map(i=>[i.id,i.acceptedAnswers[0]]));v.handle.setAnswers({...answers,__sw_checked:true});
  assert.ok(Object.values(kit.grade(d,answers)).every(x=>x==='correct'));
+ assert.deepEqual(fields.map(field=>field.value),Array.from(d.items,item=>item.acceptedAnswers[0]));assert.ok(fields.every(field=>v.host.contains(field)),'hydration preserves the mounted sentence editors');
  const first=d.items[0];v.handle.setAnswers({...answers,[first.id]:first.prompt,__sw_checked:true});assert.match(v.host.querySelector('.ek-answer-pairs').textContent,/If I were you/);v.handle.destroy();
 });
 test('lexical rules reveal outside feedback by teacher arrow and synchronize without losing flat answers',()=>{

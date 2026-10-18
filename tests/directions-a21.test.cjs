@@ -62,6 +62,6 @@ test('error correction rejects nonsense and original mistakes, accepts valid var
 test('discovery reveals one question at a time while report mode shows all',()=>{
  let discovery;walk(lesson.stages.find(s=>s.exercise.id==='A2_DIR_M04').exercise,d=>{if(d.kind==='choice')discovery=d;});
  assert.equal(discovery.progressiveQuestions,true);
- const {host,handle}=setup(discovery);assert.equal(host.querySelectorAll('fieldset').length,1);handle.destroy();
- const {document}=parseHTML('<html><body><main></main></body></html>');const report=document.querySelector('main');const h=kit.mount(report,discovery,{readOnly:true,showAllQuestions:true});assert.equal(report.querySelectorAll('fieldset').length,3);h.destroy();
+ const {host,handle}=setup(discovery);assert.equal(host.querySelectorAll('.ek-discovery-choice>.ek-inline-choice>.ek-choice-trigger').length,1);assert.equal(host.querySelector('.ek-choice-trigger').getAttribute('aria-label'),discovery.items[0].prompt+': choose an answer');handle.destroy();
+ const {document}=parseHTML('<html><body><main></main></body></html>');const report=document.querySelector('main');const h=kit.mount(report,discovery,{readOnly:true,showAllQuestions:true});const fields=[...report.querySelectorAll('.ek-discovery-choice .ek-choice-trigger')];assert.equal(fields.length,3);assert.deepEqual(fields.map(field=>field.getAttribute('aria-label')),Array.from(discovery.items,item=>item.prompt+': choose an answer'));assert.ok(fields.every(field=>field.disabled));h.destroy();
 });

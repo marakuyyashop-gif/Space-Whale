@@ -131,7 +131,16 @@ test('every published pack can complete every task through the shared UI and reo
       else type(el,gaps[i].answers[0]);
      }
     }
-    if(d.kind==='choice')for(const item of d.items){const el=[...section.querySelectorAll('input')].find(e=>e.name===`${d.id}-${item.id}`&&e.value===item.correctId);el.checked=true;p.fire(el,'change');}
+    if(d.kind==='choice')for(const [index,item] of d.items.entries()){
+     const dropdown=section.querySelectorAll('.ek-choice-trigger')[index];
+     if(dropdown){
+      p.click(dropdown);const text=item.options.find(option=>option.id===item.correctId).text;
+      p.click([...section.querySelectorAll('.ek-inline-choice')[index].querySelectorAll('.ek-inline-option')].find(option=>option.textContent===text));
+     }else{
+      const el=[...section.querySelectorAll('input')].find(e=>e.name===`${d.id}-${item.id}`&&e.value===item.correctId);
+      assert.ok(el,`${d.id}: ${item.id} has its keyed answer control`);el.checked=true;p.fire(el,'change');
+     }
+    }
     if(d.kind==='writing')d.items.forEach((item,i)=>type(section.querySelectorAll('.ek-writing-input')[i],item.acceptedAnswers[0]));
     const check=section.querySelector('.ek-check');assert.equal(check.hidden,false,`${d.id} exposes OK`);p.click(check);
     assert.equal(section.querySelector('.ek-skip').hidden,true,'checked work is not erased by Skip');

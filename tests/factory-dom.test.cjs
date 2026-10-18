@@ -31,7 +31,7 @@ function setup(id, config = {}) {
   const changes = [];
   const mount = kit.mount(host, typeof id === 'string' ? fixture(id) : id, {...config,onChange:value => changes.push(value)});
   const fire = (el,type,extras = {}) => {assert.ok(el,`${type} target exists`);const event = new window.Event(type,{bubbles:true,cancelable:true});Object.assign(event,extras);el.dispatchEvent(event);return event;};
-  const button = label => [...host.querySelectorAll('button')].find(el => el.textContent === label || el.getAttribute('aria-label') === label);
+  const button = label => [...host.querySelectorAll('button')].find(el => el.textContent === label || el.getAttribute('aria-label') === label || el.querySelector('.ek-option-label')?.textContent === label);
   const click = label => fire(button(label),'click');
   const drag = (source,target) => {
     const transfer = {setData(){},effectAllowed:'',dropEffect:''};
@@ -53,7 +53,7 @@ test('matching reassigns used option, closes dialog, clears stale feedback, rese
   assert.equal(s.host.querySelectorAll('dialog').length,0);
   s.click('OK'); assert.equal(s.host.querySelector('.ek-match-slot').getAttribute('data-feedback'),'retry');
   s.fire(s.host.querySelectorAll('.ek-match-slot')[1],'click');
-  const used = [...s.host.querySelectorAll('dialog .ek-option')].find(el => el.textContent === '[Sentence ending 2]');
+  const used = [...s.host.querySelectorAll('dialog .ek-option')].find(el => el.querySelector('.ek-option-label')?.textContent === '[Sentence ending 2]');
   assert.ok(used.classList.contains('ek-option-used'));
   s.fire(used,'click');
   assert.deepEqual(s.mount.getAnswers(),{item2:'option2'});
@@ -544,7 +544,8 @@ test('shared feedback uses five bands, neutral empty state and no duplicate coun
   const s=setup('matching-demo');s.click('OK');assert.equal(s.host.querySelector('.ek-status').textContent,'Choose an answer.');
   assert.equal(s.host.querySelectorAll('.ek-results>[data-feedback]').length,0);
   assert.ok(s.host.querySelector('.ek-results').hidden);
-  assert.equal(s.host.querySelectorAll('.ek-card>.ek-result-lamp').length,3);
+  assert.equal(s.host.querySelectorAll('.ek-match-slot>.ek-match-answer-number').length,3);
+  assert.deepEqual([...s.host.querySelectorAll('.ek-match-answer-number')].map(el=>el.dataset.result),['empty','empty','empty']);
 });
 test('height motion keeps content until closing finishes and cancels stale closing on reversal',()=>{
   const {document}=parseHTML('<html><body><div>Content</div></body></html>');const el=document.querySelector('div');
@@ -689,7 +690,7 @@ test('matching keeps the open picker attached while remote answers arrive; local
  s.mount.setAnswers({item2:'option2'});
  assert.equal(s.host.querySelector('.ek-match-slot'),slot);
  s.click('[Sentence ending 1]');
- assert.equal(slot.textContent,'[Sentence ending 1]');
+ assert.equal(slot.querySelector('.ek-match-answer-label').textContent,'[Sentence ending 1]');
  assert.equal(s.host.querySelectorAll('dialog').length,0);
  assert.deepEqual(s.mount.getAnswers(),{item2:'option2',item1:'option1'});
 });
@@ -995,8 +996,8 @@ test('picture matches keep plain choices while text matches use letters separate
   assert.equal(s.changes.length,count+1);s.click('Reset exercise');assert.deepEqual(s.mount.getAnswers(),{});
   assert.equal(s.host.querySelectorAll('.ek-match-answer-number[data-result]').length,0);s.mount.destroy();
  }
- const generic=setup('matching-demo');assert.equal(generic.host.querySelector('.ek-match-answer-number'),null);
- generic.fire(generic.host.querySelector('.ek-match-slot'),'click');assert.equal(generic.host.querySelector('.ek-option-number'),null);
+ const generic=setup('matching-demo');assert.equal(generic.host.querySelectorAll('.ek-match-answer-number').length,3);
+ generic.fire(generic.host.querySelector('.ek-match-slot'),'click');assert.deepEqual([...generic.host.querySelectorAll('.ek-option-number')].map(el=>el.textContent),['A','B','C']);
  generic.mount.destroy();
 });
 
@@ -1212,7 +1213,7 @@ test('progressive second and third questions retain the same number in prompts, 
   const state=kind==='choice'?{item1:'a',item2:'b',item3:'b'}:{gap1:'correct',gap2:'other',gap3:'other'};
   const s=setup(def,{syncChecks:true});s.mount.setAnswers({...state,__sw_choice_revealed:3,__sw_choice_checked:['item1','item2','item3']});
   assert.deepEqual([...s.host.querySelectorAll('.ek-answer-pairs>li')].map(el=>el.getAttribute('value')),['2','3']);
-  if(kind==='choice')assert.deepEqual([...s.host.querySelectorAll('legend')].map(el=>el.textContent),['1. Question 1','2. Question 2','3. Question 3']);
+  if(kind==='choice')assert.deepEqual([...s.host.querySelectorAll('legend')].map(el=>[el.querySelector('.ek-question-index').dataset.number,el.lastChild.textContent]),[['1','Question 1'],['2','Question 2'],['3','Question 3']]);
   else{assert.deepEqual([...s.host.querySelectorAll('.ek-sentence-number')].map(el=>el.textContent),['1. ','2. ','3. ']);assert.deepEqual([...s.host.querySelectorAll('.ek-choice-trigger>.ek-gap-number')].map(el=>el.dataset.number),['','','']);}
   assert.equal(s.changes.length,0);
  }

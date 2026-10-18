@@ -24,7 +24,7 @@ function setup(def,config={}){
   const host=document.querySelector('main'),changes=[];
   const mount=kit.mount(host,def,{...config,onChange:value=>changes.push(value)});
   const fire=(element,type)=>{assert.ok(element);element.dispatchEvent(new window.Event(type,{bubbles:true,cancelable:true}));};
-  const click=label=>fire([...host.querySelectorAll('button')].find(button=>button.textContent===label||button.getAttribute('aria-label')===label),'click');
+  const click=label=>fire([...host.querySelectorAll('button')].find(button=>button.textContent===label||button.getAttribute('aria-label')===label||button.querySelector('.ek-option-label')?.textContent===label),'click');
   const fill=(label,value)=>{const input=[...host.querySelectorAll('input')].find(field=>field.getAttribute('aria-label')===label);input.value=value;fire(input,'input');return input;};
   return {host,mount,changes,fire,click,fill};
 }

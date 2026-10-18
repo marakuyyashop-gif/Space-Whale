@@ -129,10 +129,10 @@ test('Listen & Repeat exposes the word and example as separate clips and steps',
 });
 
 test('speaking questions sit below the image, matching has no subtitle and rule is one multiline block',()=>{
- const opening=setup(stage('opening'));assert.equal(opening.host.querySelector('.ek-instruction').textContent,'Use the phrases below to help you.');assert.equal(opening.host.querySelector('.ek-body>img').nextElementSibling.textContent,'What clothes can you name?\nWhich items do you like?\nChoose one item. How does it look?');
+ const opening=setup(stage('opening'));assert.equal(opening.host.querySelector('.ek-instruction').textContent,'Use the phrases below to help you.');const openingImage=opening.host.querySelector('.ek-speaking-image');assert.ok(openingImage.querySelector('img'));assert.ok(openingImage.nextElementSibling.classList.contains('ek-speaking-task'));assert.equal(openingImage.nextElementSibling.textContent,'What clothes can you name?\nWhich items do you like?\nChoose one item. How does it look?');
  assert.equal(setup(stage('words')).host.querySelector('.ek-instruction'),null);
  const focus=setup(stage('language-focus'));assert.equal(focus.host.querySelectorAll('.ek-rule-block').length,1);assert.match(focus.host.querySelector('.ek-rule-block').textContent,/I \/ you \/ we \/ they → look\nhe \/ she \/ it → looks/);
- const final=setup(stage('final-speaking'));assert.equal(final.host.querySelector('.ek-instruction').textContent,'You are in a clothes shop with a friend.');assert.match(final.host.querySelector('.ek-body>img').nextElementSibling.textContent,/Choose an item and ask your partner about it/);
+ const final=setup(stage('final-speaking'));assert.equal(final.host.querySelector('.ek-instruction').textContent,'You are in a clothes shop with a friend.');const finalImage=final.host.querySelector('.ek-speaking-image');assert.ok(finalImage.querySelector('img'));assert.ok(finalImage.nextElementSibling.classList.contains('ek-speaking-task'));assert.match(finalImage.nextElementSibling.textContent,/Choose an item and ask your partner about it/);
 });
 
 test('English word highlighting preserves every space and line break in the lesson rule',()=>{

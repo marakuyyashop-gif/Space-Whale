@@ -1,5 +1,7 @@
 (function (scope) {
   'use strict';
+  const templates=typeof module==='object'&&module.exports?require('./exercise-templates.js'):scope.SpaceWhaleExerciseTemplates;
+  if(!templates)throw Error('Exercise template registry must load before ExerciseKit.');
   const uiLabels = { check: 'OK' }; // Shared button copy for every exercise.
   const kinds = ['matching', 'gaps', 'choice', 'image-label', 'order', 'sort', 'writing', 'presentation', 'audio', 'rule-page', 'stage'];
   const normalize = value => String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
@@ -79,6 +81,7 @@
   function validate(def) {
     const fail = message => { throw new Error(message); };
     const text = (value, name) => { if (typeof value !== 'string' || !value.trim()) fail(`${name}: expected non-empty text`); };
+    if(def?.templateCode!=null&&!templates.codes.includes(def.templateCode))fail('Unknown exercise template '+def.templateCode);
     const safeId = (value, name) => { text(value, name); if (['__proto__', 'constructor', 'prototype'].includes(value)) fail(`${name}: reserved ID`); };
     const array = (value, name) => { if (!Array.isArray(value) || !value.length) fail(`${name}: expected a non-empty list`); };
     const ids = (items, name) => {
@@ -144,7 +147,7 @@
           for (const field of Object.keys(object)) if (!allowed.includes(field)) fail(`${name}: unsupported field ${field}`);
         };
         // Catalog metadata is never rendered as exercise content.
-        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs'], 'Speaking');
+        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs','templateCode','templatePart','templateRole'], 'Speaking');
         if (def.image !== null) {
           only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
           if (!def.image.imagePending) text(def.image.image, 'image');
@@ -465,9 +468,11 @@
     return {...handle,getAnswers:()=>pack(handle.getAnswers()),setAnswers:value=>{saved=clone(value||{});handle.setAnswers(unpack(saved));}};
   }
   function mount(host, definition, config = {}) {
+    definition=templates.resolve(definition);
     validate(definition);
-    const flatControls = config.flatControls === true || ['D','E','L','T','Q','S'].includes(definition.catalogFamily);
-    if(flatControls)config={...config,flatControls:true};
+    const profile=definition.templateCode?templates.profileFor(definition.templateCode,definition.kind,definition.templatePart):null;
+    const flatControls=profile?profile.flatControls:config.flatControls!==false;
+    config={...config,flatControls};
     // A follow-up task or rule uses the existing teacher-controlled sequence, while
     // preserving the original flat response IDs and saved checks.
     if(definition.followUp){
@@ -881,6 +886,7 @@
     const matchBadgeLabel = badge => badge.dataset.number?'Selected option '+badge.dataset.number:badge.closest('.ek-match-slot')?.dataset.selected==='true'?'Selected match; not checked':'No option selected';
     host.classList.add('exercise-kit');host.classList.toggle('ek-modern',modern);
     host.classList.toggle('ek-flat-controls',flatControls);
+    host.dataset.templateCode=def.templateCode||'';host.dataset.templatePart=def.templatePart||'';host.dataset.templateRole=def.templateRole||'exercise';
     host.classList.toggle('ek-reading-width', def.kind === 'gaps');
     host.classList.toggle('ek-picture-practice',['gaps','writing'].includes(def.kind)&&def.layout==='picture-rows');
     host.classList.toggle('ek-stage-grouped', def.kind === 'stage' && def.layout === 'grouped');
@@ -1143,17 +1149,27 @@
         });
         body.append(picture, task, use);
       } else if (def.kind === 'presentation') {
-        def.blocks.forEach(block => {
-          if (block.type === 'image') body.append(illustration(block));
-          else if (block.type === 'disclosure') {
-            const detail = node('details', 'ek-disclosure');
-            const title = isPossibleAnswersBlock(block) ? POSSIBLE_ANSWERS_TITLE : /useful language/i.test(block.title) ? 'Use phrases' : block.title;
-            detail.open = !isPossibleAnswersBlock(block) && (block.open === true || (block.open !== false && ['useful language','useful phrases','use phrases'].includes(normalize(block.title))));
-            detail.append(node('summary', '', title), node('p', 'ek-copy', block.text));
-            body.append(detail);
+        const renderBlock=block=>{
+          if(block.type==='image')return illustration(block);
+          if(block.type==='disclosure'){
+            const detail=node('details','ek-disclosure');
+            const title=isPossibleAnswersBlock(block)?POSSIBLE_ANSWERS_TITLE:/useful language/i.test(block.title)?'Use phrases':block.title;
+            detail.open=!isPossibleAnswersBlock(block)&&(block.open===true||(block.open!==false&&['useful language','useful phrases','use phrases'].includes(normalize(block.title))));
+            detail.append(node('summary','',title),node('p','ek-copy',block.text));return detail;
           }
-          else if(block.role==='examples')body.append(exampleModels(block,isExamplesPresentation(def)));
-          else body.append(richText(block.text, block.highlights, block.emphasis));
+          return block.role==='examples'?exampleModels(block,isExamplesPresentation(def)):richText(block.text,block.highlights,block.emphasis);
+        };
+        def.blocks.forEach((block,index)=>{
+          const content=renderBlock(block);
+          if(def.templateRole!=='speaking'){body.append(content);return;}
+          const support=block.type==='disclosure'&&/^(?:useful (?:phrases|language)|use phrases|words|optional help|опора(?:\s|:|$))/i.test(block.title)||block.type==='text'&&/^\s*words to help\s*:/i.test(block.text);
+          const role=block.type==='image'?'image':isPossibleAnswersBlock(block)?'supplement':support?'use':block.type==='text'?'task':'supplement';
+          const shell=node('div','ek-speaking-'+role+' ek-speaking-legacy-block');shell.dataset.speakingSourceIndex=String(index);
+          if(role==='use'){
+            content.querySelector('summary')?.classList.add('ek-speaking-use-title');
+            for(const paragraph of content.matches('.ek-copy')?[content]:content.querySelectorAll('.ek-copy'))paragraph.classList.add('ek-speaking-group');
+          }
+          shell.append(content);body.append(shell);
         });
       }
       if (def.kind === 'stage') {
@@ -1655,7 +1671,7 @@
         if(!compact&&(item.image||item.imagePending))row.append(illustration(item));
         const label = node('label', 'ek-writing'+(inline?' ek-writing-inline':''), compact||inline ? '' : `${itemNumber(item)}. ${item.prompt}`);
         if(inline){label.append(node('span','ek-writing-prompt',`${itemNumber(item)}. ${item.prompt}`));if(def.transformationArrow){const arrow=node('span','ek-transform-arrow','→');arrow.setAttribute('aria-hidden','true');label.append(arrow);}}
-        const input = responseEditor(answers[item.id],item.placeholder,{compact:inline&&!item.multiline,multiline:Boolean(item.multiline),growing:inline&&!item.multiline&&def.answerSize!=='word'});
+        const input = responseEditor(answers[item.id],item.placeholder,{compact:(inline||def.layout==='picture-rows'&&def.templateCode==='E05A')&&!item.multiline,multiline:Boolean(item.multiline),growing:inline&&!item.multiline&&def.answerSize!=='word'});
         input.addEventListener('input', () => {sizeResponseField(input);changed(item.id, input.value);});label.append(input);
         if(compact)input.setAttribute('aria-label',`Word for picture ${itemNumber(item)}`);
         if(item.hint){const hint=node('small','ek-writing-hint',item.hint);hint.id=def.id+'-'+item.id+'-hint';input.setAttribute('aria-describedby',hint.id);label.append(hint);}
@@ -1927,7 +1943,7 @@
       destroy: () => { disposed=true;matchingCleanup();editorCleanup();if(scrollFrame!==null)doc.defaultView?.cancelAnimationFrame?.(scrollFrame);pointerDrag?.el.classList.remove('ek-dragging');pointerDrag = null;dragFlights.forEach(ghost=>ghost.remove());dragFlights.clear(); doc.removeEventListener('pointermove', pointerMove); doc.removeEventListener('pointerup', pointerEnd); doc.removeEventListener('pointercancel', pointerEnd); host.removeEventListener('click', dragClick, true); dismissInline(); doc.removeEventListener('pointerdown', onOutside); closeDialog(); nestedMounts.forEach(instance => instance.destroy()); nestedMounts = []; host.removeEventListener('keydown', onKeydown); host.querySelectorAll('audio,video').forEach(media => media.pause()); host.replaceChildren(); }
     };
   }
-  const api = { validate, grade, mount, speaking, isSpeaking, taskFinished, kinds, uiLabels, feedbackMessage, motion:{expand} };
+  const api = { templates, validate, grade, mount, speaking, isSpeaking, taskFinished, kinds, uiLabels, feedbackMessage, motion:{expand} };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.SpaceWhaleExerciseKit = api;
 })(typeof window !== 'undefined' ? window : globalThis);
