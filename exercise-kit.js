@@ -148,11 +148,18 @@
         };
         // Catalog metadata is never rendered as exercise content.
         only(def, ['version','id','kind','layout','title','image','task','use','arrangement','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs','templateCode','templatePart','templateRole'], 'Speaking');
-        if(def.arrangement!=null&&def.arrangement!=='image-support')fail('Unsupported Speaking arrangement');
+        if(def.arrangement!=null&&!['image-support','image-only'].includes(def.arrangement))fail('Unsupported Speaking arrangement');
         if (def.image !== null) {
           only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
           if (!def.image.imagePending) text(def.image.image, 'image');
           media(def.image);
+        }
+        // Explicitly requested artwork can be placed before its task is authored.
+        // Do not invent empty support or placeholder instructions for that case.
+        if(def.arrangement==='image-only'){
+          if(!def.image?.image)fail('Image-only Speaking requires supplied artwork');
+          if(def.task!=null||def.use!=null)fail('Image-only Speaking cannot contain task or Use');
+          return def;
         }
         if(def.task!=null||def.arrangement!=='image-support'){
           only(def.task, ['text','bullets'], 'Speaking task');
@@ -1151,26 +1158,29 @@
         if (def.image?.image) picture.append(illustration(def.image));
         else if(def.catalogFamily==='S'&&def.image?.imagePending){picture.append(node('div','ek-template-image','[Image]'));}
         else picture.hidden = true;
-        const task = def.task ? node('div', 'ek-speaking-task') : null;
-        if(task)task.append(node('p', 'ek-copy', def.task.text));
-        if (def.task?.bullets?.length) {
-          const list = node('ul', 'ek-speaking-bullets');
-          def.task.bullets.forEach(text => list.append(node('li', '', text)));
-          task.append(list);
+        if(def.arrangement==='image-only')body.append(picture);
+        else {
+          const task = def.task ? node('div', 'ek-speaking-task') : null;
+          if(task)task.append(node('p', 'ek-copy', def.task.text));
+          if (def.task?.bullets?.length) {
+            const list = node('ul', 'ek-speaking-bullets');
+            def.task.bullets.forEach(text => list.append(node('li', '', text)));
+            task.append(list);
+          }
+          const use = node('div', 'ek-speaking-use');
+          use.append(node('strong', 'ek-speaking-use-title', 'Use:'));
+          def.use.forEach(group => {
+            const content = node('div', 'ek-speaking-group');
+            if (group.words?.length) content.append(node('p', 'ek-copy ek-speaking-words', group.words.join(' · ')));
+            if (group.phrases?.length) content.append(node('p', 'ek-copy ek-speaking-phrases', group.phrases.join('\n')));
+            use.append(content);
+          });
+          if(def.arrangement==='image-support'){
+            const row=node('div','ek-speaking-aside'),support=node('div','ek-speaking-support');
+            if(task)support.append(task);
+            support.append(use);row.append(picture,support);body.append(row);
+          }else body.append(picture, task, use);
         }
-        const use = node('div', 'ek-speaking-use');
-        use.append(node('strong', 'ek-speaking-use-title', 'Use:'));
-        def.use.forEach(group => {
-          const content = node('div', 'ek-speaking-group');
-          if (group.words?.length) content.append(node('p', 'ek-copy ek-speaking-words', group.words.join(' · ')));
-          if (group.phrases?.length) content.append(node('p', 'ek-copy ek-speaking-phrases', group.phrases.join('\n')));
-          use.append(content);
-        });
-        if(def.arrangement==='image-support'){
-          const row=node('div','ek-speaking-aside'),support=node('div','ek-speaking-support');
-          if(task)support.append(task);
-          support.append(use);row.append(picture,support);body.append(row);
-        }else body.append(picture, task, use);
       } else if (def.kind === 'presentation') {
         const renderBlock=block=>{
           if(block.type==='image')return illustration(block);

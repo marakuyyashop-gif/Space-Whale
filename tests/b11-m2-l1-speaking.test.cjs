@@ -12,6 +12,13 @@ const images=[
  ['SAM','c41d0a27-fbfb-41f1-af19-7eaeb5c84ecf.png'],
  ['EVA','3ee93026-6da1-4423-bc18-f7b56af45231.png']
 ];
+const sheetImages=[
+ 'f319e67a-032f-4fdf-b25a-b9bebd3faad9.png',
+ '28476544-a11a-4b4e-9769-93ba0bc65f34.png',
+ '73f1a4c8-a1bb-4936-82e4-8e3c638754c7.png'
+];
+const speakingId=(lesson,role)=>'B11M02L0'+lesson+'_S01_'+role.toUpperCase();
+const ownedIds=new Set([1,2,3,4].flatMap(lesson=>['opening','final'].map(role=>speakingId(lesson,role))));
 function fixture(){
  const app={SpaceWhaleExerciseKit:kit},context=vm.createContext({window:app});
  for(const file of ['course-content-b11-m2.js','course-content-b11-m2-p01.js','course-content-b11-m2-word-practice.js','course-content-b11-m2-discovery-rules.js','course-content-b11-m2-grammar-practice.js'])vm.runInContext(read(file),context);
@@ -41,17 +48,26 @@ test('image/support Speaking is opt-in; ordinary Speaking keeps its original tas
  assert.equal(normal.host.querySelector('.ek-speaking-task').textContent,ordinary.task.text);normal.handle.destroy();
 });
 
-test('only L1 Speaking is added, preserving other lessons, existing content and repeat-load identity',()=>{
- const {app,before,apply}=fixture(),lesson=app.SpaceWhaleContent.find(item=>item.id==='b1-1-w2-l1');
- const added=lesson.stages.filter(stage=>stage.exercise.id===stageId);assert.equal(added.length,1);assert.equal(added[0].role,'final');
- assert.deepEqual(plain(lesson.stages.filter(stage=>stage.exercise.id!==stageId)),before[0].stages);
- assert.deepEqual(plain(lesson.structure.filter(section=>!section.sources.includes(stageId))),before[0].structure);
- for(const key of ['words','teacherInfo','title','id','level','whale'])assert.deepEqual(plain(lesson[key]),before[0][key]);
- assert.deepEqual(plain(app.SpaceWhaleContent.slice(1)),before.slice(1));
+test('four lessons add only paired Speaking, preserving all existing content and repeat-load identity',()=>{
+ const {app,before,apply}=fixture();
+ for(const [index,lesson] of app.SpaceWhaleContent.entries()){
+  const added=lesson.stages.filter(stage=>ownedIds.has(stage.exercise.id));assert.equal(added.length,2);
+  assert.deepEqual(plain(added.map(stage=>stage.role)),['opening','final']);
+  assert.deepEqual(plain(lesson.stages.filter(stage=>!ownedIds.has(stage.exercise.id))),before[index].stages);
+  assert.deepEqual(plain(lesson.structure.filter(section=>!section.sources.some(id=>ownedIds.has(id)))),before[index].structure);
+  for(const key of ['words','teacherInfo','title','id','level','whale'])assert.deepEqual(plain(lesson[key]),before[index][key]);
+  const classroom=lesson.stages.filter(stage=>stage.section!=='self-study');
+  assert.equal(classroom[0].exercise.id,speakingId(index+1,'opening'));assert.equal(classroom.at(-1).exercise.id,speakingId(index+1,'final'));
+ }
  const once=JSON.stringify(app.SpaceWhaleContent);apply();assert.equal(JSON.stringify(app.SpaceWhaleContent),once);
- const catalog=createCatalog(app.SpaceWhaleContent,[]),view=catalog.lessons.find(item=>item.id===lesson.id);
- assert.ok(view.blocks.find(block=>block.id==='final').stageIds.includes(stageId));
- assert.equal(view.stages.filter(stage=>stage.exercise.id===stageId).length,1);
+ const catalog=createCatalog(app.SpaceWhaleContent,[]);
+ for(const [index,lesson] of app.SpaceWhaleContent.entries()){
+  const view=catalog.lessons.find(item=>item.id===lesson.id);
+  for(const role of ['opening','final']){
+   const id=speakingId(index+1,role);assert.ok(view.blocks.find(block=>block.id===role).stageIds.includes(id));
+   assert.equal(view.stages.filter(stage=>stage.exercise.id===id).length,1);
+  }
+ }
  const html=read('classroom.html');assert.ok(html.includes('src="'+extension+'?'));assert.ok(html.indexOf('src="'+extension+'?')>html.indexOf('src="course-content-b11-m2.js?'));
 });
 
@@ -93,4 +109,39 @@ test('student read-only views follow synchronized reveal state without opening s
  const blocked=v.host.querySelector('[aria-label="Show next exercise"]');assert.ok(blocked);assert.equal(blocked.disabled,true);blocked.dispatchEvent(new v.window.Event('click',{bubbles:true}));assert.equal(v.handle.getViewState().revealed,1);
  v.handle.setViewState({revealed:4},false);assert.equal(v.handle.getViewState().revealed,4);assert.equal([...v.host.querySelectorAll('img')].filter(visible).length,4);
  v.handle.setViewState({revealed:2},false);assert.equal(v.handle.getViewState().revealed,2);assert.equal([...v.host.querySelectorAll('img')].filter(visible).length,2);assert.equal([...v.host.querySelectorAll('button')].filter(visible).length,0);v.handle.destroy();
+});
+
+test('L2–L4 mirror the exact uploaded sheets through strict image-only Speaking with no added task or support',()=>{
+ const {app}=fixture();
+ for(const [offset,file] of sheetImages.entries()){
+  const index=offset+1,source='Images/'+file,lesson=app.SpaceWhaleContent[index];
+  const png=fs.readFileSync(path.join(root,source));assert.equal(png.subarray(1,4).toString(),'PNG');assert.equal(png.readUInt32BE(16),1448);assert.equal(png.readUInt32BE(20),1086);
+  const pair=['opening','final'].map(role=>lesson.stages.find(stage=>stage.exercise.id===speakingId(index+1,role)).exercise);
+  for(const def of pair){
+   kit.validate(def);assert.equal(def.kind,'presentation');assert.equal(def.templateCode,'S01');assert.equal(def.layout,'speaking');assert.equal(def.arrangement,'image-only');assert.equal(def.title,'Speaking');
+   assert.equal(def.image.image,source);assert.equal(def.image.imageWidth,1448);assert.equal(def.image.imageHeight,1086);assert.ok(def.image.alt.trim());
+   for(const field of ['task','use','instruction','blocks','answers','teacherNotes','possibleAnswers'])assert.equal(def[field],undefined,def.id+': '+field);
+   const v=mount(def);assert.equal(v.host.querySelectorAll('img').length,1);assert.equal(v.host.querySelector('img').getAttribute('src'),source);assert.equal(v.host.querySelectorAll('input,textarea,select,button,details,.ek-speaking-task,.ek-speaking-use').length,0);assert.deepEqual(kit.grade(def,{}),{});v.handle.destroy();
+  }
+  const normalized=pair.map(def=>{const value=plain(def);delete value.id;return value;});assert.deepEqual(normalized[0],normalized[1]);
+ }
+ const source={id:'strict-image-only-speaking',title:'Speaking',arrangement:'image-only',image:{image:'Images/'+sheetImages[0],alt:'Approved speaking sheet'}};
+ assert.doesNotThrow(()=>kit.speaking(source));
+ for(const extra of [{task:{text:'Extra task'}},{use:[{words:['Extra support']}]}])assert.throws(()=>kit.speaking({...source,...extra}));
+ assert.throws(()=>kit.speaking({...source,image:null}));assert.throws(()=>kit.speaking({...source,image:{imagePending:true,assetId:'missing-sheet'}}));
+});
+
+test('L1 opening and final share the approved scenes while keeping independent progressive state',()=>{
+ const {app}=fixture(),lesson=app.SpaceWhaleContent[0];
+ const opening=lesson.stages.find(stage=>stage.exercise.id===speakingId(1,'opening')).exercise,final=lesson.stages.find(stage=>stage.exercise.id===stageId).exercise;
+ assert.equal(opening.title,title);assert.equal(opening.progressive,true);assert.equal(opening.exercises.length,5);
+ assert.deepEqual(plain(opening.exercises.map(block=>block.id)),plain(final.exercises.map(block=>block.id)));
+ const openingIds=opening.exercises.map(block=>block.exercise.id),finalIds=final.exercises.map(block=>block.exercise.id);
+ assert.deepEqual(plain(openingIds),images.map(([name])=>'B11M02L01_S01_OPENING_'+name));assert.equal(openingIds.some(id=>finalIds.includes(id)),false);
+ const content=def=>{const value=plain(def);delete value.id;value.exercises.forEach(block=>delete block.exercise.id);return value;};
+ assert.deepEqual(content(opening),content(final));
+ const first=mount(opening),last=mount(final);
+ first.handle.setViewState({revealed:4},false);assert.equal(first.handle.getViewState().revealed,4);assert.equal(last.handle.getViewState().revealed,1);
+ last.handle.setViewState({revealed:2},false);assert.equal(last.handle.getViewState().revealed,2);assert.equal(first.handle.getViewState().revealed,4);
+ first.handle.destroy();last.handle.destroy();
 });
