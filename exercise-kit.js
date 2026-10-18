@@ -171,7 +171,8 @@
         }
         array(def.use, 'Speaking Use');
         def.use.forEach(group => {
-          only(group, ['words','phrases'], 'Speaking Use group');
+          only(group, ['words','phrases','emphasizeWords'], 'Speaking Use group');
+          if(group.emphasizeWords!=null&&typeof group.emphasizeWords!=='boolean')fail('Speaking emphasizeWords must be boolean');
           for (const field of ['words','phrases']) {
             if (group[field] != null && !Array.isArray(group[field])) fail(`Speaking ${field}: expected a list`);
             (group[field] || []).forEach(value => text(value, `Speaking ${field}`));
@@ -1172,7 +1173,14 @@
           use.append(node('strong', 'ek-speaking-use-title', 'Use:'));
           def.use.forEach(group => {
             const content = node('div', 'ek-speaking-group');
-            if (group.words?.length) content.append(node('p', 'ek-copy ek-speaking-words', group.words.join(' · ')));
+            if (group.words?.length) {
+              const words=node('p','ek-copy ek-speaking-words');
+              group.words.forEach((word,index)=>{
+                if(index)words.append(doc.createTextNode(' · '));
+                words.append(group.emphasizeWords?node('strong','',word):doc.createTextNode(word));
+              });
+              content.append(words);
+            }
             (group.phrases||[]).forEach(phrase=>content.append(node('p', 'ek-copy ek-speaking-phrases', phrase)));
             use.append(content);
           });

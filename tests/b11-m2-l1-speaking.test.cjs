@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(roo
 const extension='course-content-b11-m2-speaking.js',stageId='B11M02L01_S01_FINAL';
 const title='Explain how different choices would have changed the results.';
 const words=['submit an application','get a qualification','miss an opportunity','achieve a goal','postpone a decision','face difficulties'];
-const phrases=['1. If … had / hadn’t …, … would / wouldn’t have …','2. … would / wouldn’t have … if … had / hadn’t …','get — got — gotten'];
+const phrases=['If … had (not) …, … would (not) have …','… would (not) have … if … had (not) …'];
 const images=[
  ['NINA','20a43a8d-28ba-43ee-b460-2d2665fcd781.png'],
  ['ALEX','08c25ebd-ecde-484d-a268-13991d22dbd7.png'],
@@ -20,7 +20,7 @@ const sheetImages=[
 const sheetContent=[
  {
   title:'Difficult decisions',
-  task:{text:'These situations happened at work last month. Ask your tutor what they would have done. Then answer the same questions as a member of the team and compare the decisions.'},
+  task:{text:'Ask your tutor what they would have done. Then say what you would have done.'},
   words:['be under pressure','take on responsibility','express concerns','look into the problem','explore alternatives','reach an agreement'],
   phrases:['Would you have ... if ... had / hadn’t ...?','What / How would you have ...?','Yes, I would have. · No, I wouldn’t have.','If I’d ..., I’d have ...','I would’ve ... · I wouldn’t have ...']
  },
@@ -55,6 +55,12 @@ function mount(def,config={}){
 }
 const visible=element=>{for(let current=element;current;current=current.parentElement)if(current.hidden||current.inert)return false;return true;};
 const sceneInput=()=>({id:'shared-image-support-contract',title,image:null,arrangement:'image-support',use:[{words,phrases}]});
+function checkTargetEmphasis(host,expectedWords){
+ assert.deepEqual([...host.querySelectorAll('.ek-speaking-words strong')].map(element=>element.textContent),expectedWords);
+ assert.equal(host.querySelector('.ek-speaking-words').textContent,expectedWords.join(' · '));
+ assert.deepEqual([...host.querySelectorAll('.ek-speaking-use strong')].map(element=>element.textContent),['Use:',...expectedWords]);
+ assert.equal(host.querySelectorAll('.ek-speaking-words b,.ek-speaking-phrases strong,.ek-speaking-phrases b').length,0);
+}
 
 test('image/support Speaking is opt-in; ordinary Speaking keeps its original task contract and order',()=>{
  const variant=kit.speaking(sceneInput());assert.equal(variant.task,undefined);
@@ -65,7 +71,7 @@ test('image/support Speaking is opt-in; ordinary Speaking keeps its original tas
  const normal=mount(kit.speaking(ordinary));
  assert.equal(normal.host.querySelectorAll('.ek-speaking-aside').length,0);
  assert.deepEqual([...normal.host.querySelector('.ek-body').children].map(element=>element.className),['ek-speaking-image','ek-speaking-task','ek-speaking-use']);
- assert.equal(normal.host.querySelector('.ek-speaking-task').textContent,ordinary.task.text);normal.handle.destroy();
+ assert.equal(normal.host.querySelector('.ek-speaking-task').textContent,ordinary.task.text);assert.equal(normal.host.querySelectorAll('.ek-speaking-words strong').length,0);normal.handle.destroy();
  const below=mount(kit.speaking({...sceneInput(),arrangement:'image-support-below'}));
  assert.equal(below.host.querySelectorAll('.ek-speaking-image-wide').length,1);assert.equal(below.host.querySelectorAll('.ek-speaking-aside,.ek-speaking-task').length,0);
  assert.deepEqual([...below.host.querySelector('.ek-body').children].map(element=>element.className),['ek-speaking-image ek-speaking-image-wide','ek-speaking-use']);
@@ -104,11 +110,11 @@ test('five approved PNGs and target supports use the shared S01 variant without 
   assert.equal(scene.image.image,source);assert.equal(scene.image.imageWidth,1484);assert.equal(scene.image.imageHeight,1060);assert.ok(scene.image.alt.trim());
   const png=fs.readFileSync(path.join(root,source));assert.equal(png.subarray(1,4).toString(),'PNG');assert.equal(png.readUInt32BE(16),1484);assert.equal(png.readUInt32BE(20),1060);
   assert.deepEqual(plain(scene.use.flatMap(group=>group.words||[])),words);assert.deepEqual(plain(scene.use.flatMap(group=>group.phrases||[])),phrases);
-  assert.deepEqual(plain(scene.use),[{words,phrases:phrases.slice(0,2)},{phrases:phrases.slice(2)}]);
+  assert.deepEqual(plain(scene.use),[{words,emphasizeWords:true,phrases}]);
   for(const field of ['task','instruction','blocks','answers','teacherNotes','possibleAnswers'])assert.equal(scene[field],undefined,scene.id+': '+field);
   const v=mount(scene);assert.equal(v.host.querySelectorAll('input,textarea,select,button,details,.ek-speaking-task,.ek-speaking-aside').length,0);assert.equal(v.host.querySelectorAll('.ek-speaking-image-wide img').length,1);
   assert.deepEqual([...v.host.querySelector('.ek-body').children].map(element=>element.className),['ek-speaking-image ek-speaking-image-wide','ek-speaking-use']);
-  assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,2);assert.deepEqual([...v.host.querySelectorAll('.ek-speaking-phrases')].map(element=>element.textContent),phrases);assert.deepEqual(kit.grade(scene,{}),{});v.handle.destroy();
+  assert.equal(v.host.querySelectorAll('.ek-speaking-group').length,1);assert.deepEqual([...v.host.querySelectorAll('.ek-speaking-phrases')].map(element=>element.textContent),phrases);checkTargetEmphasis(v.host,words);assert.doesNotMatch(v.host.textContent,/get — got — gotten|1\. If|2\. …/);assert.deepEqual(kit.grade(scene,{}),{});v.handle.destroy();
  }
 });
 
@@ -147,14 +153,14 @@ test('L2–L4 mirror their approved sheets, exact tasks and Use in the completed
   for(const def of pair){
    kit.validate(def);assert.equal(def.kind,'presentation');assert.equal(def.templateCode,'S01');assert.equal(def.layout,'speaking');assert.equal(def.arrangement,undefined);assert.equal(def.title,content.title);assert.deepEqual(plain(def.task),content.task);
    assert.equal(def.image.image,source);assert.equal(def.image.imageWidth,1448);assert.equal(def.image.imageHeight,1086);assert.ok(def.image.alt.trim());
-   assert.deepEqual(plain(def.use),[{words:content.words,phrases:content.phrases}]);
+   assert.deepEqual(plain(def.use),[{words:content.words,emphasizeWords:true,phrases:content.phrases}]);
    for(const field of ['instruction','blocks','answers','teacherNotes','possibleAnswers'])assert.equal(def[field],undefined,def.id+': '+field);
    const v=mount(def);assert.equal(v.host.querySelectorAll('img').length,1);assert.equal(v.host.querySelector('img').getAttribute('src'),source);assert.equal(v.host.querySelectorAll('input,textarea,select,button,details').length,0);
    assert.deepEqual([...v.host.querySelector('.ek-body').children].map(element=>element.className),['ek-speaking-image','ek-speaking-task','ek-speaking-use']);
    assert.equal(v.host.querySelectorAll('h2').length,1);assert.equal(v.host.querySelector('h2').textContent,content.title);assert.equal(v.host.querySelector('.ek-speaking-task > p').textContent,content.task.text);
    assert.deepEqual([...v.host.querySelectorAll('.ek-speaking-bullets li')].map(element=>element.textContent),content.task.bullets||[]);
    assert.equal(v.host.querySelector('.ek-speaking-words').textContent,content.words.join(' · '));assert.deepEqual([...v.host.querySelectorAll('.ek-speaking-phrases')].map(element=>element.textContent),content.phrases);
-   assert.deepEqual([...v.host.querySelectorAll('.ek-speaking-use strong')].map(element=>element.textContent),['Use:']);assert.doesNotMatch(v.host.textContent,/Words:|Phrases:|Useful language:|Possible answers/);assert.deepEqual(kit.grade(def,{}),{});v.handle.destroy();
+   checkTargetEmphasis(v.host,content.words);assert.doesNotMatch(v.host.textContent,/Words:|Phrases:|Useful language:|Possible answers/);assert.deepEqual(kit.grade(def,{}),{});v.handle.destroy();
   }
   const normalized=pair.map(def=>{const value=plain(def);delete value.id;return value;});assert.deepEqual(normalized[0],normalized[1]);
  }

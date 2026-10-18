@@ -15,12 +15,13 @@
     ['EVA','3ee93026-6da1-4423-bc18-f7b56af45231.png','Eva learns English and understands instructions at work.']
   ];
   const use=[{
+    emphasizeWords:true,
     words:['submit an application','get a qualification','miss an opportunity','achieve a goal','postpone a decision','face difficulties'],
     phrases:[
-      '1. If … had / hadn’t …, … would / wouldn’t have …',
-      '2. … would / wouldn’t have … if … had / hadn’t …'
+      'If … had (not) …, … would (not) have …',
+      '… would (not) have … if … had (not) …'
     ]
-  },{phrases:['get — got — gotten']}];
+  }];
   const careerSpeaking=role=>({
     version:1,id:'B11M02L01_S01_'+role.toUpperCase(),kind:'stage',templateRole:'composition',
     title,progressive:true,
@@ -42,8 +43,9 @@
   const tasks={
     2:{
       title:'Difficult decisions',
-      task:{text:'These situations happened at work last month. Ask your tutor what they would have done. Then answer the same questions as a member of the team and compare the decisions.'},
+      task:{text:'Ask your tutor what they would have done. Then say what you would have done.'},
       use:[{
+        emphasizeWords:true,
         words:['be under pressure','take on responsibility','express concerns','look into the problem','explore alternatives','reach an agreement'],
         phrases:[
           'Would you have ... if ... had / hadn’t ...?',
@@ -61,6 +63,7 @@
         'say what they wish had been different.'
       ]},
       use:[{
+        emphasizeWords:true,
         words:['disappointed','embarrassed','guilty','ashamed','miserable','betrayed'],
         phrases:['I feel ...','I wish I had / hadn’t ...','If only I had / hadn’t ...','I wish I’d ...','If only ... hadn’t ...']
       }]
@@ -72,6 +75,7 @@
         'explain how a different personality would change the situation or result.'
       ]},
       use:[{
+        emphasizeWords:true,
         words:['independent','reliable','competitive','self-confident','determined','stubborn'],
         phrases:[
           'If ... were / weren’t ..., ... would / wouldn’t ...',

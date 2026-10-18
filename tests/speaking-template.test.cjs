@@ -52,6 +52,7 @@ test('Speaking rejects extra UI fields, unsafe media and empty support instead o
   }
   assert.throws(()=>kit.speaking({...input(),use:[{words:['word'],title:'Words'}]}),/unsupported field/);
   assert.throws(()=>kit.speaking({...input(),use:[{}]}),/must contain/);
+  assert.throws(()=>kit.speaking({...input(),use:[{words:['word'],emphasizeWords:'yes'}]}),/must be boolean/);
   assert.throws(()=>kit.speaking({...input(),image:{image:'javascript:alert(1)',alt:'Image'}}),/Unsupported image URL/);
   assert.throws(()=>kit.speaking({...input(),layout:'custom'}),/shared presentation/);
   const definition=kit.speaking(input());definition.blocks=[];
