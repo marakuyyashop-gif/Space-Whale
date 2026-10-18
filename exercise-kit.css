@@ -73,6 +73,10 @@
 .exercise-kit :is(strong,b) { font-family: inherit; font-size: inherit; line-height: inherit; font-weight: var(--sw-exercise-emphasis-weight,650); color: var(--sw-exercise-emphasis-ink,var(--ek-ink)); }
 /* Fixed Speaking composition. Content cannot introduce panels or controls. */
 .exercise-kit .ek-speaking-image > .ek-image { display: block; width: auto; max-width: min(100%, 560px); height: auto; margin: 0; border-radius: var(--ek-radius); }
+.exercise-kit .ek-speaking-aside { display:flex; flex-wrap:wrap; gap:var(--sw-component-gap,24px); align-items:flex-start; }
+.exercise-kit .ek-speaking-aside > :is(.ek-speaking-image,.ek-speaking-support) { flex:1 1 260px; min-width:0; max-width:100%; }
+.exercise-kit .ek-speaking-support { display:grid; gap:var(--sw-component-gap,24px); }
+.exercise-kit .ek-speaking-aside > .ek-speaking-image > .ek-image { width:100%; max-width:100%; height:auto; max-height:none; object-fit:contain; }
 .exercise-kit .ek-speaking-task, .exercise-kit .ek-speaking-use, .exercise-kit .ek-speaking-group { min-width: 0; }
 .exercise-kit .ek-speaking-bullets { margin: 8px 0 0; padding-left: 1.4em; }
 .exercise-kit .ek-speaking-use { display: grid; gap: 16px; }

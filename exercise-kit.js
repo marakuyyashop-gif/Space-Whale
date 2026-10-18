@@ -147,17 +147,20 @@
           for (const field of Object.keys(object)) if (!allowed.includes(field)) fail(`${name}: unsupported field ${field}`);
         };
         // Catalog metadata is never rendered as exercise content.
-        only(def, ['version','id','kind','layout','title','image','task','use','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs','templateCode','templatePart','templateRole'], 'Speaking');
+        only(def, ['version','id','kind','layout','title','image','task','use','arrangement','label','catalogGroup','legacyIds','description','code','catalogFamily','catalogTitle','sourceRefs','templateCode','templatePart','templateRole'], 'Speaking');
+        if(def.arrangement!=null&&def.arrangement!=='image-support')fail('Unsupported Speaking arrangement');
         if (def.image !== null) {
           only(def.image, ['image','alt','imageWidth','imageHeight','crop','assetId','imagePending'], 'Speaking image');
           if (!def.image.imagePending) text(def.image.image, 'image');
           media(def.image);
         }
-        only(def.task, ['text','bullets'], 'Speaking task');
-        text(def.task.text, 'Speaking task text');
-        if (def.task.bullets != null) {
-          if (!Array.isArray(def.task.bullets)) fail('Speaking bullets: expected a list');
-          def.task.bullets.forEach(value => text(value, 'Speaking bullet'));
+        if(def.task!=null||def.arrangement!=='image-support'){
+          only(def.task, ['text','bullets'], 'Speaking task');
+          text(def.task.text, 'Speaking task text');
+          if (def.task.bullets != null) {
+            if (!Array.isArray(def.task.bullets)) fail('Speaking bullets: expected a list');
+            def.task.bullets.forEach(value => text(value, 'Speaking bullet'));
+          }
         }
         array(def.use, 'Speaking Use');
         def.use.forEach(group => {
@@ -1148,9 +1151,9 @@
         if (def.image?.image) picture.append(illustration(def.image));
         else if(def.catalogFamily==='S'&&def.image?.imagePending){picture.append(node('div','ek-template-image','[Image]'));}
         else picture.hidden = true;
-        const task = node('div', 'ek-speaking-task');
-        task.append(node('p', 'ek-copy', def.task.text));
-        if (def.task.bullets?.length) {
+        const task = def.task ? node('div', 'ek-speaking-task') : null;
+        if(task)task.append(node('p', 'ek-copy', def.task.text));
+        if (def.task?.bullets?.length) {
           const list = node('ul', 'ek-speaking-bullets');
           def.task.bullets.forEach(text => list.append(node('li', '', text)));
           task.append(list);
@@ -1163,7 +1166,11 @@
           if (group.phrases?.length) content.append(node('p', 'ek-copy ek-speaking-phrases', group.phrases.join('\n')));
           use.append(content);
         });
-        body.append(picture, task, use);
+        if(def.arrangement==='image-support'){
+          const row=node('div','ek-speaking-aside'),support=node('div','ek-speaking-support');
+          if(task)support.append(task);
+          support.append(use);row.append(picture,support);body.append(row);
+        }else body.append(picture, task, use);
       } else if (def.kind === 'presentation') {
         const renderBlock=block=>{
           if(block.type==='image')return illustration(block);

@@ -8,6 +8,8 @@ Every new exercise declares an existing `templateCode` and fills its compatible 
 
 All new or revised Speaking uses `SpaceWhaleExerciseKit.speaking(...)`: **title → image slot → task → Use:**. See [SPEAKING_TEMPLATE.md](SPEAKING_TEMPLATE.md) for the exact schema and authoring process. The renderer fixes this order, prints one bold `Use:`, places words before phrase models in each group, and supplies no disclosures, teacher notes, Test label or exercise buttons. Missing artwork leaves a hidden slot. Extra content/layout fields are rejected. The same renderer is used in the catalog and every lesson, including live teacher/student views. Legacy presentation Speaking receives the same template identity and shared visual classes while retaining its original blocks, disclosures and role cards; only an explicitly requested content revision may replace those structures.
 
+The owner-approved `arrangement:'image-support'` is an opt-in within the same Speaking factory: one brief title, image left and Use right, wrapping at the actual content width. Only this arrangement permits omitting `task` when the title is the full instruction. Original media proportions and all default Speaking behavior remain intact. Native progressive stages reveal multiple pictures through teacher arrows; do not create lesson-specific windows or markup.
+
 ## One source of truth
 
 - `exercise-template-profiles.js`: canonical visual settings for all 79 approved source templates, including compatible parts of compound templates. Edit a profile once to update its catalog preview, course exercises and homework on their next mount.
