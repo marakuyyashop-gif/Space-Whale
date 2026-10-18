@@ -32,6 +32,8 @@
     "The team faced difficulties because they had very little time."
   ]
 ];
+  const audioRoot = 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/b1-1/w2/l1/p01/';
+  const clipUrl = (number, type) => audioRoot + 'B11_M02_L01_P01_' + number + '_' + type + '.mp3';
   const exercise = {
     version: 1,
     id: 'B11M02L01_P01',
@@ -39,12 +41,16 @@
     kind: 'audio',
     layout: 'listen-repeat',
     title: 'Listen and repeat.',
-    audioPending: true,
-    items: pairs.map(([word, example], i) => ({
-      id: 'B11_M02_L01_P01_' + String(i + 1).padStart(2, '0'),
-      text: word,
-      example
-    }))
+    items: pairs.map(([word, example], i) => {
+      const number = String(i + 1).padStart(2, '0');
+      return {
+        id: 'B11_M02_L01_P01_' + number,
+        text: word,
+        audio: clipUrl(number, 'word'),
+        example,
+        exampleAudio: clipUrl(number, 'example')
+      };
+    })
   };
   kit.validate(exercise);
   const lessonIndex = (window.SpaceWhaleContent || []).findIndex(lesson => lesson.id === 'b1-1-w2-l1');
