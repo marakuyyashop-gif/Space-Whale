@@ -1,6 +1,7 @@
-/* B1.1 / Module 2 — approved Discovery and Rule, lessons 1–4.
- * Content source: Pasted text(20261018-123813).txt.
- * D01 / D04 / R01 / R02 own the shared presentation; this file supplies content only.
+/* B1.1 / Module 2 — approved compact Discovery and Rule, lessons 1–4.
+ * Source: final revision in Pasted text(20261018-142148).txt.
+ * Shared templates own all appearance. Historical IDs stay stable even when
+ * the revised L3 teaching purpose changes its explicit templateCode to D02.
  */
 (() => {
   'use strict';
@@ -9,154 +10,126 @@
   const exercise = (id, templateCode, kind, title, content) => ({version:1,id,templateCode,kind,title,...content});
   const text = (copy, highlights) => ({type:'text',text:copy,...(highlights?.length ? {highlights} : {})});
   const models = (copy, highlights) => ({type:'text',role:'examples',text:copy,highlights});
-  const pair = (label, fact, imagined, highlights) => ({
-    type:'rule', title:label, text:fact, examples:[imagined], highlights
+  const formula = (copy, highlights) => ({type:'rule',formula:copy,highlights});
+  const gap = (id, options, answer) => ({id,options,answers:[answer]});
+  // Source models and their conclusion are one compact task with one OK.
+  // Direct response children keep the existing teacher-arrow check gate.
+  const discovery = (prefix, title, blocks, items) => ({
+    version:1,id:prefix+'_DISCOVERY',kind:'stage',templateRole:'composition',
+    title,instruction:'Choose the correct options.',layout:'grouped',
+    exercises:[
+      {id:'models',exercise:exercise(prefix+'_DISCOVERY_MODELS','D01','presentation',title,{
+        templatePart:'oral-conclusion',templateRole:'material',blocks
+      })},
+      {id:'conclusion',exercise:exercise(prefix+'_CONCLUSION','D01','gaps',title,{
+        templatePart:'$.blocks[1].exercise',inputMode:'select',items
+      })}
+    ]
   });
-  const conclusion = (prefix, title, items) => ({
-    type:'exercise', id:'conclusion',
-    exercise:exercise(prefix+'_CONCLUSION','D01','gaps',title,{
-      templatePart:'$.blocks[1].exercise',inputMode:'select',items
-    })
-  });
-  // The shared progressive-stage gate recognizes direct response children.
-  // Keep the source models and conclusion together, with the response visible
-  // to that gate, so Rule cannot open before the conclusion is checked/skipped.
-  const groupedDiscovery = definition => {
-    if (definition.kind !== 'rule-page') return definition;
-    const response = definition.blocks.find(block => block.type === 'exercise');
-    return {
-      version:1,id:definition.id,kind:'stage',templateRole:'composition',
-      title:definition.title,instruction:definition.instruction,layout:'grouped',
-      exercises:[
-        {id:'models',exercise:{
-          version:1,id:definition.id+'_MODELS',kind:'presentation',templateCode:'D01',templatePart:'oral-conclusion',templateRole:'material',
-          title:definition.title,blocks:definition.blocks.filter(block => block.type !== 'exercise').map(block => {
-            const copy = [block.title ? block.title+'.' : '',block.text,...(block.examples || [])].filter(Boolean).join('\n');
-            return text(copy,block.highlights);
-          })
-        }},
-        {id:response.id,exercise:response.exercise}
-      ]
-    };
-  };
 
   const additions = [
     {
       lessonId:'b1-1-w2-l1',
-      discovery:exercise('B11M02L01_D01_DISCOVERY','D01','rule-page','A different past',{
-        instruction:'Read the examples. Choose the correct options to complete the rule below.',
+      discovery:discovery('B11M02L01_D01','Read the examples and complete the rule.',[
+        text('I postponed my decision and missed an opportunity.\nIf I hadn’t postponed my decision, I wouldn’t have missed the opportunity.', ['hadn’t postponed','wouldn’t have missed']),
+        text('I didn’t finish the course, so I didn’t get a qualification.\nI would have gotten a qualification if I had finished the course.', ['would have gotten','had finished'])
+      ],[
+        {id:'meaning',segments:['These sentences imagine a different ',gap('time',['future','past'],'past'),'.']},
+        {id:'condition',segments:['In the if-part, we use ',gap('if-form',['had','would'],'had'),' + V3. The negative form is hadn’t + V3.']},
+        {id:'result',segments:['For the imagined result, we use would / wouldn’t + ',gap('result-form',['had','have'],'have'),' + V3.']}
+      ]),
+      rule:exercise('B11M02L01_R01_RULE','R01','rule-page','Third Conditional: a different past',{
         blocks:[
-          text('What really happened → What I imagine now'),
-          pair('A','I postponed my decision and missed an opportunity.',
-            'If I hadn’t postponed my decision, I wouldn’t have missed the opportunity.',
-            ['hadn’t postponed','wouldn’t have missed']),
-          pair('B','I didn’t finish the course, so I didn’t get a qualification.',
-            'I would have gotten a qualification if I had finished the course.',
-            ['would have gotten','had finished']),
-          pair('C','I faced difficulties with the computer program and finished the project late.',
-            'If I hadn’t faced these difficulties, I would have finished the project on time.',
-            ['hadn’t faced','would have finished']),
-          conclusion('B11M02L01_D01','A different past',[
-            {id:'meaning',segments:['These sentences imagine a different ',{id:'time',options:['future','past'],answers:['past']},'.']},
-            {id:'condition',segments:['In the if-part, we use ',{id:'if-form',options:['had','would'],answers:['had']},' or hadn’t + the third form of the verb.']},
-            {id:'result',segments:['For the imagined result, we use would / wouldn’t + ',{id:'result-form',options:['had','have'],answers:['have']},' + the third form of the verb.']}
-          ])
-        ]
-      }),
-      rule:exercise('B11M02L01_R01_RULE','R01','rule-page','Third Conditional: imagining a different past',{
-        blocks:[
-          text('We use the Third Conditional to imagine a different past situation and a different past result. The real events are already over; we cannot change them.'),
-          text('The if-part gives the imagined situation. Use the Past Perfect: had / hadn’t + V3. The other part gives the imagined result: would / wouldn’t have + V3. V3 is the third form of the verb, such as finished or taken.', ['had / hadn’t + V3','would / wouldn’t have + V3']),
-          {type:'rule',formula:'If + subject + had / hadn’t + V3, subject + would / wouldn’t have + V3.',highlights:['had / hadn’t + V3','would / wouldn’t have + V3']},
-          text('Each part can be positive or negative. Choose the form that expresses your meaning:'),
+          text('We use the Third Conditional to imagine that a past situation was different and to describe a different past result. The real events are already over and cannot change.'),
+          text('Use had / hadn’t + V3 in the if-part.', ['had / hadn’t + V3']),
+          text('Use would / wouldn’t have + V3 for the imagined result.', ['would / wouldn’t have + V3']),
+          formula('If + subject + had / hadn’t + V3, subject + would / wouldn’t have + V3.', ['had / hadn’t + V3','would / wouldn’t have + V3']),
           models('If I had submitted my application on time, I wouldn’t have missed the opportunity.\nIf I hadn’t faced so many difficulties, I would have achieved my goal.', ['had submitted','wouldn’t have missed','hadn’t faced','would have achieved']),
-          text('You can put either part first. Use a comma when the if-part comes first. When it comes second, you usually do not need a comma:'),
-          models('I would have achieved my goal if I hadn’t faced so many difficulties.', ['would have achieved','hadn’t faced']),
-          text('In this model, would belongs in the result, not in the if-part.', ['would']),
-          text('For get, we use the American English forms get — got — gotten:'),
+          text('Either part can come first:'),
+          models('If I hadn’t faced so many difficulties, I would have achieved my goal.\nI would have achieved my goal if I hadn’t faced so many difficulties.', ['hadn’t faced','would have achieved']),
+          text('Use a comma when the if-part comes first. Do not use would in the if-part.', ['would']),
+          text('In American English, the third form of get is usually gotten:'),
+          text('get → got → gotten', ['gotten']),
           models('If I had finished the course, I would have gotten a qualification.', ['had finished','would have gotten'])
         ]
       })
     },
     {
       lessonId:'b1-1-w2-l2',
-      discovery:exercise('B11M02L02_D01_DISCOVERY','D01','rule-page','Looking back at a difficult decision',{
-        instruction:'Read the conversations. Choose the correct options to complete the rule.',
+      discovery:discovery('B11M02L02_D01','Read the examples and complete the rule.',[
+        text('— Would you have taken on responsibility if you had known about the problem?\n— Yes, I would have.', ['Would you have taken on','had known','would have']),
+        text('What would you have done if the team hadn’t reached an agreement?', ['What would you have done','hadn’t reached'])
+      ],[
+        {id:'question-order',segments:['In a yes/no question, would comes ',gap('would-position',['after','before'],'before'),' the subject.']},
+        {id:'question-word',segments:['In a question with what, the question word comes ',gap('what-position',['before','after'],'before'),' would.']},
+        {id:'condition',segments:['The if-part uses ',gap('if-form',['would have','had'],'had'),' or hadn’t + V3.']}
+      ]),
+      rule:exercise('B11M02L02_R01_RULE','R01','rule-page','Third Conditional: questions',{
         blocks:[
-          text('Two colleagues are discussing different choices after a difficult project.'),
-          {type:'text',title:'A',text:'— Would you have expressed your concerns if you had known about the problem?\n— Yes, I would have.',highlights:['Would you have expressed','had known','would have']},
-          {type:'text',title:'B',text:'— Would you have taken on responsibility for the project if you had been under pressure?\n— No, I wouldn’t have.',highlights:['Would you have taken on','had been','wouldn’t have']},
-          {type:'text',title:'C',text:'— What would you have done if the team hadn’t reached an agreement?\n— I would have explored alternatives.',highlights:['What would you have done','hadn’t reached','would have explored']},
-          conclusion('B11M02L02_D01','Looking back at a difficult decision',[
-            {id:'question-order',segments:['In these questions, would comes ',{id:'would-position',options:['after','before'],answers:['before']},' the person: you.']},
-            {id:'question-word',segments:['The question word What comes ',{id:'what-position',options:['before','after'],answers:['before']},' would.']},
-            {id:'condition',segments:['The if-part keeps ',{id:'if-form',options:['would have','had or hadn’t'],answers:['had or hadn’t']},' + the third form of the verb.']}
-          ])
-        ]
-      }),
-      rule:exercise('B11M02L02_R01_RULE','R01','rule-page','Third Conditional: questions and short answers',{
-        blocks:[
-          text('To ask about a different past choice or result, put would before the subject. Keep have + V3 after the subject:', ['would','have + V3']),
-          {type:'rule',formula:'Would + subject + have + V3 …?',highlights:['Would','have + V3']},
-          models('Would you have taken on responsibility if you had known about the difficulties?', ['Would you have taken on','had known']),
-          text('The if-part keeps its usual order: subject + had / hadn’t + V3.', ['had / hadn’t + V3']),
-          text('To ask for information, put What or How before would:', ['What','How','would']),
-          models('What would you have done if you had been under pressure?\nHow would the decision have changed if the team had looked into the problem earlier?', ['What would you have done','had been','How would the decision have changed','had looked into']),
-          text('For a yes/no question, you can give a short answer: Yes, I would have. / No, I wouldn’t have. A What or How question needs information: I would have expressed my concerns.', ['Yes, I would have.','No, I wouldn’t have.','would have expressed']),
-          text('In conversation, we often use contractions. Look at what follows ’d to understand it:'),
-          {type:'rule',title:'Contraction → Full form',examples:[
-            'If I’d known … → If I had known …',
-            'I’d have expressed my concerns. → I would have expressed my concerns.',
-            'I would’ve expressed my concerns. → I would have expressed my concerns.'
-          ],highlights:['I’d known','I had known','I’d have expressed','I would’ve expressed','I would have expressed']},
-          text('In would have + V3, have is usually weak in connected speech: /əv/. This gives the sound of would’ve. The have is still part of the construction.', ['would have + V3','/əv/','would’ve'])
+          text('For a yes/no question, put would before the subject:', ['would']),
+          formula('Would + subject + have + V3 …?', ['Would','have + V3']),
+          models('Would you have taken on responsibility if you had known about the problem?', ['Would you have taken on','had known']),
+          text('Short answers:'),
+          models('Yes, I would have.\nNo, I wouldn’t have.', ['would have','wouldn’t have']),
+          text('For a question with what or how, put the question word before would:', ['what','how','would']),
+          formula('What / How + would + subject + have + V3 …?', ['What / How','would','have + V3']),
+          models('What would you have done if the team hadn’t reached an agreement?', ['What would you have done','hadn’t reached']),
+          text('The if-part keeps the same form:'),
+          formula('subject + had / hadn’t + V3', ['had / hadn’t + V3']),
+          text('In conversation, we often use contractions:'),
+          models('If I’d known … = If I had known …\nI’d have expressed my concerns. = I would have expressed my concerns.\nI would’ve expressed my concerns. = I would have expressed my concerns.', ['I’d known','had known','I’d have expressed','would have expressed','I would’ve expressed']),
+          text('In would have + V3, have is usually unstressed.', ['would have + V3','have'])
         ]
       })
     },
     {
       lessonId:'b1-1-w2-l3',
-      discovery:exercise('B11M02L03_D01_DISCOVERY','D01','rule-page','Regrets about the past',{
-        instruction:'Read the facts and regrets. Choose the correct options to complete the rule.',
-        blocks:[
-          text('What really happened → My regret'),
-          pair('A','I didn’t apologize to Nina. I feel guilty.',
-            'I wish I had apologized to Nina.', ['I wish','had apologized']),
-          pair('B','I laughed at a colleague’s mistake. I feel ashamed.',
-            'If only I hadn’t laughed at her mistake.', ['If only','hadn’t laughed']),
-          pair('C','My friend shared my private messages. I feel betrayed.',
-            'I wish she hadn’t shared my private messages.', ['I wish','hadn’t shared']),
-          conclusion('B11M02L03_D01','Regrets about the past',[
-            {id:'meaning',segments:['These regrets are about the ',{id:'time',options:['past','future'],answers:['past']},'.']},
-            {id:'form',segments:['After I wish / If only, we use a person + ',{id:'regret-form',options:['would','had or hadn’t'],answers:['had or hadn’t']},' + the third form of the verb.']},
-            {id:'facts',segments:['In A, I ',{id:'fact-a',options:['did','didn’t'],answers:['didn’t']},' apologize. In B and C, the actions ',{id:'facts-b-c',options:['happened','didn’t happen'],answers:['happened']},', and I regret them now.']}
-          ])
+      discovery:exercise('B11M02L03_D01_DISCOVERY','D02','gaps','Read the examples and choose the correct meanings.',{
+        templatePart:'legacy-inline-meaning',inputMode:'select',preserveLines:true,
+        items:[
+          {id:'meaning',highlights:['I wish','had apologized'],segments:[
+            'I feel guilty. I wish I had apologized.\nThis means: ',
+            gap('regret-meaning',['I plan to apologize later.','I regret not apologizing.'],'I regret not apologizing.')
+          ]},
+          {id:'facts',highlights:['If only','hadn’t laughed'],segments:[
+            'I feel ashamed. If only I hadn’t laughed at her mistake.\nWhat really happened? ',
+            gap('real-event',['I laughed at her mistake.','I didn’t laugh at her mistake.'],'I laughed at her mistake.')
+          ]},
+          {id:'time',segments:['Both speakers want to change something in the ',gap('time',['future','past'],'past'),'.']}
         ]
       }),
       rule:exercise('B11M02L03_R02_RULE','R02','rule-page','A regret or a different past result?',{
         blocks:[
-          text('Use I wish / If only to say what you would like to change about the past. Use the Third Conditional to connect a different past situation with an imagined result.'),
-          {type:'text',title:'Expressing a regret',text:'After I wish / If only, use the Past Perfect: subject + had / hadn’t + V3. The past cannot change, but you want it to be different.',highlights:['I wish / If only','had / hadn’t + V3']},
-          models('I didn’t apologize. → I wish I had apologized.\nI laughed at her mistake. → If only I hadn’t laughed at her mistake.', ['I wish','had apologized','If only','hadn’t laughed']),
-          text('The positive and negative forms show how you now want the past to be different. You can also regret another person’s action: I wish she hadn’t shared my messages.', ['I wish','hadn’t shared']),
-          text('If only usually expresses a stronger feeling than I wish. Here, ’d means had: I wish I’d apologized = I wish I had apologized. For these past regrets, use had / hadn’t, not would.', ['I’d apologized','had apologized','had / hadn’t']),
-          {type:'text',title:'Imagining a different result',text:'I didn’t apologize after our argument, and we didn’t reach an agreement. Compare two ways to look back at this:'},
-          models('I wish I had apologized. — I regret not apologizing.\nIf I had apologized, we would have reached an agreement. — I imagine both a different past action and its result.', ['I wish','had apologized','would have reached'])
+          text('Use I wish / If only + Past Perfect to express regret about the past.', ['I wish / If only + Past Perfect']),
+          formula('I wish / If only + subject + had / hadn’t + V3', ['I wish / If only','had / hadn’t + V3']),
+          models('I didn’t apologize.\nI wish I had apologized.', ['I wish','had apologized']),
+          models('I laughed at her mistake.\nIf only I hadn’t laughed at her mistake.', ['If only','hadn’t laughed']),
+          text('If only usually expresses a stronger feeling than I wish.', ['If only','I wish']),
+          text('In these sentences, ’d means had:', ['’d','had']),
+          models('I wish I’d apologized.\n= I wish I had apologized.', ['I wish','I’d apologized','had apologized']),
+          text('Do not use would after I wish / If only for these past regrets.', ['would','I wish / If only']),
+          text('Use the Third Conditional when you also want to describe an imagined result:'),
+          models('I wish I had apologized.', ['I wish','had apologized']),
+          text('— I regret not apologizing.'),
+          models('If I had apologized, we would have reached an agreement.', ['had apologized','would have reached']),
+          text('— I imagine a different past action and its result.')
         ]
       })
     },
     {
       lessonId:'b1-1-w2-l4',
-      discovery:exercise('B11M02L04_D04_DISCOVERY','D04','stage','A different choice: now or in the past?',{
-        instruction:'Match each situation 1–4 with a sentence A–D. Notice whether the choice is still possible or is already in the past.',
+      discovery:exercise('B11M02L04_D04_DISCOVERY','D04','stage','Match the situations with the sentences.',{
         layout:'grouped',
         exercises:[
-          {id:'pairs',exercise:exercise('B11M02L04_D04_PAIRS','D04','matching','A different choice: now or in the past?',{
+          {id:'pairs',exercise:exercise('B11M02L04_D04_PAIRS','D04','matching','Match the situations with the sentences.',{
             templatePart:'$.exercises["part-2"].exercise',
+            // Preserve each situation/option identity and its meaning while
+            // ordering the shortened situations as in the approved revision.
             items:[
-              {id:'situation-a',text:'Eva wanted the job but wasn’t self-confident enough to apply. She didn’t apply, and the company stopped accepting applications last month.',correctId:'sentence-2'},
-              {id:'situation-b',text:'Max is stubborn and refuses to try a different plan. His team still has time to solve the problem.',correctId:'sentence-1'},
-              {id:'situation-c',text:'Eva wants the job but isn’t self-confident enough to apply. The company is still accepting applications.',correctId:'sentence-4'},
-              {id:'situation-d',text:'Max was stubborn and refused to try a different plan. The project failed last week.',correctId:'sentence-3'}
+              {id:'situation-c',text:'The company is still accepting applications. Eva isn’t self-confident enough to apply.',correctId:'sentence-4'},
+              {id:'situation-a',text:'The application deadline was last month. Eva didn’t apply.',correctId:'sentence-2'},
+              {id:'situation-b',text:'The team can still change the plan. Max refuses because he is stubborn.',correctId:'sentence-1'},
+              {id:'situation-d',text:'The project failed last week because Max refused to change the plan.',correctId:'sentence-3'}
             ],
             options:[
               {id:'sentence-1',text:'If Max weren’t so stubborn, he would try a different plan.'},
@@ -169,23 +142,27 @@
       }),
       rule:exercise('B11M02L04_R02_RULE','R02','rule-page','Second or Third Conditional?',{
         blocks:[
-          text('Choose the model by the time of the situation and its imagined result.'),
-          text('Use the Second Conditional for an unreal or unlikely situation now or in the future. The if-part uses the Past Simple, but its meaning is not past:'),
-          {type:'rule',formula:'If + subject + Past Simple, subject + would / wouldn’t + base verb.',highlights:['Past Simple','would / wouldn’t + base verb']},
+          text('Use the Second Conditional for an unreal or unlikely situation now or in the future.'),
+          formula('If + Past Simple, would / wouldn’t + base verb', ['Past Simple','would / wouldn’t + base verb']),
           models('If Eva were more self-confident, she would apply for the job.', ['were','would apply']),
-          text('She lacks confidence now. The opportunity is still open. The base verb has no to: apply, not to apply.'),
-          text('Use the Third Conditional for a different situation and result in the past. That opportunity has already passed:'),
-          {type:'rule',formula:'If + subject + had / hadn’t + V3, subject + would / wouldn’t have + V3.',highlights:['had / hadn’t + V3','would / wouldn’t have + V3']},
+          text('The opportunity is still open.'),
+          text('Use the Third Conditional for a different situation and result in the past.'),
+          formula('If + Past Perfect, would / wouldn’t have + V3', ['Past Perfect','would / wouldn’t have + V3']),
           models('If Eva had been more self-confident, she would have applied for the job.', ['had been','would have applied']),
-          text('The same quality can appear in both models. The time changes the form: were / weren’t → would do; had / hadn’t been → would have done.', ['were / weren’t','would do','had / hadn’t been','would have done']),
-          text('For be in the Second Conditional, use were / weren’t, including with I, he, she, it. Was / wasn’t is also possible in informal speech. In both models here, would belongs in the result, not in the if-part.', ['were / weren’t'])
+          text('The opportunity has already passed.'),
+          text('Compare:'),
+          formula('were / weren’t → would + base verb', ['were / weren’t','would + base verb']),
+          text('now or future'),
+          formula('had / hadn’t been → would / wouldn’t have + V3', ['had / hadn’t been','would / wouldn’t have + V3']),
+          text('past'),
+          text('For hypothetical situations, use were with I, he, she and it. Was is also possible in informal speech.', ['were','Was']),
+          text('Do not use would in the if-part.', ['would'])
         ]
       })
     }
   ];
 
-  additions.forEach(({lessonId,discovery:authoredDiscovery,rule}) => {
-    const discovery = groupedDiscovery(authoredDiscovery);
+  additions.forEach(({lessonId,discovery,rule}) => {
     kit.validate(discovery);
     kit.validate(rule);
     const index = window.SpaceWhaleContent?.findIndex(lesson => lesson.id === lessonId) ?? -1;

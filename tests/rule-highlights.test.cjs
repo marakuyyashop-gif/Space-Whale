@@ -7,8 +7,8 @@ const app=content(),rules=app.SpaceWhaleContent.flatMap(l=>l.stages.map(s=>s.exe
 
 test('existing course Rules get shared term/formula highlights without changing source text or state',()=>{
  for(const def of rules){const before=JSON.stringify(def),view=mount(def);assert.equal(view.host.querySelectorAll('.ek-rule-summary').length,1);assert.equal(view.host.querySelectorAll('input,textarea,select,.ek-check').length,0);assert.ok(view.host.querySelectorAll('.ek-rule-highlight').length>0);assert.equal(view.host.querySelectorAll('.ek-example-model .ek-rule-highlight,.ek-rule-example .ek-rule-highlight').length,0,'Model sentences retain their approved italic/target-only presentation');view.handle.setAnswers({});assert.deepEqual(view.handle.getAnswers(),{});view.handle.destroy();assert.equal(JSON.stringify(def),before);}
- const def=rules[0],view=mount(def),copy=[...view.host.querySelectorAll('.ek-rule-text-section .ek-copy')].find(p=>p.textContent.startsWith('The if-part'));
- assert.equal(copy.textContent,def.blocks[1].text);assert.equal(copy.querySelector('.ek-rule-highlight').textContent,'if-part');
+ const def=rules[0],view=mount(def),copy=[...view.host.querySelectorAll('.ek-rule-text-section .ek-copy')].find(p=>p.textContent.includes('had / hadn’t + V3')&&p.textContent.includes('if-part'));
+ assert.ok(def.blocks.some(b=>b.text===copy.textContent));assert.ok([...copy.querySelectorAll('.ek-rule-highlight')].some(s=>s.textContent==='if-part'));
  const formula=view.host.querySelector('.ek-rule-formula');assert.equal(formula.textContent,def.blocks.find(b=>b.formula).formula);assert.equal(formula.querySelectorAll('.ek-rule-highlight--condition').length,1);assert.equal(formula.querySelectorAll('.ek-rule-highlight--result').length,1);assert.equal(formula.querySelectorAll('strong').length,2);view.handle.destroy();
 });
 

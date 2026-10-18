@@ -40,10 +40,10 @@ test('four lessons add only approved focus/practice blocks and retain other auth
 test('all supplied closed answers grade through the same registered templates',()=>{
  const {app}=fixture(),closed=app.SpaceWhaleContent.flatMap(l=>newStages(l).flatMap(s=>definitions(s.exercise))).filter(d=>['gaps','matching','choice'].includes(d.kind));
  let count=0;for(const def of closed){kit.validate(def);const view=kit.templates.resolve(def);assert.equal(kit.templates.profileFor(view.templateCode,view.kind,view.templatePart).supported,true,def.id);const results=Object.values(kit.grade(def,keyedAnswers(def)));assert.ok(results.every(r=>r==='correct'),def.id);count+=results.length;}
- assert.equal(count,26);
+ assert.equal(count,25);
  const choices=closed.find(d=>d.templateCode==='E01');assert.deepEqual(Array.from(choices.items,i=>i.correctId),['B','A','B','C']);
  const contrast=closed.find(d=>d.templateCode==='E03A');assert.deepEqual(Object.values(keyedAnswers(contrast)),['were','would apply','had been','would have applied','were','would trust','had been','would have finished']);
- const discovery=closed.find(d=>d.kind==='matching'&&d.templateCode==='D04');assert.deepEqual(Array.from(discovery.items,i=>i.correctId),['sentence-2','sentence-1','sentence-4','sentence-3']);
+ const discovery=closed.find(d=>d.kind==='matching'&&d.templateCode==='D04');assert.deepEqual(Array.from(discovery.items,i=>i.correctId),['sentence-4','sentence-2','sentence-1','sentence-3']);
 });
 
 test('open written production has 15 fields, no false exact-match grading, and samples appear only after a response',()=>{
@@ -64,10 +64,22 @@ test('oral tasks keep factual media and supplied help, without written inputs or
  for(const def of oral){kit.validate(def);const v=mount(def);assert.equal(v.host.querySelectorAll('input,textarea,.ek-check').length,0);for(const image of v.host.querySelectorAll('img'))assert.ok(fs.existsSync(path.join(root,image.getAttribute('src'))));assert.equal(v.host.textContent.includes('Image contents'),false);assert.equal(v.host.textContent.includes('[Image]'),false);assert.equal(v.host.textContent.includes('If the team hadn’t faced difficulties'),false);assert.equal(v.host.textContent.includes('I wish I hadn’t told the private story'),false);v.handle.destroy();}
 });
 
-test('Rule stays behind the Discovery check and teacher arrow in the composed lesson',()=>{
- const {app}=fixture(),catalog=createCatalog(app.SpaceWhaleContent,[]),lesson=catalog.lessons.find(l=>l.id==='b1-1-w2-l1'),focus=lesson.stages.find(s=>s.role==='focus').exercise,source=app.SpaceWhaleContent[0],rule=source.stages.filter(s=>s.role==='focus')[1].exercise;
- const v=mount(focus);assert.equal(v.host.textContent.includes(rule.title),false);const forward=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible);assert.equal(forward.length,1);assert.equal(forward[0].disabled,true);
+test('each Rule stays behind its compact Discovery check and teacher arrow',()=>{
+ const {app}=fixture(),catalog=createCatalog(app.SpaceWhaleContent,[]);
  function checked(def){if(def.kind==='stage')return Object.fromEntries(def.exercises.map(b=>[b.id,checked(b.exercise)]));if(def.kind==='rule-page')return Object.fromEntries(def.blocks.filter(b=>b.type==='exercise').map(b=>[b.id,checked(b.exercise)]));return {...keyedAnswers(def),__sw_checked:true};}
- v.handle.setAnswers({...v.handle.getAnswers(),[focus.exercises[0].id]:checked(focus.exercises[0].exercise)});
- const next=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible)[0];assert.equal(next.disabled,false);assert.equal(v.host.textContent.includes(rule.title),false);next.dispatchEvent(new v.window.Event('click',{bubbles:true}));assert.ok(v.host.textContent.includes(rule.title));v.handle.destroy();
+ for(const source of app.SpaceWhaleContent){
+  const lesson=catalog.lessons.find(l=>l.id===source.id),focus=lesson.stages.find(s=>s.role==='focus').exercise,rule=source.stages.filter(s=>s.role==='focus')[1].exercise;
+  const v=mount(focus);assert.equal(v.host.textContent.includes(rule.title),false);const forward=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible);assert.equal(forward.length,1);assert.equal(forward[0].disabled,true);
+  v.handle.setAnswers({...v.handle.getAnswers(),[focus.exercises[0].id]:checked(focus.exercises[0].exercise)});
+  const next=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible)[0];assert.equal(next.disabled,false);assert.equal(v.host.textContent.includes(rule.title),false);next.dispatchEvent(new v.window.Event('click',{bubbles:true}));assert.ok(v.host.textContent.includes(rule.title));assert.equal(v.host.querySelectorAll('.ek-rule-summary').length,1);v.handle.destroy();
+ }
+});
+
+test('compact Discovery shows examples next to their own conclusions without ABC or redundant labels',()=>{
+ const {app}=fixture(),discovery=app.SpaceWhaleContent.map(l=>l.stages.find(s=>s.role==='focus').exercise);
+ for(const def of discovery.slice(0,3)){const v=mount(def);assert.equal(v.host.querySelectorAll('.ek-title').length,1);assert.equal([...v.host.querySelectorAll('.ek-title')].filter(visible).length,1);assert.doesNotMatch(v.host.textContent,/What happened:|What really happened →|What I imagine now|Imagined past:|My regret:|A\.\n|B\.\n|C\.\n/);assert.equal(v.host.querySelectorAll('.ek-check').length,1);v.handle.destroy();}
+ assert.equal(discovery[0].exercises[0].exercise.blocks.length,2);assert.equal(discovery[1].exercises[0].exercise.blocks.length,2);
+ const meaning=discovery[2];assert.equal(meaning.templateCode,'D02');assert.equal(meaning.templatePart,'legacy-inline-meaning');assert.equal(meaning.items.length,3);
+ const v=mount(meaning),rows=[...v.host.querySelectorAll('.ek-sentence')];assert.equal(rows.length,3);assert.ok(rows[0].textContent.includes('I wish I had apologized.'));assert.ok(rows[0].textContent.includes('This means:'));assert.ok(rows[1].textContent.includes('If only I hadn’t laughed'));assert.ok(rows[1].textContent.includes('What really happened?'));assert.ok(rows[0].querySelectorAll('strong').length>0);assert.equal(rows[0].querySelectorAll('.ek-choice-trigger').length,1);v.handle.destroy();
+ assert.deepEqual(Array.from(discovery[3].exercises[0].exercise.items,i=>i.id),['situation-c','situation-a','situation-b','situation-d']);
 });
