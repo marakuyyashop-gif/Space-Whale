@@ -17,7 +17,7 @@
     return text;
   };
   const sameTaskCopy = (first,second) => Boolean(first&&second)&&taskCopyKey(first)===taskCopyKey(second);
-  const mechanismTitles = new Set(['matching','gaps','dropdown','inline dropdown','single choice','multiple choice','multiple select','text single choice','image single choice','text multiple select','image multiple select','typed input','typed input / gap','text / writing field','typed gap','typed gap + word bank','writing','open writing','global audio','reading','order','sort','image label']);
+  const mechanismTitles = new Set(['matching','gaps','dropdown','inline dropdown','single choice','multiple choice','multiple select','text single choice','image single choice','text multiple select','image multiple select','typed input','typed input / gap','text / writing field','typed gap','typed gap + word bank','writing','open writing','global audio','reading','order','sort','image label','practice']);
   const hasExampleModels = def => ['presentation','rule-page'].includes(def.kind)&&def.blocks?.some(block=>block.type==='text'&&block.role==='examples');
   const isExamplesPresentation = def => def.kind==='presentation'&&hasExampleModels(def)&&taskCopy(def.title)==='examples';
   const hiddenChildHeading = (parent,child,index) => {

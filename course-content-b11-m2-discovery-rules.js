@@ -47,10 +47,7 @@
           models('If I had submitted my application on time, I wouldn’t have missed the opportunity.\nIf I hadn’t faced so many difficulties, I would have achieved my goal.', ['had submitted','wouldn’t have missed','hadn’t faced','would have achieved']),
           text('Either part can come first:'),
           models('If I hadn’t faced so many difficulties, I would have achieved my goal.\nI would have achieved my goal if I hadn’t faced so many difficulties.', ['hadn’t faced','would have achieved']),
-          text('Use a comma when the if-part comes first. Do not use would in the if-part.', ['would']),
-          text('In American English, the third form of get is usually gotten:'),
-          text('get → got → gotten', ['gotten']),
-          models('If I had finished the course, I would have gotten a qualification.', ['had finished','would have gotten'])
+          text('Use a comma when the if-part comes first. Do not use would in the if-part.', ['would'])
         ]
       })
     },

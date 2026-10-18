@@ -6,6 +6,16 @@ const catalog=require('../workspace-catalog.js').createCatalog(app.SpaceWhaleCon
 const visible=e=>{for(let p=e;p;p=p.parentElement)if(p.hidden)return false;return true;};
 function setup(def,options={}){const {document,window}=parseHTML('<html><body><main></main></body></html>');const create=document.createElement.bind(document);document.createElement=t=>{const e=create(t);if(t==='audio'){e.pause=()=>{};e.play=async()=>{};e.paused=true;}return e;};const host=document.querySelector('main');const handle=kit.mount(host,def,{syncChecks:true,...options});const query=q=>[...host.querySelectorAll(q)].filter(visible);const click=e=>{assert.ok(e);assert.ok(!e.disabled);e.dispatchEvent(new window.Event('click',{bubbles:true,cancelable:true}));};return {host,handle,query,click,window};}
 const byRole=(id,role)=>lessons.find(l=>l.id===id).stages.find(s=>s.role===role);
+test('Practice containers show the actual task heading while preserving specific headings and saved work',()=>{
+ const task={version:1,id:'clear-writing-task',templateCode:'E11',kind:'writing',title:'Rewrite the sentences using the Third Conditional.',responseMode:'open',items:[{id:'sentence',prompt:'Nora postponed the decision. She missed the opportunity.',placeholder:'If…'}]};
+ const def={version:1,id:'clear-practice-section',kind:'stage',title:'Practice',progressive:true,exercises:[{id:'one',exercise:task},{id:'two',exercise:{...task,id:'next-writing-task',title:'Use the prompts to write questions.'}}]};
+ const saved={one:{sentence:'My saved sentence.'},revealed:1},v=setup(def,{answers:saved});
+ assert.deepEqual(v.query('h2').map(e=>e.textContent),[task.title]);
+ assert.equal([...v.host.children].some(e=>e.tagName==='H2'),false);
+ assert.deepEqual(v.handle.getAnswers(),saved);assert.equal(v.query('input')[0].value,'My saved sentence.');v.handle.destroy();
+ const specific=setup({...def,title:'Discuss a different decision'});assert.deepEqual(specific.query('h2').map(e=>e.textContent),['Discuss a different decision',task.title]);specific.handle.destroy();
+ const single=setup({...task,title:'Practice'});assert.equal(single.query('h2')[0].textContent,'Practice');single.handle.destroy();
+});
 function answer(d){let a={};if(d.kind==='stage'){for(const b of d.exercises)a[b.id]=answer(b.exercise);a.revealed=d.exercises.length;return a;}if(d.kind==='gaps')for(const i of d.items)for(const g of i.segments)if(typeof g!=='string')a[g.id]=g.answers?.[0]||'response';if(['choice','matching','sort'].includes(d.kind))for(const i of d.items)a[i.id]=i.correctIds||i.correctId;if(d.kind==='writing')for(const i of d.items)a[i.id]=i.acceptedAnswers?.[0]||'My answer';if(d.kind==='order')a.order=d.correctOrder;if(d.items)a.__sw_checked=true;if(d.progressiveQuestions)a.__sw_choice_revealed=d.items.length;if(d.followUp)a.__sw_followup_revealed=2;return a;}
 test('four lessons use one explicit section builder, omit empty sections and keep originals unchanged',()=>{
  assert.equal(lessons.length,4);

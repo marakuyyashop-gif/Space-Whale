@@ -58,13 +58,51 @@ test('open written production has 13 fields, no false exact-match grading, and s
  const regrets=written.find(d=>d.id.includes('L03'));assert.equal(regrets.items.length,3);assert.ok(regrets.items[0].possibleAnswers.length>=2);assert.ok(regrets.items[2].possibleAnswers.length>=2);
 });
 
+test('E11 task copy identifies each construction without duplicating instructions or changing other practice',()=>{
+ const {app}=fixture(),hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
+ const titles=[
+  'Rewrite the sentences using the Third Conditional.',
+  'Use the prompts to write Third Conditional questions.',
+  'Use the prompts to write sentences.',
+  'Use the prompts to write Second or Third Conditional sentences.'
+ ];
+ const unchangedPractice=[
+  '0846ded30142792c788a90601dff6a230dc23c51432775e46316967df871ba60',
+  'adb4206caa4e2f7b6360817e0c2bb8db1f6d0b189d65361a1e1cb3466ec91571',
+  'd06220ec80533d4cfc6c9bb01f80fe1a0b5884905395a2ba3ab357024f1ca1b5',
+  '32437d8adba46dbef7a503e774f22c11a9449b04da1f17c157fe102165fdae4e'
+ ];
+ for(const [index,lesson] of app.SpaceWhaleContent.entries()){
+  assert.equal(hash(lesson.stages.filter(s=>s.role==='practice'&&s.exercise.templateCode!=='E11')),unchangedPractice[index]);
+  const def=lesson.stages.find(s=>s.exercise.templateCode==='E11').exercise,v=mount(def);
+  assert.equal(def.title,titles[index]);assert.equal(v.host.querySelectorAll('.ek-title').length,1);assert.equal(v.host.querySelector('.ek-title').textContent,titles[index]);
+  assert.equal(v.host.querySelectorAll('textarea').length,0);assert.equal(v.host.querySelectorAll('input.ek-writing-input').length,def.items.length);
+  if(index!==2){assert.equal(def.instruction,undefined);assert.equal(v.host.querySelectorAll('.ek-instruction').length,0);}
+  if(index===0){
+   assert.deepEqual(Array.from(def.items,i=>i.id),['nora','leo','sam']);
+   assert.deepEqual(Array.from(def.items,i=>i.prompt),['Nora postponed the decision. She missed the opportunity.','Leo did not get the qualification. He did not achieve his goal.','Sam faced difficulties with the form. He did not submit an application.']);
+   assert.deepEqual([...v.host.querySelectorAll('input.ek-writing-input')].map(input=>input.getAttribute('placeholder')),['If…','If…','If…']);
+   assert.ok([...v.host.querySelectorAll('input.ek-writing-input')].every(input=>input.value===''));assert.deepEqual(v.handle.getAnswers(),{});
+   assert.doesNotMatch(v.host.textContent,/Start with|If…/);assert.ok(def.items.every(item=>item.possibleAnswers.every(answer=>answer.startsWith('If '))));
+  }
+  if(index===1){
+   assert.deepEqual(Array.from(def.items,i=>i.id),['approved-1','approved-2','approved-3']);
+   assert.deepEqual(Array.from(def.items,i=>i.prompt),['Leo / take on responsibility / manager / ask for help?','managers / reach an agreement / not explore alternatives?','what / Anna / do / colleagues / not express concerns?']);
+   assert.ok(def.items.every(item=>!item.hint&&!item.multiline&&item.possibleAnswers.every(answer=>answer.endsWith('?'))));assert.doesNotMatch(JSON.stringify(def),/Yes,|No,|short answer|— yes|— no/);
+  }
+  if(index===2){assert.equal(def.instruction,'Use I wish, If only and the Third Conditional, in that order.');assert.ok(def.items[0].possibleAnswers.every(answer=>answer.startsWith('I wish ')));assert.ok(def.items[1].possibleAnswers.every(answer=>answer.startsWith('If only ')));assert.ok(def.items[2].possibleAnswers.every(answer=>answer.startsWith('If I ')));}
+  if(index===3)assert.deepEqual(Array.from(def.items,i=>i.prompt),['now / Ava / not self-confident / not apply for new job','last month / Ben / not reliable / team miss deadline','now / Mark / stubborn / refuse to try team’s better idea','last year / Lena / determined / finish difficult course']);
+  v.handle.destroy();
+ }
+});
+
 test('oral discussion tasks use the supplied situations, without written inputs or exposed model answers',()=>{
  const {app}=fixture(),oral=app.SpaceWhaleContent.flatMap(l=>newStages(l).map(s=>s.exercise)).filter(d=>['E11A','Q01'].includes(d.templateCode));
  assert.equal(oral.length,3);
  for(const def of oral){kit.validate(def);const v=mount(def);assert.equal(v.host.querySelectorAll('input,textarea,.ek-check').length,0);for(const image of v.host.querySelectorAll('img'))assert.ok(fs.existsSync(path.join(root,image.getAttribute('src'))));assert.equal(v.host.textContent.includes('Image contents'),false);assert.equal(v.host.textContent.includes('[Image]'),false);assert.equal(v.host.textContent.includes('If the team hadn’t faced difficulties'),false);assert.equal(v.host.textContent.includes('I wish I hadn’t told the private story'),false);v.handle.destroy();}
 });
 
-test('L1 uses the approved three dropdowns and six bank-based typed gaps before unchanged E11',()=>{
+test('L1 uses the approved three dropdowns and six bank-based typed gaps before E11',()=>{
  const {app}=fixture(),lesson=app.SpaceWhaleContent.find(l=>l.id==='b1-1-w2-l1');
  const practice=lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise),[select,typed,writing]=practice;
  assert.deepEqual(Array.from(practice,d=>d.id),['B11M02L01_E03_GRAMMAR_PRACTICE','B11M02L01_E04_GRAMMAR_PRACTICE','B11M02L01_E11_GRAMMAR_PRACTICE']);
@@ -108,13 +146,14 @@ test('typed L1 negatives accept full forms and got/gotten without accepting the 
  for(const [id,value] of [['qualification-result','would have gotten'],['decision-condition','had postponed'],['difficulties-result','would not face']])assert.equal(kit.grade(typed,{...correct,[id]:value})[id],'retry',value);
 });
 
-test('retiring only L1 timeline preserves existing E11 and all L2–L4 grammar definitions on reload',()=>{
+test('retiring only L1 timeline preserves published grammar definitions on reload',()=>{
  const {app,apply}=fixture(),hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
  const approved=app.SpaceWhaleContent.slice(1).map(lesson=>hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise)));
+ const approvedL1=hash(app.SpaceWhaleContent[0].stages.find(s=>s.exercise.templateCode==='E11').exercise);
  apply();
  assert.deepEqual(app.SpaceWhaleContent.slice(1).map(lesson=>hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise))),approved);
  const lesson=app.SpaceWhaleContent[0],retired='B11M02L01_E11A_GRAMMAR_PRACTICE';
- assert.equal(hash(lesson.stages.find(s=>s.exercise.templateCode==='E11').exercise),'066cfbc4e035b2370ce90df259e24807688d6dcdc9756ff8daf1505cfeba2ff5');
+ assert.equal(hash(lesson.stages.find(s=>s.exercise.templateCode==='E11').exercise),approvedL1);
  const before=JSON.stringify(app.SpaceWhaleContent);
  lesson.stages.push({menu:'Grammar Practice',role:'practice',section:'tasks',exercise:{version:1,id:retired,templateCode:'E11A',kind:'presentation',title:'Say it aloud',blocks:[{type:'text',text:'Retired timeline'}]}});
  lesson.structure.find(s=>s.role==='practice').sources.push(retired);
@@ -131,7 +170,7 @@ test('each Rule stays behind its compact Discovery check and teacher arrow',()=>
   const lesson=catalog.lessons.find(l=>l.id===source.id),focus=lesson.stages.find(s=>s.role==='focus').exercise,rule=source.stages.filter(s=>s.role==='focus')[1].exercise;
   const v=mount(focus);assert.equal(v.host.textContent.includes(rule.title),false);const forward=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible);assert.equal(forward.length,1);assert.equal(forward[0].disabled,true);
   v.handle.setAnswers({...v.handle.getAnswers(),[focus.exercises[0].id]:checked(focus.exercises[0].exercise)});
-  const next=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible)[0];assert.equal(next.disabled,false);assert.equal(v.host.textContent.includes(rule.title),false);next.dispatchEvent(new v.window.Event('click',{bubbles:true}));assert.ok(v.host.textContent.includes(rule.title));assert.equal(v.host.querySelectorAll('.ek-rule-summary').length,1);v.handle.destroy();
+  const next=[...v.host.querySelectorAll('[aria-label="Show next exercise"]')].filter(visible)[0];assert.equal(next.disabled,false);assert.equal(v.host.textContent.includes(rule.title),false);next.dispatchEvent(new v.window.Event('click',{bubbles:true}));assert.ok(v.host.textContent.includes(rule.title));assert.equal(v.host.querySelectorAll('.ek-rule-summary').length,1);if(source.id==='b1-1-w2-l1')assert.doesNotMatch(JSON.stringify(rule),/get — got — gotten|American English forms/);v.handle.destroy();
  }
 });
 

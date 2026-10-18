@@ -9,7 +9,7 @@
   if (!kit) throw new Error('SpaceWhaleExerciseKit is required.');
 
   const writing = (id, title, instruction, items) => ({
-    version: 1, id, templateCode: 'E11', kind: 'writing', title, instruction,
+    version: 1, id, templateCode: 'E11', kind: 'writing', title, ...(instruction ? {instruction} : {}),
     responseMode: 'open', showAuthoredSamples: true, revealPossibleAnswers: true, items
   });
   const gap = (id, options, answer) => ({id, options, answers: [answer]});
@@ -78,12 +78,12 @@
         }},
         {time: '3 min', exercise: writing(
           'B11M02L01_E11_GRAMMAR_PRACTICE',
-          'Change the past',
-          'Read what really happened. Write one Third Conditional sentence. Follow the instruction in brackets.',
+          'Rewrite the sentences using the Third Conditional.',
+          undefined,
           [
-            {id: 'nora', prompt: 'Nora postponed the decision. She missed the opportunity.\n(Start with If.)', possibleAnswers: ['If Nora hadn’t postponed the decision, she wouldn’t have missed the opportunity.']},
-            {id: 'leo', prompt: 'Leo did not get the qualification. He did not achieve his goal.\n(Start with the result.)', possibleAnswers: ['Leo would have achieved his goal if he had gotten the qualification.']},
-            {id: 'sam', prompt: 'Sam faced difficulties with the form. He did not submit an application.\n(Start with If.)', possibleAnswers: ['If Sam hadn’t faced difficulties with the form, he would have submitted an application.']}
+            {id: 'nora', prompt: 'Nora postponed the decision. She missed the opportunity.', placeholder: 'If…', possibleAnswers: ['If Nora hadn’t postponed the decision, she wouldn’t have missed the opportunity.']},
+            {id: 'leo', prompt: 'Leo did not get the qualification. He did not achieve his goal.', placeholder: 'If…', possibleAnswers: ['If Leo had gotten the qualification, he would have achieved his goal.']},
+            {id: 'sam', prompt: 'Sam faced difficulties with the form. He did not submit an application.', placeholder: 'If…', possibleAnswers: ['If Sam hadn’t faced difficulties with the form, he would have submitted an application.']}
           ]
         )}
       ]
@@ -230,25 +230,24 @@
             "version": 1,
             "id": "B11M02L02_E11_GRAMMAR_PRACTICE",
             "templateCode": "E11",
-            "title": "Write the questions.",
+            "title": "Use the prompts to write Third Conditional questions.",
             "kind": "writing",
-            "instruction": "Write Third Conditional questions. Add a short answer for 1 and 2.",
             "responseMode": "open",
             "showAuthoredSamples": true,
             "revealPossibleAnswers": true,
             "items": [
               {
                 "id": "approved-1",
-                "prompt": "Leo / take on responsibility / manager / ask for help? — yes",
+                "prompt": "Leo / take on responsibility / manager / ask for help?",
                 "possibleAnswers": [
-                  "Would Leo have taken on responsibility if the manager had asked for help? Yes, he would have."
+                  "Would Leo have taken on responsibility if the manager had asked for help?"
                 ]
               },
               {
                 "id": "approved-2",
-                "prompt": "managers / reach an agreement / not explore alternatives? — no",
+                "prompt": "managers / reach an agreement / not explore alternatives?",
                 "possibleAnswers": [
-                  "Would the managers have reached an agreement if they hadn’t explored alternatives? No, they wouldn’t have."
+                  "Would the managers have reached an agreement if they hadn’t explored alternatives?"
                 ]
               },
               {
@@ -429,9 +428,9 @@
             "version": 1,
             "id": "B11M02L03_E11_GRAMMAR_PRACTICE",
             "templateCode": "E11",
-            "title": "Write complete sentences.",
+            "title": "Use the prompts to write sentences.",
             "kind": "writing",
-            "instruction": "The notes show what happened to you. Use I wish, If only and the Third Conditional, in that order.",
+            "instruction": "Use I wish, If only and the Third Conditional, in that order.",
             "responseMode": "open",
             "showAuthoredSamples": true,
             "revealPossibleAnswers": true,
@@ -619,9 +618,8 @@
             "version": 1,
             "id": "B11M02L04_E11_GRAMMAR_PRACTICE",
             "templateCode": "E11",
-            "title": "Write complete sentences.",
+            "title": "Use the prompts to write Second or Third Conditional sentences.",
             "kind": "writing",
-            "instruction": "The cues show real situations. Imagine a different situation and result. Use the Second or Third Conditional.",
             "responseMode": "open",
             "showAuthoredSamples": true,
             "revealPossibleAnswers": true,
