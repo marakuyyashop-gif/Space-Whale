@@ -101,6 +101,84 @@
     templateRole: 'composition', progressive: true, requireCheckBeforeNext: true, unifiedProgression: true,
     exercises: [{id: 'gist', exercise: l4Gist}, {id: 'details', exercise: l4Details}]
   });
+
+  // Replay the same dialogue, then build the grammar independently. The original
+  // response IDs and paths stay intact so existing learner answers remain usable.
+  const forms = (number, code, items, clues = false) => base(
+    `B11_M02_L0${number}_${code}_GRAMMAR_LISTENING`, 'gaps', 'Listen again and complete the sentences.', {
+      templateCode: code, inputMode: 'text',
+      instruction: clues ? 'Write the verb forms you hear. Use the verbs in the gaps to help you.' : 'Write the missing words you hear.',
+      items: items.map((segments, i) => ({id: 'line' + (i + 1), segments}))
+    });
+  // Full and contracted forms are both valid; apostrophe styles are equivalent.
+  const gap = (id, answer, alternatives = [], placeholder) => ({
+    id, answers: [...new Set([answer, ...alternatives].flatMap(text => [text, text.replace(/’/g, "'")]))],
+    ...(placeholder ? {placeholder} : {})
+  });
+  const writing = (number, code, title, instruction, items, accepted = false) => base(
+    `B11_M02_L0${number}_${code}_GRAMMAR_LISTENING`, 'writing', title, {
+      templateCode: code, instruction, responseMode: accepted ? 'accepted' : 'open',
+      ...(!accepted ? {showAuthoredSamples: true, revealPossibleAnswers: true} : {}),
+      items: items.map(([prompt, answers], i) => ({id: 'sentence' + (i + 1), prompt,
+        ...(accepted ? {normalization: 'translation', acceptedAnswers: answers} : {possibleAnswers: answers})}))
+    });
+  const l1Forms = forms(1, 'L08', [
+    ['If I ', gap('postpone', 'hadn’t postponed', ['had not postponed'], 'postpone'), ' the decision, I ', gap('submit', 'would have submitted', ["would’ve submitted"], 'submit'), ' the application on time.'],
+    ['I ', gap('miss', 'wouldn’t have missed', ['would not have missed'], 'miss'), ' the opportunity if I ', gap('submitted', 'had submitted', [], 'submit'), ' it on time.'],
+    ['I ', gap('qualification', 'would have gotten', ['would’ve gotten', 'would have got', 'would’ve got'], 'get'), ' the qualification if I ', gap('difficulties', 'hadn’t faced', ['had not faced'], 'face'), ' so many difficulties.'],
+    ['I ', gap('goal', 'would have achieved', ['would’ve achieved'], 'achieve'), ' my goal much earlier if I ', gap('course', 'had finished', [], 'finish'), ' the course.']
+  ], true);
+  const l1Production = writing(1, 'E11', 'Write Third Conditional sentences.',
+    'Imagine a different past for Alex. Use the notes to write complete sentences.', [
+      ['Alex / submit application on time / not miss opportunity', ['If Alex had submitted his application on time, he wouldn’t have missed the opportunity.']],
+      ['Alex / not face difficulties at work / finish course', ['If Alex hadn’t faced difficulties at work, he would have finished the course.']],
+      ['Alex / finish course / achieve goal earlier', ['If Alex had finished the course, he would have achieved his goal earlier.']]
+    ]);
+  const l2Forms = forms(2, 'L07', [
+    [gap('question', 'Would you have taken'), ' on the responsibility if ', gap('known', 'you’d known', ['you had known']), ' how many problems there were?'],
+    ['No, ', gap('short-no', 'I wouldn’t have', ['I would not have']), '. ', gap('concerns', 'I’d have expressed', ['I would have expressed', 'I would’ve expressed']), ' my concerns first.'],
+    ['What ', gap('wh-question', 'would you have done'), ' if the manager ', gap('listened', 'had listened'), '?'],
+    ['Yes, ', gap('short-yes', 'I would have'), '. I think the team ', gap('agreed', 'would have agreed', ['would’ve agreed']), ' if ', gap('time', 'we’d had', ['we had had']), ' more time.']
+  ]);
+  const l2Production = writing(2, 'L18', 'Write your own replies to Dana.',
+    'Imagine you are Ben. Answer Dana’s questions using your own ideas and the Third Conditional. For 1 and 3, give a short answer and explain your choice.', [
+      ['Would you have taken on the responsibility if you’d known how many problems there were?', ['No, I wouldn’t have. I would have asked for more help.', 'Yes, I would have. I would have asked for more time.']],
+      ['What would you have done if the manager had listened?', ['If the manager had listened, I would have suggested a different plan.']],
+      ['Would you have tried to reach an agreement before changing the plan?', ['Yes, I would have. I would have discussed the alternatives with the team.']]
+    ]);
+  const l3Forms = forms(3, 'L08', [
+    ['I wish ', gap('apology', 'I’d apologized', ['I had apologized'], 'apologize'), ' right away.'],
+    ['If ', gap('condition', 'I’d apologized', ['I had apologized'], 'apologize'), ' then, he ', gap('result', 'would have understood', ['would’ve understood'], 'understand'), '.'],
+    ['If only ', gap('trust', 'I hadn’t trusted', ['I had not trusted'], 'trust'), ' him with it.'],
+    ['I wish ', gap('handle', 'I had handled', ['I’d handled'], 'handle'), ' everything differently.']
+  ], true);
+  const l3Production = writing(3, 'E13', 'Correct the sentences.',
+    'Leo is talking about the past. There is one grammar error in each sentence. Write the whole sentence correctly.', [
+      ['I wish I apologized right away.', ['I wish I had apologized right away.', 'I wish I’d apologized right away.']],
+      ['If I’d apologized then, he would understand.', ['If I’d apologized then, he would have understood.', 'If I had apologized then, he would have understood.', 'If I’d apologized then, he would’ve understood.', 'If I had apologized then, he would’ve understood.']],
+      ['If only I didn’t trust him with it.', ['If only I hadn’t trusted him with it.', 'If only I had not trusted him with it.']]
+    ], true);
+  const l4Forms = forms(4, 'L07', [
+    ['If you ', gap('confident', 'were'), ' more self-confident, you ', gap('apply', 'would apply'), ' for the role.'],
+    ['If ', gap('past-confident', 'you’d been', ['you had been']), ' more self-confident then, you ', gap('project', 'would have taken', ['would’ve taken']), ' the project.'],
+    ['If he ', gap('stubborn', 'were'), ' less stubborn, he ', gap('listen', 'would listen'), ' to the team more.'],
+    ['If he ', gap('past-stubborn', 'hadn’t been', ['had not been']), ' so stubborn, the team ', gap('finish', 'would have finished', ['would’ve finished']), ' earlier.']
+  ]);
+  const l4Production = writing(4, 'E11', 'Write Second or Third Conditional sentences.',
+    'The notes describe real situations. Imagine the opposite. Use the Second Conditional for now and the Third Conditional for last year.', [
+      ['now / Ben / not self-confident / not apply for role', ['If Ben were more self-confident, he would apply for the role.']],
+      ['last year / Ben / not independent / not make decisions himself', ['If Ben had been more independent last year, he would have made more decisions himself.']],
+      ['last year / Mark / stubborn / team not finish earlier', ['If Mark hadn’t been so stubborn last year, the team would have finished earlier.']]
+    ]);
+  // Grouped shared stages reveal each additional response through the teacher arrow.
+  // Keep the master script locked until every task in this final group is attempted.
+  [[l1, l1Forms, l1Production], [l2, l2Forms, l2Production],
+    [l3, l3Forms, l3Production], [l4Details, l4Forms, l4Production]].forEach(([group, typed, production]) => {
+    group.requireCheckBeforeNext = true;
+    group.exercises.push({id: 'forms', exercise: typed}, {id: 'production', exercise: production});
+    group.transcriptAfter = ['task', 'forms', 'production'];
+  });
+
   [l1, l2, l3, l4].forEach((exercise, i) => {
     kit.validate(exercise);
     const lessonId = 'b1-1-w2-l' + (i + 1);
@@ -109,7 +187,7 @@
     const lesson = window.SpaceWhaleContent[index];
     const stages = lesson.stages.filter(stage => stage.exercise.id !== exercise.id);
     const entry = {menu: 'Listening', navigationTitle: 'Listening', navigationBlock: 'language',
-      section: 'tasks', role: 'listening', guide: {time: i === 3 ? '6 min' : '4 min'}, exercise};
+      section: 'tasks', role: 'listening', guide: {time: i === 3 ? '12 min' : '10 min'}, exercise};
     const finalIndex = stages.findIndex(stage => stage.role === 'final');
     stages.splice(finalIndex < 0 ? stages.length : finalIndex, 0, entry);
     const structure = (lesson.structure || []).map(section => ({
