@@ -1,6 +1,6 @@
 /* B1.1 · M2 · L1–L4 · P01 Listen & Repeat — exact CARD Words and W03B examples.
  * Each word and full sentence has a separate stable recording slot.
- * L1 retains its existing audio; L2–L4 remain pending until supplied recordings are verified.
+ * L1 retains its existing audio. Supplied recordings cover L2/L3 and the first five L4 rows.
  * Load after the B1 module and before its word practice.
  */
 (() => {
@@ -126,13 +126,18 @@
   }
 ];
   const audioRoots = {
-    1: 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/b1-1/w2/l1/p01/'
+    1: 'https://xpeywyonbapnvtjnwawi.supabase.co/storage/v1/object/public/course-audio/b1-1/w2/l1/p01/',
+    2: 'assets/lesson-media/b1-1/module-2/l2/p01/',
+    3: 'assets/lesson-media/b1-1/module-2/l3/p01/',
+    4: 'assets/lesson-media/b1-1/module-2/l4/p01/'
   };
+  const availableRecordings = {1: 12, 2: 12, 3: 12, 4: 5};
   lessonData.forEach(({lesson: lessonNumber, pairs}) => {
     const lessonCode = String(lessonNumber).padStart(2, '0');
     const prefix = 'B11M02L' + lessonCode;
     const recordingPrefix = 'B11_M02_L' + lessonCode + '_P01_';
     const audioRoot = audioRoots[lessonNumber];
+    const recordingCount = availableRecordings[lessonNumber];
     const exercise = {
       version: 1,
       id: prefix + '_P01',
@@ -140,15 +145,15 @@
       kind: 'audio',
       layout: 'listen-repeat',
       title: 'Listen and repeat.',
-      ...(!audioRoot ? {audioPending: true} : {}),
+      ...(recordingCount < pairs.length * 2 ? {audioPending: true} : {}),
       items: pairs.map(([word, example], i) => {
         const id = recordingPrefix + String(i + 1).padStart(2, '0');
         return {
           id,
           text: word,
-          ...(audioRoot ? {audio: audioRoot + id + '_word.mp3'} : {}),
+          ...(i * 2 < recordingCount ? {audio: audioRoot + id + '_word.mp3'} : {}),
           example,
-          ...(audioRoot ? {exampleAudio: audioRoot + id + '_example.mp3'} : {})
+          ...(i * 2 + 1 < recordingCount ? {exampleAudio: audioRoot + id + '_example.mp3'} : {})
         };
       })
     };

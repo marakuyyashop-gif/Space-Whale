@@ -1,0 +1,266 @@
+{
+  "source_archive": "B11_M02_L02-L04_P01_available_29.zip",
+  "recordings": [
+    {
+      "id": "B11_M02_L02_P01_01_word",
+      "lesson": 2,
+      "number": 1,
+      "kind": "word",
+      "text": "be under pressure",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_01_word.mp3",
+      "sha256": "a585ab65486d1dd2d1af1604f1ee7f665cea1480be12a2d238be29503f3b1991"
+    },
+    {
+      "id": "B11_M02_L02_P01_01_example",
+      "lesson": 2,
+      "number": 1,
+      "kind": "example",
+      "text": "Daniel is under pressure because his manager needs the report today.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_01_example.mp3",
+      "sha256": "87b26d984bb114fe2223c4dfa4389f5a0b914f9fe99ce6058934b8221244ff52"
+    },
+    {
+      "id": "B11_M02_L02_P01_02_word",
+      "lesson": 2,
+      "number": 2,
+      "kind": "word",
+      "text": "take on responsibility",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_02_word.mp3",
+      "sha256": "807d2924f21686dc8fc3568a3d5ddcfce1518b2b3d4e25662b00727a1f295129"
+    },
+    {
+      "id": "B11_M02_L02_P01_02_example",
+      "lesson": 2,
+      "number": 2,
+      "kind": "example",
+      "text": "Jordan took on responsibility for the project when the manager left.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_02_example.mp3",
+      "sha256": "91961913e5408a3c5ff9ff865d5e46c60793032ea29174713b69376ab40ecee3"
+    },
+    {
+      "id": "B11_M02_L02_P01_03_word",
+      "lesson": 2,
+      "number": 3,
+      "kind": "word",
+      "text": "express concerns",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_03_word.mp3",
+      "sha256": "f2f8d497e9d90c6cff423d6d7240cc1e3a246d4764194d7ab33761e13d9b893a"
+    },
+    {
+      "id": "B11_M02_L02_P01_03_example",
+      "lesson": 2,
+      "number": 3,
+      "kind": "example",
+      "text": "Several employees expressed concerns about working alone at night.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_03_example.mp3",
+      "sha256": "63fb719b8ffbefa641f1e1033ec5f1b707e1168b7a4a5e651cf45ce82c9e771d"
+    },
+    {
+      "id": "B11_M02_L02_P01_04_word",
+      "lesson": 2,
+      "number": 4,
+      "kind": "word",
+      "text": "look into the problem",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_04_word.mp3",
+      "sha256": "45503bfa76cfbfdf27bbe7bf4005e11aa6dec1a73fd8f420d44928929de6a383"
+    },
+    {
+      "id": "B11_M02_L02_P01_04_example",
+      "lesson": 2,
+      "number": 4,
+      "kind": "example",
+      "text": "The payment failed twice, so the manager promised to look into the problem.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_04_example.mp3",
+      "sha256": "43d4db6e63abbdbdc413d7f9c55b153516b302d4fa0479777b9e3fc7daf1564b"
+    },
+    {
+      "id": "B11_M02_L02_P01_05_word",
+      "lesson": 2,
+      "number": 5,
+      "kind": "word",
+      "text": "explore alternatives",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_05_word.mp3",
+      "sha256": "4fb01953f296db93bc986317218ef1bae10203a3200522695cb55078f0a52ac6"
+    },
+    {
+      "id": "B11_M02_L02_P01_05_example",
+      "lesson": 2,
+      "number": 5,
+      "kind": "example",
+      "text": "Renting a larger office was too expensive, so we explored alternatives.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_05_example.mp3",
+      "sha256": "fb2b8137e31560cc1458d1f45ff169fcba03530656e379bfe2c01cd87e888e23"
+    },
+    {
+      "id": "B11_M02_L02_P01_06_word",
+      "lesson": 2,
+      "number": 6,
+      "kind": "word",
+      "text": "reach an agreement",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_06_word.mp3",
+      "sha256": "02aa3a45dceb9d81d604f68ee1c8ed4e05dd81c54264bc2f67447ebf56ed36f1"
+    },
+    {
+      "id": "B11_M02_L02_P01_06_example",
+      "lesson": 2,
+      "number": 6,
+      "kind": "example",
+      "text": "After a long discussion, we reached an agreement on how to share the work.",
+      "path": "assets/lesson-media/b1-1/module-2/l2/p01/B11_M02_L02_P01_06_example.mp3",
+      "sha256": "db5b058cce01b8050195078f09ccfb34794701c87f5f10cb14d72468bc791374"
+    },
+    {
+      "id": "B11_M02_L03_P01_01_word",
+      "lesson": 3,
+      "number": 1,
+      "kind": "word",
+      "text": "disappointed",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_01_word.mp3",
+      "sha256": "30a66679271996ad2e526f2f7816cc049a02c816902218fd067d225c769048df"
+    },
+    {
+      "id": "B11_M02_L03_P01_01_example",
+      "lesson": 3,
+      "number": 1,
+      "kind": "example",
+      "text": "I was disappointed when I didn’t get the job after such a good interview.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_01_example.mp3",
+      "sha256": "e60997423222bb474f05f38c6c41ea39c8ba5bff48bee34a1575e0969a1f8830"
+    },
+    {
+      "id": "B11_M02_L03_P01_02_word",
+      "lesson": 3,
+      "number": 2,
+      "kind": "word",
+      "text": "embarrassed",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_02_word.mp3",
+      "sha256": "0517957cf63f8dc5acbf9b221a48dcdf1585e1dcadbde73bcb52c56c6f368064"
+    },
+    {
+      "id": "B11_M02_L03_P01_02_example",
+      "lesson": 3,
+      "number": 2,
+      "kind": "example",
+      "text": "She felt embarrassed after calling her manager by the wrong name.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_02_example.mp3",
+      "sha256": "4de103921bdb724c2c06070f9cc2052f05dd185b5c4e7941e782a721e7f6b4bf"
+    },
+    {
+      "id": "B11_M02_L03_P01_03_word",
+      "lesson": 3,
+      "number": 3,
+      "kind": "word",
+      "text": "guilty",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_03_word.mp3",
+      "sha256": "4d58d55080c5ac46e689147380643a14c96bb2404887dc146dcbb6dfdceba7fc"
+    },
+    {
+      "id": "B11_M02_L03_P01_03_example",
+      "lesson": 3,
+      "number": 3,
+      "kind": "example",
+      "text": "Ben felt guilty about breaking his friend’s phone and offered to pay for it.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_03_example.mp3",
+      "sha256": "18947ccd874cc92d7ac8aae4e2a5248a554f3426e090544ff707100680b2c73c"
+    },
+    {
+      "id": "B11_M02_L03_P01_04_word",
+      "lesson": 3,
+      "number": 4,
+      "kind": "word",
+      "text": "ashamed",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_04_word.mp3",
+      "sha256": "e7b5e7b8c542510edb746b39a471a61acfb2d59ea135bd1686bf99ad1da001bc"
+    },
+    {
+      "id": "B11_M02_L03_P01_04_example",
+      "lesson": 3,
+      "number": 4,
+      "kind": "example",
+      "text": "I felt ashamed of myself after shouting at a colleague over a small mistake.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_04_example.mp3",
+      "sha256": "bc221d007ccdd9a29e33d8907a0e7622274b4712c6980cebed1cc9d6ea63bee0"
+    },
+    {
+      "id": "B11_M02_L03_P01_05_word",
+      "lesson": 3,
+      "number": 5,
+      "kind": "word",
+      "text": "miserable",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_05_word.mp3",
+      "sha256": "37dd43292bde31be9ae242cb0439dfaaec218012acb246c29df4112d2062b707"
+    },
+    {
+      "id": "B11_M02_L03_P01_05_example",
+      "lesson": 3,
+      "number": 5,
+      "kind": "example",
+      "text": "I felt miserable all weekend after losing my job.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_05_example.mp3",
+      "sha256": "b60f5f0f2be2487d464e530384e3ce305f40c496c9adecfe5aeaec1bcdf981d5"
+    },
+    {
+      "id": "B11_M02_L03_P01_06_word",
+      "lesson": 3,
+      "number": 6,
+      "kind": "word",
+      "text": "betrayed",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_06_word.mp3",
+      "sha256": "2ce3061cd274bb5dafd8c599439694223f8d339ac95c1d9b6e95f94a38c3a62f"
+    },
+    {
+      "id": "B11_M02_L03_P01_06_example",
+      "lesson": 3,
+      "number": 6,
+      "kind": "example",
+      "text": "She felt betrayed when a close friend shared her private messages without asking her.",
+      "path": "assets/lesson-media/b1-1/module-2/l3/p01/B11_M02_L03_P01_06_example.mp3",
+      "sha256": "f44bd7d2bf7f54b808774d78d75671c10b14fc104bab3408040739a3ab380f03"
+    },
+    {
+      "id": "B11_M02_L04_P01_01_word",
+      "lesson": 4,
+      "number": 1,
+      "kind": "word",
+      "text": "independent",
+      "path": "assets/lesson-media/b1-1/module-2/l4/p01/B11_M02_L04_P01_01_word.mp3",
+      "sha256": "7b33c1fbfed279c476aab88b806cca0f06ca8ff0d2dbe91045285d2b92024baf"
+    },
+    {
+      "id": "B11_M02_L04_P01_01_example",
+      "lesson": 4,
+      "number": 1,
+      "kind": "example",
+      "text": "Nina is independent and usually makes important decisions on her own.",
+      "path": "assets/lesson-media/b1-1/module-2/l4/p01/B11_M02_L04_P01_01_example.mp3",
+      "sha256": "393344aa54d0e8226f19fba90fd5ea685625f90a28f0b3af270215615b4a242d"
+    },
+    {
+      "id": "B11_M02_L04_P01_02_word",
+      "lesson": 4,
+      "number": 2,
+      "kind": "word",
+      "text": "reliable",
+      "path": "assets/lesson-media/b1-1/module-2/l4/p01/B11_M02_L04_P01_02_word.mp3",
+      "sha256": "d5708efefacaa1814dcdc0d531df31aa1da75ae40069196bf426332733a56858"
+    },
+    {
+      "id": "B11_M02_L04_P01_02_example",
+      "lesson": 4,
+      "number": 2,
+      "kind": "example",
+      "text": "Leo is reliable and always finishes the work he promises to do.",
+      "path": "assets/lesson-media/b1-1/module-2/l4/p01/B11_M02_L04_P01_02_example.mp3",
+      "sha256": "a8684dd6f2ada8a40dc78cbb2440226d90c491b7cdf553b8b8be6997b7fa7043"
+    },
+    {
+      "id": "B11_M02_L04_P01_03_word",
+      "lesson": 4,
+      "number": 3,
+      "kind": "word",
+      "text": "competitive",
+      "path": "assets/lesson-media/b1-1/module-2/l4/p01/B11_M02_L04_P01_03_word.mp3",
+      "sha256": "a0ef166e9ac4b82beca5e3594696a7568e59af013389c5cc1db01a1ae245c9fe"
+    }
+  ]
+}
