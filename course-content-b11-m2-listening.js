@@ -9,13 +9,13 @@
   {
     "id": "B11_M02_L01_LISTENING_MASTER",
     "title": "Too late to apply",
-    "audio": null,
+    "audio": "assets/lesson-media/b1-1/module-2/l1/listening/l01-dialogue.mp3",
     "script": "Alex: I got an email from the training program today. They said my application was too late.\n\nNina: Oh no. What happened?\n\nAlex: I postponed the decision because I wasn’t sure about the course. By the time I tried to submit the application, the deadline had passed. I missed the opportunity.\n\nNina: That’s frustrating.\n\nAlex: If I hadn’t postponed the decision, I would have submitted the application on time. I wouldn’t have missed the opportunity if I had submitted it on time.\n\nNina: Were you still taking the qualification course then?\n\nAlex: Yes, but I was facing difficulties at work, so I didn’t finish it.\n\nNina: I see.\n\nAlex: I would have gotten the qualification if I hadn’t faced so many difficulties. I would have achieved my goal much earlier if I had finished the course."
   },
   {
     "id": "B11_M02_L02_LISTENING_MASTER",
     "title": "A difficult project",
-    "audio": null,
+    "audio": "assets/lesson-media/b1-1/module-2/l2/listening/l02-dialogue.mp3",
     "script": "Dana: That meeting was difficult. You looked under pressure.\n\nBen: I was. The manager asked me to take on responsibility for the whole project.\n\nDana: Would you have taken on the responsibility if you’d known how many problems there were?\n\nBen: No, I wouldn’t have. I’d have expressed my concerns first.\n\nDana: What would you have done if the manager had listened?\n\nBen: I’d have asked the team to look into the problem and explore alternatives.\n\nDana: Would you have tried to reach an agreement before changing the plan?\n\nBen: Yes, I would have. I think the team would have agreed if we’d had more time."
   },
   {

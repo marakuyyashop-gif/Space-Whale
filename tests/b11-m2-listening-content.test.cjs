@@ -35,12 +35,16 @@ test('Listening is the last Lexis / Grammar entry in all four final classroom le
  }
 });
 
-test('five approved source templates have correct keys, four pending masters and shared L4 recording',()=>{
+test('five approved source templates retain keys, supplied L1/L2 audio and shared L4 recording',()=>{
  const {app}=fixture(),all=selected(app).flatMap(l=>walk(stage(l).exercise));
  const groups=all.filter(d=>d.templateCode&&d.kind==='stage');assert.deepEqual(plain(groups.map(d=>d.templateCode)),['L01','L12','L13','L02','L09']);
  const audio=all.filter(d=>d.kind==='audio');assert.equal(audio.length,5);assert.equal(new Set(audio.map(d=>d.recordingId)).size,4);
  assert.deepEqual(plain(audio.map(d=>d.authorTranscript.split('\n\n').length)),[9,8,10,11,11]);
- for(const d of audio){assert.equal(d.audioPending,true);assert.equal(d.audio,undefined);assert.equal(d.transcript,undefined);}
+ for(const [i,d] of audio.entries()){
+  assert.equal(d.audioPending,i>=2);assert.equal(d.transcript,undefined);
+  if(i<2){assert.equal(d.audio,`assets/lesson-media/b1-1/module-2/l${i+1}/listening/l0${i+1}-dialogue.mp3`);assert.ok(fs.existsSync(path.join(root,d.audio)));}
+  else assert.equal(d.audio,undefined);
+ }
  assert.equal(audio[3].authorTranscript,audio[4].authorTranscript);
  for(const group of groups){
   for(const d of walk(kit.templates.resolve(group)))assert.equal(kit.templates.profileFor(d.templateCode,d.kind,d.templatePart).supported,true);
@@ -55,7 +59,7 @@ test('five approved source templates have correct keys, four pending masters and
  assert.equal(groups[3].exercises[1].exercise.items[0].correctId,'B');
 });
 
-test('shared players remain disabled and scripts wait for the response, with no L4 gist transcript',()=>{
+test('supplied dialogue players are enabled, missing players stay disabled and scripts wait for responses',()=>{
  const {app}=fixture();
  for(const lesson of selected(app)){
   const def=stage(lesson).exercise;
@@ -63,8 +67,9 @@ test('shared players remain disabled and scripts wait for the response, with no 
    const {document}=parseHTML('<html><body><main></main></body></html>'),host=document.querySelector('main');
    const handle=kit.mount(host,group,{syncChecks:true}),task=group.exercises[1].exercise;
    for(const media of host.querySelectorAll('audio'))media.pause=()=>{};
-   assert.equal(host.querySelectorAll('audio[src]').length,0);
-   const players=[...host.querySelectorAll('.ek-audio-play')];assert.equal(players.length,1);assert.ok(players.every(p=>p.disabled));
+   const available=Boolean(group.exercises[0].exercise.audio);
+   assert.equal([...host.querySelectorAll('audio')].filter(media=>media.src).length,available?1:0);
+   const players=[...host.querySelectorAll('.ek-audio-play')];assert.equal(players.length,1);assert.equal(players[0].disabled,!available);
    const disclosure=host.querySelector('details');
    if(group.templateCode==='L02'){assert.equal(disclosure,null);handle.destroy();continue;}
    assert.ok(disclosure);assert.equal(visible(disclosure),false);
