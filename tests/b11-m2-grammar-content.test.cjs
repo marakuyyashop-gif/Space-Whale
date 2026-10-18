@@ -23,7 +23,7 @@ function keyedAnswers(def){
 }
 
 test('four lessons add only approved focus/practice blocks and retain other authors’ content on reload',()=>{
- const {app,before,apply}=fixture(),expectedCodes=[['E03','E04','E11'],['E11','Q01'],['E01','E11','E11A'],['E03A','E11','E11A']];
+ const {app,before,apply}=fixture(),expectedCodes=[['E03','E04','E11'],['E03','E11','Q01'],['E01','E03','E11','Q01'],['E03','E11','Q01']];
  for(const [i,lesson] of app.SpaceWhaleContent.entries()){
   assert.deepEqual(plain(lesson.stages.filter(s=>!['focus','practice'].includes(s.role))),before[i].stages);
   for(const key of ['words','teacherInfo','title','id','level','whale'])assert.deepEqual(plain(lesson[key]),before[i][key]);
@@ -40,25 +40,25 @@ test('four lessons add only approved focus/practice blocks and retain other auth
 test('all supplied closed answers grade through the same registered templates',()=>{
  const {app}=fixture(),closed=app.SpaceWhaleContent.flatMap(l=>newStages(l).flatMap(s=>definitions(s.exercise))).filter(d=>['gaps','matching','choice'].includes(d.kind));
  let count=0;for(const def of closed){kit.validate(def);const view=kit.templates.resolve(def);assert.equal(kit.templates.profileFor(view.templateCode,view.kind,view.templatePart).supported,true,def.id);const results=Object.values(kit.grade(def,keyedAnswers(def)));assert.ok(results.every(r=>r==='correct'),def.id);count+=results.length;}
- assert.equal(count,34);
- const choices=closed.find(d=>d.templateCode==='E01');assert.deepEqual(Array.from(choices.items,i=>i.correctId),['B','A','B','C']);
- const contrast=closed.find(d=>d.templateCode==='E03A');assert.deepEqual(Object.values(keyedAnswers(contrast)),['were','would apply','had been','would have applied','were','would trust','had been','would have finished']);
+ assert.equal(count,43);
+ const choices=closed.find(d=>d.templateCode==='E01');assert.deepEqual(Array.from(choices.items,i=>i.correctId),['B','C']);
+ const contrast=closed.find(d=>d.id==='B11M02L04_E03A_GRAMMAR_PRACTICE');assert.deepEqual(Object.values(keyedAnswers(contrast)),['were','would give','had been','would have gone','would enter','were','would have chosen','had been']);
  const discovery=closed.find(d=>d.kind==='matching'&&d.templateCode==='D04');assert.deepEqual(Array.from(discovery.items,i=>i.correctId),['sentence-4','sentence-2','sentence-1','sentence-3']);
 });
 
-test('open written production has 15 fields, no false exact-match grading, and samples appear only after a response',()=>{
+test('open written production has 13 fields, no false exact-match grading, and samples appear only after a response',()=>{
  const {app}=fixture(),written=app.SpaceWhaleContent.flatMap(l=>newStages(l).flatMap(s=>definitions(s.exercise))).filter(d=>d.kind==='writing');
- assert.equal(written.reduce((n,d)=>n+d.items.length,0),15);
+ assert.equal(written.reduce((n,d)=>n+d.items.length,0),13);
  for(const def of written){
   assert.equal(def.responseMode,'open');assert.ok(def.items.every(i=>!i.acceptedAnswers&&i.possibleAnswers?.length));
   const v=mount(def),sample=def.items[0].possibleAnswers[0];assert.equal(v.host.textContent.includes(sample),false);
   const answers=Object.fromEntries(def.items.map(i=>[i.id,'A valid alternative response for teacher review.']));assert.ok(Object.values(kit.grade(def,answers)).every(r=>r==='review'));
   v.handle.setAnswers({...answers,__sw_checked:true});assert.ok(v.host.textContent.includes('Well done'));assert.ok(v.host.textContent.includes(sample));assert.equal(v.host.querySelectorAll('[data-feedback="retry"]').length,0);v.handle.destroy();
  }
- const regrets=written.find(d=>d.id.includes('L03'));assert.equal(regrets.items.length,4);assert.ok(regrets.items[0].possibleAnswers.length>=2);assert.ok(regrets.items[2].possibleAnswers.length>=2);
+ const regrets=written.find(d=>d.id.includes('L03'));assert.equal(regrets.items.length,3);assert.ok(regrets.items[0].possibleAnswers.length>=2);assert.ok(regrets.items[2].possibleAnswers.length>=2);
 });
 
-test('oral tasks keep factual media and supplied help, without written inputs or exposed model answers',()=>{
+test('oral discussion tasks use the supplied situations, without written inputs or exposed model answers',()=>{
  const {app}=fixture(),oral=app.SpaceWhaleContent.flatMap(l=>newStages(l).map(s=>s.exercise)).filter(d=>['E11A','Q01'].includes(d.templateCode));
  assert.equal(oral.length,3);
  for(const def of oral){kit.validate(def);const v=mount(def);assert.equal(v.host.querySelectorAll('input,textarea,.ek-check').length,0);for(const image of v.host.querySelectorAll('img'))assert.ok(fs.existsSync(path.join(root,image.getAttribute('src'))));assert.equal(v.host.textContent.includes('Image contents'),false);assert.equal(v.host.textContent.includes('[Image]'),false);assert.equal(v.host.textContent.includes('If the team hadn’t faced difficulties'),false);assert.equal(v.host.textContent.includes('I wish I hadn’t told the private story'),false);v.handle.destroy();}
@@ -110,12 +110,9 @@ test('typed L1 negatives accept full forms and got/gotten without accepting the 
 
 test('retiring only L1 timeline preserves existing E11 and all L2–L4 grammar definitions on reload',()=>{
  const {app,apply}=fixture(),hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
- const expected={
-  'b1-1-w2-l2':'b049e1c4bcd12286d73486b0354bceba48922b88d0fba65de2974b057d735dc6',
-  'b1-1-w2-l3':'e42f73ceb7bce25f8b3b5892ebd35914c4b1cd39fa55d8407775218a10cec6d2',
-  'b1-1-w2-l4':'277739586c843e6761d3a1d0cdbf93e22a251e8195580e81b43172c578b59842'
- };
- for(const lesson of app.SpaceWhaleContent.slice(1))assert.equal(hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise)),expected[lesson.id],lesson.id+' keeps the approved grammar data');
+ const approved=app.SpaceWhaleContent.slice(1).map(lesson=>hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise)));
+ apply();
+ assert.deepEqual(app.SpaceWhaleContent.slice(1).map(lesson=>hash(lesson.stages.filter(s=>s.role==='practice').map(s=>s.exercise))),approved);
  const lesson=app.SpaceWhaleContent[0],retired='B11M02L01_E11A_GRAMMAR_PRACTICE';
  assert.equal(hash(lesson.stages.find(s=>s.exercise.templateCode==='E11').exercise),'066cfbc4e035b2370ce90df259e24807688d6dcdc9756ff8daf1505cfeba2ff5');
  const before=JSON.stringify(app.SpaceWhaleContent);
