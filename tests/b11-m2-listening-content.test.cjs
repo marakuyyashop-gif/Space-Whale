@@ -35,15 +35,16 @@ test('Listening is the last Lexis / Grammar entry in all four final classroom le
  }
 });
 
-test('five approved source templates retain keys, supplied L1/L2 audio and shared L4 recording',()=>{
+test('five approved source templates retain keys, supplied L1–L4 audio and shared L4 recording',()=>{
  const {app}=fixture(),all=selected(app).flatMap(l=>walk(stage(l).exercise));
  const groups=all.filter(d=>d.templateCode&&d.kind==='stage');assert.deepEqual(plain(groups.map(d=>d.templateCode)),['L01','L12','L13','L02','L09']);
  const audio=all.filter(d=>d.kind==='audio');assert.equal(audio.length,5);assert.equal(new Set(audio.map(d=>d.recordingId)).size,4);
  assert.deepEqual(plain(audio.map(d=>d.authorTranscript.split('\n\n').length)),[9,8,10,11,11]);
  for(const [i,d] of audio.entries()){
-  assert.equal(d.audioPending,i>=2);assert.equal(d.transcript,undefined);
-  if(i<2){assert.equal(d.audio,`assets/lesson-media/b1-1/module-2/l${i+1}/listening/l0${i+1}-dialogue.mp3`);assert.ok(fs.existsSync(path.join(root,d.audio)));}
-  else assert.equal(d.audio,undefined);
+  const number=Math.min(i+1,4);
+  assert.equal(d.audioPending,false);assert.equal(d.transcript,undefined);
+  assert.equal(d.audio,`assets/lesson-media/b1-1/module-2/l${number}/listening/l0${number}-dialogue.mp3`);
+  assert.ok(fs.existsSync(path.join(root,d.audio)));
  }
  assert.equal(audio[3].authorTranscript,audio[4].authorTranscript);
  for(const group of groups){
@@ -59,7 +60,7 @@ test('five approved source templates retain keys, supplied L1/L2 audio and share
  assert.equal(groups[3].exercises[1].exercise.items[0].correctId,'B');
 });
 
-test('supplied dialogue players are enabled, missing players stay disabled and scripts wait for responses',()=>{
+test('all supplied dialogue players are enabled and scripts wait for responses',()=>{
  const {app}=fixture();
  for(const lesson of selected(app)){
   const def=stage(lesson).exercise;

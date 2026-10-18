@@ -21,13 +21,13 @@
   {
     "id": "B11_M02_L03_LISTENING_MASTER",
     "title": "A bad evening",
-    "audio": null,
+    "audio": "assets/lesson-media/b1-1/module-2/l3/listening/l03-dialogue.mp3",
     "script": "Kate: You seem really upset. What happened?\n\nLeo: The team dinner went badly. I called my manager by the wrong name in front of everyone. I was so embarrassed.\n\nKate: Oh no. Did anything else happen?\n\nLeo: I told Sam I had finished my part of the project, but I hadn’t. I felt guilty, and I was ashamed of how I behaved.\n\nKate: Did you talk to him afterward?\n\nLeo: No. I wish I’d apologized right away. If I’d apologized then, he would have understood.\n\nKate: And why do you look so miserable now?\n\nLeo: I told a friend something private, and he shared it with other people. I felt betrayed. If only I hadn’t trusted him with it.\n\nKate: That’s a difficult evening.\n\nLeo: Yeah. I wish I had handled everything differently."
   },
   {
     "id": "B11_M02_L04_LISTENING_MASTER",
     "title": "The team leader",
-    "audio": null,
+    "audio": "assets/lesson-media/b1-1/module-2/l4/listening/l04-dialogue.mp3",
     "script": "Nina: Are you still thinking about applying for team leader?\n\nBen: Yes, but I don’t think I’m self-confident enough in big meetings.\n\nNina: If you were more self-confident, you would apply for the role. You’re determined, and everyone says you’re reliable.\n\nBen: Maybe. Last year I had the chance to lead a project, but I said no.\n\nNina: If you’d been more self-confident then, you would have taken the project.\n\nBen: That’s true. I also depended on my manager for every small decision.\n\nNina: If you’d been more independent, you would have made more decisions yourself.\n\nBen: Probably. Mark wants the role too. He’s very competitive.\n\nNina: And a little stubborn.\n\nBen: Definitely. If he were less stubborn, he would listen to the team more.\n\nNina: Last year he refused to change his plan several times. If he hadn’t been so stubborn, the team would have finished earlier."
   }
 ];
