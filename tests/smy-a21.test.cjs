@@ -23,7 +23,11 @@ function setup(def,config={}){
 function walk(def,fn){fn(def);for(const b of def.exercises||[])walk(b.exercise,fn);for(const b of def.blocks||[])if(b.exercise)walk(b.exercise,fn);}
 test('two Smy lessons append to A2.1 module 1 without replacing existing lessons',()=>{
  const catalog=require('../workspace-catalog.js').createCatalog(app.SpaceWhaleContent,[]);
- assert.deepEqual(Array.from(catalog.topics({view:'library',level:'A2.1',whale:1}),l=>l.title),['Уроки для Smy 1','Уроки для Smy 2']);
+ const topics=catalog.topics({view:'library',level:'A2.1',whale:1});
+ assert.deepEqual(Array.from(topics.filter(l=>/^a2-1-w1-smy-/.test(l.id)),l=>l.title),['Уроки для Smy 1','Уроки для Smy 2']);
+ assert.deepEqual(topics.slice(0,3).map(l=>[l.id,l.title]),[
+  ['a2-1-w1-l1','Старые фотографии'],['a2-1-w1-l2','Городские места'],['a2-1-w1-l3','Старый район']
+ ]);
  for(const [i,l] of lessons.entries()){
   assert.equal(l.level,'A2.1');assert.equal(l.whale,1);assert.equal(l.stages.length,7+i);
   assert.equal(l.stages.reduce((sum,s)=>sum+parseFloat(s.guide.time),0),28);assert.equal(l.feedback.minutes,2);assert.equal(l.durationMinutes,30);
